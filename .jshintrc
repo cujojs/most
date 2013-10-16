@@ -1,0 +1,28 @@
+{
+	"browser": true,
+	"node": true,
+
+	"globals": {
+		"define": true
+	},
+
+	"boss": true,
+	"curly": true,
+	"eqnull": true,
+	"expr": true,
+	"globalstrict": false,
+	"laxbreak": true,
+	"newcap": true,
+	"noarg": true,
+	"noempty": true,
+	"nonew": true,
+	"quotmark": "single",
+	"strict": false,
+	"sub": true,
+	"trailing": true,
+	"undef": true,
+	"unused": true,
+
+	"maxdepth": 3,
+	"maxcomplexity": 5
+}
