@@ -4,7 +4,7 @@
   "description": "Simple, fast, monadic streams",
   "main": "stream.js",
   "scripts": {
-    "test": "buster-test"
+    "test": "buster test"
   },
   "keywords": [
     "stream",
@@ -14,5 +14,8 @@
     "functional"
   ],
   "author": "brian@hovercraftstudios.com",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "test-support": "~0.3.2"
+  }
 }
