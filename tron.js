@@ -1,3 +1,13 @@
+/** @license MIT License (c) copyright 2010-2013 original author or authors */
+
+/**
+ * Licensed under the MIT License at:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ * @author: Brian Cavalier
+ * @author: John Hann
+ */
+
 // TODO: take, takeWhile, takeUntil, drop, dropWhile, takeUntil
 // TODO: streams from iterable/iterator/generator
 // TODO: move delay?
@@ -49,13 +59,24 @@ function fromPromise(promise) {
 }
 
 Object.keys(Stream.prototype).reduce(function(exports, key) {
-	if(!(key in exports)) {
-		exports[key] = function() {
-			var args = Array.prototype.slice.call(arguments);
-			var stream = args.pop();
-			return proto[key].apply(stream, args);
-		};
+	var method = Stream.prototype[key];
 
-		return exports;
+	if(typeof method === 'function') {
+		exports[key] = curry([], method.length + 1, function(args) {
+			return method.apply(args.pop(), args);
+		});
 	}
-}, exports);
+
+	return exports;
+}, create);
+
+var slice = [].slice;
+function curry(args, arity, f) {
+	return function() {
+		var accumulated = args.concat(slice.call(arguments));
+
+		return accumulated.length < arity
+			? curry(accumulated, arity, f)
+			: f(accumulated);
+	};
+}

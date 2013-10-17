@@ -1,3 +1,13 @@
+/** @license MIT License (c) copyright 2010-2013 original author or authors */
+
+/**
+ * Licensed under the MIT License at:
+ * http://www.opensource.org/licenses/mit-license.php
+ *
+ * @author: Brian Cavalier
+ * @author: John Hann
+ */
+
 module.exports = Stream;
 
 Stream.of = of;
@@ -48,10 +58,11 @@ proto.ap = function(stream2) {
 };
 
 proto.flatMap = function(f) {
-	return join(this.map(f));
-}
+	return this.map(f).flatten();
+};
 
-function join(self) {
+proto.flatten = function() {
+	var self = this;
 	return new Stream(function(next, end) {
 		self.each(function(inner) {
 			inner.each(next, end);
@@ -85,7 +96,7 @@ proto.concat = function(other) {
 			e ? (end && end(e)) : other.each(next, end);
 		});
 	});
-}
+};
 
 proto.tap = function(f) {
 	var stream = this._emitter;
@@ -108,7 +119,7 @@ proto.delay = function(ms) {
 	});
 };
 
-proto.catch = function(f) {
+proto['catch'] = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(next, function(e1) {
