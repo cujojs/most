@@ -1,12 +1,14 @@
 {
-  "name": "tron",
+  "name": "most",
   "version": "0.1.0",
-  "description": "Simple, fast, monadic streams",
-  "main": "stream.js",
+  "description": "Monadic streams",
+  "main": "most.js",
   "scripts": {
     "test": "buster test"
   },
   "keywords": [
+    "cujojs",
+    "cujo",
     "stream",
     "streams",
     "monad",
