@@ -40,7 +40,7 @@ describe('Stream', function() {
 			expect(spyEnd).toHaveBeenCalledOnce();
 		});
 	});
-	
+
 	describe('catch', function() {
 		it('should catch errors', function() {
 			var s1 = Stream.of({}).map(function() {

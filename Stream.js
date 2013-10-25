@@ -26,7 +26,7 @@ function of(x) {
 			error = e;
 		}
 
-		streamEnd(end, error);
+		callSafely(end, error);
 	});
 }
 
@@ -49,7 +49,7 @@ proto.each = function(next, end) {
 	var endCalled;
 
 	function safeNext(x) {
-		self.ended || (next && next(x));
+		self.ended || callSafely(next, x);
 	}
 
 	function safeEnd(e) {
@@ -58,7 +58,7 @@ proto.each = function(next, end) {
 		}
 
 		endCalled = true;
-		streamEnd(end, e);
+		callSafely(end, e);
 	}
 
 	this._emitter(safeNext, safeEnd);
@@ -115,7 +115,7 @@ proto.concat = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(next, function(e) {
-			e ? streamEnd(end, e) : other.each(next, end);
+			e ? callSafely(end, e) : other.each(next, end);
 		});
 	});
 };
@@ -155,7 +155,7 @@ proto['catch'] = function(f) {
 			}
 
 			if(error != null) {
-				streamEnd(end, error);
+				callSafely(end, error);
 			}
 		});
 	});
@@ -171,7 +171,7 @@ proto.reduce = function(f, initial) {
 			if(e == null) {
 				next(value);
 			}
-			streamEnd(end, e);
+			callSafely(end, e);
 		});
 	});
 };
@@ -182,7 +182,7 @@ proto.scan = function(f, initial) {
 	});
 };
 
-function streamEnd(end, e) {
+function callSafely(end, e) {
 	return end && end(e);
 }
 
