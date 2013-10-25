@@ -26,7 +26,7 @@ function of(x) {
 			error = e;
 		}
 
-		end && end(error);
+		streamEnd(end, error);
 	});
 }
 
@@ -40,6 +40,30 @@ var proto = Stream.prototype = {};
 
 proto.constructor = Stream;
 
+proto.end = function() {
+	this.ended = true;
+};
+
+proto.each = function(next, end) {
+	var self = this;
+	var endCalled;
+
+	function safeNext(x) {
+		self.ended || (next && next(x));
+	}
+
+	function safeEnd(e) {
+		if(endCalled) {
+			return;
+		}
+
+		endCalled = true;
+		streamEnd(end, e);
+	}
+
+	this._emitter(safeNext, safeEnd);
+};
+
 proto.map = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
@@ -51,23 +75,21 @@ proto.map = function(f) {
 
 proto.ap = function(stream2) {
 	return this.flatMap(function(f) {
-		return stream2.map(function(x) {
-			return f(x);
-		});
+		return stream2.map(f);
 	});
 };
 
 proto.flatMap = function(f) {
-	return this.map(f).flatten();
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			f(x).each(next, end);
+		}, end);
+	});
 };
 
 proto.flatten = function() {
-	var self = this;
-	return new Stream(function(next, end) {
-		self.each(function(inner) {
-			inner.each(next, end);
-		}, end);
-	});
+	return this.flatMap(identity);
 };
 
 proto.filter = function(predicate) {
@@ -81,19 +103,19 @@ proto.filter = function(predicate) {
 
 proto.merge = function(other) {
 	// TODO: Should this accept an array?  a stream of streams?
-	var self = this;
+	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		self.each(next, end);
+		stream(next, end);
 		other.each(next, end);
 	});
 };
 
 proto.concat = function(other) {
 	// TODO: Should this accept an array?  a stream of streams?
-	var self = this;
+	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		self.each(next, function(e) {
-			e ? (end && end(e)) : other.each(next, end);
+		stream(next, function(e) {
+			e ? streamEnd(end, e) : other.each(next, end);
 		});
 	});
 };
@@ -124,7 +146,7 @@ proto['catch'] = function(f) {
 	return new Stream(function(next, end) {
 		stream(next, function(e1) {
 			var error;
-			if(e1) {
+			if(e1 != null) {
 				try {
 					next(f(e1));
 				} catch(e2) {
@@ -132,15 +154,11 @@ proto['catch'] = function(f) {
 				}
 			}
 
-			if(error) {
-				end && end(error);
+			if(error != null) {
+				streamEnd(end, error);
 			}
 		});
 	});
-};
-
-proto.each = function(next, end) {
-	this._emitter(next, end);
 };
 
 proto.reduce = function(f, initial) {
@@ -150,12 +168,10 @@ proto.reduce = function(f, initial) {
 		stream(function(x) {
 			value = f(value, x);
 		}, function(e) {
-			if(e) {
-				end && end(e);
-			} else {
+			if(e == null) {
 				next(value);
-				end && end();
 			}
+			streamEnd(end, e);
 		});
 	});
 };
@@ -165,3 +181,11 @@ proto.scan = function(f, initial) {
 		return initial = f(initial, x);
 	});
 };
+
+function streamEnd(end, e) {
+	return end && end(e);
+}
+
+function identity(x) {
+	return x;
+}

@@ -47,9 +47,21 @@ function fromItems() {
 }
 
 function fromEventTarget(eventTarget, eventType) {
-	return new Stream(function(next) {
-		eventTarget.addEventListener(eventType, next, false);
+	var stream = new Stream(eventTargetHandler);
+	var safeNext;
+
+	return Object.create(stream, {
+		end: { value: function() {
+			if(safeNext) {
+				eventTarget.removeEventListener(eventType, safeNext);
+			}
+		}}
 	});
+
+	function eventTargetHandler(next) {
+		safeNext = next;
+		eventTarget.addEventListener(eventType, safeNext, false);
+	}
 }
 
 function fromPromise(promise) {
