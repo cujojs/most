@@ -1,4 +1,5 @@
 require('buster').spec.expose();
+var expect = require('buster').expect;
 
 var Stream = require('../Stream');
 var sentinel = { value: 'sentinel' };
@@ -28,6 +29,22 @@ describe('Stream', function() {
 			expect(spy).toHaveBeenCalledOnceWith(sentinel);
 			expect(spy).not.toHaveBeenCalledTwice();
 		});
+	});
+
+	describe('catch', function() {
+		it('should catch errors', function() {
+			var s1 = Stream.of({}).map(function() {
+				throw sentinel;
+			});
+
+			var s2 = s1.catch(function(x) {
+				return x;
+			});
+
+			s2.each(function(x) {
+				expect(x).toBe(sentinel);
+			});
+		})
 	});
 
 	describe('map', function() {

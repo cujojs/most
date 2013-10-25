@@ -4,7 +4,11 @@
   "description": "Monadic streams",
   "main": "most.js",
   "scripts": {
-    "test": "buster test"
+    "test": "buster-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://npmjs.org/package/most"
   },
   "keywords": [
     "cujojs",
@@ -18,6 +22,6 @@
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
   "dependencies": {
-    "test-support": "~0.3.2"
+    "buster": "~0.7"
   }
 }
