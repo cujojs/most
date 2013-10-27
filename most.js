@@ -13,6 +13,7 @@
 // TODO: move delay?
 
 var Stream = require('./Stream');
+var async = require('./async');
 
 module.exports = create;
 
@@ -29,16 +30,28 @@ function create(emitter) {
 
 function fromArray(array) {
 	return new Stream(function(next, end) {
-		var error;
-		try {
-			array.forEach(function(x) {
-				next(x);
-			});
-		} catch(e) {
-			error = e;
-		}
+		var subscribed = true;
 
-		end && end(error);
+		async(function() {
+			if(!subscribed) {
+				return;
+			}
+
+			var error;
+			try {
+				array.forEach(function(x) {
+					next(x);
+				});
+			} catch(e) {
+				error = e;
+			}
+
+			end && end(error);
+		});
+
+		return function() {
+			subscribed = false;
+		}
 	});
 }
 
@@ -47,26 +60,37 @@ function fromItems() {
 }
 
 function fromEventTarget(eventTarget, eventType) {
-	var stream = new Stream(eventTargetHandler);
-	var safeNext;
+	return new Stream(function(next) {
+		eventTarget.addEventListener(eventType, next, false);
 
-	return Object.create(stream, {
-		end: { value: function() {
-			if(safeNext) {
-				eventTarget.removeEventListener(eventType, safeNext);
-			}
-		}}
+		return function() {
+			eventTarget.removeEventListener(eventType, next, false);
+		};
 	});
-
-	function eventTargetHandler(next) {
-		safeNext = next;
-		eventTarget.addEventListener(eventType, safeNext, false);
-	}
 }
 
 function fromPromise(promise) {
 	return new Stream(function(next, end) {
-		promise.then(next, end);
+		var subscribed = true;
+
+		function safeNext(x) {
+			subscribed && next(x);
+		}
+
+		function safeEnd(e) {
+			if(subscribed) {
+				subscribed = false;
+				end && end(e);
+			}
+		}
+
+		promise.then(safeNext).then(
+			function() { safeEnd(); },
+			safeEnd);
+
+		return function() {
+			subscribed = false;
+		};
 	});
 }
 

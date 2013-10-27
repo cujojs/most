@@ -8,6 +8,8 @@
  * @author: John Hann
  */
 
+var async = require('./async');
+
 module.exports = Stream;
 
 Stream.of = of;
@@ -19,20 +21,32 @@ function Stream(emitter) {
 
 function of(x) {
 	return new Stream(function(next, end) {
-		var error;
-		try {
-			next(x);
-		} catch(e) {
-			error = e;
-		}
+		var subscribed = true;
 
-		callSafely(end, error);
+		async(function() {
+			if(!subscribed) {
+				return;
+			}
+
+			var error;
+			try {
+				next(x);
+			} catch(e) {
+				error = e;
+			}
+
+			callSafely(end, error);
+
+			return function() {
+				subscribed = false;
+			}
+		});
 	});
 }
 
 function empty() {
 	return new Stream(function(next, end) {
-		end();
+		async(end);
 	});
 }
 
@@ -40,28 +54,8 @@ var proto = Stream.prototype = {};
 
 proto.constructor = Stream;
 
-proto.end = function() {
-	this.ended = true;
-};
-
 proto.each = function(next, end) {
-	var self = this;
-	var endCalled;
-
-	function safeNext(x) {
-		self.ended || callSafely(next, x);
-	}
-
-	function safeEnd(e) {
-		if(endCalled) {
-			return;
-		}
-
-		endCalled = true;
-		callSafely(end, e);
-	}
-
-	this._emitter(safeNext, safeEnd);
+	return this._emitter(next, end);
 };
 
 proto.map = function(f) {
@@ -141,6 +135,39 @@ proto.delay = function(ms) {
 	});
 };
 
+proto.debounce = function(interval) {
+	var nextEventTime = interval;
+	var stream = this._emitter;
+
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			var now = Date.now();
+			if(now >= nextEventTime) {
+				nextEventTime = now + interval;
+				next(x);
+			}
+		}, end);
+	});
+};
+
+proto.throttle = function(interval) {
+	var cachedEvent, throttled;
+	var stream = this._emitter;
+
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			cachedEvent = x;
+
+			if(!throttled) {
+				throttled = setTimeout(function() {
+					throttled = void 0;
+					next(x);
+				}, interval);
+			}
+		}, end);
+	});
+};
+
 proto['catch'] = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
@@ -182,8 +209,8 @@ proto.scan = function(f, initial) {
 	});
 };
 
-function callSafely(end, e) {
-	return end && end(e);
+function callSafely(f, x) {
+	return f && f(x);
 }
 
 function identity(x) {

@@ -5,44 +5,26 @@ var Stream = require('../Stream');
 var sentinel = { value: 'sentinel' };
 
 describe('Stream', function() {
+
 	describe('each', function() {
 		it('should call emitter', function() {
 			var spy = this.spy();
 
-			new Stream(spy).each(noop, noop);
+			new Stream(spy).each(function() {});
 			expect(spy).toHaveBeenCalled();
-
-			function noop() {}
 		});
 	});
 
 	describe('of', function() {
-		it('should create a stream of one item', function() {
-			var s = Stream.of(sentinel);
-			var spy = this.spy();
-			s.each(spy);
-
-			expect(spy).toHaveBeenCalledOnceWith(sentinel);
-			expect(spy).not.toHaveBeenCalledTwice();
-		});
-	});
-
-	describe('end', function() {
-		it('should prevent more events', function() {
-			var s = Stream.of(sentinel);
-
-			var spyNext = this.spy();
-			var spyEnd = this.spy();
-			s.end();
-			s.each(spyNext, spyEnd);
-
-			expect(spyNext).not.toHaveBeenCalled();
-			expect(spyEnd).toHaveBeenCalledOnce();
+		it('should create a stream of one item', function(done) {
+			Stream.of(sentinel).each(done(function(x) {
+				expect(x).toBe(sentinel);
+			}));
 		});
 	});
 
 	describe('catch', function() {
-		it('should catch errors', function() {
+		it('should catch errors', function(done) {
 			var s1 = Stream.of({}).map(function() {
 				throw sentinel;
 			});
@@ -51,9 +33,9 @@ describe('Stream', function() {
 				return x;
 			});
 
-			s2.each(function(x) {
+			s2.each(done(function(x) {
 				expect(x).toBe(sentinel);
-			});
+			}));
 		})
 	});
 
@@ -66,27 +48,16 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 		});
 
-		it('should be lazy', function() {
+		it('should transform stream items', function(done) {
 			var s = Stream.of();
-			var spy = this.spy();
 
-			s = s.map(spy);
-			expect(spy).not.toHaveBeenCalled();
-
-			s.each(function() {
-				expect(spy).toHaveBeenCalled();
-			});
-		});
-
-		it('should transform stream items', function() {
-			var expected = {};
-			var s = Stream.of(sentinel).map(function(x) {
-				expect(x).toBe(sentinel);
-				return expected;
+			s = s.map(function() {
+				return sentinel;
 			});
 
 			s.each(function(x) {
-				expect(x).toBe(expected);
+				expect(x).toBe(sentinel);
+				done();
 			});
 		});
 	});
@@ -100,19 +71,20 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 		});
 
-		it('should be lazy', function() {
+		it('should be lazy', function(done) {
 			var s = Stream.of();
-			var spy = this.spy();
 
-			s = s.flatMap(spy);
-			expect(spy).not.toHaveBeenCalled();
+			s = s.flatMap(function() {
+				return Stream.of(sentinel);
+			});
 
-			s.each(function() {
-				expect(spy).toHaveBeenCalled();
+			s.each(function(x) {
+				expect(x).toBe(sentinel);
+				done();
 			});
 		});
 
-		it('should transform stream items', function() {
+		it('should transform stream items', function(done) {
 			var a = {};
 			var b = {};
 			function f() {
@@ -131,22 +103,24 @@ describe('Stream', function() {
 			s1.each(function(result1) {
 				s2.each(function(result2) {
 					expect(result1).toBe(result2);
+					done();
 				});
 			});
 		});
 	});
 
-	describe('flatten', function() {
-		it('should flatten stream of stream of x to stream of x', function() {
+	describe('flatten', function(done) {
+		it('should flatten stream of stream of x to stream of x', function(done) {
 			var s = Stream.of(Stream.of(sentinel)).flatten();
 			s.each(function(x) {
 				expect(x).toBe(sentinel);
+				done();
 			});
 		});
 	});
 
 	describe('filter', function() {
-		it('should return a stream containing only allowed items', function() {
+		it('should return a stream containing only allowed items', function(done) {
 			var s = new Stream(function(next) {
 				[sentinel, {}].forEach(next);
 			}).filter(function(x) {
@@ -155,6 +129,7 @@ describe('Stream', function() {
 
 			s.each(function(x) {
 				expect(x).toBe(sentinel);
+				done();
 			});
 		})
 	})
@@ -168,27 +143,16 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 		});
 
-		it('should be lazy', function() {
+		it('should not transform stream items', function(done) {
 			var s = Stream.of();
-			var spy = this.spy();
 
-			s = s.tap(spy);
-			expect(spy).not.toHaveBeenCalled();
-
-			s.each(function() {
-				expect(spy).toHaveBeenCalled();
-			});
-		});
-
-		it('should not transform stream items', function() {
-			var expected = {};
-			var s = Stream.of(sentinel).tap(function(x) {
-				expect(x).toBe(sentinel);
-				return expected;
+			s = s.tap(function() {
+				return sentinel;
 			});
 
 			s.each(function(x) {
-				expect(x).toBe(sentinel);
+				expect(x).not.toBeDefined();
+				done();
 			});
 		});
 	});
