@@ -4,6 +4,15 @@ var expect = require('buster').expect;
 var Stream = require('../Stream');
 var sentinel = { value: 'sentinel' };
 
+function assertSame(done, p1, p2) {
+	p1.each(function(x) {
+		p2.each(function(y) {
+			expect(x).toBe(y);
+			done();
+		});
+	});
+}
+
 describe('Stream', function() {
 
 	describe('each', function() {
@@ -40,76 +49,90 @@ describe('Stream', function() {
 	});
 
 	describe('map', function() {
-		it('should return a new stream', function() {
-			var s1 = Stream.of();
-			var s2 = s1.map(function(){});
 
-			expect(s2).not.toBe(s1);
-			expect(s2 instanceof s1.constructor).toBeTrue();
+		it('should satisfy identity', function(done) {
+			// u.map(function(a) { return a; })) ~= u
+			var u = Stream.of(sentinel);
+			assertSame(done, u.map(function(x) { return x; }), u);
 		});
 
-		it('should transform stream items', function(done) {
-			var s = Stream.of();
+		it('should satisfy composition', function(done) {
+			//u.map(function(x) { return f(g(x)); }) ~= u.map(g).map(f)
+			function f(x) { return x + 'f'; }
+			function g(x) { return x + 'g'; }
 
-			s = s.map(function() {
-				return sentinel;
-			});
+			var u = Stream.of('e');
 
-			s.each(function(x) {
-				expect(x).toBe(sentinel);
-				done();
-			});
+			assertSame(done,
+				u.map(function(x) { return f(g(x)); }),
+				u.map(g).map(f)
+			);
 		});
 	});
 
 	describe('flatMap', function() {
-		it('should return a new stream', function() {
-			var s1 = Stream.of();
-			var s2 = s1.flatMap(function(){});
 
-			expect(s2).not.toBe(s1);
-			expect(s2 instanceof s1.constructor).toBeTrue();
+		it('should satisfy associativity', function(done) {
+			// m.flatMap(f).flatMap(g) ~= m.flatMap(function(x) { return f(x).flatMap(g); })
+			function f(x) { return Stream.of(x + 'f'); }
+			function g(x) { return Stream.of(x + 'g'); }
+
+			var m = Stream.of('m');
+
+			assertSame(done,
+				m.flatMap(function(x) { return f(x).flatMap(g); }),
+				m.flatMap(f).flatMap(g)
+			);
+		})
+	})
+
+	describe('ap', function() {
+
+		it('should satisfy identity', function(done) {
+			// P.of(function(a) { return a; }).ap(v) ~= v
+			var v = Stream.of(sentinel);
+			assertSame(done, Stream.of(function(x) { return x; }).ap(v), v);
 		});
 
-		it('should be lazy', function(done) {
-			var s = Stream.of();
+		it('should satisfy composition', function(done) {
+			//P.of(function(f) { return function(g) { return function(x) { return f(g(x))}; }; }).ap(u).ap(v
+			var u = Stream.of(function(x) { return 'u' + x; });
+			var v = Stream.of(function(x) { return 'v' + x; });
+			var w = Stream.of('w');
 
-			s = s.flatMap(function() {
-				return Stream.of(sentinel);
-			});
-
-			s.each(function(x) {
-				expect(x).toBe(sentinel);
-				done();
-			});
+			assertSame(done, Stream.of(function(f) {
+				return function(g) {
+					return function(x) {
+						return f(g(x));
+					};
+				};
+			}).ap(u).ap(v).ap(w),
+				u.ap(v.ap(w))
+			)
 		});
 
-		it('should transform stream items', function(done) {
-			var a = {};
-			var b = {};
-			function f() {
-				return Stream.of(a);
-			}
+		it('should satisfy homomorphism', function(done) {
+			//P.of(f).ap(P.of(x)) ~= P.of(f(x)) (homomorphism)
+			function f(x) { return x + 'f'; }
+			var x = 'x'
+			assertSame(done, Stream.of(f).ap(Stream.of(x)), Stream.of(f(x)));
+		});
 
-			function g() {
-				return Stream.of(b);
-			}
+		it('should satisfy interchange', function(done) {
+			// u.ap(a.of(y)) ~= a.of(function(f) { return f(y); }).ap(u)
+			function f(x) { return x + 'f'; }
 
-			var s1 = Stream.of(sentinel).flatMap(f).flatMap(g);
-			var s2 = Stream.of(sentinel).flatMap(function(x) {
-				return f(x).flatMap(g);
-			});
+			var u = Stream.of(f);
+			var y = 'y';
 
-			s1.each(function(result1) {
-				s2.each(function(result2) {
-					expect(result1).toBe(result2);
-					done();
-				});
-			});
+			assertSame(done,
+				u.ap(Stream.of(y)),
+				Stream.of(function(f) { return f(y); }).ap(u)
+			);
 		});
 	});
 
-	describe('flatten', function(done) {
+	describe('flatten', function() {
 		it('should flatten stream of stream of x to stream of x', function(done) {
 			var s = Stream.of(Stream.of(sentinel)).flatten();
 			s.each(function(x) {
@@ -154,6 +177,50 @@ describe('Stream', function() {
 				expect(x).not.toBeDefined();
 				done();
 			});
+		});
+	});
+
+	describe('bufferCount', function() {
+		it('should should buffer N items', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(next, end) {
+				next(1);
+				next(2);
+				expect(spy).not.toHaveBeenCalled();
+				next(3);
+				expect(spy).toHaveBeenCalledWith([1,2,3]);
+				next(4);
+				expect(spy).not.toHaveBeenCalledTwice();
+				end();
+			}).bufferCount(3).each(spy, done);
+		});
+	});
+
+	describe('bufferTime', function() {
+		it('should should buffer N items', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(next, end) {
+				next(1);
+				setTimeout(function() {
+					next(2);
+				}, 50);
+
+				setTimeout(function() {
+					next(3);
+				}, 150);
+
+				setTimeout(function() {
+					expect(spy).not.toHaveBeenCalled();
+				}, 55);
+
+				setTimeout(function() {
+					expect(spy).toHaveBeenCalledWith([1,2]);
+					end();
+				}, 155);
+
+			}).bufferTime(100).each(spy, done);
 		});
 	});
 

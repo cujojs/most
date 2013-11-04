@@ -124,6 +124,24 @@ proto.tap = function(f) {
 	});
 };
 
+proto.buffer = function(windower) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var buffer;
+		stream(function(x) {
+			buffer = windower(next, x, buffer||[]);
+		}, end);
+	});
+};
+
+proto.bufferCount = function(n) {
+	return this.buffer(createCountBuffer(n));
+};
+
+proto.bufferTime = function(interval) {
+	return this.buffer(createTimeBuffer(interval));
+};
+
 proto.delay = function(ms) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
@@ -208,6 +226,38 @@ proto.scan = function(f, initial) {
 		return initial = f(initial, x);
 	});
 };
+
+function createTimeBuffer(interval) {
+	var buffered;
+	return function(next, x, buffer) {
+		if(!buffered) {
+			buffered = true;
+			buffer = [x];
+
+			setTimeout(function() {
+				next(buffer.slice());
+				buffered = false;
+			}, interval);
+		} else {
+			buffer.push(x);
+		}
+
+		return buffer;
+	}
+}
+
+function createCountBuffer(n) {
+	return function (next, x, buffer) {
+		buffer && buffer.push(x) || (buffer = [x]);
+
+		if(buffer.length >= n) {
+			next(buffer);
+			buffer = void 0;
+		}
+
+		return buffer;
+	};
+}
 
 function callSafely(f, x) {
 	return f && f(x);
