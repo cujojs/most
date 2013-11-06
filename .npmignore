@@ -1,0 +1,6 @@
+/test/
+.jshintrc
+.jshintignore
+.editorconfig
+.npmignore
+.idea/
