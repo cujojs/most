@@ -71,7 +71,6 @@ describe('Stream', function() {
 				expect(spy).toHaveBeenCalledOnce();
 				done();
 			}, 0);
-
 		});
 
 		it('should never call next after end', function(done) {
@@ -86,9 +85,7 @@ describe('Stream', function() {
 				expect(spy).not.toHaveBeenCalled();
 				done();
 			}, 0);
-
-		})
-
+		});
 
 	});
 
@@ -156,14 +153,17 @@ describe('Stream', function() {
 	});
 
 	describe('of', function() {
+
 		it('should create a stream of one item', function(done) {
 			Stream.of(sentinel).each(done(function(x) {
 				expect(x).toBe(sentinel);
 			}));
 		});
+
 	});
 
 	describe('catch', function() {
+
 		it('should catch errors', function(done) {
 			var s1 = Stream.of({}).map(function() {
 				throw sentinel;
@@ -176,7 +176,8 @@ describe('Stream', function() {
 			s2.each(done(function(x) {
 				expect(x).toBe(sentinel);
 			}));
-		})
+		});
+
 	});
 
 	describe('map', function() {
@@ -199,6 +200,7 @@ describe('Stream', function() {
 				u.map(g).map(f)
 			);
 		});
+
 	});
 
 	describe('flatMap', function() {
@@ -261,9 +263,11 @@ describe('Stream', function() {
 				Stream.of(function(f) { return f(y); }).ap(u)
 			);
 		});
+
 	});
 
 	describe('flatten', function() {
+
 		it('should flatten stream of stream of x to stream of x', function(done) {
 			var s = Stream.of(Stream.of(sentinel)).flatten();
 			s.each(function(x) {
@@ -271,9 +275,11 @@ describe('Stream', function() {
 				done();
 			});
 		});
+
 	});
 
 	describe('filter', function() {
+
 		it('should return a stream containing only allowed items', function(done) {
 			var s = new Stream(function(next) {
 				[sentinel, {}].forEach(next);
@@ -285,10 +291,12 @@ describe('Stream', function() {
 				expect(x).toBe(sentinel);
 				done();
 			});
-		})
-	})
+		});
+
+	});
 
 	describe('tap', function() {
+
 		it('should return a new stream', function() {
 			var s1 = Stream.of();
 			var s2 = s1.tap(function(){});
@@ -309,9 +317,11 @@ describe('Stream', function() {
 				done();
 			});
 		});
+
 	});
 
 	describe('bufferCount', function() {
+
 		it('should should buffer N items', function(done) {
 			var spy = this.spy();
 
@@ -326,10 +336,12 @@ describe('Stream', function() {
 				end();
 			}).bufferCount(3).each(spy, done);
 		});
+
 	});
 
 	describe('bufferTime', function() {
-		it('should should buffer N items', function(done) {
+
+		it('should should buffer items in time window', function(done) {
 			var spy = this.spy();
 
 			new Stream(function(next, end) {
@@ -353,6 +365,7 @@ describe('Stream', function() {
 
 			}).bufferTime(100).each(spy, done);
 		});
+
 	});
 
 });
