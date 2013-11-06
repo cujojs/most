@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Monadic streams",
   "main": "most.js",
   "scripts": {
@@ -15,13 +15,14 @@
     "cujo",
     "stream",
     "streams",
+    "event stream",
     "monad",
     "monadic",
     "functional"
   ],
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "buster": "~0.7"
   }
 }
