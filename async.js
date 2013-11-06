@@ -1,6 +1,6 @@
-var handlerQueue = [];
-
 module.exports = enqueue;
+
+var nextTick, handlerQueue = [];
 
 function enqueue(task) {
 	if(handlerQueue.push(task) === 1) {
@@ -9,11 +9,11 @@ function enqueue(task) {
 }
 
 function drainQueue() {
-	var task, i = 0, queue = handlerQueue;
+	var i, len, queue = handlerQueue;
 
 	handlerQueue = [];
-	while(task = queue[i++]) {
-		task();
+	for(i=0, len=queue.length; i<len; i++) {
+		queue[i]();
 	}
 }
 
