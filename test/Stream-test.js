@@ -16,11 +16,142 @@ function assertSame(done, p1, p2) {
 describe('Stream', function() {
 
 	describe('each', function() {
-		it('should call emitter', function() {
+		it('should call emitter in future stack', function(done) {
 			var spy = this.spy();
 
 			new Stream(spy).each(function() {});
-			expect(spy).toHaveBeenCalled();
+
+			expect(spy).not.toHaveBeenCalled();
+
+			setTimeout(function() {
+				expect(spy).toHaveBeenCalled();
+				done();
+			}, 10);
+		});
+
+		it('should call next in future stack', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(next) {
+				next(sentinel);
+			}).each(spy);
+
+			expect(spy).not.toHaveBeenCalled();
+
+			setTimeout(function() {
+				expect(spy).toHaveBeenCalled();
+				done();
+			}, 10);
+		});
+
+		it('should call end in future stack', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(_, end) {
+				end();
+			}).each(void 0, spy);
+
+			expect(spy).not.toHaveBeenCalled();
+
+			setTimeout(function() {
+				expect(spy).toHaveBeenCalled();
+				done();
+			}, 10);
+		});
+
+		it('should never call end after end', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(_, end) {
+				end();
+				end();
+			}).each(void 0, spy);
+
+			setTimeout(function() {
+				expect(spy).toHaveBeenCalledOnce();
+				done();
+			}, 0);
+
+		});
+
+		it('should never call next after end', function(done) {
+			var spy = this.spy();
+
+			new Stream(function(next, end) {
+				end();
+				next();
+			}).each(spy);
+
+			setTimeout(function() {
+				expect(spy).not.toHaveBeenCalled();
+				done();
+			}, 0);
+
+		})
+
+
+	});
+
+	describe('unsubscribe', function() {
+
+		it('should call returned unsubscriber function', function(done) {
+			var unsubSpy = this.spy();
+
+			var unsubscribe = new Stream(function() {
+				return unsubSpy;
+			}).each();
+
+			unsubscribe();
+
+			setTimeout(function() {
+				expect(unsubSpy).toHaveBeenCalled();
+				done();
+			}, 10);
+		});
+
+
+		it('should unsubscribe', function(done) {
+			var nextSpy = this.spy();
+
+			var unsubscribe = new Stream(function(next) {
+				var unsub;
+
+				next();
+				setTimeout(function() {
+					unsub || next();
+				}, 50);
+
+				return function() {
+					unsub = true;
+				};
+			}).each(nextSpy);
+
+			setTimeout(function() {
+				unsubscribe();
+			}, 10);
+
+			setTimeout(function() {
+				expect(nextSpy).toHaveBeenCalledOnce();
+				done();
+			}, 100);
+		});
+
+		it('should unsubscribe immediately', function(done) {
+			var nextSpy = this.spy();
+			var unsubSpy = this.spy();
+
+			var unsubscribe = new Stream(function(next) {
+				next();
+				return unsubSpy;
+			}).each(nextSpy);
+
+			unsubscribe();
+
+			setTimeout(function() {
+				expect(nextSpy).not.toHaveBeenCalled();
+				expect(unsubSpy).toHaveBeenCalled();
+				done();
+			}, 10);
 		});
 	});
 

@@ -20,42 +20,82 @@ function Stream(emitter) {
 }
 
 function of(x) {
-	return new Stream(function(next, end) {
-		var subscribed = true;
+	return new Stream(function (next, end) {
+		try {
+			next(x);
+			end();
+		} catch (e) {
+			end(e);
+		}
 
-		async(function() {
-			if(!subscribed) {
-				return;
-			}
-
-			var error;
-			try {
-				next(x);
-			} catch(e) {
-				error = e;
-			}
-
-			callSafely(end, error);
-
-			return function() {
-				subscribed = false;
-			}
-		});
+		return noop;
 	});
 }
 
 function empty() {
-	return new Stream(function(next, end) {
-		async(end);
-	});
+	return new Stream(emptyEmitter);
 }
 
 var proto = Stream.prototype = {};
 
 proto.constructor = Stream;
 
+/**
+ * Start consuming items in the stream.
+ * @param {function} next called once for each item in the stream
+ * @param {function?} end called once when either:
+ *  1. the stream is ended, that is, when it has no more items, *or*
+ *  2. when a fatal error has occurred in the stream. In this case, the error
+ *     will be passed to end.
+ *  In either case, neither next nor end will ever be called again.
+ *  If end is not provided, and an error occurs, it will be rethrown to the host
+ *  environment.
+ * @returns {function} function to unsubscribe from the stream. After calling
+ *  this, next and end will never be called again.
+ */
 proto.each = function(next, end) {
-	return this._emitter(next, end);
+	var done, unsubscribe, self = this;
+
+	if(typeof end !== 'function') {
+		end = fatal;
+	}
+
+	async(function() {
+		unsubscribe = self._emitter(safeNext, safeEnd);
+	});
+
+	function safeUnsubscribe() {
+		if(done) {
+			return;
+		}
+
+		done = true;
+
+		if(typeof unsubscribe === 'function') {
+			unsubscribe();
+		} else {
+			async(function() {
+				unsubscribe();
+			});
+		}
+	}
+
+	function safeNext(x) {
+		if(done) {
+			return;
+		}
+		next(x);
+	}
+
+	function safeEnd(e) {
+		if(done) {
+			return;
+		}
+		done = true;
+		end.apply(void 0, arguments);
+	}
+
+	return safeUnsubscribe;
 };
 
 proto.map = function(f) {
@@ -77,7 +117,7 @@ proto.flatMap = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			f(x).each(next, end);
+			f(x)._emitter(next, end);
 		}, end);
 	});
 };
@@ -100,7 +140,7 @@ proto.merge = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(next, end);
-		other.each(next, end);
+		other._emitter(next, end);
 	});
 };
 
@@ -109,7 +149,7 @@ proto.concat = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(next, function(e) {
-			e ? callSafely(end, e) : other.each(next, end);
+			e ? end(e) : other._emitter(next, end);
 		});
 	});
 };
@@ -200,7 +240,7 @@ proto['catch'] = function(f) {
 			}
 
 			if(error != null) {
-				callSafely(end, error);
+				end(error);
 			}
 		});
 	});
@@ -216,7 +256,8 @@ proto.reduce = function(f, initial) {
 			if(e == null) {
 				next(value);
 			}
-			callSafely(end, e);
+
+			end(e);
 		});
 	});
 };
@@ -226,6 +267,10 @@ proto.scan = function(f, initial) {
 		return initial = f(initial, x);
 	});
 };
+
+function emptyEmitter(_, end) {
+	async(end);
+}
 
 function createTimeBuffer(interval) {
 	var buffered;
@@ -259,10 +304,14 @@ function createCountBuffer(n) {
 	};
 }
 
-function callSafely(f, x) {
-	return f && f(x);
+function fatal(e) {
+	if(e != null) {
+		throw e;
+	}
 }
 
 function identity(x) {
 	return x;
 }
+
+function noop() {}

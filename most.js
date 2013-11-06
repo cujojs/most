@@ -30,28 +30,16 @@ function create(emitter) {
 
 function fromArray(array) {
 	return new Stream(function(next, end) {
-		var subscribed = true;
-
-		async(function() {
-			if(!subscribed) {
-				return;
-			}
-
-			var error;
-			try {
-				array.forEach(function(x) {
-					next(x);
-				});
-			} catch(e) {
-				error = e;
-			}
-
-			end && end(error);
-		});
-
-		return function() {
-			subscribed = false;
+		try {
+			array.forEach(function(x) {
+				next(x);
+			});
+			end();
+		} catch(e) {
+			end(e);
 		}
+
+		return noop;
 	});
 }
 
@@ -71,26 +59,9 @@ function fromEventTarget(eventTarget, eventType) {
 
 function fromPromise(promise) {
 	return new Stream(function(next, end) {
-		var subscribed = true;
+		promise.then(next).then(function() { end(); }, end);
 
-		function safeNext(x) {
-			subscribed && next(x);
-		}
-
-		function safeEnd(e) {
-			if(subscribed) {
-				subscribed = false;
-				end && end(e);
-			}
-		}
-
-		promise.then(safeNext).then(
-			function() { safeEnd(); },
-			safeEnd);
-
-		return function() {
-			subscribed = false;
-		};
+		return noop;
 	});
 }
 
@@ -116,3 +87,5 @@ function curry(args, arity, f) {
 			: f(accumulated);
 	};
 }
+
+function noop() {}
