@@ -10,10 +10,8 @@
 
 // TODO: take, takeWhile, takeUntil, drop, dropWhile, takeUntil
 // TODO: streams from iterable/iterator/generator
-// TODO: move delay?
 
 var Stream = require('./Stream');
-var async = require('./async');
 
 module.exports = create;
 
@@ -22,16 +20,28 @@ create.empty = Stream.empty;
 create.fromArray = fromArray;
 create.fromItem = fromItems;
 create.fromEventTarget = fromEventTarget;
+create.fromEventEmitter = fromEventEmitter;
 create.fromPromise = fromPromise;
 
+var slice = Array.prototype.slice;
+var forEach = Array.prototype.forEach;
+
+// Emitter -> Stream
+// Create a custom stream
+// Emitter :: (f, g) -> h
+// Emitter is a function that accepts a next and end function, and
+// emits events by calling next.  It may call end with no arguments
+// to signal that it will never call next again, or with one error
+// argument to signal that it has encountered an unrecoverable error.
 function create(emitter) {
 	return new Stream(emitter);
 }
 
+// ArrayLike -> Stream
 function fromArray(array) {
 	return new Stream(function(next, end) {
 		try {
-			array.forEach(function(x) {
+			forEach.call(array, function(x) {
 				next(x);
 			});
 			end();
@@ -43,10 +53,13 @@ function fromArray(array) {
 	});
 }
 
+// arguments -> Stream
 function fromItems() {
-	return fromArray(Array.prototype.slice.call(arguments));
+	return fromArray(slice.call(arguments));
 }
 
+// EventTarget -> String -> Stream
+// Create an event stream from a w3c EventTarget
 function fromEventTarget(eventTarget, eventType) {
 	return new Stream(function(next) {
 		eventTarget.addEventListener(eventType, next, false);
@@ -57,6 +70,22 @@ function fromEventTarget(eventTarget, eventType) {
 	});
 }
 
+// EventEmitter -> String -> Stream
+// Create an event stream from a typical EventEmitter
+function fromEventEmitter(eventEmitter, eventType) {
+	return new Stream(function(next) {
+		eventEmitter.on(eventType, next);
+
+		return function() {
+			eventEmitter.off(eventType, next);
+		}
+	});
+}
+
+// Promise -> Stream
+// Create a stream containing only a single item, the promise's
+// fulfillment value.  If the promise rejects, end will be called
+// with the rejection reason.
 function fromPromise(promise) {
 	return new Stream(function(next, end) {
 		promise.then(next).then(function() { end(); }, end);
@@ -77,7 +106,6 @@ Object.keys(Stream.prototype).reduce(function(exports, key) {
 	return exports;
 }, create);
 
-var slice = [].slice;
 function curry(args, arity, f) {
 	return function() {
 		var accumulated = args.concat(slice.call(arguments));

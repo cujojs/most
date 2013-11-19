@@ -3,6 +3,7 @@ var expect = require('buster').expect;
 
 var Stream = require('../Stream');
 var sentinel = { value: 'sentinel' };
+var other = { value: 'other' };
 
 function assertSame(done, p1, p2) {
 	p1.each(function(x) {
@@ -318,6 +319,60 @@ describe('Stream', function() {
 			});
 		});
 
+	});
+
+	describe('reduce', function() {
+
+		describe('when stream is empty', function() {
+			it('should reduce to initial', function(done) {
+				Stream.empty().reduce(function() {
+					throw new Error();
+				}, sentinel).each(function(result) {
+					expect(result).toBe(sentinel);
+					done();
+				});
+			});
+
+			it('should call end', function(done) {
+				Stream.empty().reduce(function() {
+					throw new Error();
+				}, sentinel).each(
+					function(){},
+					function(e) {
+						expect(e).not.toBeDefined();
+						done();
+					}
+				);
+			});
+		});
+
+		describe('when stream errors', function() {
+			it('should call end with error', function(done) {
+				new Stream(function(_, end) {
+					end(sentinel);
+				}).reduce(function() {
+					throw new Error();
+				}, other).each(function() {
+						throw new Error();
+				}, function(e) {
+					expect(e).toBe(sentinel);
+					done();
+				});
+			});
+		});
+
+		it('should reduce values', function(done) {
+			var values = [1, 2, 3];
+			new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			}).reduce(function(a, x) {
+				return a.concat(x);
+			}, []).each(function(result) {
+				expect(result).toEqual(values);
+				done();
+			});
+		});
 	});
 
 	describe('bufferCount', function() {
