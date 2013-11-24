@@ -164,6 +164,65 @@ proto.tap = function(f) {
 	});
 };
 
+proto.drop = function(m, other) {
+	var stream = other._emitter;
+	return new Stream(function(next, end) {
+		var dropped = 0;
+		stream(function(x) {
+			(dropped >= m) && next(x);
+			dropped++;
+		}, end);
+	});
+};
+
+proto.dropWhile = function(predicate, other) {
+	var assertPredicate = true;
+	var stream = other._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			if (assertPredicate) {
+				if (predicate(x)) {
+					return;
+				} 					
+				assertPredicate = false;
+			} 
+			next(x);
+		}, end);
+	});
+};
+
+proto.take = function(m, other) {
+	var stream = other._emitter;
+	return new Stream(function(next, end) {
+		var accumulated = 0;
+		stream(function(x) {
+			// Do something here to stop the loop
+			// When accumulated
+			// Possible ??
+			(accumulated < m) && next(x);
+			accumulated++;
+		}, end);
+	});
+};
+
+proto.takeWhile = function(predicate, other) {
+	var stream = other._emitter;
+	var assertPredicate = true;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			if (assertPredicate) {
+				if(predicate(x)) {
+					next(x);
+				} else {
+					// Do something here to stop the loop
+					// Possible ??
+					assertPredicate = false;
+				}
+			}
+		}, end);
+	});
+};
+
 proto.buffer = function(windower) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
