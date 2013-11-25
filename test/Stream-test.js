@@ -325,19 +325,17 @@ describe('Stream', function() {
 
 		it('should take only the first two elements', function(done) {
 			var values = [1, 2, 3];
-			var s1 = Stream.of();
-			var s2 = new Stream(function(next, end) {
+			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
 			});			
 
-			var s3 = s1.take(2, s2);
-			expect(s3).not.toBe(s1);
-			expect(s3).not.toBe(s2);
-			expect(s3 instanceof s1.constructor).toBeTrue();
+			var s2 = s1.take(2);
+			expect(s2).not.toBe(s1);
+			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s3.each(function(x) {
+			s2.each(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([1, 2]);
@@ -348,19 +346,17 @@ describe('Stream', function() {
 
 		it('should take only the first two elements with condition', function(done) {
 			var values = [1, 2, 3];
-			var s1 = Stream.of();
-			var s2 = new Stream(function(next, end) {
+			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
 			});			
 
-			var s3 = s1.takeWhile(function(x) {return x < 3}, s2);
-			expect(s3).not.toBe(s1);
-			expect(s3).not.toBe(s2);
-			expect(s3 instanceof s1.constructor).toBeTrue();
+			var s2 = s1.takeWhile(function(x) {return x < 3});
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s3.each(function(x) {
+			s2.each(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([1, 2]);
@@ -374,19 +370,17 @@ describe('Stream', function() {
 
 		it('should take only the last two elements', function(done) {
 			var values = [1, 2, 3];
-			var s1 = Stream.of();
-			var s2 = new Stream(function(next, end) {
+			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
 			});			
 
-			var s3 = s1.drop(1, s2);
-			expect(s3).not.toBe(s1);
-			expect(s3).not.toBe(s2);
-			expect(s3 instanceof s1.constructor).toBeTrue();
+			var s2 = s1.drop(1);
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s3.each(function(x) {
+			s2.each(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([2, 3]);
@@ -397,19 +391,17 @@ describe('Stream', function() {
 
 		it('should take only the last two elements with condition', function(done) {
 			var values = [1, 2, 3];
-			var s1 = Stream.of();
-			var s2 = new Stream(function(next, end) {
+			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
 			});			
 
-			var s3 = s1.dropWhile(function(x) {return x < 2}, s2);
-			expect(s3).not.toBe(s1);
-			expect(s3).not.toBe(s2);
-			expect(s3 instanceof s1.constructor).toBeTrue();
+			var s2 = s1.dropWhile(function(x) {return x < 2});
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s3.each(function(x) {
+			s2.each(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([2, 3]);

@@ -164,10 +164,10 @@ proto.tap = function(f) {
 	});
 };
 
-proto.drop = function(m, other) {
-	var stream = other._emitter;
+proto.drop = function(m) {
+	var dropped = 0;
+	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var dropped = 0;
 		stream(function(x) {
 			(dropped >= m) && next(x);
 			dropped++;
@@ -175,9 +175,9 @@ proto.drop = function(m, other) {
 	});
 };
 
-proto.dropWhile = function(predicate, other) {
+proto.dropWhile = function(predicate) {
 	var assertPredicate = true;
-	var stream = other._emitter;
+	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
 			if (assertPredicate) {
@@ -191,22 +191,19 @@ proto.dropWhile = function(predicate, other) {
 	});
 };
 
-proto.take = function(m, other) {
-	var stream = other._emitter;
+proto.take = function(m) {
+	var accumulated = 0;
+	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var accumulated = 0;
 		stream(function(x) {
-			// Do something here to stop the loop
-			// When accumulated
-			// Possible ??
 			(accumulated < m) && next(x);
 			accumulated++;
 		}, end);
 	});
 };
 
-proto.takeWhile = function(predicate, other) {
-	var stream = other._emitter;
+proto.takeWhile = function(predicate) {
+	var stream = this._emitter;
 	var assertPredicate = true;
 	return new Stream(function(next, end) {
 		stream(function(x) {
@@ -214,9 +211,8 @@ proto.takeWhile = function(predicate, other) {
 				if(predicate(x)) {
 					next(x);
 				} else {
-					// Do something here to stop the loop
-					// Possible ??
 					assertPredicate = false;
+					return;
 				}
 			}
 		}, end);
