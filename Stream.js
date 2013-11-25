@@ -176,15 +176,14 @@ proto.drop = function(m) {
 };
 
 proto.dropWhile = function(predicate) {
-	var assertPredicate = true;
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			if (assertPredicate) {
+			if (predicate != null) {
 				if (predicate(x)) {
 					return;
 				} 					
-				assertPredicate = false;
+				predicate = null;
 			} 
 			next(x);
 		}, end);
@@ -204,14 +203,13 @@ proto.take = function(m) {
 
 proto.takeWhile = function(predicate) {
 	var stream = this._emitter;
-	var assertPredicate = true;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			if (assertPredicate) {
+			if (predicate != null) {
 				if(predicate(x)) {
 					next(x);
 				} else {
-					assertPredicate = false;
+					predicate = null;
 					return;
 				}
 			}
