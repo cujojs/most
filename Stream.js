@@ -169,8 +169,7 @@ proto.drop = function(m) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			(dropped >= m) && next(x);
-			dropped++;
+			(dropped >= m) ? next(x) : dropped++;
 		}, end);
 	});
 };
@@ -195,8 +194,10 @@ proto.take = function(m) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			(accumulated < m) && next(x);
-			accumulated++;
+			if (accumulated < m) {
+				next(x); 
+				accumulated++;
+			}
 		}, end);
 	});
 };
