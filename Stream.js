@@ -207,11 +207,7 @@ proto.takeWhile = function(predicate) {
 	return new Stream(function(next, end) {
 		stream(function(x) {
 			if (predicate != null) {
-				if(predicate(x)) {
-					next(x);
-				} else {
-					predicate = null;
-				}
+				predicate(x) ? next(x) : predicate = null;
 			}
 		}, end);
 	});
