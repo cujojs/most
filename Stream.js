@@ -190,13 +190,13 @@ proto.dropWhile = function(predicate) {
 };
 
 proto.take = function(m) {
-	var accumulated = 0;
+	var taken = 0;
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			if (accumulated < m) {
+			if (taken < m) {
 				next(x); 
-				accumulated++;
+				taken++;
 			}
 		}, end);
 	});
@@ -211,7 +211,6 @@ proto.takeWhile = function(predicate) {
 					next(x);
 				} else {
 					predicate = null;
-					return;
 				}
 			}
 		}, end);
