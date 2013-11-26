@@ -296,6 +296,43 @@ describe('Stream', function() {
 
 	});
 
+	describe('concat', function() {
+
+		it('should return a stream containing items from concatenated streams in correct order', function(done) {
+			var s1 = Stream.of(sentinel);
+			var s2 = Stream.of(1);
+
+			var results = [];
+			s1.concat(s2).each(function(x) {
+				results.push(x);
+			}, function() {
+				expect(results).toEqual([sentinel, 1]);
+				done();
+			});
+		});
+
+		it('should satisfy left identity', function(done) {
+			var spy = this.spy();
+			var s = Stream.of(sentinel).concat(Stream.empty());
+
+			s.each(spy, function() {
+				expect(spy).toHaveBeenCalledOnceWith(sentinel);
+				done();
+			});
+		});
+
+		it('should satisfy right identity', function(done) {
+			var spy = this.spy();
+			var s = Stream.empty().concat(Stream.of(sentinel));
+
+			s.each(spy, function() {
+				expect(spy).toHaveBeenCalledOnceWith(sentinel);
+				done();
+			});
+		});
+
+	});
+
 	describe('tap', function() {
 
 		it('should return a new stream', function() {
