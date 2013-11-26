@@ -375,6 +375,60 @@ describe('Stream', function() {
 		});
 	});
 
+	describe('reduceRight', function() {
+
+		describe('when stream is empty', function() {
+			it('should reduce to initial', function(done) {
+				Stream.empty().reduceRight(function() {
+					throw new Error();
+				}, sentinel).each(function(result) {
+					expect(result).toBe(sentinel);
+					done();
+				});
+			});
+
+			it('should call end', function(done) {
+				Stream.empty().reduceRight(function() {
+					throw new Error();
+				}, sentinel).each(
+					function(){},
+					function(e) {
+						expect(e).not.toBeDefined();
+						done();
+					}
+				);
+			});
+		});
+
+		describe('when stream errors', function() {
+			it('should call end with error', function(done) {
+				new Stream(function(_, end) {
+					end(sentinel);
+				}).reduceRight(function() {
+					throw new Error();
+				}, other).each(function() {
+						throw new Error();
+				}, function(e) {
+					expect(e).toBe(sentinel);
+					done();
+				});
+			});
+		});
+
+		it('should reduce values', function(done) {
+			var values = [1, 2, 3];
+			new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			}).reduceRight(function(a, x) {
+				return a + x;
+			}, '0').each(function(result) {
+				expect(result).toEqual('0321');
+				done();
+			});
+		});
+	});
+
 	describe('bufferCount', function() {
 
 		it('should should buffer N items', function(done) {

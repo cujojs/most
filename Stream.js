@@ -262,6 +262,25 @@ proto.reduce = function(f, initial) {
 	});
 };
 
+proto.reduceRight = function(f, initial) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		// This is a brute-force approach that uses an array to buffer
+		// items, then runs array.reduceRight. Less elegant than recursion,
+		// but much faster and more practical in JS.
+		var buffer = [];
+		stream(function(x) {
+			buffer.push(x);
+		}, function(e) {
+			if(e == null) {
+				next(buffer.reduceRight(f, initial));
+			}
+
+			end(e);
+		});
+	});
+};
+
 proto.scan = function(f, initial) {
 	return this.map(function(x) {
 		return initial = f(initial, x);
