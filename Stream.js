@@ -164,6 +164,55 @@ proto.tap = function(f) {
 	});
 };
 
+proto.drop = function(m) {
+	var dropped = 0;
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			(dropped >= m) ? next(x) : dropped++;
+		}, end);
+	});
+};
+
+proto.dropWhile = function(predicate) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			if (predicate != null) {
+				if (predicate(x)) {
+					return;
+				} 					
+				predicate = null;
+			} 
+			next(x);
+		}, end);
+	});
+};
+
+proto.take = function(m) {
+	var taken = 0;
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			if (taken < m) {
+				next(x); 
+				taken++;
+			}
+		}, end);
+	});
+};
+
+proto.takeWhile = function(predicate) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			if (predicate != null) {
+				predicate(x) ? next(x) : predicate = null;
+			}
+		}, end);
+	});
+};
+
 proto.buffer = function(windower) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {

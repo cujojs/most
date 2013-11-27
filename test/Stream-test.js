@@ -358,6 +358,96 @@ describe('Stream', function() {
 
 	});
 
+	describe('take', function() {
+
+		it('should take only the first two elements', function(done) {
+			var values = [1, 2, 3];
+			var s1 = new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			});			
+
+			var s2 = s1.take(2);
+			expect(s2).not.toBe(s1);
+			expect(s2 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s2.each(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([1, 2]);
+				done();
+			})
+
+		});
+
+		it('should take only the first two elements with condition', function(done) {
+			var values = [1, 2, 3];
+			var s1 = new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			});			
+
+			var s2 = s1.takeWhile(function(x) {return x < 3});
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s2.each(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([1, 2]);
+				done();
+			})
+
+		});
+	});
+
+	describe('drop', function() {
+
+		it('should take only the last two elements', function(done) {
+			var values = [1, 2, 3];
+			var s1 = new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			});			
+
+			var s2 = s1.drop(1);
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s2.each(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([2, 3]);
+				done();
+			})
+
+		});
+
+		it('should take only the last two elements with condition', function(done) {
+			var values = [1, 2, 3];
+			var s1 = new Stream(function(next, end) {
+				values.forEach(next);
+				end();
+			});			
+
+			var s2 = s1.dropWhile(function(x) {return x < 2});
+			expect(s1).not.toBe(s2);
+			expect(s2 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s2.each(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([2, 3]);
+				done();
+			})
+
+		});
+	});
+
 	describe('reduce', function() {
 
 		describe('when stream is empty', function() {
