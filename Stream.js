@@ -55,7 +55,7 @@ proto.constructor = Stream;
  *  this, next and end will never be called again.
  */
 proto.forEach = function(next, end) {
-	var done, unsubscribe, self = this;
+	var ended, unsubscribed, unsubscribe, self = this;
 
 	if(typeof end !== 'function') {
 		end = fatal;
@@ -66,11 +66,11 @@ proto.forEach = function(next, end) {
 	});
 
 	function safeUnsubscribe() {
-		if(done) {
+		if(unsubscribed) {
 			return;
 		}
 
-		done = true;
+		unsubscribed = true;
 
 		async(function() {
 			if(typeof unsubscribe === 'function') {
@@ -80,17 +80,19 @@ proto.forEach = function(next, end) {
 	}
 
 	function safeNext(x) {
-		if(done) {
+		if(ended || unsubscribed) {
 			return;
 		}
 		next(x);
 	}
 
 	function safeEnd() {
-		if(done) {
+		if(ended) {
 			return;
 		}
-		done = true;
+		ended = true;
+		safeUnsubscribe();
+
 		end.apply(void 0, arguments);
 	}
 
@@ -206,10 +208,9 @@ proto.take = function(m) {
 
 proto.takeWhile = function(predicate) {
 	var self = this;
-//	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var done = self.forEach(function(x) {
-			predicate(x) ? next(x) : done();
+		var unsubscribe = self.forEach(function(x) {
+			predicate(x) ? next(x) : unsubscribe();
 		}, end);
 	});
 };
