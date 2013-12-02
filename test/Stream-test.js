@@ -6,8 +6,8 @@ var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
 function assertSame(done, p1, p2) {
-	p1.each(function(x) {
-		p2.each(function(y) {
+	p1.forEach(function(x) {
+		p2.forEach(function(y) {
 			expect(x).toBe(y);
 			done();
 		});
@@ -20,7 +20,7 @@ describe('Stream', function() {
 		it('should call emitter in future stack', function(done) {
 			var spy = this.spy();
 
-			new Stream(spy).each(function() {});
+			new Stream(spy).forEach(function() {});
 
 			expect(spy).not.toHaveBeenCalled();
 
@@ -35,7 +35,7 @@ describe('Stream', function() {
 
 			new Stream(function(next) {
 				next(sentinel);
-			}).each(spy);
+			}).forEach(spy);
 
 			expect(spy).not.toHaveBeenCalled();
 
@@ -50,7 +50,7 @@ describe('Stream', function() {
 
 			new Stream(function(_, end) {
 				end();
-			}).each(void 0, spy);
+			}).forEach(void 0, spy);
 
 			expect(spy).not.toHaveBeenCalled();
 
@@ -66,7 +66,7 @@ describe('Stream', function() {
 			new Stream(function(_, end) {
 				end();
 				end();
-			}).each(void 0, spy);
+			}).forEach(void 0, spy);
 
 			setTimeout(function() {
 				expect(spy).toHaveBeenCalledOnce();
@@ -80,7 +80,7 @@ describe('Stream', function() {
 			new Stream(function(next, end) {
 				end();
 				next();
-			}).each(spy);
+			}).forEach(spy);
 
 			setTimeout(function() {
 				expect(spy).not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ describe('Stream', function() {
 
 			var unsubscribe = new Stream(function() {
 				return unsubSpy;
-			}).each();
+			}).forEach();
 
 			unsubscribe();
 
@@ -122,7 +122,7 @@ describe('Stream', function() {
 				return function() {
 					unsub = true;
 				};
-			}).each(nextSpy);
+			}).forEach(nextSpy);
 
 			setTimeout(function() {
 				unsubscribe();
@@ -141,7 +141,7 @@ describe('Stream', function() {
 			var unsubscribe = new Stream(function(next) {
 				next();
 				return unsubSpy;
-			}).each(nextSpy);
+			}).forEach(nextSpy);
 
 			unsubscribe();
 
@@ -156,7 +156,7 @@ describe('Stream', function() {
 	describe('of', function() {
 
 		it('should create a stream of one item', function(done) {
-			Stream.of(sentinel).each(done(function(x) {
+			Stream.of(sentinel).forEach(done(function(x) {
 				expect(x).toBe(sentinel);
 			}));
 		});
@@ -174,7 +174,7 @@ describe('Stream', function() {
 				return x;
 			});
 
-			s2.each(done(function(x) {
+			s2.forEach(done(function(x) {
 				expect(x).toBe(sentinel);
 			}));
 		});
@@ -226,7 +226,7 @@ describe('Stream', function() {
 				return new Stream(function(_, end) {
 					end(sentinel);
 				});
-			}).each(nextSpy, function(e) {
+			}).forEach(nextSpy, function(e) {
 				expect(nextSpy).not.toHaveBeenCalled();
 				expect(e).toBe(sentinel);
 				done();
@@ -245,7 +245,7 @@ describe('Stream', function() {
 					next(x);
 					end();
 				});
-			}).each(nextSpy, function(e) {
+			}).forEach(nextSpy, function(e) {
 				expect(e).not.toBeDefined();
 				expect(nextSpy).toHaveBeenCalledTwice();
 				done();
@@ -304,7 +304,7 @@ describe('Stream', function() {
 
 		it('should flatten stream of stream of x to stream of x', function(done) {
 			var s = Stream.of(Stream.of(sentinel)).flatten();
-			s.each(function(x) {
+			s.forEach(function(x) {
 				expect(x).toBe(sentinel);
 				done();
 			});
@@ -321,7 +321,7 @@ describe('Stream', function() {
 				return x === sentinel;
 			});
 
-			s.each(function(x) {
+			s.forEach(function(x) {
 				expect(x).toBe(sentinel);
 				done();
 			});
@@ -334,7 +334,7 @@ describe('Stream', function() {
 		it('should contain items from both', function(done) {
 			var result = [];
 			Stream.of(1).merge(Stream.of(2))
-				.each(function(x) {
+				.forEach(function(x) {
 					result.push(x);
 				}, function(e) {
 					expect(e).not.toBeDefined();
@@ -350,7 +350,7 @@ describe('Stream', function() {
 				end(sentinel);
 			})
 				.merge(Stream.of())
-				.each(nextSpy, function(e) {
+				.forEach(nextSpy, function(e) {
 					expect(nextSpy).not.toHaveBeenCalled();
 					expect(e).toBe(sentinel);
 					done();
@@ -366,7 +366,7 @@ describe('Stream', function() {
 			}).merge(new Stream(function(next, end) {
 					next();
 					end();
-			})).each(nextSpy, function(e) {
+			})).forEach(nextSpy, function(e) {
 				expect(e).not.toBeDefined();
 				expect(nextSpy).toHaveBeenCalledTwice();
 				done();
@@ -381,7 +381,7 @@ describe('Stream', function() {
 			var s2 = Stream.of(1);
 
 			var results = [];
-			s1.concat(s2).each(function(x) {
+			s1.concat(s2).forEach(function(x) {
 				results.push(x);
 			}, function() {
 				expect(results).toEqual([sentinel, 1]);
@@ -393,7 +393,7 @@ describe('Stream', function() {
 			var spy = this.spy();
 			var s = Stream.of(sentinel).concat(Stream.empty());
 
-			s.each(spy, function() {
+			s.forEach(spy, function() {
 				expect(spy).toHaveBeenCalledOnceWith(sentinel);
 				done();
 			});
@@ -403,7 +403,7 @@ describe('Stream', function() {
 			var spy = this.spy();
 			var s = Stream.empty().concat(Stream.of(sentinel));
 
-			s.each(spy, function() {
+			s.forEach(spy, function() {
 				expect(spy).toHaveBeenCalledOnceWith(sentinel);
 				done();
 			});
@@ -428,7 +428,7 @@ describe('Stream', function() {
 				return sentinel;
 			});
 
-			s.each(function(x) {
+			s.forEach(function(x) {
 				expect(x).not.toBeDefined();
 				done();
 			});
@@ -450,7 +450,7 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s2.each(function(x) {
+			s2.forEach(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([1, 2]);
@@ -471,7 +471,7 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s2.each(function(x) {
+			s2.forEach(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([1, 2]);
@@ -495,7 +495,7 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s2.each(function(x) {
+			s2.forEach(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([2, 3]);
@@ -516,7 +516,7 @@ describe('Stream', function() {
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
 			var result = [];
-			s2.each(function(x) {
+			s2.forEach(function(x) {
 				result.push(x);
 			}, function() {
 				expect(result).toEqual([2, 3]);
@@ -532,7 +532,7 @@ describe('Stream', function() {
 			it('should reduce to initial', function(done) {
 				Stream.empty().reduce(function() {
 					throw new Error();
-				}, sentinel).each(function(result) {
+				}, sentinel).forEach(function(result) {
 					expect(result).toBe(sentinel);
 					done();
 				});
@@ -541,7 +541,7 @@ describe('Stream', function() {
 			it('should call end', function(done) {
 				Stream.empty().reduce(function() {
 					throw new Error();
-				}, sentinel).each(
+				}, sentinel).forEach(
 					function(){},
 					function(e) {
 						expect(e).not.toBeDefined();
@@ -557,7 +557,7 @@ describe('Stream', function() {
 					end(sentinel);
 				}).reduce(function() {
 					throw new Error();
-				}, other).each(function() {
+				}, other).forEach(function() {
 						throw new Error();
 				}, function(e) {
 					expect(e).toBe(sentinel);
@@ -573,7 +573,7 @@ describe('Stream', function() {
 				end();
 			}).reduce(function(a, x) {
 				return a.concat(x);
-			}, []).each(function(result) {
+			}, []).forEach(function(result) {
 				expect(result).toEqual(values);
 				done();
 			});
@@ -586,7 +586,7 @@ describe('Stream', function() {
 			it('should reduce to initial', function(done) {
 				Stream.empty().reduceRight(function() {
 					throw new Error();
-				}, sentinel).each(function(result) {
+				}, sentinel).forEach(function(result) {
 					expect(result).toBe(sentinel);
 					done();
 				});
@@ -595,7 +595,7 @@ describe('Stream', function() {
 			it('should call end', function(done) {
 				Stream.empty().reduceRight(function() {
 					throw new Error();
-				}, sentinel).each(
+				}, sentinel).forEach(
 					function(){},
 					function(e) {
 						expect(e).not.toBeDefined();
@@ -611,7 +611,7 @@ describe('Stream', function() {
 					end(sentinel);
 				}).reduceRight(function() {
 					throw new Error();
-				}, other).each(function() {
+				}, other).forEach(function() {
 						throw new Error();
 				}, function(e) {
 					expect(e).toBe(sentinel);
@@ -627,7 +627,7 @@ describe('Stream', function() {
 				end();
 			}).reduceRight(function(a, x) {
 				return a + x;
-			}, '0').each(function(result) {
+			}, '0').forEach(function(result) {
 				expect(result).toEqual('0321');
 				done();
 			});
@@ -648,7 +648,7 @@ describe('Stream', function() {
 				next(4);
 				expect(spy).not.toHaveBeenCalledTwice();
 				end();
-			}).bufferCount(3).each(spy, done);
+			}).bufferCount(3).forEach(spy, done);
 		});
 
 	});
@@ -677,7 +677,7 @@ describe('Stream', function() {
 					end();
 				}, 155);
 
-			}).bufferTime(100).each(spy, done);
+			}).bufferTime(100).forEach(spy, done);
 		});
 
 	});

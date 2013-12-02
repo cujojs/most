@@ -53,7 +53,7 @@ proto.constructor = Stream;
  * @returns {function} function to unsubscribe from the stream. After calling
  *  this, next and end will never be called again.
  */
-proto.each = function(next, end) {
+proto.forEach = function(next, end) {
 	var done, unsubscribe, self = this;
 
 	if(typeof end !== 'function') {
