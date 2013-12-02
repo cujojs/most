@@ -217,8 +217,41 @@ describe('Stream', function() {
 				m.flatMap(function(x) { return f(x).flatMap(g); }),
 				m.flatMap(f).flatMap(g)
 			);
-		})
-	})
+		});
+
+		it('should call end on error', function(done) {
+			var nextSpy = this.spy();
+
+			Stream.of(other).flatMap(function() {
+				return new Stream(function(_, end) {
+					end(sentinel);
+				});
+			}).each(nextSpy, function(e) {
+				expect(nextSpy).not.toHaveBeenCalled();
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				next();
+				end();
+			}).flatMap(function(x) {
+				return new Stream(function(next, end) {
+					next(x);
+					end();
+				});
+			}).each(nextSpy, function(e) {
+				expect(e).not.toBeDefined();
+				expect(nextSpy).toHaveBeenCalledTwice();
+				done();
+			});
+		});
+	});
 
 	describe('ap', function() {
 
@@ -294,6 +327,51 @@ describe('Stream', function() {
 			});
 		});
 
+	});
+
+	describe('merge', function() {
+
+		it('should contain items from both', function(done) {
+			var result = [];
+			Stream.of(1).merge(Stream.of(2))
+				.each(function(x) {
+					result.push(x);
+				}, function(e) {
+					expect(e).not.toBeDefined();
+					expect(result).toEqual([1, 2]);
+					done();
+				});
+		});
+
+		it('should end immediately on error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				end(sentinel);
+			})
+				.merge(Stream.of())
+				.each(nextSpy, function(e) {
+					expect(nextSpy).not.toHaveBeenCalled();
+					expect(e).toBe(sentinel);
+					done();
+				});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).merge(new Stream(function(next, end) {
+					next();
+					end();
+			})).each(nextSpy, function(e) {
+				expect(e).not.toBeDefined();
+				expect(nextSpy).toHaveBeenCalledTwice();
+				done();
+			});
+		});
 	});
 
 	describe('concat', function() {

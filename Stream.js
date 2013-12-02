@@ -117,7 +117,7 @@ proto.flatMap = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			f(x)._emitter(next, end);
+			f(x)._emitter(next, endOnError(end));
 		}, end);
 	});
 };
@@ -136,11 +136,21 @@ proto.filter = function(predicate) {
 };
 
 proto.merge = function(other) {
-	// TODO: Should this accept an array?  a stream of streams?
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		stream(next, end);
-		other._emitter(next, end);
+		var count = 2;
+
+		stream(next, handleEnd);
+		other._emitter(next, handleEnd);
+
+		function handleEnd(e) {
+			count -= 1;
+			if(e != null) {
+				end(e);
+			} else if (count === 0) {
+				end();
+			}
+		}
 	});
 };
 
@@ -149,7 +159,7 @@ proto.concat = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(next, function(e) {
-			e ? end(e) : other._emitter(next, end);
+			e == null ? other._emitter(next, end) : end(e);
 		});
 	});
 };
@@ -165,9 +175,9 @@ proto.tap = function(f) {
 };
 
 proto.drop = function(m) {
-	var dropped = 0;
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
+		var dropped = 0;
 		stream(function(x) {
 			(dropped >= m) ? next(x) : dropped++;
 		}, end);
@@ -190,9 +200,9 @@ proto.dropWhile = function(predicate) {
 };
 
 proto.take = function(m) {
-	var taken = 0;
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
+		var taken = 0;
 		stream(function(x) {
 			if (taken < m) {
 				next(x); 
@@ -370,6 +380,12 @@ function createCountBuffer(n) {
 
 		return buffer;
 	};
+}
+
+function endOnError(end) {
+	return function(e) {
+		e == null || end(e);
+	}
 }
 
 function fatal(e) {
