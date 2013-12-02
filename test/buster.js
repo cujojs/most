@@ -1,4 +1,4 @@
-exports['all'] = {
+exports.all = {
 	environment: 'node',
 	tests: ['*-test.js']
 };

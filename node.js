@@ -4,8 +4,8 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @author: Brian Cavalier
- * @author: John Hann
+ * @author Brian Cavalier
+ * @author John Hann
  */
 
 var Stream = require('./Stream');
@@ -21,7 +21,7 @@ function fromReadable(readable) {
 }
 
 function toWritable(writable, stream) {
-	stream.each(function(x) {
+	stream.forEach(function(x) {
 		writable.write(x);
 	}, noop);
 

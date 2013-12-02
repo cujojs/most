@@ -116,7 +116,9 @@ describe('Stream', function() {
 
 				next();
 				setTimeout(function() {
-					unsub || next();
+					if(!unsub) {
+						next();
+					}
 				}, 50);
 
 				return function() {
@@ -275,13 +277,13 @@ describe('Stream', function() {
 				};
 			}).ap(u).ap(v).ap(w),
 				u.ap(v.ap(w))
-			)
+			);
 		});
 
 		it('should satisfy homomorphism', function(done) {
 			//P.of(f).ap(P.of(x)) ~= P.of(f(x)) (homomorphism)
 			function f(x) { return x + 'f'; }
-			var x = 'x'
+			var x = 'x';
 			assertSame(done, Stream.of(f).ap(Stream.of(x)), Stream.of(f(x)));
 		});
 
@@ -443,7 +445,7 @@ describe('Stream', function() {
 			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
-			});			
+			});
 
 			var s2 = s1.take(2);
 			expect(s2).not.toBe(s1);
@@ -455,7 +457,7 @@ describe('Stream', function() {
 			}, function() {
 				expect(result).toEqual([1, 2]);
 				done();
-			})
+			});
 
 		});
 
@@ -464,9 +466,12 @@ describe('Stream', function() {
 			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
-			});			
+			});
 
-			var s2 = s1.takeWhile(function(x) {return x < 3});
+			var s2 = s1.takeWhile(function(x) {
+				return x < 3;
+			});
+
 			expect(s1).not.toBe(s2);
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
@@ -476,7 +481,7 @@ describe('Stream', function() {
 			}, function() {
 				expect(result).toEqual([1, 2]);
 				done();
-			})
+			});
 
 		});
 	});
@@ -488,7 +493,7 @@ describe('Stream', function() {
 			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
-			});			
+			});
 
 			var s2 = s1.drop(1);
 			expect(s1).not.toBe(s2);
@@ -500,7 +505,7 @@ describe('Stream', function() {
 			}, function() {
 				expect(result).toEqual([2, 3]);
 				done();
-			})
+			});
 
 		});
 
@@ -509,9 +514,12 @@ describe('Stream', function() {
 			var s1 = new Stream(function(next, end) {
 				values.forEach(next);
 				end();
-			});			
+			});
 
-			var s2 = s1.dropWhile(function(x) {return x < 2});
+			var s2 = s1.dropWhile(function(x) {
+				return x < 2;
+			});
+
 			expect(s1).not.toBe(s2);
 			expect(s2 instanceof s1.constructor).toBeTrue();
 
@@ -521,7 +529,7 @@ describe('Stream', function() {
 			}, function() {
 				expect(result).toEqual([2, 3]);
 				done();
-			})
+			});
 
 		});
 	});

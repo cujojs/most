@@ -1,0 +1,6 @@
+{
+	"globals": {
+		"describe": true,
+		"it": true
+	}
+}

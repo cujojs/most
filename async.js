@@ -1,6 +1,6 @@
 module.exports = enqueue;
 
-var nextTick, handlerQueue = [];
+var nextTick, MutOb, handlerQueue = [];
 
 function enqueue(task) {
 	if(handlerQueue.push(task) === 1) {
@@ -21,7 +21,7 @@ function drainQueue() {
 /*global process,window,document,setImmediate*/
 if (typeof process === 'object' && process.nextTick) {
 	nextTick = typeof setImmediate === 'function' ? setImmediate : process.nextTick;
-} else if(typeof window !== 'undefined' && (MutationObserver = window.MutationObserver || window.WebKitMutationObserver)) {
+} else if(typeof window !== 'undefined' && (MutOb = window.MutationObserver || window.WebKitMutationObserver)) {
 	nextTick = (function(document, MutationObserver, drainQueue) {
 		var el = document.createElement('div');
 		new MutationObserver(drainQueue).observe(el, { attributes: true });
@@ -29,7 +29,7 @@ if (typeof process === 'object' && process.nextTick) {
 		return function() {
 			el.setAttribute('x', 'x');
 		};
-	}(document, MutationObserver, drainQueue));
+	}(document, MutOb, drainQueue));
 } else {
 	nextTick = function(t) { setTimeout(t, 0); };
 }

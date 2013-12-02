@@ -44,6 +44,7 @@ proto.constructor = Stream;
  * Start consuming items in the stream.
  * @param {function} next called once for each item in the stream
  * @param {function?} end called once when either:
+ *
  *  1. the stream is ended, that is, when it has no more items, *or*
  *  2. when a fatal error has occurred in the stream. In this case, the error
  *     will be passed to end.
@@ -71,13 +72,11 @@ proto.forEach = function(next, end) {
 
 		done = true;
 
-		if(typeof unsubscribe === 'function') {
-			unsubscribe();
-		} else {
-			async(function() {
+		async(function() {
+			if(typeof unsubscribe === 'function') {
 				unsubscribe();
-			});
-		}
+			}
+		});
 	}
 
 	function safeNext(x) {
@@ -87,7 +86,7 @@ proto.forEach = function(next, end) {
 		next(x);
 	}
 
-	function safeEnd(e) {
+	function safeEnd() {
 		if(done) {
 			return;
 		}
@@ -175,12 +174,10 @@ proto.tap = function(f) {
 };
 
 proto.drop = function(m) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var dropped = 0;
-		stream(function(x) {
-			(dropped >= m) ? next(x) : dropped++;
-		}, end);
+	var remaining = m;
+	return this.dropWhile(function() {
+		remaining -= 1;
+		return remaining >= 0;
 	});
 };
 
@@ -191,34 +188,28 @@ proto.dropWhile = function(predicate) {
 			if (predicate != null) {
 				if (predicate(x)) {
 					return;
-				} 					
+				}
 				predicate = null;
-			} 
+			}
 			next(x);
 		}, end);
 	});
 };
 
 proto.take = function(m) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var taken = 0;
-		stream(function(x) {
-			if (taken < m) {
-				next(x); 
-				taken++;
-			}
-		}, end);
+	var taken = 0;
+	return this.takeWhile(function() {
+		taken += 1;
+		return taken <= m;
 	});
 };
 
 proto.takeWhile = function(predicate) {
-	var stream = this._emitter;
+	var self = this;
+//	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		stream(function(x) {
-			if (predicate != null) {
-				predicate(x) ? next(x) : predicate = null;
-			}
+		var done = self.forEach(function(x) {
+			predicate(x) ? next(x) : done();
 		}, end);
 	});
 };
@@ -347,7 +338,7 @@ proto.scan = function(f, initial) {
 };
 
 function emptyEmitter(_, end) {
-	async(end);
+	end();
 }
 
 function createTimeBuffer(interval) {
@@ -366,7 +357,7 @@ function createTimeBuffer(interval) {
 		}
 
 		return buffer;
-	}
+	};
 }
 
 function createCountBuffer(n) {
@@ -385,7 +376,7 @@ function createCountBuffer(n) {
 function endOnError(end) {
 	return function(e) {
 		e == null || end(e);
-	}
+	};
 }
 
 function fatal(e) {

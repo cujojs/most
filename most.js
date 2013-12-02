@@ -23,18 +23,25 @@ create.fromPromise = fromPromise;
 var slice = Array.prototype.slice;
 var forEach = Array.prototype.forEach;
 
-// Emitter -> Stream
-// Create a custom stream
-// Emitter :: (f, g) -> h
-// Emitter is a function that accepts a next and end function, and
-// emits events by calling next.  It may call end with no arguments
-// to signal that it will never call next again, or with one error
-// argument to signal that it has encountered an unrecoverable error.
+/**
+ * (f, g) -> h -> Stream
+ * @param {function(next, end):function} emitter accepts a next and end function, and
+ * emits events by calling next.  It may call end with no arguments
+ * to signal that it will never call next again, or with one error
+ * argument to signal that it has encountered an unrecoverable error.
+ * It should return a function that the caller can use to unsubscribe
+ * from further events.
+ * @return {Stream} stream
+ */
 function create(emitter) {
 	return new Stream(emitter);
 }
 
-// ArrayLike -> Stream
+/**
+ * ArrayLike -> Stream
+ * @param {array} array Array-like
+ * @return {Stream} stream
+ */
 function fromArray(array) {
 	return new Stream(function(next, end) {
 		try {
@@ -50,13 +57,23 @@ function fromArray(array) {
 	});
 }
 
-// arguments -> Stream
+/**
+ * arguments -> Stream
+ * @param {...*?} items
+ * @return {Stream} stream
+ */
 function fromItems() {
 	return fromArray(slice.call(arguments));
 }
 
 // EventTarget -> String -> Stream
 // Create an event stream from a w3c EventTarget
+/**
+ * Create a Stream from a w3c EventTarget
+ * @param {EventTarget} eventTarget
+ * @param {string} eventType type of events (e.g. "click", "message", etc.)
+ * @returns {Stream} stream
+ */
 function fromEventTarget(eventTarget, eventType) {
 	return new Stream(function(next) {
 		eventTarget.addEventListener(eventType, next, false);
@@ -75,7 +92,7 @@ function fromEventEmitter(eventEmitter, eventType) {
 
 		return function() {
 			eventEmitter.off(eventType, next);
-		}
+		};
 	});
 }
 
