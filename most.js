@@ -4,8 +4,8 @@
  * Licensed under the MIT License at:
  * http://www.opensource.org/licenses/mit-license.php
  *
- * @author: Brian Cavalier
- * @author: John Hann
+ * @author Brian Cavalier
+ * @author John Hann
  */
 
 // TODO: take, takeWhile, takeUntil, drop, dropWhile, takeUntil

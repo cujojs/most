@@ -16,7 +16,7 @@ function assertSame(done, p1, p2) {
 
 describe('Stream', function() {
 
-	describe('each', function() {
+	describe('forEach', function() {
 		it('should call emitter in future stack', function(done) {
 			var spy = this.spy();
 
