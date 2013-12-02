@@ -8,9 +8,6 @@
  * @author John Hann
  */
 
-// TODO: take, takeWhile, takeUntil, drop, dropWhile, takeUntil
-// TODO: streams from iterable/iterator/generator
-
 var Stream = require('./Stream');
 
 module.exports = create;
