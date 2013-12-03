@@ -9,6 +9,7 @@
  */
 
 var Stream = require('./Stream');
+var asyncEvery = require('./array/async');
 
 module.exports = create;
 
@@ -21,7 +22,6 @@ create.fromEventEmitter = fromEventEmitter;
 create.fromPromise = fromPromise;
 
 var slice = Array.prototype.slice;
-var forEach = Array.prototype.forEach;
 
 /**
  * (f, g) -> h -> Stream
@@ -44,14 +44,7 @@ function create(emitter) {
  */
 function fromArray(array) {
 	return new Stream(function(next, end) {
-		try {
-			forEach.call(array, function(x) {
-				next(x);
-			});
-			end();
-		} catch(e) {
-			end(e);
-		}
+		asyncEvery(array, next, end);
 
 		return noop;
 	});

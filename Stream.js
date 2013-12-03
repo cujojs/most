@@ -81,9 +81,11 @@ proto.forEach = function(next, end) {
 
 	function safeNext(x) {
 		if(ended || unsubscribed) {
-			return;
+			return false;
 		}
 		next(x);
+
+		return true;
 	}
 
 	function safeEnd() {
@@ -136,7 +138,7 @@ proto.filter = function(predicate) {
 	});
 };
 
-proto.merge = function(other) {
+proto.interleave = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		var count = 2;
@@ -223,6 +225,95 @@ proto.buffer = function(windower) {
 			buffer = windower(next, x, buffer||[]);
 		}, end);
 	});
+};
+
+proto.zipWith = function(other, f) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var first, count = 2, pursue = true;
+
+		stream(function(x) {
+			first = x;
+			return pursue;
+		}, handleEnd);
+		other._emitter(function(x) {
+			if(next(f(first, x)) === false) {
+				end();
+				pursue = false;
+			}
+			return pursue;
+		}, handleEnd);
+
+		function handleEnd(e) {
+			pursue = false;
+			count -= 1;
+			if(e != null) {
+				end(e);
+			} else if (count === 0) {
+				end();
+			}
+		}
+	});
+};
+
+proto.zip = function(other) {
+	return this.zipWith(other, function(x, y) {
+		return [x, y];
+	});
+};
+
+proto.intersperse = function(val) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var pursue = true;
+
+		stream(function(x) {
+			next(x);
+			pursue = next(val);
+			return pursue;
+		}, handleEnd);
+
+		function handleEnd(e) {
+			pursue = false;
+			if(e != null) {
+				end(e);
+			} else {
+				end();
+			}
+		}
+	});
+};
+
+proto.unfold = function(f, g) {
+	var self = this;
+	var pursue = true;
+	return new Stream(function(next, end) {
+		var iterate = function(e) {
+			var handleEnd = function() {
+				self = self.flatMap(function(x){
+					return Stream.of(f(x));
+				});
+				self._emitter(function(x) {
+					pursue = next(x);
+					if(typeof g === 'function') {
+						pursue = !(g(x) === void 0);
+					}
+				}, function(e) {
+					if(e != null) {
+						end(e);
+					} else {
+						pursue ? iterate() : end();
+					}
+				});
+			};
+			e == null ? async(handleEnd) : end(e);
+		};
+		self._emitter(next, iterate);
+	});
+};
+
+proto.iterate = function(f) {
+	return this.unfold(f);
 };
 
 proto.bufferCount = function(n) {
