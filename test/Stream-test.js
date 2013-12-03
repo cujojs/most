@@ -690,4 +690,44 @@ describe('Stream', function() {
 
 	});
 
+	describe('throttle', function() {
+
+		it('should emit the most recent element', function(done) {
+			var spy = this.spy();
+			new Stream(function(next, end) {
+				next(other);
+				next(other);
+				next(other);
+				next(other);
+				next(sentinel);
+				setTimeout(end, 20);
+			}).throttle(10).forEach(spy, function() {
+				expect(spy).toHaveBeenCalledOnceWith(sentinel);
+				done();
+			});
+		});
+
+		it('should allow only 1 item within the interval', function(done) {
+			var spy = this.spy();
+			new Stream(function(next, end) {
+				setTimeout(function() {
+					next(other);
+				}, 0);
+				setTimeout(function() {
+					next(sentinel);
+				}, 10);
+				setTimeout(function() {
+					next(other);
+				}, 20);
+				setTimeout(function() {
+					next(sentinel);
+				}, 30);
+
+				setTimeout(end, 100);
+			}).throttle(15).forEach(function(x) {
+				expect(x).toBe(sentinel);
+			}, done);
+		});
+	});
+
 });

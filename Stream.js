@@ -187,11 +187,11 @@ proto.dropWhile = function(predicate) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			if (predicate != null) {
+			if (predicate !== void 0) {
 				if (predicate(x)) {
 					return;
 				}
-				predicate = null;
+				predicate = void 0;
 			}
 			next(x);
 		}, end);
@@ -267,10 +267,10 @@ proto.throttle = function(interval) {
 		stream(function(x) {
 			cachedEvent = x;
 
-			if(!throttled) {
+			if(throttled === void 0) {
 				throttled = setTimeout(function() {
 					throttled = void 0;
-					next(x);
+					next(cachedEvent);
 				}, interval);
 			}
 		}, end);
