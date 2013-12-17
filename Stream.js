@@ -267,7 +267,7 @@ proto.intersperse = function(val) {
 	return new Stream(function(next, end) {
 		stream(function(x) {
 			next(x);
-			return next(val);
+			next(val);
 		}, handleEnd);
 
 		function handleEnd(e) {
