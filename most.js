@@ -101,6 +101,18 @@ function fromPromise(promise) {
 	});
 }
 
+/**
+ * Create an infinite stream starting at seed
+ * and applying generator
+ * [seed, generator(seed), generator(generator(seed)) .... ]
+ * @param generator
+ * @param seed
+ * @returns {*}
+ */
+function unfold(generator, seed) {
+	return Stream.of(seed).iterate(generator)
+}
+
 Object.keys(Stream.prototype).reduce(function(exports, key) {
 	var method = Stream.prototype[key];
 

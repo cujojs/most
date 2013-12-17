@@ -284,20 +284,21 @@ proto.intersperse = function(val) {
 	});
 };
 
-proto.unfold = function(f, g) {
+proto.cycle = function() {
+	return this.iterate(identity);
+};
+
+proto.iterate = function(g) {
 	var self = this;
 	var pursue = true;
 	return new Stream(function(next, end) {
 		var iterate = function(e) {
 			var handleEnd = function() {
-				self = self.flatMap(function(x){
-					return Stream.of(f(x));
+				self = self.map(function(x){
+					return g(x);
 				});
 				self._emitter(function(x) {
 					pursue = next(x);
-					if(typeof g === 'function') {
-						pursue = !(g(x) === void 0);
-					}
 				}, function(e) {
 					if(e != null) {
 						end(e);
@@ -310,10 +311,6 @@ proto.unfold = function(f, g) {
 		};
 		self._emitter(next, iterate);
 	});
-};
-
-proto.iterate = function(f) {
-	return this.unfold(f);
 };
 
 proto.bufferCount = function(n) {

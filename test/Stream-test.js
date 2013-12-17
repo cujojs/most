@@ -447,45 +447,20 @@ describe('Stream', function() {
 			});
 		});
 
-		it('should do unfold by calling the iterator and the predicate', function(done) {
+		it('should do unfold by calling the generator', function(done) {
 			var f = this.spy();
-			var pred = this.spy();
 
-			var unsubscribe = Stream.of(1).unfold(f, pred)
+			var unsubscribe = Stream.of(1).iterate(f)
 				.forEach(function(x) {
 					unsubscribe();
 				}, function() {
 					expect(f).toHaveBeenCalled();
-					expect(pred).toHaveBeenCalled();
-					done();
-				});
-		});
-
-		it('should do unfold by calling the iterator and the predicate', function(done) {
-			var f = this.spy();
-			var pred = this.spy();
-
-			var unsubscribe = Stream.of(1).unfold(f, pred)
-				.forEach(function(x) {
-					unsubscribe();
-				}, function() {
-					expect(f).toHaveBeenCalled();
-					expect(pred).toHaveBeenCalled();
 					done();
 				});
 		});
 
 		it('should call end on error on iterator', function(done) {
-			Stream.of(1).unfold(function() {throw sentinel;})
-				.forEach(function() {}, function(e) {
-					expect(e).toBe(sentinel);
-					done();
-				});
-		});
-
-		it('should call end on error on predicate', function(done) {
-			var f = this.spy();
-			Stream.of(1).unfold(f, function() {throw sentinel;})
+			Stream.of(1).iterate(function() {throw sentinel;})
 				.forEach(function() {}, function(e) {
 					expect(e).toBe(sentinel);
 					done();
