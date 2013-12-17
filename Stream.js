@@ -265,16 +265,12 @@ proto.zip = function(other) {
 proto.intersperse = function(val) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var pursue = true;
-
 		stream(function(x) {
 			next(x);
-			pursue = next(val);
-			return pursue;
+			return next(val);
 		}, handleEnd);
 
 		function handleEnd(e) {
-			pursue = false;
 			if(e != null) {
 				end(e);
 			} else {

@@ -104,13 +104,13 @@ function fromPromise(promise) {
 /**
  * Create an infinite stream starting at seed
  * and applying generator
- * [seed, generator(seed), generator(generator(seed)) .... ]
- * @param generator
- * @param seed
- * @returns {*}
+ * {seed, generator(seed), generator(generator(seed)) .... }
+ * @param {function(x)} generator function
+ * @param {element} seed that will be the head of the stream
+ * @returns {Stream} infinite stream
  */
 function unfold(generator, seed) {
-	return Stream.of(seed).iterate(generator)
+	return Stream.of(seed).iterate(generator);
 }
 
 Object.keys(Stream.prototype).reduce(function(exports, key) {
