@@ -14,6 +14,8 @@ module.exports = Stream;
 
 Stream.of = of;
 Stream.empty = empty;
+Stream.unfold = unfold;
+Stream.cycle = cycle;
 
 function Stream(emitter) {
 	this._emitter = emitter;
@@ -35,6 +37,29 @@ function of(x) {
 function empty() {
 	return new Stream(emptyEmitter);
 }
+
+function unfold(f, x) {
+	var value = x;
+	return new Stream(function(next, end) {
+		try {
+			(next(value) === false) ? end() : async(emitNext);
+		} catch(e) {
+			end(e)
+		}
+
+		function emitNext() {
+			try {
+				(next(value = f(value)) === false) ? end() : async(emitNext);
+			} catch(e) {
+				end(e);
+			}
+		}
+	});
+}
+
+function cycle(x) {
+	return iterate(identity, x);
+};
 
 var proto = Stream.prototype = {};
 
@@ -227,85 +252,13 @@ proto.buffer = function(windower) {
 	});
 };
 
-proto.zipWith = function(other, f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var first, count = 2, pursue = true;
-
-		stream(function(x) {
-			first = x;
-			return pursue;
-		}, handleEnd);
-		other._emitter(function(x) {
-			if(next(f(first, x)) === false) {
-				end();
-				pursue = false;
-			}
-			return pursue;
-		}, handleEnd);
-
-		function handleEnd(e) {
-			pursue = false;
-			count -= 1;
-			if(e != null) {
-				end(e);
-			} else if (count === 0) {
-				end();
-			}
-		}
-	});
-};
-
-proto.zip = function(other) {
-	return this.zipWith(other, function(x, y) {
-		return [x, y];
-	});
-};
-
 proto.intersperse = function(val) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
 			next(x);
-			next(val);
-		}, handleEnd);
-
-		function handleEnd(e) {
-			if(e != null) {
-				end(e);
-			} else {
-				end();
-			}
-		}
-	});
-};
-
-proto.cycle = function() {
-	return this.iterate(identity);
-};
-
-proto.iterate = function(g) {
-	var self = this;
-	var pursue = true;
-	return new Stream(function(next, end) {
-		var iterate = function(e) {
-			var handleEnd = function() {
-				self = self.map(function(x){
-					return g(x);
-				});
-				self._emitter(function(x) {
-					pursue = next(x);
-				}, function(e) {
-					if(e != null) {
-						end(e);
-					} else {
-						pursue ? iterate() : end();
-					}
-				});
-			};
-			e == null ? async(handleEnd) : end(e);
-		};
-		self._emitter(next, iterate);
+			return next(val);
+		}, end);
 	});
 };
 
