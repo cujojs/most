@@ -14,7 +14,7 @@ module.exports = Stream;
 
 Stream.of = of;
 Stream.empty = empty;
-Stream.unfold = unfold;
+Stream.iterate = iterate;
 Stream.cycle = cycle;
 
 function Stream(emitter) {
@@ -38,7 +38,7 @@ function empty() {
 	return new Stream(emptyEmitter);
 }
 
-function unfold(f, x) {
+function iterate(f, x) {
 	var value = x;
 	return new Stream(function(next, end) {
 		try {

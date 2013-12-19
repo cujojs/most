@@ -15,7 +15,7 @@ module.exports = create;
 
 create.of = Stream.of;
 create.empty = Stream.empty;
-create.unfold = Stream.unfold;
+create.iterate = Stream.iterate;
 create.cycle = Stream.cycle;
 create.fromArray = fromArray;
 create.fromItem = fromItems;
