@@ -242,6 +242,24 @@ describe('Stream', function() {
 			});
 		});
 
+		it('should flatMap even for infinite streams', function(done) {
+			var s1 = Stream.iterate(function(x) {return x+1;}, 1);
+			var s2 = s1.flatMap(function(x) {return Stream.of(x + 'f');});
+			expect(s2).not.toBe(s1);
+			expect(s2 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			var i = 0;
+			var unsubscribe = s2.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 4) && unsubscribe();
+			}, function() {
+				expect(result).toEqual(['1f', '2f', '3f', '4f']);
+				done();
+			});
+		});
+
 		it('should not call end when no error', function(done) {
 			var nextSpy = this.spy();
 
@@ -337,6 +355,22 @@ describe('Stream', function() {
 			});
 		});
 
+		it('should filter an infinite stream', function(done) {
+			var s1 = Stream.iterate(function(x) {return x+1;}, 1);
+			var s2 = s1.filter(function(){return true;});
+			var result = [];
+			var i = 0;
+			var unsubscribe = s2.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 3) && unsubscribe();
+			}, function() {
+				expect(i).toEqual(3);
+				expect(result).toEqual([1, 2, 3]);
+				done();
+			});
+		});
+
 	});
 
 	describe('interleave', function() {
@@ -376,12 +410,9 @@ describe('Stream', function() {
 			var result = [];
 			var i = 0;
 			var unsubscribe = s3.forEach(function(x) {
-				if(i >= 6) {
-					unsubscribe();
-				} else {
-					result.push(x);
-					i++;
-				}
+				result.push(x);
+				i++;
+				(i >= 6) && unsubscribe();
 			}, function() {
 				expect(result).toEqual([1, 4, 2, 5, 3, 6]);
 				done();
@@ -481,6 +512,31 @@ describe('Stream', function() {
 
 	});
 
+	describe('cycle', function() {
+
+		it('should keep repeating', function(done) {
+			var count = 0;
+			var buffer = [];
+			var unsubscribe = fromArray([1, 2, 3]).cycle().forEach(function(x) {
+				count ++;
+				buffer.push(x);
+				(count == 9) && unsubscribe();
+			}, function() {
+				expect(buffer).toEqual([1, 2, 3, 1, 2, 3, 1, 2, 3]);
+				done();
+			});
+		});
+
+		it('should call end on error ', function(done) {
+			fromArray([1, 2, 3]).cycle()
+				.forEach(function() { throw sentinel;}, function(e) {
+					expect(e).toBe(sentinel);
+					done();
+				});
+		});
+
+	});
+
 	describe('intersperse', function() {
 
 		it('should add one more item', function(done) {
@@ -560,6 +616,87 @@ describe('Stream', function() {
 
 	});
 
+	describe('zip', function() {
+
+		it('should zip two stream', function(done) {
+			var first = [1, 2, 3];
+			var second = [4, 5, 6];
+			var s1 = fromArray(first);
+			var s2 = fromArray(second);
+			var s3 = s1.zip(s2);
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s3.forEach(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([[1, 4], [2, 5], [3, 6]]);
+				done();
+			});
+		});
+
+		it('should call end on error', function(done) {
+			Stream.of(1).zip(Stream.of(1)).forEach(function() {
+				throw sentinel;
+			}, function(e) {
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should zip two infinite streams', function(done) {
+			var s1 = Stream.iterate(function(x) {return x+1;}, 1);
+			var s2 = Stream.iterate(function(x) {return x+1;}, 4);
+			var s3 = s1.zip(s2);
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			var i = 0;
+			var unsubscribe = s3.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 3) && unsubscribe();
+			}, function() {
+				expect(result).toEqual([[1, 4], [2, 5], [3, 6]]);
+				done();
+			});
+		});
+
+		it('should call end on error even for infinite stream', function(done) {
+			var f = this.spy();
+			var s1 = Stream.iterate(f, 1);
+			var s2 = Stream.iterate(f, 1);
+			s1.zip(s2)
+				.forEach(function() {
+					throw sentinel;
+				}, function(e) {
+					expect(e).toBe(sentinel);
+					done();
+				});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).zip(new Stream(function(next, end) {
+					next();
+					end();
+				})).forEach(nextSpy, function(e) {
+					expect(e).not.toBeDefined();
+					expect(nextSpy).toHaveBeenCalledOnce();
+					done();
+				});
+		});
+
+	});
+
 	describe('concat', function() {
 
 		it('should return a stream containing items from concatenated streams in correct order', function(done) {
@@ -629,6 +766,21 @@ describe('Stream', function() {
 
 			s.forEach(function(x) {
 				expect(x).not.toBeDefined();
+				done();
+			});
+		});
+
+		it('should tap even for infinite streams', function(done) {
+			var s1 = Stream.iterate(function(x) {return x+1;}, 1);
+			var s2 = s1.tap(function() {});
+			var result = [];
+			var i = 0;
+			var unsubscribe = s2.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 4) && unsubscribe();
+			}, function() {
+				expect(i).toEqual(4);
 				done();
 			});
 		});
@@ -703,6 +855,21 @@ describe('Stream', function() {
 					expect(nextSpy).toHaveBeenCalledOnce();
 					done();
 				});
+		});
+
+		it('should take even for infinite streams', function(done) {
+			var s1 = Stream.iterate(function(x) {return x+1;}, 1);
+			var s2 = s1.take(3);
+			var result = [];
+			var i = 0;
+			var unsubscribe = s2.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 3) && unsubscribe();
+			}, function() {
+				expect(i).toEqual(3);
+				done();
+			});
 		});
 
 	});
