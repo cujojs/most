@@ -144,8 +144,8 @@ proto.ap = function(stream2) {
 
 proto.flatMap = function(f) {
 	var stream = this._emitter;
-	var cont = true;
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
 			f(x)._emitter(function(x) {
 				return (cont = next(x));
@@ -161,22 +161,18 @@ proto.flatten = function() {
 
 proto.cycle = function() {
 	var stream = this._emitter;
-	var cont = true;
 	return new Stream(function(next, end) {
 		stream(next, handleEnd);
+		var cont = true;
 		function handleEnd(e) {
 			if(e != null) {
 				end(e);
 			} else {
-				if (cont === false) {
-					end();
-				} else {
-					async(function() {
-						stream(function(x) {
-							return (cont = next(x));
-						}, handleEnd);
-					});
-				}
+				(cont === false) ? end() : async(function() {
+					stream(function(x) {
+						return (cont = next(x));
+					}, handleEnd);
+				});
 			}
 		}
 	});
@@ -230,16 +226,16 @@ proto.zipWith = function(other, f) {
 		stream(function(x) {
 			if(buffer.length == 0) {
 				buffer.push(x);
-				return;
+			} else {
+				return next(f(x, buffer.shift()));
 			}
-			return next(f(x, buffer.shift()));
 		}, handleEnd);
 		other._emitter(function(x) {
 			if(buffer.length == 0) {
 				buffer.push(x);
-				return;
+			} else {
+				return next(f(buffer.shift(), x));
 			}
-			return next(f(buffer.shift(), x));
 		}, handleEnd);
 
 		function handleEnd(e) {
@@ -321,11 +317,12 @@ proto.takeWhile = function(predicate) {
 
 proto.buffer = function(windower) {
 	var stream = this._emitter;
-	var cont = true;
 	return new Stream(function(next, end) {
-		var buffer;
+		var buffer, cont = true;
 		stream(function(x) {
-			buffer = windower(function(x) {cont = next(x);}, x, buffer||[]);
+			buffer = windower(function(x) {
+				cont = next(x);
+			}, x, buffer||[]);
 			return cont;
 		}, end);
 	});
@@ -341,8 +338,8 @@ proto.bufferTime = function(interval) {
 
 proto.delay = function(ms) {
 	var stream = this._emitter;
-	var cont = true;
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
 			setTimeout(function() {
 				cont = next(x);
@@ -355,10 +352,10 @@ proto.delay = function(ms) {
 proto.debounce = function(interval) {
 	var nextEventTime = interval;
 	var stream = this._emitter;
-	var cont = true;
 
 	return new Stream(function(next, end) {
-		stream(function(x) {
+		var cont = true;
+			stream(function(x) {
 			var now = Date.now();
 			if(now >= nextEventTime) {
 				nextEventTime = now + interval;
@@ -372,9 +369,9 @@ proto.debounce = function(interval) {
 proto.throttle = function(interval) {
 	var cachedEvent, throttled;
 	var stream = this._emitter;
-	var cont = true;
 
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
 			cachedEvent = x;
 
@@ -416,9 +413,7 @@ proto.reduce = function(f, initial) {
 		stream(function(x) {
 			value = f(value, x);
 		}, function(e) {
-			if(e == null) {
-				next(value);
-			}
+			e == null && next(value);
 
 			end(e);
 		});
@@ -435,9 +430,7 @@ proto.reduceRight = function(f, initial) {
 		stream(function(x) {
 			buffer.push(x);
 		}, function(e) {
-			if(e == null) {
-				next(buffer.reduceRight(f, initial));
-			}
+			e == null && next(buffer.reduceRight(f, initial));
 
 			end(e);
 		});
