@@ -224,18 +224,16 @@ proto.zipWith = function(other, f) {
 		var buffer = [], count = 2;
 
 		stream(function(x) {
-			if(buffer.length == 0) {
-				buffer.push(x);
-			} else {
+			if(buffer.length > 0) {
 				return next(f(x, buffer.shift()));
 			}
+			buffer.push(x);
 		}, handleEnd);
 		other._emitter(function(x) {
-			if(buffer.length == 0) {
-				buffer.push(x);
-			} else {
+			if(buffer.length > 0) {
 				return next(f(buffer.shift(), x));
 			}
+			buffer.push(x);
 		}, handleEnd);
 
 		function handleEnd(e) {

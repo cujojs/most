@@ -1079,6 +1079,19 @@ describe('Stream', function() {
 			}).bufferCount(3).forEach(spy, done);
 		});
 
+		it('should buffer N items even with infinite stream', function(done) {
+			var s  = Stream.iterate(function(x) {return x+1;}, 1).bufferCount(3);
+			var i = 0, result = [];
+			var unsubscribe = s.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 6) && unsubscribe();
+			}, function() {
+				expect(i).toEqual(6);
+				done();
+			});
+		});
+
 	});
 
 	describe('bufferTime', function() {
@@ -1147,6 +1160,19 @@ describe('Stream', function() {
 			}).throttle(15).forEach(function(x) {
 				expect(x).toBe(sentinel);
 			}, done);
+		});
+
+		it('should throttle even with infinite stream', function(done) {
+			var s  = Stream.iterate(function(x) {return x+1;}, 1).throttle(5);
+			var i = 0, result = [];
+			var unsubscribe = s.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 6) && unsubscribe();
+			}, function() {
+				expect(i).toEqual(6);
+				done();
+			});
 		});
 
 	});
