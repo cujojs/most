@@ -325,10 +325,7 @@ proto.buffer = function(windower) {
 	return new Stream(function(next, end) {
 		var buffer;
 		stream(function(x) {
-			function n(x) {
-				cont = next(x);
-			}
-			buffer = windower(n, x, buffer||[]);
+			buffer = windower(function(x) {cont = next(x);}, x, buffer||[]);
 			return cont;
 		}, end);
 	});
