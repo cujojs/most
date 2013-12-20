@@ -637,6 +637,25 @@ describe('Stream', function() {
 			});
 		});
 
+		it('should zip two stream of different size', function(done) {
+			var first = [1, 2, 3];
+			var second = [4, 5];
+			var s1 = fromArray(first);
+			var s2 = fromArray(second);
+			var s3 = s1.zip(s2);
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			s3.forEach(function(x) {
+				result.push(x);
+			}, function() {
+				expect(result).toEqual([[1, 4], [2, 5]]);
+				done();
+			});
+		});
+
 		it('should call end on error', function(done) {
 			Stream.of(1).zip(Stream.of(1)).forEach(function() {
 				throw sentinel;
@@ -662,6 +681,95 @@ describe('Stream', function() {
 				(i >= 3) && unsubscribe();
 			}, function() {
 				expect(result).toEqual([[1, 4], [2, 5], [3, 6]]);
+				done();
+			});
+		});
+
+		it('should zip two streams with one stream faster in next', function(done) {
+			var s1 = new Stream(function(next, end) {
+				var i = 100;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 110) {
+						clearInterval(interval);
+						end();
+					}
+				}, 0);
+			});
+			var s2 = new Stream(function(next, end) {
+				var i = 0;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 10) {
+						clearInterval(interval);
+						end();
+					}
+				}, 10);
+			});
+			var s3 = s1.zip(s2);
+
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			var i = 0;
+			var unsubscribe = s3.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 10) && unsubscribe();
+			}, function(e) {
+				expect(result).toEqual([[100, 0], [101, 1], [102, 2], [103, 3], [104, 4], [105, 5], [106, 6], [107, 7], [108, 8], [109, 9]]);
+				done();
+			});
+		});
+
+		it('should zip two streams with time variation in speed for one stream in next', function(done) {
+			this.timeout = 1000;
+			var s1 = new Stream(function(next, end) {
+				var i = 100;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 105) {
+						f();
+					}
+				}, 0);
+
+				function f() {
+					clearInterval(interval);
+					var interval2 = setInterval(function() {
+						next(i++);
+						if(i > 110) {
+							clearInterval(interval2);
+							end();
+						}
+					}, 100);
+				}
+			});
+			var s2 = new Stream(function(next, end) {
+				var i = 0;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 10) {
+						clearInterval(interval);
+						end();
+					}
+				}, 10);
+			});
+			var s3 = s1.zip(s2);
+
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			var i = 0;
+			var unsubscribe = s3.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 10) && unsubscribe();
+			}, function(e) {
+				expect(result).toEqual([[100, 0], [101, 1], [102, 2], [103, 3], [104, 4], [105, 5], [106, 6], [107, 7], [108, 8], [109, 9]]);
 				done();
 			});
 		});

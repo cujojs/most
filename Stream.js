@@ -42,14 +42,14 @@ function iterate(f, x) {
 	var value = x;
 	return new Stream(function(next, end) {
 		try {
-			(next(value) === false) ? end() : async(emitNext);
+			next(value) ? async(emitNext) : end();
 		} catch(e) {
 			end(e)
 		}
 
 		function emitNext() {
 			try {
-				(next(value = f(value)) === false) ? end() : async(emitNext);
+				next(value = f(value)) ? async(emitNext) : end();
 			} catch(e) {
 				end(e);
 			}
@@ -221,24 +221,31 @@ proto.intersperse = function(val) {
 proto.zipWith = function(other, f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var buffer = [], count = 2;
+		var buffer1 = [], buffer2 = [], count = 2, cont = true;
 
 		stream(function(x) {
-			if(buffer.length > 0) {
-				return next(f(x, buffer.shift()));
+			if(cont) {
+				if(buffer2.length > 0) {
+					return (cont = next(f(x, buffer2.shift())));
+				}
+				buffer1.push(x);
 			}
-			buffer.push(x);
+			return cont;
 		}, handleEnd);
 		other._emitter(function(x) {
-			if(buffer.length > 0) {
-				return next(f(buffer.shift(), x));
+			if(cont) {
+				if(buffer1.length > 0) {
+					return (cont = next(f(buffer1.shift(), x)));
+				}
+				buffer2.push(x);
 			}
-			buffer.push(x);
+			return cont;
 		}, handleEnd);
 
 		function handleEnd(e) {
 			count -= 1;
 			if(e != null) {
+				cont = false;
 				end(e);
 			} else if (count === 0) {
 				end();
