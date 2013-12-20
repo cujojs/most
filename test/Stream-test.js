@@ -685,7 +685,7 @@ describe('Stream', function() {
 			});
 		});
 
-		it('should zip two streams with one stream faster in next', function(done) {
+		it('should zip two streams with second stream faster in next', function(done) {
 			var s1 = new Stream(function(next, end) {
 				var i = 100;
 				var interval = setInterval(function() {
@@ -718,7 +718,46 @@ describe('Stream', function() {
 				result.push(x);
 				i++;
 				(i >= 10) && unsubscribe();
-			}, function(e) {
+			}, function() {
+				expect(result).toEqual([[100, 0], [101, 1], [102, 2], [103, 3], [104, 4], [105, 5], [106, 6], [107, 7], [108, 8], [109, 9]]);
+				done();
+			});
+		});
+
+		it('should zip two streams with first stream faster in next', function(done) {
+			var s1 = new Stream(function(next, end) {
+				var i = 100;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 110) {
+						clearInterval(interval);
+						end();
+					}
+				}, 10);
+			});
+			var s2 = new Stream(function(next, end) {
+				var i = 0;
+				var interval = setInterval(function() {
+					next(i++);
+					if(i > 10) {
+						clearInterval(interval);
+						end();
+					}
+				}, 0);
+			});
+			var s3 = s1.zip(s2);
+
+			expect(s3).not.toBe(s1);
+			expect(s3).not.toBe(s2);
+			expect(s3 instanceof s1.constructor).toBeTrue();
+
+			var result = [];
+			var i = 0;
+			var unsubscribe = s3.forEach(function(x) {
+				result.push(x);
+				i++;
+				(i >= 10) && unsubscribe();
+			}, function() {
 				expect(result).toEqual([[100, 0], [101, 1], [102, 2], [103, 3], [104, 4], [105, 5], [106, 6], [107, 7], [108, 8], [109, 9]]);
 				done();
 			});
@@ -768,7 +807,7 @@ describe('Stream', function() {
 				result.push(x);
 				i++;
 				(i >= 10) && unsubscribe();
-			}, function(e) {
+			}, function() {
 				expect(result).toEqual([[100, 0], [101, 1], [102, 2], [103, 3], [104, 4], [105, 5], [106, 6], [107, 7], [108, 8], [109, 9]]);
 				done();
 			});

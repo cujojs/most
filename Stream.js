@@ -221,23 +221,25 @@ proto.intersperse = function(val) {
 proto.zipWith = function(other, f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var buffer1 = [], buffer2 = [], count = 2, cont = true;
+		var buffer = [], count = 2, first = true, cont = true;
 
 		stream(function(x) {
 			if(cont) {
-				if(buffer2.length > 0) {
-					return (cont = next(f(x, buffer2.shift())));
+				if(buffer.length > 0 && !first) {
+					return (cont = next(f(x, buffer.shift())));
 				}
-				buffer1.push(x);
+				buffer.push(x);
+				first = true;
 			}
 			return cont;
 		}, handleEnd);
 		other._emitter(function(x) {
 			if(cont) {
-				if(buffer1.length > 0) {
-					return (cont = next(f(buffer1.shift(), x)));
+				if(buffer.length > 0 && first) {
+					return (cont = next(f(buffer.shift(), x)));
 				}
-				buffer2.push(x);
+				buffer.push(x);
+				first = false;
 			}
 			return cont;
 		}, handleEnd);
