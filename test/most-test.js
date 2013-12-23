@@ -37,7 +37,7 @@ describe('most', function() {
 				expect(count).toEqual(1);
 				done();
 			});
-		})
+		});
 
 	});
 });

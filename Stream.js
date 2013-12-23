@@ -44,7 +44,7 @@ function iterate(f, x) {
 		try {
 			next(value) ? async(emitNext) : end();
 		} catch(e) {
-			end(e)
+			end(e);
 		}
 
 		function emitNext() {
