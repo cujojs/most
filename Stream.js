@@ -14,6 +14,8 @@ module.exports = Stream;
 
 Stream.of = of;
 Stream.empty = empty;
+Stream.iterate = iterate;
+Stream.repeat = repeat;
 
 function Stream(emitter) {
 	this._emitter = emitter;
@@ -35,6 +37,30 @@ function of(x) {
 function empty() {
 	return new Stream(emptyEmitter);
 }
+
+function iterate(f, x) {
+	var value = x;
+	return new Stream(function(next, end) {
+		try {
+			next(value) ? async(emitNext) : end();
+		} catch(e) {
+			end(e);
+		}
+
+		function emitNext() {
+			try {
+				next(value = f(value)) ? async(emitNext) : end();
+			} catch(e) {
+				end(e);
+			}
+		}
+	});
+}
+
+function repeat(x) {
+	return iterate(identity, x);
+}
+
 
 var proto = Stream.prototype = {};
 
@@ -81,9 +107,11 @@ proto.forEach = function(next, end) {
 
 	function safeNext(x) {
 		if(ended || unsubscribed) {
-			return;
+			return false;
 		}
 		next(x);
+
+		return true;
 	}
 
 	function safeEnd() {
@@ -103,7 +131,7 @@ proto.map = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			next(f(x));
+			return next(f(x));
 		}, end);
 	});
 };
@@ -117,8 +145,12 @@ proto.ap = function(stream2) {
 proto.flatMap = function(f) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
-			f(x)._emitter(next, endOnError(end));
+			f(x)._emitter(function(x) {
+				return (cont = next(x));
+			}, endOnError(end));
+			return cont;
 		}, end);
 	});
 };
@@ -127,16 +159,37 @@ proto.flatten = function() {
 	return this.flatMap(identity);
 };
 
+proto.cycle = function() {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(next, handleEnd);
+		var cont = true;
+		function handleEnd(e) {
+			if(e != null) {
+				end(e);
+			} else {
+				(cont === false) ? end() : async(function() {
+					stream(function(x) {
+						return (cont = next(x));
+					}, handleEnd);
+				});
+			}
+		}
+	});
+};
+
 proto.filter = function(predicate) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			predicate(x) && next(x);
+			if (predicate(x)) {
+				return next(x);
+			}
 		}, end);
 	});
 };
 
-proto.merge = function(other) {
+proto.interleave = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		var count = 2;
@@ -155,6 +208,60 @@ proto.merge = function(other) {
 	});
 };
 
+proto.intersperse = function(val) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		stream(function(x) {
+			next(x);
+			return next(val);
+		}, end);
+	});
+};
+
+proto.zipWith = function(other, f) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var buffer = [], count = 2, first = true, cont = true;
+
+		stream(function(x) {
+			if(cont) {
+				if(buffer.length > 0 && !first) {
+					return (cont = next(f(x, buffer.shift())));
+				}
+				buffer.push(x);
+				first = true;
+			}
+			return cont;
+		}, handleEnd);
+		other._emitter(function(x) {
+			if(cont) {
+				if(buffer.length > 0 && first) {
+					return (cont = next(f(buffer.shift(), x)));
+				}
+				buffer.push(x);
+				first = false;
+			}
+			return cont;
+		}, handleEnd);
+
+		function handleEnd(e) {
+			count -= 1;
+			if(e != null) {
+				cont = false;
+				end(e);
+			} else if (count === 0) {
+				end();
+			}
+		}
+	});
+};
+
+proto.zip = function(other) {
+	return this.zipWith(other, function(x, y) {
+		return [x, y];
+	});
+};
+
 proto.concat = function(other) {
 	// TODO: Should this accept an array?  a stream of streams?
 	var stream = this._emitter;
@@ -170,7 +277,7 @@ proto.tap = function(f) {
 	return new Stream(function(next, end) {
 		stream(function(x) {
 			f(x);
-			next(x);
+			return next(x);
 		}, end);
 	});
 };
@@ -193,7 +300,7 @@ proto.dropWhile = function(predicate) {
 				}
 				predicate = void 0;
 			}
-			next(x);
+			return next(x);
 		}, end);
 	});
 };
@@ -218,9 +325,12 @@ proto.takeWhile = function(predicate) {
 proto.buffer = function(windower) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
-		var buffer;
+		var buffer, cont = true;
 		stream(function(x) {
-			buffer = windower(next, x, buffer||[]);
+			buffer = windower(function(x) {
+				cont = next(x);
+			}, x, buffer||[]);
+			return cont;
 		}, end);
 	});
 };
@@ -236,10 +346,12 @@ proto.bufferTime = function(interval) {
 proto.delay = function(ms) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
 			setTimeout(function() {
-				next(x);
+				cont = next(x);
 			}, ms||0);
+			return cont;
 		}, end);
 	});
 };
@@ -249,12 +361,14 @@ proto.debounce = function(interval) {
 	var stream = this._emitter;
 
 	return new Stream(function(next, end) {
-		stream(function(x) {
+		var cont = true;
+			stream(function(x) {
 			var now = Date.now();
 			if(now >= nextEventTime) {
 				nextEventTime = now + interval;
-				next(x);
+				cont = next(x);
 			}
+			return cont;
 		}, end);
 	});
 };
@@ -264,15 +378,17 @@ proto.throttle = function(interval) {
 	var stream = this._emitter;
 
 	return new Stream(function(next, end) {
+		var cont = true;
 		stream(function(x) {
 			cachedEvent = x;
 
 			if(throttled === void 0) {
 				throttled = setTimeout(function() {
 					throttled = void 0;
-					next(cachedEvent);
+					cont = next(cachedEvent);
 				}, interval);
 			}
+			return cont;
 		}, end);
 	});
 };
@@ -304,9 +420,7 @@ proto.reduce = function(f, initial) {
 		stream(function(x) {
 			value = f(value, x);
 		}, function(e) {
-			if(e == null) {
-				next(value);
-			}
+			e == null && next(value);
 
 			end(e);
 		});
@@ -323,9 +437,7 @@ proto.reduceRight = function(f, initial) {
 		stream(function(x) {
 			buffer.push(x);
 		}, function(e) {
-			if(e == null) {
-				next(buffer.reduceRight(f, initial));
-			}
+			e == null && next(buffer.reduceRight(f, initial));
 
 			end(e);
 		});
