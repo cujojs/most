@@ -844,6 +844,110 @@ describe('Stream', function() {
 
 	});
 
+	describe('group', function() {
+
+		it('should return a stream of elements grouped by array', function(done) {
+			var s = fromArray([1, 2, 2, 3, 4, 4]).group();
+
+			var a = [];
+			s.forEach(function(x) {
+				a.push(x);
+			}, function(e) {
+				expect(a).toEqual([[1], [2, 2], [3], [4, 4]]);
+				done();
+			});
+		});
+
+		it('should return a stream of distinct elements even for infinite stream', function(done) {
+			var s = Stream.iterate(function(x) {return x + 1;}, 1).group();
+
+			var a = [], i = 0;
+			var unsubscribe = s.forEach(function(x) {
+				a.push(x);
+				i++;
+				(i >= 3) && unsubscribe();
+			}, function(e) {
+				expect(a).toEqual([[1], [2], [3]]);
+				done();
+			});
+		});
+
+		it('should call end on error', function(done) {
+			Stream.of(1).group().forEach(function() {
+				throw sentinel;
+			}, function(e) {
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).group().forEach(nextSpy, function(e) {
+					expect(e).not.toBeDefined();
+					expect(nextSpy).toHaveBeenCalledOnce();
+					done();
+				});
+		});
+
+	});
+
+	describe('distinct', function() {
+
+		it('should return a stream of elements with a suite of distinct element', function(done) {
+			var s = fromArray([1, 2, 2, 3, 4, 4]).distinct();
+
+			var a = [];
+			s.forEach(function(x) {
+				a.push(x);
+			}, function(e) {
+				expect(a).toEqual([1, 2, 3, 4]);
+				done();
+			});
+		});
+
+		it('should return a stream of distinct elements even for infinite stream', function(done) {
+			var s = Stream.iterate(function(x) {return x + 1;}, 1).distinct();
+
+			var a = [], i = 0;
+			var unsubscribe = s.forEach(function(x) {
+				a.push(x);
+				i++;
+				(i >= 3) && unsubscribe();
+			}, function(e) {
+				expect(a).toEqual([1, 2, 3]);
+				done();
+			});
+		});
+
+		it('should call end on error', function(done) {
+			Stream.of(1).distinct().forEach(function() {
+				throw sentinel;
+			}, function(e) {
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).distinct().forEach(nextSpy, function(e) {
+					expect(e).not.toBeDefined();
+					expect(nextSpy).toHaveBeenCalledOnce();
+					done();
+				});
+		});
+
+	});
+
 	describe('concat', function() {
 
 		it('should return a stream containing items from concatenated streams in correct order', function(done) {

@@ -182,9 +182,7 @@ proto.filter = function(predicate) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		stream(function(x) {
-			if (predicate(x)) {
-				return next(x);
-			}
+			return predicate(x) ? next(x) : true;
 		}, end);
 	});
 };
@@ -262,6 +260,36 @@ proto.zip = function(other) {
 	});
 };
 
+proto.group = function() {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var buffer = [];
+		var cont = true;
+		stream(function(x) {
+			if(buffer.length === 0 || buffer[0] === x) {
+				buffer.push(x);
+			} else {
+				cont = next(buffer);
+				buffer = [x];
+			}
+			return cont;
+		}, function(e) {
+			if (e != null) {
+				end(e);
+			} else {
+				(buffer.length > 0) && next(buffer);
+				end();
+			}
+		});
+	});
+};
+
+proto.distinct = function() {
+	return this.group().map(function(x) {
+		return x[0];
+	});
+};
+
 proto.concat = function(other) {
 	// TODO: Should this accept an array?  a stream of streams?
 	var stream = this._emitter;
@@ -296,7 +324,7 @@ proto.dropWhile = function(predicate) {
 		stream(function(x) {
 			if (predicate !== void 0) {
 				if (predicate(x)) {
-					return;
+					return true;
 				}
 				predicate = void 0;
 			}
