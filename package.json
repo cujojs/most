@@ -1,7 +1,7 @@
 {
 	"name": "most",
 	"version": "0.4.0",
-	"description": "Monadic streams",
+	"description": "Monads",
 	"main": "most.js",
 	"scripts": {
 		"test": "jshint . && buster-test"
@@ -16,6 +16,8 @@
 		"stream",
 		"streams",
 		"event stream",
+		"list",
+		"lazy list",
 		"monad",
 		"monadic",
 		"functional"
