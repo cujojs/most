@@ -2,15 +2,9 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../Stream');
-var asyncEvery = require('../array/async');
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
-
-function fromArray(array) {
-	return new Stream(function(next, end) {
-		asyncEvery(array, next, end);
-	});
-}
+var fromArray = Stream.fromArray;
 
 function assertSame(done, p1, p2) {
 	p1.forEach(function(x) {
@@ -449,6 +443,43 @@ describe('Stream', function() {
 		});
 
 	});
+
+	describe('fromArray', function() {
+
+		it('should not call next for empty array', function(done) {
+			var next = this.spy();
+
+			Stream.fromArray([]).forEach(next, function(e) {
+				expect(next).not.toHaveBeenCalled();
+				expect(e).not.toBeDefined();
+				done();
+			});
+		});
+
+		it('should iterate over each elements', function(done) {
+			var results = [];
+			Stream.fromArray([1, 2]).forEach(function(x) {
+				results.push(x);
+			}, function() {
+				expect(results).toEqual([1, 2]);
+				done();
+			});
+		});
+
+		it('should iterate until reach the right number', function(done) {
+			var s1 = Stream.fromArray([1, 2]);
+			var count = 0;
+			var unsubscribe = s1.forEach(function(x) {
+				count++;
+				unsubscribe();
+			}, function() {
+				expect(count).toEqual(1);
+				done();
+			});
+		});
+
+	});
+
 
 	describe('iterate', function() {
 
