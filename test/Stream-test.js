@@ -1041,7 +1041,6 @@ describe('Stream', function() {
 
 		it('should not transform stream items', function(done) {
 			var s = Stream.of();
-
 			s = s.tap(function() {
 				return sentinel;
 			});

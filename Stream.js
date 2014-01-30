@@ -16,7 +16,6 @@ module.exports = Stream;
 Stream.of = of;
 Stream.empty = empty;
 Stream.from = from;
-Stream.fromItems = fromItems;
 Stream.fromEventTarget = fromEventTarget;
 Stream.fromEventEmitter = fromEventEmitter;
 Stream.fromPromise = fromPromise;
@@ -28,16 +27,18 @@ function Stream(emitter) {
 }
 
 function of(x) {
-	return new Stream(function (next, end) {
-		try {
-			next(x);
-			end();
-		} catch (e) {
-			end(e);
-		}
+	return arguments.length <= 1
+	? new Stream(function (next, end) {
+			try {
+				next(x);
+				end();
+			} catch (e) {
+				end(e);
+			}
 
-		return noop;
-	});
+			return noop;
+		})
+	: from(slice.call(arguments));
 }
 
 function empty() {
@@ -57,14 +58,6 @@ function from(array) {
 	});
 }
 
-/**
- * arguments -> Stream
- * @param {...*?} items
- * @return {Stream} stream
- */
-function fromItems() {
-	return from(slice.call(arguments));
-}
 
 // EventTarget -> String -> Stream
 // Create an event stream from a w3c EventTarget
