@@ -15,7 +15,7 @@ module.exports = Stream;
 
 Stream.of = of;
 Stream.empty = empty;
-Stream.fromArray = fromArray;
+Stream.from = from;
 Stream.fromItems = fromItems;
 Stream.fromEventTarget = fromEventTarget;
 Stream.fromEventEmitter = fromEventEmitter;
@@ -49,7 +49,7 @@ function empty() {
  * @param {array} array Array-like
  * @return {Stream} stream
  */
-function fromArray(array) {
+function from(array) {
 	return new Stream(function(next, end) {
 		asyncArray(array, next, end);
 
@@ -63,7 +63,7 @@ function fromArray(array) {
  * @return {Stream} stream
  */
 function fromItems() {
-	return fromArray(slice.call(arguments));
+	return from(slice.call(arguments));
 }
 
 // EventTarget -> String -> Stream
