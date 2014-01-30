@@ -4,7 +4,7 @@ var expect = require('buster').expect;
 var Stream = require('../Stream');
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
-var fromArray = Stream.fromArray;
+var from = Stream.from;
 
 function assertSame(done, p1, p2) {
 	p1.forEach(function(x) {
@@ -383,7 +383,7 @@ describe('Stream', function() {
 
 		it('should contain items from both interleaved', function(done) {
 			var result = [];
-			fromArray([1, 2, 3]).interleave(fromArray([1, 2, 3]))
+			from([1, 2, 3]).interleave(from([1, 2, 3]))
 				.forEach(function(x) {
 					result.push(x);
 				}, function(e) {
@@ -444,12 +444,12 @@ describe('Stream', function() {
 
 	});
 
-	describe('fromArray', function() {
+	describe('from', function() {
 
 		it('should not call next for empty array', function(done) {
 			var next = this.spy();
 
-			Stream.fromArray([]).forEach(next, function(e) {
+			Stream.from([]).forEach(next, function(e) {
 				expect(next).not.toHaveBeenCalled();
 				expect(e).not.toBeDefined();
 				done();
@@ -458,7 +458,7 @@ describe('Stream', function() {
 
 		it('should iterate over each elements', function(done) {
 			var results = [];
-			Stream.fromArray([1, 2]).forEach(function(x) {
+			Stream.from([1, 2]).forEach(function(x) {
 				results.push(x);
 			}, function() {
 				expect(results).toEqual([1, 2]);
@@ -467,7 +467,7 @@ describe('Stream', function() {
 		});
 
 		it('should iterate until reach the right number', function(done) {
-			var s1 = Stream.fromArray([1, 2]);
+			var s1 = Stream.from([1, 2]);
 			var count = 0;
 			var unsubscribe = s1.forEach(function(x) {
 				count++;
@@ -548,7 +548,7 @@ describe('Stream', function() {
 		it('should keep repeating', function(done) {
 			var count = 0;
 			var buffer = [];
-			var unsubscribe = fromArray([1, 2, 3]).cycle().forEach(function(x) {
+			var unsubscribe = from([1, 2, 3]).cycle().forEach(function(x) {
 				count ++;
 				buffer.push(x);
 				(count == 9) && unsubscribe();
@@ -559,7 +559,7 @@ describe('Stream', function() {
 		});
 
 		it('should call end on error ', function(done) {
-			fromArray([1, 2, 3]).cycle()
+			from([1, 2, 3]).cycle()
 				.forEach(function() { throw sentinel;}, function(e) {
 					expect(e).toBe(sentinel);
 					done();
@@ -581,7 +581,7 @@ describe('Stream', function() {
 
 		it('should intersperse element in between', function(done) {
 			var first = [1, 2, 3];
-			var s1 = fromArray(first);
+			var s1 = from(first);
 			var s2 = s1.intersperse(4);
 			expect(s2).not.toBe(s1);
 			expect(s2 instanceof s1.constructor).toBeTrue();
@@ -652,8 +652,8 @@ describe('Stream', function() {
 		it('should zip two stream', function(done) {
 			var first = [1, 2, 3];
 			var second = [4, 5, 6];
-			var s1 = fromArray(first);
-			var s2 = fromArray(second);
+			var s1 = from(first);
+			var s2 = from(second);
 			var s3 = s1.zip(s2);
 			expect(s3).not.toBe(s1);
 			expect(s3).not.toBe(s2);
@@ -671,8 +671,8 @@ describe('Stream', function() {
 		it('should zip two stream of different size', function(done) {
 			var first = [1, 2, 3];
 			var second = [4, 5];
-			var s1 = fromArray(first);
-			var s2 = fromArray(second);
+			var s1 = from(first);
+			var s2 = from(second);
 			var s3 = s1.zip(s2);
 			expect(s3).not.toBe(s1);
 			expect(s3).not.toBe(s2);
@@ -878,7 +878,7 @@ describe('Stream', function() {
 	describe('group', function() {
 
 		it('should return a stream of elements grouped by array', function(done) {
-			var s = fromArray([1, 2, 2, 3, 4, 4]).group();
+			var s = from([1, 2, 2, 3, 4, 4]).group();
 
 			var a = [];
 			s.forEach(function(x) {
@@ -930,7 +930,7 @@ describe('Stream', function() {
 	describe('distinct', function() {
 
 		it('should return a stream of elements with a suite of distinct element', function(done) {
-			var s = fromArray([1, 2, 2, 3, 4, 4]).distinct();
+			var s = from([1, 2, 2, 3, 4, 4]).distinct();
 
 			var a = [];
 			s.forEach(function(x) {
@@ -997,7 +997,7 @@ describe('Stream', function() {
 
 		it('should contain items from both in right order', function(done) {
 			var result = [];
-			fromArray([1, 2, 3]).concat(fromArray([1, 2, 3]))
+			from([1, 2, 3]).concat(from([1, 2, 3]))
 				.forEach(function(x) {
 					result.push(x);
 				}, function(e) {
@@ -1041,7 +1041,6 @@ describe('Stream', function() {
 
 		it('should not transform stream items', function(done) {
 			var s = Stream.of();
-
 			s = s.tap(function() {
 				return sentinel;
 			});
@@ -1217,7 +1216,7 @@ describe('Stream', function() {
 		it('should not call end when no error', function(done) {
 			var nextSpy = this.spy();
 
-			fromArray([1, 2]).drop(1).forEach(nextSpy, function(e) {
+			from([1, 2]).drop(1).forEach(nextSpy, function(e) {
 				expect(e).not.toBeDefined();
 				expect(nextSpy).toHaveBeenCalledOnce();
 				done();
