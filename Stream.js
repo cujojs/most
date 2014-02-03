@@ -187,6 +187,43 @@ proto.filter = function(predicate) {
 	});
 };
 
+proto.findIndex = function(predicate) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var i = -1, found = false;
+		stream(function(x) {
+			i++;
+			if(predicate(x)) {
+				(found = true) && next(i);
+			}
+			return !found;
+		}, end);
+	});
+};
+
+proto.elementIndex = function(element) {
+	return this.findIndex(function(x) {
+		return element === x;
+	});
+};
+
+proto.findIndices = function(predicate) {
+	var stream = this._emitter;
+	return new Stream(function(next, end) {
+		var i = -1;
+		stream(function(x) {
+			i++;
+			return predicate(x) ? next(i) : true;
+		}, end);
+	});
+};
+
+proto.elementIndices = function(element) {
+	return this.findIndices(function(x) {
+		return element === x;
+	});
+};
+
 proto.interleave = function(other) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {

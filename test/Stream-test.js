@@ -373,6 +373,148 @@ describe('Stream', function() {
 
 	});
 
+	describe('findIndex', function() {
+
+		it('should return a stream containing the first index satisfying the predicate', function(done) {
+			var s = Stream.iterate(function(x) {return x + 1;}, 1).findIndex(function(x) {
+				return x >= 2;
+			});
+
+			var count = 0, a = -1;
+			s.forEach(function(x) {
+				a = x;
+				count++;
+			}, function() {
+				expect(a).toEqual(1);
+				expect(count).toEqual(1);
+				done();
+			});
+		});
+
+		it('should return an empty stream when not satisfying the predicate', function(done) {
+			var s = fromArray([1, 2 ,3, 4]).findIndex(function(x) {
+				return x < 0;
+			});
+
+			var count = 0;
+			s.forEach(function(x) {
+				count++;
+			}, function() {
+				expect(count).toEqual(0);
+				done();
+			});
+		});
+
+		it('should call end on error', function(done) {
+			Stream.of(1).findIndex(function(){ throw sentinel; }).forEach(function() {
+			}, function(e) {
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).findIndex(function(){ return true; }).forEach(nextSpy, function(e) {
+					expect(e).not.toBeDefined();
+					expect(nextSpy).toHaveBeenCalledOnce();
+					done();
+				});
+		});
+
+	});
+
+	describe('elementIndex', function() {
+
+		it('should return a stream containing the first index that is equals to the element', function(done) {
+			var s = Stream.iterate(function(x) {return x + 1;}, 1).elementIndex(2);
+
+			var count = 0, a = -1;
+			s.forEach(function(x) {
+				a = x;
+				count++;
+			}, function() {
+				expect(a).toEqual(1);
+				expect(count).toEqual(1);
+				done();
+			});
+		});
+
+	});
+
+	describe('findIndices', function() {
+
+		it('should return a stream containing all the indices satisfying the predicate', function(done) {
+			var s = fromArray([1, 2 ,3, 4]).findIndices(function(x) {
+				return x > 2;
+			});
+
+			var a = [];
+			s.forEach(function(x) {
+				a.push(x);
+			}, function(e) {
+				expect(a).toEqual([2, 3]);
+				done();
+			});
+		});
+
+		it('should return an empty stream when not satisfying the predicate', function(done) {
+			var s = fromArray([1, 2 ,3, 4]).findIndices(function(x) {
+				return x < 0;
+			});
+
+			var count = 0;
+			s.forEach(function(x) {
+				count++;
+			}, function() {
+				expect(count).toEqual(0);
+				done();
+			});
+		});
+
+		it('should call end on error', function(done) {
+			Stream.of(1).findIndices(function(){ throw sentinel; }).forEach(function() {
+			}, function(e) {
+				expect(e).toBe(sentinel);
+				done();
+			});
+		});
+
+		it('should not call end when no error', function(done) {
+			var nextSpy = this.spy();
+
+			new Stream(function(next, end) {
+				next();
+				end();
+			}).findIndices(function(){ return true; }).forEach(nextSpy, function(e) {
+					expect(e).not.toBeDefined();
+					expect(nextSpy).toHaveBeenCalledOnce();
+					done();
+				});
+		});
+
+	});
+
+	describe('elementIndices', function() {
+
+		it('should return a stream containing all the indices where the element was found', function(done) {
+			var s = fromArray([1, 2 , 1, 2]).elementIndices(2);
+
+			var a = [];
+			s.forEach(function(x) {
+				a.push(x);
+			}, function() {
+				expect(a).toEqual([1, 3]);
+				done();
+			});
+		});
+
+	});
+
 	describe('interleave', function() {
 
 		it('should contain items from both', function(done) {
