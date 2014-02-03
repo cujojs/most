@@ -62,7 +62,7 @@ function foldl(f, initial, foldable) {
 
 function foldl1(f, foldable) {
 	if(typeof foldable.foldl1 === 'function') {
-		return foldable.foldl1(f, initial);
+		return foldable.foldl1(f);
 	} else if(typeof foldable.reduce === 'function') {
 		return foldable.reduce(f);
 	}
@@ -82,7 +82,7 @@ function foldr(f, initial, foldable) {
 
 function foldr1(f, foldable) {
 	if(typeof foldable.foldr1 === 'function') {
-		return foldable.foldr1(f, initial);
+		return foldable.foldr1(f);
 	} else if(typeof foldable.reduceRight === 'function') {
 		return foldable.reduceRight(f);
 	}

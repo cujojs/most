@@ -414,6 +414,19 @@ proto.takeWhile = function(predicate) {
 	});
 };
 
+proto.slice = function(start, end) {
+	var s = this.drop(start);
+	return typeof end === 'number' ? s.take(end - start) : s;
+};
+
+proto.split = function(n) {
+	return [this.take(n), this.drop(n)];
+};
+
+proto.span = function(predicate) {
+	return [this.takeWhile(predicate), this.dropWhile(predicate)];
+};
+
 proto.buffer = function(windower) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
@@ -505,7 +518,13 @@ proto['catch'] = function(f) {
 	});
 };
 
-proto.reduce = function(f, initial) {
+/**
+ * Fold the stream from the left
+ * @param {function} f
+ * @param {*} initial
+ * @returns {Stream}
+ */
+proto.foldl = function(f, initial) {
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		var value = initial;
@@ -519,7 +538,56 @@ proto.reduce = function(f, initial) {
 	});
 };
 
-proto.reduceRight = function(f, initial) {
+/**
+ * Fold the stream from the left
+ * @param {function} f
+ * @returns {Stream}
+ */
+proto.foldl1 = function(f) {
+	var s = this.split(1); // es6: let [head, tail] = this.split(1);
+	var head = s[0];
+	var tail = s[1];
+	head.map(function(initial) {
+		return tail.foldl(f, initial);
+	});
+};
+
+/**
+ * Fold the stream from the left, with an optional initial value
+ * @param {function} f
+ * @returns {Stream}
+ */
+proto.reduce = function(f /*, initial */) {
+	return arguments.length === 1 ? this.foldl1(f) : this.foldl(f, arguments[1]);
+};
+
+/**
+ * Fold the stream from the right
+ * @param {function} f
+ * @param {*} initial
+ * @returns {Stream}
+ */
+proto.foldr = function(f, initial) {
+	return this.reduceRight(f, initial);
+};
+
+/**
+ * Fold the stream from the right
+ * @param {function} f
+ * @returns {Stream}
+ */
+proto.foldr1 = function(f) {
+	return this.reduceRight(f);
+};
+
+/**
+ * Fold the stream from the right, with an optional initial value
+ * @param {function} f
+ * @returns {Stream}
+ */
+proto.reduceRight = function(f /*, initial */) {
+	/*jshint unused:false*/
+	var args = slice.call(arguments);
 	var stream = this._emitter;
 	return new Stream(function(next, end) {
 		// This is a brute-force approach that uses an array to buffer
@@ -529,7 +597,7 @@ proto.reduceRight = function(f, initial) {
 		stream(function(x) {
 			buffer.push(x);
 		}, function(e) {
-			e == null && next(buffer.reduceRight(f, initial));
+			e == null && next(buffer.reduceRight.apply(buffer, args));
 
 			end(e);
 		});
