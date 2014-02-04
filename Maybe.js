@@ -18,10 +18,11 @@ define(function () {
 	Maybe.maybeToList = maybeToList;
 	Maybe.catMaybes = catMaybes;
 	Maybe.lift = lift;
+	Maybe.empty = empty;
 	Maybe.of = of;
 
 	function Maybe(value) {
-		if(value == undefined || value === null) {
+		if(value === undefined || value === null) {
 			return new Nothing();
 		} else {
 			return new Just(value);
@@ -47,14 +48,14 @@ define(function () {
 
 	function maybeToList(maybe) {
 		if(maybe.isNothing()) {
-			return new Array();
+			return [];
 		} else {
 			return [maybe.getOrElse()];
 		}
 	}
 
 	function catMaybes(array) {
-		var values = []
+		var values = [];
 		array.forEach(function(x) {
 			x.isJust() && values.push(x.getOrElse());
 		});
@@ -67,9 +68,22 @@ define(function () {
 		};
 	}
 
-	function of(value) { 
+	function empty() {
+		// For Semigroup/Monoid
+		return nothing;
+	}
+
+	function of(value) {
 		return new Maybe(value);
 	}
+
+	Maybe.prototype.reduce = function(f) {
+		return arguments.length < 2 ? this.foldl1(f) : this.foldl(f, arguments[1]);
+	};
+
+	Maybe.prototype.reduceRight = function(f) {
+		return arguments.length < 2 ? this.foldr1(f) : this.foldr(f, arguments[1]);
+	};
 
 	var just = Just.prototype = Object.create(Maybe.prototype);
 
@@ -79,19 +93,19 @@ define(function () {
 		this._value = value;
 	}
 
-	just.isNothing = function() { 
+	just.isNothing = function() {
 		return !this.isJust();
 	};
 
-	just.isJust = function() { 
-		return true; 
+	just.isJust = function() {
+		return true;
 	};
 
 	just.getOrElse = function() {
 		return this._value;
 	};
 
-	just.filter = function(predicate) { 
+	just.filter = function(predicate) {
 		return predicate(this._value) ? this : Maybe.of(void 0);
 	};
 
@@ -103,30 +117,81 @@ define(function () {
 		return f(this._value);
 	};
 
+	just.ap = function(maybe) {
+		return this.flatMap(function(f) {
+			return maybe.map(f);
+		});
+	};
+
+	just.foldl = just.foldr = function(f, initial) {
+		return f(initial, this._value);
+	};
+
+	just.foldl1 = just.foldr1 = function(f) {
+		/*jshint unused:false*/
+		return this._value;
+	};
+
+	just.toString = just.inspect = function() {
+		return 'Just ' + this._value.toString();
+	};
+
+	just.concat = function(maybe) {
+		/*jshint unused:false*/
+		// Semigroup/Monoid
+		// See http://en.wikibooks.org/wiki/Haskell/MonadPlus#Definition
+		return this;
+	};
+
+	just.forEach = function(f) {
+		f(this._value);
+	};
+
 	var nothing = Nothing.prototype = Object.create(Maybe.prototype);
 
 	nothing.constructor = Nothing;
 
 	function Nothing() {}
 
-	nothing.isNothing = function() { 
-		return true
+	nothing.isNothing = function() {
+		return true;
 	};
 
-	nothing.isJust = function() { 
-		return !this.isNothing(); 
+	nothing.isJust = function() {
+		return !this.isNothing();
 	};
 
 	nothing.getOrElse = function() {
 		return void 0;
 	};
 
-	nothing.filter = nothing.map = nothing.flatMap = function() {
+	nothing.foldl = nothing.foldr = function(f, initial) {
+		return initial;
+	};
+
+	nothing.foldl1 = nothing.foldr1 = function(f) {
+		/*jshint unused:false*/
+		return void 0;
+	};
+
+	nothing.toString = nothing.inspect = function() {
+		return 'Nothing';
+	};
+
+	nothing.forEach = noop;
+
+	nothing.concat = identity;
+
+	nothing.filter = nothing.map = nothing.flatMap = nothing.ap = function() {
 		return this;
 	};
-	
 
 	return Maybe;
+
+
+	function noop() {}
+
+	function identity(x) { return x; }
 
 });
 })(typeof define == 'function' && define.amd ? define : function (factory) { module.exports = factory(); }
