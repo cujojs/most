@@ -20,12 +20,13 @@ define(function () {
 	Maybe.lift = lift;
 	Maybe.empty = empty;
 	Maybe.of = of;
+	Maybe.just = just;
 
 	function Maybe(value) {
 		if(value === undefined || value === null) {
-			return new Nothing();
+			return nothing;
 		} else {
-			return new Just(value);
+			return just(value);
 		}
 
 	}
@@ -40,7 +41,7 @@ define(function () {
 
 	function listToMaybe(array) {
 		if(array == null || array.length === 0) {
-			return Maybe.of(void 0);
+			return nothing;
 		} else {
 			return Maybe.of(array[0]);
 		}
@@ -77,6 +78,10 @@ define(function () {
 		return new Maybe(value);
 	}
 
+	function just(value) {
+		return new Just(value);
+	}
+
 	Maybe.prototype.reduce = function(f) {
 		return arguments.length < 2 ? this.foldl1(f) : this.foldl(f, arguments[1]);
 	};
@@ -85,106 +90,127 @@ define(function () {
 		return arguments.length < 2 ? this.foldr1(f) : this.foldr(f, arguments[1]);
 	};
 
-	var just = Just.prototype = Object.create(Maybe.prototype);
+	Maybe.prototype.sequence = function(T) {
+		/*jshint unused:false*/
+		return this._value.map(this.constructor.of);
+	};
 
-	just.constructor = Just;
+	Just.prototype = Object.create(Maybe.prototype);
+
+	Just.prototype.constructor = Just;
 
 	function Just(value) {
 		this._value = value;
 	}
 
-	just.isNothing = function() {
+	Just.prototype.isNothing = function() {
 		return !this.isJust();
 	};
 
-	just.isJust = function() {
+	Just.prototype.isJust = function() {
 		return true;
 	};
 
-	just.getOrElse = function() {
+	Just.prototype.getOrElse = function() {
 		return this._value;
 	};
 
-	just.filter = function(predicate) {
-		return predicate(this._value) ? this : Maybe.of(void 0);
+	Just.prototype.filter = function(predicate) {
+		return predicate(this._value) ? this : nothing;
 	};
 
-	just.map = function(f) {
-		return Maybe.of(f(this._value));
+	Just.prototype.map = function(f) {
+		return Maybe.just(f(this._value));
 	};
 
-	just.flatMap = function(f) {
+	Just.prototype.flatMap = function(f) {
 		return f(this._value);
 	};
 
-	just.ap = function(maybe) {
+	Just.prototype.ap = function(maybe) {
 		return this.flatMap(function(f) {
 			return maybe.map(f);
 		});
 	};
 
-	just.foldl = just.foldr = function(f, initial) {
+	Just.prototype.foldl = Just.prototype.foldr = function(f, initial) {
 		return f(initial, this._value);
 	};
 
-	just.foldl1 = just.foldr1 = function(f) {
+	Just.prototype.foldl1 = Just.prototype.foldr1 = function(f) {
 		/*jshint unused:false*/
 		return this._value;
 	};
 
-	just.toString = just.inspect = function() {
+	Just.prototype.toString = Just.prototype.inspect = function() {
 		return 'Just ' + this._value.toString();
 	};
 
-	just.concat = function(maybe) {
+	Just.prototype.concat = function(maybe) {
 		/*jshint unused:false*/
 		// Semigroup/Monoid
 		// See http://en.wikibooks.org/wiki/Haskell/MonadPlus#Definition
 		return this;
 	};
 
-	just.forEach = function(f) {
+	Just.prototype.forEach = function(f) {
 		f(this._value);
 	};
 
-	var nothing = Nothing.prototype = Object.create(Maybe.prototype);
 
-	nothing.constructor = Nothing;
+	Just.prototype.traverse = function(_, f) {
+		var of = this.constructor.of;
+		return this._value.map(function(x) {
+			return of(f(x));
+		});
+	};
+
+	Nothing.prototype = Object.create(Maybe.prototype);
+
+	var nothing = Maybe.nothing = new Nothing();
+
+	Nothing.prototype.constructor = Nothing;
 
 	function Nothing() {}
 
-	nothing.isNothing = function() {
+	Nothing.prototype.isNothing = function() {
 		return true;
 	};
 
-	nothing.isJust = function() {
+	Nothing.prototype.isJust = function() {
 		return !this.isNothing();
 	};
 
-	nothing.getOrElse = function() {
+	Nothing.prototype.getOrElse = function() {
 		return void 0;
 	};
 
-	nothing.foldl = nothing.foldr = function(f, initial) {
+	Nothing.prototype.foldl = Nothing.prototype.foldr = function(f, initial) {
 		return initial;
 	};
 
-	nothing.foldl1 = nothing.foldr1 = function(f) {
+	Nothing.prototype.foldl1 = Nothing.prototype.foldr1 = function(f) {
 		/*jshint unused:false*/
 		return void 0;
 	};
 
-	nothing.toString = nothing.inspect = function() {
+	Nothing.prototype.traverse = function(T, f) {
+		/*jshint unused:false*/
+		return this;
+	};
+
+	Nothing.prototype.toString = Nothing.prototype.inspect = function() {
 		return 'Nothing';
 	};
 
-	nothing.forEach = noop;
+	Nothing.prototype.forEach = noop;
 
-	nothing.concat = identity;
+	Nothing.prototype.concat = identity;
 
-	nothing.filter = nothing.map = nothing.flatMap = nothing.ap = function() {
+	Nothing.prototype.filter = Nothing.prototype.map = Nothing.prototype.flatMap = Nothing.prototype.ap = function() {
 		return this;
 	};
+
 
 	return Maybe;
 
