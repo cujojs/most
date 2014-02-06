@@ -1,4 +1,4 @@
-var async = require('./async');
+var async = require('./lib/async');
 
 module.exports = Promise;
 
@@ -87,6 +87,10 @@ Promise.prototype.flatMap = function(f) {
 	});
 };
 
+Promise.prototype.flatten = function() {
+	return this.flatMap(identity);
+};
+
 Promise.prototype.ap = function(promise) {
 	return this.flatMap(function(f) {
 		return promise.map(f);
@@ -99,15 +103,13 @@ Promise.prototype.then = function(f, r) {
 			return x.then(f);
 		}
 
-		if(Object(x) !== x) {
-			return resolve(f(x));
-		}
-
-		var then = x.then;
-		if(typeof then === 'function') {
-			return new Promise(function(resolve, reject) {
-				then.call(x, resolve, reject);
-			});
+		if(Object(x) === x) {
+			var then = x.then;
+			if(typeof then === 'function') {
+				return new Promise(function(resolve, reject) {
+					then.call(x, resolve, reject);
+				}).then(f);
+			}
 		}
 
 		return resolve(f(x));
@@ -142,3 +144,5 @@ RejectedPromise.prototype = Object.create(Promise.prototype);
 RejectedPromise.prototype._resolver = function(_, reject) {
 	reject(this._value);
 };
+
+function identity(x) { return x; }

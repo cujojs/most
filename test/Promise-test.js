@@ -36,12 +36,76 @@ buster.testCase('Promise', {
 		}
 	},
 
+	'catch': {
+		'should be called for errors': function(done) {
+			Promise.of(other).map(function() {
+				throw sentinel;
+			}).catch(function(e) {
+				assert.same(e, sentinel);
+			}).done(done, buster.fail);
+		},
+
+		'should recover from error': {
+			'when it returns a non-promise value': function(done) {
+				Promise.of(other).map(function() {
+					throw sentinel;
+				}).catch(function(x) {
+					return x;
+				}).map(function(x) {
+					assert.same(x, sentinel);
+				}).done(done, buster.fail);
+			},
+
+			'when it returns a fulfilled promise value': function(done) {
+				Promise.of(other).map(function() {
+					throw sentinel;
+				}).catch(function(x) {
+					return Promise.of(x);
+				}).flatten().map(function(x) {
+					assert.same(x, sentinel);
+				}).done(done, buster.fail);
+			}
+		},
+
+		'should propagate error': {
+			'when it throws': function(done) {
+				Promise.of().map(function() {
+					throw other;
+				}).catch(function() {
+					throw sentinel;
+				}).catch(function(x) {
+					assert.same(x, sentinel);
+				}).done(done, buster.fail);
+			},
+
+			'when it returns a rejected promise': function(done) {
+				Promise.of().map(function() {
+					throw other;
+				}).catch(function() {
+					return Promise.reject(sentinel);
+				}).flatten().catch(function(x) {
+					assert.same(x, sentinel);
+				}).done(done, buster.fail);
+			}
+		}
+	},
+
 	'of': {
-		'should create a promise for x': function(done) {
-			Promise.of(sentinel).done(function(x) {
-				assert.same(x, sentinel);
-				done();
-			});
+		'should create a promise for x': {
+			'when x is a non-promise value': function(done) {
+				Promise.of(sentinel).done(function(x) {
+					assert.same(x, sentinel);
+					done();
+				});
+			},
+
+			'when x is a promise': function(done) {
+				var x = Promise.of();
+				Promise.of(x).done(function(y) {
+					assert.same(x, y);
+					done();
+				});
+			}
 		}
 	},
 
