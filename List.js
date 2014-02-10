@@ -361,8 +361,8 @@ List.prototype.foldr1 = function(f) {
 	return result.reduceRight(f);
 };
 
-List.prototype.traverse = function(of, f) {
-	return this.foldr(consf, of(empty()));
+List.prototype.traverse = function(T, f) {
+	return this.foldr(consf, T.of(empty()));
 
 	function consf(tOfList, m) {
 		return m.map(function(x) {
