@@ -48,7 +48,7 @@ function maybeT(M) {
 
 	MaybeT.prototype.map = function(f) {
 		return this.flatMap(function(x) {
-			return of(f(x));
+			return just(f(x));
 		});
 	};
 
