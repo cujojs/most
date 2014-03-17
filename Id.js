@@ -23,5 +23,5 @@ Id.prototype.ap = function(x) {
 };
 
 Id.prototype.toString = Id.prototype.inspect = function() {
-	return 'Just ' + String(this._value);
+	return 'Id ' + String(this._value);
 };

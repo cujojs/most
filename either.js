@@ -1,16 +1,17 @@
 var Id = require('./Id');
 
-module.exports = {
-	right: right,
-	left: left,
-	eitherT: eitherT
-};
+module.exports = Right;
+
+Right.of = right;
+Right.right = right;
+Right.left = left;
+Right.eitherT = eitherT;
+
+// Right
 
 function Right(x) {
 	Id.call(this, x);
 }
-
-Right.of = right;
 
 function right(x) {
 	return new Right(x);
@@ -22,11 +23,11 @@ Right.prototype.toString = Right.prototype.inspect = function() {
 	return 'Right ' + String(this._value);
 };
 
+// Left
+
 function Left(x) {
 	this._value = x;
 }
-
-Left.of = left;
 
 function left(x) {
 	return new Left(x);
@@ -39,6 +40,8 @@ Left.prototype.flatMap = Left.prototype.map = Left.prototype.ap = function() {
 Left.prototype.toString = Left.prototype.inspect = function() {
 	return 'Left ' + String(this._value);
 };
+
+// eitherT
 
 function eitherT(M) {
 	function EitherT(x) {

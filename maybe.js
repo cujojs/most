@@ -1,24 +1,36 @@
 var Id = require('./Id');
-var _nothing = Object.create(Id.prototype);
-var just = Id.of;
+var _nothing;
 
-module.exports = maybe;
+module.exports = Maybe;
+
+Maybe.maybe = maybe;
+maybe.just = Maybe.of = just;
+maybe.nothing = nothing;
+maybe.maybeT = maybeT;
+
+// Maybe (Just)
+
+function Maybe(x) {
+	Id.call(this, x);
+}
+
+Maybe.prototype = Object.create(Id.prototype);
+
+Maybe.prototype.toString = Maybe.prototype.inspect = function() {
+	return 'Just ' + String(this._value);
+};
 
 function maybe(x) {
 	return isNothing(x) ? nothing() : just(x);
 }
 
-maybe.just = just;
-maybe.nothing = nothing;
-maybe.maybeT = maybeT;
-
-function isNothing(x) {
-	return x === void 0;
+function just(x) {
+	return new Maybe(x);
 }
 
-function nothing() {
-	return _nothing;
-}
+// Nothing
+
+_nothing = Object.create(Maybe.prototype);
 
 _nothing.map = _nothing.flatMap = _nothing.ap = function() {
 	return this;
@@ -27,6 +39,16 @@ _nothing.map = _nothing.flatMap = _nothing.ap = function() {
 _nothing.toString = _nothing.inspect = function() {
 	return 'Nothing';
 };
+
+function nothing() {
+	return _nothing;
+}
+
+function isNothing(x) {
+	return x === void 0;
+}
+
+// maybeT
 
 function maybeT(M) {
 	function MaybeT(x) {
