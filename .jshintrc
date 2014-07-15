@@ -3,7 +3,7 @@
 	"node": true,
 
 	"globals": {
-		"define": true
+		"Promise": true
 	},
 
 	"boss": true,

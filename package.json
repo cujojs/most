@@ -1,29 +1,32 @@
 {
-	"name": "most",
-	"version": "0.4.0",
-	"description": "Monadic streams",
-	"main": "most.js",
-	"scripts": {
-		"test": "jshint . && buster-test"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://npmjs.org/package/most"
-	},
-	"keywords": [
-		"cujojs",
-		"cujo",
-		"stream",
-		"streams",
-		"event stream",
-		"monad",
-		"monadic",
-		"functional"
-	],
-	"author": "brian@hovercraftstudios.com",
-	"license": "MIT",
-	"devDependencies": {
-		"buster": "~0.7",
-		"jshint": "~2"
-	}
+  "name": "most",
+  "version": "0.5.0",
+  "description": "Monadic streams",
+  "main": "Stream.js",
+  "scripts": {
+    "test": "jshint . && buster-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cujojs/most"
+  },
+  "keywords": [
+    "cujojs",
+    "cujo",
+    "stream",
+    "streams",
+    "event stream",
+    "monad",
+    "monadic",
+    "functional"
+  ],
+  "author": "brian@hovercraftstudios.com",
+  "license": "MIT",
+  "devDependencies": {
+    "buster": "~0.7",
+    "jshint": "~2"
+  },
+  "dependencies": {
+    "when": "~3.4"
+  }
 }

@@ -1,533 +1,294 @@
-/** @license MIT License (c) copyright 2010-2013 original author or authors */
+/** @license MIT License (c) copyright 2010-2014 original author or authors */
+/** @author Brian Cavalier */
+/** @author John Hann */
 
-/**
- * Licensed under the MIT License at:
- * http://www.opensource.org/licenses/mit-license.php
- *
- * @author Brian Cavalier
- * @author John Hann
- */
+var Promise = require('when/es6-shim/Promise');
 
-var async = require('./async');
+var Queue = require('./lib/Queue');
+var step = require('./lib/step');
+var iterable = require('./lib/iterable');
+var iterableFrom = iterable.from;
+var iterableHead = iterable.head;
 
 module.exports = Stream;
 
-Stream.of = of;
-Stream.empty = empty;
-Stream.iterate = iterate;
-Stream.repeat = repeat;
+var Yield = Stream.Yield = step.Yield;
+var Skip  = Stream.Skip  = step.Skip;
+var End   = Stream.End   = step.End;
 
-function Stream(emitter) {
-	this._emitter = emitter;
+function Stream(step, state) {
+	this.step = step;
+	this.state = state;
 }
 
-function of(x) {
-	return new Stream(function (next, end) {
-		try {
-			next(x);
-			end();
-		} catch (e) {
-			end(e);
+Stream.empty = function() {
+	return new Stream(identity, new End());
+};
+
+Stream.of = function(x) {
+	return new Stream(identity, once(x));
+};
+
+Stream.from = function(iterable) {
+	return new Stream(iterableHead, iterableFrom(iterable));
+};
+
+Stream.fromPromise = function(p) {
+	return new Stream(identity, p.then(once));
+};
+
+Stream.unfold = function(f, x) {
+	return new Stream(f, x);
+};
+
+Stream.iterate = function(f, x) {
+	return new Stream(function(x) {
+		return new Yield(x, f(x));
+	}, x);
+};
+
+Stream.repeat = function(x) {
+	return new Stream(repeat, x);
+};
+
+Stream.produce = function(f) {
+	var q = new Queue();
+
+	f(function put(x) {
+		q.put(x);
+	}, function end(e) {
+		q.end(e);
+	});
+
+	return Stream.from(q);
+};
+
+Stream.prototype.forEach = Stream.prototype.observe = function(f) {
+	return runStream(f, this.step, this.state);
+};
+
+function runStream(f, stepper, state) {
+	return next(stepper, state).then(function(s) {
+		if (s.done) {
+			return s.value;
 		}
 
-		return noop;
+		return Promise.resolve(f(s.value)).then(function (x) {
+			return x instanceof End ? x.value : runStream(f, stepper, s.state);
+		});
 	});
 }
 
-function empty() {
-	return new Stream(emptyEmitter);
+Stream.prototype.map = function(f) {
+	var stepper = this.step;
+	return new Stream(function (state) {
+		return next(stepper, state).then(function(i) {
+			return i.done ? i
+				: new Yield(f(i.value), i.state);
+		});
+	}, this.state);
+};
+
+Stream.prototype.tap = function(f) {
+	return this.map(function(x) {
+		f(x);
+		return x;
+	});
+};
+
+Stream.prototype.ap = function(xs) {
+	return this.chain(function(f) {
+		return xs.map(f);
+	});
+};
+
+Stream.prototype.chain = function(f) {
+	return new Stream(stepChain, new Outer(f, this));
+
+	function stepChain(s) {
+		return s.inner === void 0 ? stepOuter(stepChain, s.f, s.outer)
+			: stepInner(stepChain, s.f, s.outer, s.inner);
+	}
+};
+
+function stepOuter(stepChain, f, outer) {
+	return streamNext(outer).then(function(i) {
+		return i.done ? i
+			: stepInner(stepChain, f, new Stream(outer.step, i.state), f(i.value));
+	});
 }
 
-function iterate(f, x) {
-	var value = x;
-	return new Stream(function(next, end) {
-		try {
-			next(value) ? async(emitNext) : end();
-		} catch(e) {
-			end(e);
-		}
+function stepInner(stepChain, f, outer, inner) {
+	return streamNext(inner).then(function(ii) {
+		return ii.done ? stepChain(new Outer(f, outer))
+			: new Yield(ii.value, new Inner(f, outer, new Stream(inner.step, ii.state)));
+	});
+}
 
-		function emitNext() {
-			try {
-				next(value = f(value)) ? async(emitNext) : end();
-			} catch(e) {
-				end(e);
+Stream.prototype.filter = function(p) {
+	var stepper = this.step;
+	return new Stream(function(state) {
+		return next(stepper, state).then(function(i) {
+			return i.done || p(i.value) ? i
+				: new Skip(i.state);
+		});
+	}, this.state);
+};
+
+Stream.prototype.distinct = function(eq) {
+	if(typeof eq !== 'function') {
+		eq = same;
+	}
+
+	var stepper = this.step;
+	return new Stream(function(s) {
+		return next(stepper, s.state).then(function(i) {
+			return i.done ? i
+				: eq(s.value, i.value) ? new Skip(new Pair(s.value, i.state))
+				: new Yield(i.value, new Pair(i.value, i.state));
+		});
+	}, new Pair({}, this.state));
+};
+
+Stream.prototype.head = function() {
+	return next(this.step, this.state).then(getValueOrFail);
+};
+
+Stream.prototype.tail = function() {
+	var state = next(this.step, this.state).then(getState);
+	return new Stream(this.step, state);
+};
+
+Stream.prototype.takeWhile = function(p) {
+	var stepper = this.step;
+	return new Stream(function(s) {
+		return next(stepper, s).then(function(i) {
+			return i.done || p(i.value) ? i
+				: new End();
+		});
+	}, this.state);
+};
+
+Stream.prototype.take = function(n) {
+	var stepper = this.step;
+	return new Stream(function(s) {
+		return next(stepper, s.state).then(function(i) {
+			return i.done || s.value === 0 ? new End()
+				: new Yield(i.value, new Pair(s.value-1, i.state));
+		});
+	}, new Pair(n, this.state));
+};
+
+Stream.prototype.cycle = function() {
+	return Stream.repeat(this).chain(identity);
+};
+
+Stream.prototype.startWith = function(x) {
+	return Stream.of(x).concat(this);
+};
+
+Stream.prototype.concat = function(stream) {
+	return Stream.from([this, stream]).chain(identity);
+};
+
+Stream.prototype.scan = function(f, z) {
+	var stepper = this.step;
+	return new Stream(function(s) {
+		return next(stepper, s.state).then(function(i) {
+			if(i.done) {
+				return i;
 			}
+
+			var value = f(s.value, i.value);
+			return new Yield(value, new Pair(value, i.state));
+		});
+	}, new Pair(z, this.state));
+};
+
+Stream.prototype.reduce = function(f, z) {
+	return reduce(f, z, this.step, this.state);
+};
+
+function reduce(f, z, stepper, state) {
+	return next(stepper, state).then(function(i) {
+			return i.done ? z
+				: reduce(f, f(z, i.value), stepper, i.state);
 		}
+	);
+}
+
+// Helpers
+
+function next(stepper, state) {
+	return Promise.resolve(state).then(stepper).then(function(i) {
+		return i.skip ? next(stepper, i.state) : i;
 	});
+}
+
+function streamNext(s) {
+	return next(s.step, s.state);
+}
+
+function getValueOrFail(s) {
+	if(s.done) {
+		throw new Error('empty stream');
+	}
+	return s.value;
+}
+
+function getState(s) {
+	return s.state;
+}
+
+function once(x) {
+	return new Yield(x, new End());
 }
 
 function repeat(x) {
-	return iterate(identity, x);
+	return new Yield(x, x);
 }
 
-
-var proto = Stream.prototype = {};
-
-proto.constructor = Stream;
-
-/**
- * Start consuming items in the stream.
- * @param {function} next called once for each item in the stream
- * @param {function?} end called once when either:
- *
- *  1. the stream is ended, that is, when it has no more items, *or*
- *  2. when a fatal error has occurred in the stream. In this case, the error
- *     will be passed to end.
- *  In either case, neither next nor end will ever be called again.
- *  If end is not provided, and an error occurs, it will be rethrown to the host
- *  environment.
- * @returns {function} function to unsubscribe from the stream. After calling
- *  this, next and end will never be called again.
- */
-proto.forEach = function(next, end) {
-	var ended, unsubscribed, unsubscribe, self = this;
-
-	if(typeof end !== 'function') {
-		end = fatal;
-	}
-
-	async(function() {
-		unsubscribe = self._emitter(safeNext, safeEnd);
-	});
-
-	function safeUnsubscribe() {
-		if(unsubscribed) {
-			return;
-		}
-
-		unsubscribed = true;
-
-		async(function() {
-			if(typeof unsubscribe === 'function') {
-				unsubscribe();
-			}
-		});
-	}
-
-	function safeNext(x) {
-		if(ended || unsubscribed) {
-			return false;
-		}
-		next(x);
-
-		return true;
-	}
-
-	function safeEnd() {
-		if(ended) {
-			return;
-		}
-		ended = true;
-		safeUnsubscribe();
-
-		end.apply(void 0, arguments);
-	}
-
-	return safeUnsubscribe;
-};
-
-proto.map = function(f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(function(x) {
-			return next(f(x));
-		}, end);
-	});
-};
-
-proto.ap = function(stream2) {
-	return this.flatMap(function(f) {
-		return stream2.map(f);
-	});
-};
-
-proto.flatMap = function(f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var cont = true;
-		stream(function(x) {
-			f(x)._emitter(function(x) {
-				return (cont = next(x));
-			}, endOnError(end));
-			return cont;
-		}, end);
-	});
-};
-
-proto.flatten = function() {
-	return this.flatMap(identity);
-};
-
-proto.cycle = function() {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(next, handleEnd);
-		var cont = true;
-		function handleEnd(e) {
-			if(e != null) {
-				end(e);
-			} else {
-				(cont === false) ? end() : async(function() {
-					stream(function(x) {
-						return (cont = next(x));
-					}, handleEnd);
-				});
-			}
-		}
-	});
-};
-
-proto.filter = function(predicate) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(function(x) {
-			return predicate(x) ? next(x) : true;
-		}, end);
-	});
-};
-
-proto.interleave = function(other) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var count = 2;
-
-		stream(next, handleEnd);
-		other._emitter(next, handleEnd);
-
-		function handleEnd(e) {
-			count -= 1;
-			if(e != null) {
-				end(e);
-			} else if (count === 0) {
-				end();
-			}
-		}
-	});
-};
-
-proto.intersperse = function(val) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(function(x) {
-			next(x);
-			return next(val);
-		}, end);
-	});
-};
-
-proto.zipWith = function(other, f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var buffer = [], count = 2, first = true, cont = true;
-
-		stream(function(x) {
-			if(cont) {
-				if(buffer.length > 0 && !first) {
-					return (cont = next(f(x, buffer.shift())));
-				}
-				buffer.push(x);
-				first = true;
-			}
-			return cont;
-		}, handleEnd);
-		other._emitter(function(x) {
-			if(cont) {
-				if(buffer.length > 0 && first) {
-					return (cont = next(f(buffer.shift(), x)));
-				}
-				buffer.push(x);
-				first = false;
-			}
-			return cont;
-		}, handleEnd);
-
-		function handleEnd(e) {
-			count -= 1;
-			if(e != null) {
-				cont = false;
-				end(e);
-			} else if (count === 0) {
-				end();
-			}
-		}
-	});
-};
-
-proto.zip = function(other) {
-	return this.zipWith(other, function(x, y) {
-		return [x, y];
-	});
-};
-
-proto.group = function() {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var buffer = [];
-		var cont = true;
-		stream(function(x) {
-			if(buffer.length === 0 || buffer[0] === x) {
-				buffer.push(x);
-			} else {
-				cont = next(buffer);
-				buffer = [x];
-			}
-			return cont;
-		}, function(e) {
-			if (e != null) {
-				end(e);
-			} else {
-				(buffer.length > 0) && next(buffer);
-				end();
-			}
-		});
-	});
-};
-
-proto.distinct = function() {
-	return this.group().map(function(x) {
-		return x[0];
-	});
-};
-
-proto.concat = function(other) {
-	// TODO: Should this accept an array?  a stream of streams?
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(next, function(e) {
-			e == null ? other._emitter(next, end) : end(e);
-		});
-	});
-};
-
-proto.tap = function(f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(function(x) {
-			f(x);
-			return next(x);
-		}, end);
-	});
-};
-
-proto.drop = function(m) {
-	var remaining = m;
-	return this.dropWhile(function() {
-		remaining -= 1;
-		return remaining >= 0;
-	});
-};
-
-proto.dropWhile = function(predicate) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(function(x) {
-			if (predicate !== void 0) {
-				if (predicate(x)) {
-					return true;
-				}
-				predicate = void 0;
-			}
-			return next(x);
-		}, end);
-	});
-};
-
-proto.take = function(m) {
-	var taken = 0;
-	return this.takeWhile(function() {
-		taken += 1;
-		return taken <= m;
-	});
-};
-
-proto.takeWhile = function(predicate) {
-	var self = this;
-	return new Stream(function(next, end) {
-		var unsubscribe = self.forEach(function(x) {
-			predicate(x) ? next(x) : unsubscribe();
-		}, end);
-	});
-};
-
-proto.buffer = function(windower) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var buffer, cont = true;
-		stream(function(x) {
-			buffer = windower(function(x) {
-				cont = next(x);
-			}, x, buffer||[]);
-			return cont;
-		}, end);
-	});
-};
-
-proto.bufferCount = function(n) {
-	return this.buffer(createCountBuffer(n));
-};
-
-proto.bufferTime = function(interval) {
-	return this.buffer(createTimeBuffer(interval));
-};
-
-proto.delay = function(ms) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var cont = true;
-		stream(function(x) {
-			setTimeout(function() {
-				cont = next(x);
-			}, ms||0);
-			return cont;
-		}, end);
-	});
-};
-
-proto.debounce = function(interval) {
-	var nextEventTime = interval;
-	var stream = this._emitter;
-
-	return new Stream(function(next, end) {
-		var cont = true;
-			stream(function(x) {
-			var now = Date.now();
-			if(now >= nextEventTime) {
-				nextEventTime = now + interval;
-				cont = next(x);
-			}
-			return cont;
-		}, end);
-	});
-};
-
-proto.throttle = function(interval) {
-	var cachedEvent, throttled;
-	var stream = this._emitter;
-
-	return new Stream(function(next, end) {
-		var cont = true;
-		stream(function(x) {
-			cachedEvent = x;
-
-			if(throttled === void 0) {
-				throttled = setTimeout(function() {
-					throttled = void 0;
-					cont = next(cachedEvent);
-				}, interval);
-			}
-			return cont;
-		}, end);
-	});
-};
-
-proto['catch'] = function(f) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		stream(next, function(e1) {
-			var error;
-			if(e1 != null) {
-				try {
-					next(f(e1));
-				} catch(e2) {
-					error = e2;
-				}
-			}
-
-			if(error != null) {
-				end(error);
-			}
-		});
-	});
-};
-
-proto.reduce = function(f, initial) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		var value = initial;
-		stream(function(x) {
-			value = f(value, x);
-		}, function(e) {
-			e == null && next(value);
-
-			end(e);
-		});
-	});
-};
-
-proto.reduceRight = function(f, initial) {
-	var stream = this._emitter;
-	return new Stream(function(next, end) {
-		// This is a brute-force approach that uses an array to buffer
-		// items, then runs array.reduceRight. Less elegant than recursion,
-		// but much faster and more practical in JS.
-		var buffer = [];
-		stream(function(x) {
-			buffer.push(x);
-		}, function(e) {
-			e == null && next(buffer.reduceRight(f, initial));
-
-			end(e);
-		});
-	});
-};
-
-proto.scan = function(f, initial) {
-	return this.map(function(x) {
-		return initial = f(initial, x);
-	});
-};
-
-function emptyEmitter(_, end) {
-	end();
+function Pair(x, s) {
+	this.value = x; this.state = s;
 }
 
-function createTimeBuffer(interval) {
-	var buffered;
-	return function(next, x, buffer) {
-		if(!buffered) {
-			buffered = true;
-			buffer = [x];
-
-			setTimeout(function() {
-				next(buffer.slice());
-				buffered = false;
-			}, interval);
-		} else {
-			buffer.push(x);
-		}
-
-		return buffer;
-	};
+function Outer(f, outer) {
+	this.f = f; this.outer = outer; this.inner = void 0;
 }
 
-function createCountBuffer(n) {
-	return function (next, x, buffer) {
-		buffer && buffer.push(x) || (buffer = [x]);
-
-		if(buffer.length >= n) {
-			next(buffer);
-			buffer = void 0;
-		}
-
-		return buffer;
-	};
-}
-
-function endOnError(end) {
-	return function(e) {
-		e == null || end(e);
-	};
-}
-
-function fatal(e) {
-	if(e != null) {
-		throw e;
-	}
+function Inner(f, outer, inner) {
+	this.f = f; this.outer = outer; this.inner = inner;
 }
 
 function identity(x) {
 	return x;
 }
 
-function noop() {}
+function same(a, b) {
+	return a === b;
+}
+
+function Subscribable(observable) {
+	this.subscribers = [];
+
+	var self = this;
+
+	observable.observe(function(x) {
+		self.subscribers.reduce(function(x, s) {
+			s.put(x);
+			return x;
+		}, x);
+	}).done(function(e) {
+		self.subscribers.reduce(function(e, s) {
+			s.end(e);
+			return e;
+		}, e);
+		self.subscribers = [];
+	});
+}
+
+Subscribable.prototype.subscribe = function() {
+	var q = new Queue();
+	this.subscribers.push(q);
+	return Stream.from(q);
+};

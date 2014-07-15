@@ -1,0 +1,33 @@
+{
+  "name": "most",
+  "main": "Stream.js",
+  "version": "0.5.0",
+  "homepage": "https://github.com/cujojs/most",
+  "authors": [
+    "Brian Cavalier <brian@hovercraftstudios.com>"
+  ],
+  "description": "Async monadic streams",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "stream",
+    "promise",
+    "promises",
+    "async",
+    "monad",
+    "cujo"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "package.json"
+  ],
+  "dependencies": {
+    "when": "~3.4"
+  }
+}
