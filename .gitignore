@@ -1,3 +1,6 @@
 /node_modules/
 /.idea/
 *.iml
+examples/
+.DS_Store
+experiments/

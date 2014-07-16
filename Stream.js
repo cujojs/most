@@ -1,68 +1,125 @@
 /** @license MIT License (c) copyright 2010-2014 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
+/** @module */
 
-var Promise = require('when/es6-shim/Promise');
-
-var Queue = require('./lib/Queue');
+var Scheduler = require('./lib/Scheduler');
+var Promise = require('./lib/Promise');
+var delay = require('./lib/delay');
 var step = require('./lib/step');
 var iterable = require('./lib/iterable');
-var iterableFrom = iterable.from;
-var iterableHead = iterable.head;
 
 module.exports = Stream;
+
+/** @typedef {Yield|Skip|End} Step */
 
 var Yield = Stream.Yield = step.Yield;
 var Skip  = Stream.Skip  = step.Skip;
 var End   = Stream.End   = step.End;
 
+var iterableFrom = iterable.from;
+var iterableHead = iterable.head;
+
+/**
+ * A stream that generates items by repeatedly calling the provided
+ * step function.  It will generate the first item by calling step with
+ * the provided initial state.  The step function must return a Step,
+ * which may Yield a value and a new state to be provided to the next
+ * call to step.
+ * This constructor is functionality equivalent to using Stream.unfold
+ * @param {function(state:*):Step} step stream step function
+ * @param {*} state initial state
+ * @constructor
+ */
 function Stream(step, state) {
 	this.step = step;
 	this.state = state;
 }
 
+/**
+ * @returns {Stream} stream that contains no items, and immediately ends
+ */
 Stream.empty = function() {
 	return new Stream(identity, new End());
 };
 
+/**
+ * @param {*} x
+ * @returns {Stream} stream that contains x as its only item
+ */
 Stream.of = function(x) {
 	return new Stream(identity, once(x));
 };
 
+/**
+ * Create a stream from an array-like or iterable
+ * @param {Array|{iterator:function}|{next:function}|{length:Number}} iterable Array,
+ *  array-like, iterable, or iterator
+ * @returns {Stream} stream containing all items from the iterable
+ */
 Stream.from = function(iterable) {
 	return new Stream(iterableHead, iterableFrom(iterable));
 };
 
+/**
+ * @param {Promise} p
+ * @returns {Stream} stream containing p's fulfillment value as its only item
+ */
 Stream.fromPromise = function(p) {
 	return new Stream(identity, p.then(once));
 };
 
+/**
+ * Build a stream by unfolding steps from a seed value
+ * @param {function(x:*):Step} f
+ * @param {*} x seed value
+ * @returns {Stream} stream containing all items
+ */
 Stream.unfold = function(f, x) {
 	return new Stream(f, x);
 };
 
+/**
+ * Build a stream by iteratively calling f
+ * @param {function(x:*):*} f
+ * @param {*} x initial value
+ * @returns {Stream}
+ */
 Stream.iterate = function(f, x) {
 	return new Stream(function(x) {
 		return new Yield(x, f(x));
 	}, x);
 };
 
+/**
+ * Create an infinite stream of xs
+ * @param {*} x
+ * @returns {Stream} infinite stream where all items are x
+ */
 Stream.repeat = function(x) {
 	return new Stream(repeat, x);
 };
 
-Stream.produce = function(f) {
-	var q = new Queue();
-
-	f(function put(x) {
-		q.put(x);
-	}, function end(e) {
-		q.end(e);
-	});
-
-	return Stream.from(q);
+/**
+ * Create a stream that emits the current time periodically
+ * @param {Number} period
+ * @param {?Scheduler} scheduler optional scheduler to use
+ * @returns {Stream} new stream that emits the current time every period
+ */
+Stream.periodic = function(period, scheduler) {
+	return Stream.repeat(void 0).delay(period, scheduler);
 };
 
+/**
+ * Observe all items in the stream
+ * @param {function(*):undefined|Promise} f function which will be called
+ *  for each item in the stream.  It may return a promise to exert a simple
+ *  form of back pressure: f is guaranteed not to receive the next item in
+ *  the stream before the promise fulfills.  Returning a non-promise has no
+ *  effect on back pressure
+ * @returns {Promise} promise that fulfills after all items have been observed,
+ *  and the stream has ended.
+ */
 Stream.prototype.forEach = Stream.prototype.observe = function(f) {
 	return runStream(f, this.step, this.state);
 };
@@ -74,11 +131,61 @@ function runStream(f, stepper, state) {
 		}
 
 		return Promise.resolve(f(s.value)).then(function (x) {
-			return x instanceof End ? x.value : runStream(f, stepper, s.state);
+			return x instanceof End ? x.value
+				: runStream(f, stepper, s.state);
 		});
 	});
 }
 
+/**
+ * @param {Number} delayTime milliseconds to delay each item
+ * @param {?Scheduler} scheduler optional scheduler to use
+ * @returns {Stream} new stream containing the same items, but delayed by ms
+ */
+Stream.prototype.delay = function(delayTime, scheduler) {
+	if(typeof scheduler === 'undefined') {
+		scheduler = Scheduler.getDefault();
+	}
+
+	var stepper = this.step;
+	return new Stream(function(state) {
+		return next(stepper, state).then(function(i) {
+			return delay(delayTime, i, scheduler);
+		});
+	}, this.state);
+};
+
+/**
+ * Skip events for period time after the most recent event
+ * @param {Number} period time to suppress events
+ * @param {Scheduler} scheduler optional scheduler
+ * @returns {Stream}
+ */
+Stream.prototype.debounce = function(period, scheduler) {
+	if(typeof scheduler === 'undefined') {
+		scheduler = Scheduler.getDefault();
+	}
+
+	var stepper = this.step;
+	return new Stream(function(s) {
+		return next(stepper, s.state).then(function(i) {
+			if(i.done) {
+				return i;
+			}
+
+			var now = scheduler.now();
+			var end = s.value;
+			return now > end ? new Yield(i.value, new Pair(now + period, i.state))
+				: new Skip(new Pair(end, i.state));
+		});
+	}, new Pair(scheduler.now(), this.state));
+};
+
+/**
+ * Functor: Transform each value in the stream by applying f to each
+ * @param {function(*):*} f mapping function
+ * @returns {Stream} stream containing items transformed by f
+ */
 Stream.prototype.map = function(f) {
 	var stepper = this.step;
 	return new Stream(function (state) {
@@ -89,6 +196,12 @@ Stream.prototype.map = function(f) {
 	}, this.state);
 };
 
+/**
+ * Perform a side effect for each item in the stream
+ * @param {function(x:*):*} f side effect to execute for each item. The
+ *  return value will be discarded.
+ * @returns {Stream} new stream containing the same items as this stream
+ */
 Stream.prototype.tap = function(f) {
 	return this.map(function(x) {
 		f(x);
@@ -96,12 +209,25 @@ Stream.prototype.tap = function(f) {
 	});
 };
 
+/**
+ * Applicative: Apply each function in this stream to each item in the
+ * provides stream.  This generates, in effect, a cross product.  This
+ * stream must contain only functions.
+ * @param {Stream} xs stream of items to which
+ * @returns {Stream} stream containing the cross product of items
+ */
 Stream.prototype.ap = function(xs) {
 	return this.chain(function(f) {
 		return xs.map(f);
 	});
 };
 
+/**
+ * Chain: Map each value in the stream to a new stream, and emit its values
+ * into the returned stream.
+ * @param {function(x:*):Stream} f chaining function, must return a Stream
+ * @returns {Stream} new stream containing all items from each stream returned by f
+ */
 Stream.prototype.chain = function(f) {
 	return new Stream(stepChain, new Outer(f, this));
 
@@ -125,6 +251,11 @@ function stepInner(stepChain, f, outer, inner) {
 	});
 }
 
+/**
+ * Retain only items matching a predicate
+ * @param {function(x:*):boolean} p filtering predicate called for each item
+ * @returns {Stream} stream containing only items for which predicate returns truthy
+ */
 Stream.prototype.filter = function(p) {
 	var stepper = this.step;
 	return new Stream(function(state) {
@@ -135,30 +266,49 @@ Stream.prototype.filter = function(p) {
 	}, this.state);
 };
 
-Stream.prototype.distinct = function(eq) {
-	if(typeof eq !== 'function') {
-		eq = same;
+/**
+ * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
+ * @param {?function(a:*, b:*):boolean} equals optional function to compare items.
+ *  default: ===
+ * @returns {Stream} stream with no adjacent duplicates
+ */
+Stream.prototype.distinct = function(equals) {
+	if(typeof equals !== 'function') {
+		equals = same;
 	}
 
 	var stepper = this.step;
 	return new Stream(function(s) {
 		return next(stepper, s.state).then(function(i) {
-			return i.done ? i
-				: eq(s.value, i.value) ? new Skip(new Pair(s.value, i.state))
+			if(i.done) {
+				return i;
+			}
+			return equals(s.value, i.value) ? new Skip(new Pair(s.value, i.state))
 				: new Yield(i.value, new Pair(i.value, i.state));
 		});
 	}, new Pair({}, this.state));
 };
 
+/**
+ * @returns {Promise} a promise for the first item in the stream
+ */
 Stream.prototype.head = function() {
 	return next(this.step, this.state).then(getValueOrFail);
 };
 
+/**
+ * @returns {Stream} a stream containing all items in this stream except the first
+ */
 Stream.prototype.tail = function() {
 	var state = next(this.step, this.state).then(getState);
 	return new Stream(this.step, state);
 };
 
+/**
+ * @param {function(x:*):boolean} p
+ * @returns {Stream} stream containing items up to, but not including, the
+ * first item for which p returns falsy.
+ */
 Stream.prototype.takeWhile = function(p) {
 	var stepper = this.step;
 	return new Stream(function(s) {
@@ -169,6 +319,10 @@ Stream.prototype.takeWhile = function(p) {
 	}, this.state);
 };
 
+/**
+ * @param {Number} n
+ * @returns {Stream} stream containing at most the first n items from this stream
+ */
 Stream.prototype.take = function(n) {
 	var stepper = this.step;
 	return new Stream(function(s) {
@@ -179,19 +333,39 @@ Stream.prototype.take = function(n) {
 	}, new Pair(n, this.state));
 };
 
+/**
+ * Tie this stream into a circle, thus creating an infinite stream
+ * @returns {Stream} infinite stream that replays all items from this stream
+ */
 Stream.prototype.cycle = function() {
 	return Stream.repeat(this).chain(identity);
 };
 
+/**
+ * @param {*} x
+ * @returns {Stream} new stream containing x followed by all items in this stream
+ */
 Stream.prototype.startWith = function(x) {
 	return Stream.of(x).concat(this);
 };
 
-Stream.prototype.concat = function(stream) {
-	return Stream.from([this, stream]).chain(identity);
+/**
+ * @param {Stream} s
+ * @returns {Stream} new stream containing all items in this stream followed by
+ *  all items in s
+ */
+Stream.prototype.concat = function(s) {
+	return Stream.from([this, s]).chain(identity);
 };
 
-Stream.prototype.scan = function(f, z) {
+/**
+ * Create a stream containing successive reduce results of applying f to
+ * the previous reduce result and the current stream item.
+ * @param {function(result:*, x:*):*} f reducer function
+ * @param {*} initial initial value
+ * @returns {Stream} new stream containing successive reduce results
+ */
+Stream.prototype.scan = function(f, initial) {
 	var stepper = this.step;
 	return new Stream(function(s) {
 		return next(stepper, s.state).then(function(i) {
@@ -202,11 +376,19 @@ Stream.prototype.scan = function(f, z) {
 			var value = f(s.value, i.value);
 			return new Yield(value, new Pair(value, i.state));
 		});
-	}, new Pair(z, this.state));
+	}, new Pair(initial, this.state));
 };
 
-Stream.prototype.reduce = function(f, z) {
-	return reduce(f, z, this.step, this.state);
+/**
+ * Reduce this stream to produce a single result.  Note that reducing an infinite
+ * stream will return a Promise that never fulfills, but that may reject if an error
+ * occurs.
+ * @param {function(result:*, x:*):*} f reducer function
+ * @param {*} initial initial value
+ * @returns {Promise} promise for the file result of the reduce
+ */
+Stream.prototype.reduce = function(f, initial) {
+	return reduce(f, initial, this.step, this.state);
 };
 
 function reduce(f, z, stepper, state) {
@@ -267,28 +449,3 @@ function identity(x) {
 function same(a, b) {
 	return a === b;
 }
-
-function Subscribable(observable) {
-	this.subscribers = [];
-
-	var self = this;
-
-	observable.observe(function(x) {
-		self.subscribers.reduce(function(x, s) {
-			s.put(x);
-			return x;
-		}, x);
-	}).done(function(e) {
-		self.subscribers.reduce(function(e, s) {
-			s.end(e);
-			return e;
-		}, e);
-		self.subscribers = [];
-	});
-}
-
-Subscribable.prototype.subscribe = function() {
-	var q = new Queue();
-	this.subscribers.push(q);
-	return Stream.from(q);
-};
