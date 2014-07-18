@@ -2,6 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../Stream');
+var Promise = require('../lib/Promise');
 
 var createTestScheduler = require('./createTestScheduler');
 
@@ -85,6 +86,39 @@ describe('Stream', function() {
 
 	});
 
+	describe('of', function() {
+
+		it('should contain one item', function() {
+			return Stream.of(sentinel).observe(function(x) {
+				expect(x).toBe(sentinel);
+			});
+		});
+
+	});
+
+	describe('from', function() {
+
+		it('should contain array items', function() {
+			var input = [1,2,3];
+			var result = [];
+			return Stream.from([1,2,3]).observe(function(x) {
+				result.push(x);
+			}).then(function() {
+				expect(result).toEqual(input);
+			});
+		});
+
+	});
+
+	describe('fromPromise', function() {
+		it('should contain only promise\'s fulfillment value', function() {
+			return Stream.fromPromise(Promise.resolve(sentinel))
+				.observe(function(x) {
+					expect(x).toBe(sentinel);
+				});
+		});
+	});
+
 	describe('tail', function() {
 		it('should contain all items except the first', function() {
 			var count = 0;
@@ -118,16 +152,6 @@ describe('Stream', function() {
 					expect(spy).not.toHaveBeenCalled();
 				});
 		});
-	});
-
-	describe('of', function() {
-
-		it('should create a stream of one item', function() {
-			return Stream.of(sentinel).observe(function(x) {
-				expect(x).toBe(sentinel);
-			});
-		});
-
 	});
 
 	describe('map', function() {
@@ -255,6 +279,44 @@ describe('Stream', function() {
 
 	});
 
+	describe('unfold', function() {
+		it('should call unfold with seed', function() {
+			return Stream.unfold(function(x) {
+				return new Stream.Yield(x, x);
+			}, sentinel).observe(function(x) {
+				expect(x).toBe(sentinel);
+				return new Stream.End();
+			});
+		});
+
+		it('should unfold until end', function() {
+			var count = 0;
+			var expected = 3;
+
+			return Stream.unfold(function(x) {
+				return new Stream.Yield(x, x - 1);
+			}, expected).observe(function(x) {
+				if(x === 0) {
+					return new Stream.End();
+				}
+				count++;
+			}).then(function() {
+				expect(count).toBe(expected);
+			});
+		});
+
+		it('should reject on error', function() {
+			var spy = this.spy();
+			return Stream.unfold(function() {
+				throw sentinel;
+			}, other).observe(spy).catch(function(e) {
+				expect(spy).not.toHaveBeenCalled();
+				expect(e).toBe(sentinel);
+			});
+		});
+
+	});
+
 	describe('iterate', function() {
 
 		it('should call iterator with seed', function() {
@@ -283,9 +345,11 @@ describe('Stream', function() {
 		});
 
 		it('should reject on error', function() {
+			var spy = this.spy();
 			return Stream.iterate(function() {
 				throw sentinel;
-			}, 1).observe(function() {}).catch(function(e) {
+			}, other).observe(spy).catch(function(e) {
+				expect(spy).not.toHaveBeenCalled();
 				expect(e).toBe(sentinel);
 			});
 		});
