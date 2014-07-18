@@ -1,5 +1,6 @@
 node_modules/
 .git/
 .idea/
-dev/lib
-build/
+examples/
+benchmark/
+experiments/
