@@ -374,7 +374,6 @@ describe('Stream', function() {
 	describe('delay', function() {
 		it('should delay events by delayTime', function() {
 			var scheduler = createTestScheduler();
-			expect(scheduler.now()).toBe(0);
 
 			var result = Stream.of(sentinel).delay(100, scheduler).observe(function(x) {
 				expect(x).toBe(sentinel);
@@ -382,6 +381,24 @@ describe('Stream', function() {
 			});
 
 			scheduler.tick(100);
+			return result;
+		});
+	});
+
+	describe('periodic', function() {
+		it('should emit events at tick periods', function() {
+			var scheduler = createTestScheduler();
+
+			var count = 5;
+			var result = Stream.periodic(1, scheduler)
+				.take(count)
+				.reduce(function(c) {
+					return c - 1;
+				}, count).then(function(count) {
+					expect(count).toBe(0);
+				});
+
+			scheduler.tick(10, 1);
 			return result;
 		});
 	});

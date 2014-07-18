@@ -107,7 +107,10 @@ Stream.repeat = function(x) {
  * @returns {Stream} new stream that emits the current time every period
  */
 Stream.periodic = function(period, scheduler) {
-	return Stream.repeat(void 0).delay(period, scheduler);
+	return new Stream(function(p) {
+		var now = p.state.now();
+		return delay(p.value, new Yield(now, p), p.state);
+	}, new Pair(Math.max(1, period), ensureScheduler(scheduler)));
 };
 
 /**
@@ -156,7 +159,7 @@ Stream.prototype.delay = function(delayTime, scheduler) {
 	return new Stream(function(s) {
 		return next(stepper, s.state).then(function(i) {
 			return i.done ? i
-				: delay(s.value, yieldPair(i, delayTime), scheduler);
+				: delay(s.value, yieldPair(i, s.value), scheduler);
 		});
 	}, new Pair(delayTime, this.state));
 };
@@ -176,9 +179,7 @@ function skipPair(step, x) {
  * @returns {Stream}
  */
 Stream.prototype.debounce = function(period, scheduler) {
-	if(typeof scheduler === 'undefined') {
-		scheduler = Scheduler.getDefault();
-	}
+	scheduler = ensureScheduler(scheduler);
 
 	var stepper = this.step;
 	return new Stream(function(s) {
@@ -340,9 +341,10 @@ Stream.prototype.take = function(n) {
 	var stepper = this.step;
 	return new Stream(function(s) {
 		return next(stepper, s.state).then(function(i) {
+			var remaining = s.value - 1;
 			return i.done ? i
-				: s.value === 0 ? new End()
-				: yieldPair(i, s.value-1);
+				: s.value === 0 ? new End(i.value)
+				: yieldPair(i, remaining);
 		});
 	}, new Pair(n, this.state));
 };

@@ -1,4 +1,5 @@
 var Scheduler = require('../lib/Scheduler');
+var Promise = require('../lib/Promise');
 
 module.exports = createTestScheduler;
 
@@ -7,24 +8,46 @@ module.exports = createTestScheduler;
  *  via its tick(ticks:Number) method.
  */
 function createTestScheduler() {
-	var timeout;
-	var currentTime = 0;
-	var s = new Scheduler(setTimer, clearTimer, now, function(e) {
-		throw e;
-	});
+	var s = new Scheduler(setTimer, clearTimer, now, thrower);
 
-	s.tick = function(ticks) {
-		clearTimeout(timeout);
-		var self = this;
-		timeout = setTimeout(function() {
-			currentTime += ticks;
-			self._runReadyTasks();
-		}, 1);
+	s._now = 0;
+
+	s.tick = function(ticks, step) {
+		if(typeof step !== 'number') {
+			step = ticks;
+		}
+
+		var s = this;
+		var p = Promise.resolve();
+		for(var i=0; i<ticks; ++i) {
+			p = p.then(tickStep);
+		}
+
+		return p;
+
+		function tickStep() {
+			return tick(s, step);
+		}
 	};
+
 
 	return s;
 
 	function setTimer() {}
 	function clearTimer() {}
-	function now() { return currentTime; }
+	function now() { return this._now; }
+}
+
+function tick(s, step) {
+	return new Promise(function(resolve) {
+		setTimeout(function() {
+			s._now += step;
+			s._runReadyTasks();
+			resolve(s.now());
+		}, 0);
+	});
+}
+
+function thrower(e) {
+	throw e;
 }
