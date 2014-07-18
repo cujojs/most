@@ -578,6 +578,22 @@ describe('Stream', function() {
 		});
 	});
 
+	describe('debounce', function() {
+		it('should exclude items during debounce period', function() {
+			var scheduler = createTestScheduler();
+
+			var result = Stream.periodic(1, scheduler)
+				.take(5)
+				.debounce(1, scheduler)
+				.forEach(function(x) {
+					expect(x % 2 === 0).toBeTrue();
+				});
+
+			scheduler.tick(10, 1);
+			return result;
+		});
+	});
+
 //	describe('drop', function() {
 //
 //		it('should take only the last two elements', function(done) {
