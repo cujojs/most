@@ -137,23 +137,37 @@ function runStream(f, stepper, state) {
 	});
 }
 
+function ensureScheduler(scheduler) {
+	if(typeof scheduler === 'undefined') {
+		return Scheduler.getDefault();
+	}
+	return scheduler;
+}
+
 /**
  * @param {Number} delayTime milliseconds to delay each item
  * @param {?Scheduler} scheduler optional scheduler to use
  * @returns {Stream} new stream containing the same items, but delayed by ms
  */
 Stream.prototype.delay = function(delayTime, scheduler) {
-	if(typeof scheduler === 'undefined') {
-		scheduler = Scheduler.getDefault();
-	}
+	scheduler = ensureScheduler(scheduler);
 
 	var stepper = this.step;
-	return new Stream(function(state) {
-		return next(stepper, state).then(function(i) {
-			return delay(delayTime, i, scheduler);
+	return new Stream(function(s) {
+		return next(stepper, s.state).then(function(i) {
+			return i.done ? i
+				: delay(s.value, yieldPair(i, delayTime), scheduler);
 		});
-	}, this.state);
+	}, new Pair(delayTime, this.state));
 };
+
+function yieldPair(step, x) {
+	return new Yield(step.value, new Pair(x, step.state));
+}
+
+function skipPair(step, x) {
+	return new Skip(new Pair(x, step.state));
+}
 
 /**
  * Skip events for period time after the most recent event
@@ -175,8 +189,7 @@ Stream.prototype.debounce = function(period, scheduler) {
 
 			var now = scheduler.now();
 			var end = s.value;
-			return now > end ? new Yield(i.value, new Pair(now + period, i.state))
-				: new Skip(new Pair(end, i.state));
+			return now > end ? yieldPair(i, now + period) : skipPair(i, end);
 		});
 	}, new Pair(scheduler.now(), this.state));
 };
@@ -283,8 +296,8 @@ Stream.prototype.distinct = function(equals) {
 			if(i.done) {
 				return i;
 			}
-			return equals(s.value, i.value) ? new Skip(new Pair(s.value, i.state))
-				: new Yield(i.value, new Pair(i.value, i.state));
+			return equals(s.value, i.value) ? skipPair(i, s.value)
+				: yieldPair(i, i.value);
 		});
 	}, new Pair({}, this.state));
 };
@@ -327,8 +340,9 @@ Stream.prototype.take = function(n) {
 	var stepper = this.step;
 	return new Stream(function(s) {
 		return next(stepper, s.state).then(function(i) {
-			return i.done || s.value === 0 ? new End()
-				: new Yield(i.value, new Pair(s.value-1, i.state));
+			return i.done ? i
+				: s.value === 0 ? new End()
+				: yieldPair(i, s.value-1);
 		});
 	}, new Pair(n, this.state));
 };
@@ -374,7 +388,7 @@ Stream.prototype.scan = function(f, initial) {
 			}
 
 			var value = f(s.value, i.value);
-			return new Yield(value, new Pair(value, i.state));
+			return yieldPair(i, value);
 		});
 	}, new Pair(initial, this.state));
 };

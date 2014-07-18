@@ -2,6 +2,9 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../Stream');
+
+var createTestScheduler = require('./createTestScheduler');
+
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
@@ -18,7 +21,7 @@ describe('Stream', function() {
 	beforeAll(function() {
 		// This is for Node 0.11.13's Promise, which is astonishingly slow.
 		// You really should use when.js's es6-shim
-		this.timeout = 5000;
+//		this.timeout = 5000;
 	});
 
 	describe('forEach', function() {
@@ -366,6 +369,21 @@ describe('Stream', function() {
 				});
 		});
 
+	});
+
+	describe('delay', function() {
+		it('should delay events by delayTime', function() {
+			var scheduler = createTestScheduler();
+			expect(scheduler.now()).toBe(0);
+
+			var result = Stream.of(sentinel).delay(100, scheduler).observe(function(x) {
+				expect(x).toBe(sentinel);
+				expect(scheduler.now()).toBe(100);
+			});
+
+			scheduler.tick(100);
+			return result;
+		});
 	});
 
 //	describe('drop', function() {
