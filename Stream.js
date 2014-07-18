@@ -140,13 +140,6 @@ function runStream(f, stepper, state) {
 	});
 }
 
-function ensureScheduler(scheduler) {
-	if(typeof scheduler === 'undefined') {
-		return Scheduler.getDefault();
-	}
-	return scheduler;
-}
-
 /**
  * @param {Number} delayTime milliseconds to delay each item
  * @param {?Scheduler} scheduler optional scheduler to use
@@ -163,14 +156,6 @@ Stream.prototype.delay = function(delayTime, scheduler) {
 		});
 	}, new Pair(delayTime, this.state));
 };
-
-function yieldPair(step, x) {
-	return new Yield(step.value, new Pair(x, step.state));
-}
-
-function skipPair(step, x) {
-	return new Skip(new Pair(x, step.state));
-}
 
 /**
  * Skip events for period time after the most recent event
@@ -390,7 +375,7 @@ Stream.prototype.scan = function(f, initial) {
 			}
 
 			var value = f(s.value, i.value);
-			return yieldPair(i, value);
+			return new Yield(value, new Pair(value, i.state));
 		});
 	}, new Pair(initial, this.state));
 };
@@ -450,6 +435,14 @@ function Pair(x, s) {
 	this.value = x; this.state = s;
 }
 
+function yieldPair(step, x) {
+	return new Yield(step.value, new Pair(x, step.state));
+}
+
+function skipPair(step, x) {
+	return new Skip(new Pair(x, step.state));
+}
+
 function Outer(f, outer) {
 	this.f = f; this.outer = outer; this.inner = void 0;
 }
@@ -465,3 +458,11 @@ function identity(x) {
 function same(a, b) {
 	return a === b;
 }
+
+function ensureScheduler(scheduler) {
+	if(typeof scheduler === 'undefined') {
+		return Scheduler.getDefault();
+	}
+	return scheduler;
+}
+

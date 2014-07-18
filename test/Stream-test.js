@@ -9,8 +9,8 @@ var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
 function assertSame(p1, p2) {
-	return p1.forEach(function(x) {
-		return p2.forEach(function(y) {
+	return p1.observe(function(x) {
+		return p2.observe(function(y) {
 			expect(x).toBe(y);
 		});
 	});
@@ -24,13 +24,47 @@ describe('Stream', function() {
 //		this.timeout = 5000;
 	});
 
+	describe('empty', function() {
+		it('should yield no items before end', function() {
+			return Stream.empty().observe(function(x) {
+				throw new Error('not empty ' + x);
+			}).then(function() {
+				expect(true).toBeTrue();
+			});
+		});
+	});
+
+	describe('head', function() {
+		it('should return a promise for first item', function() {
+			return Stream.from([sentinel, other])
+				.head()
+				.then(function(x) {
+					expect(x).toBe(sentinel);
+				});
+		});
+
+		it('should fail when empty', function() {
+			return Stream.empty().head().then(function(x) {
+				throw new Error('should not have returned ' + x);
+			}).catch(function(e) {
+				expect(e).toBeDefined();
+			});
+		});
+	});
+
 	describe('forEach', function() {
+		it('should be an alias for observe', function() {
+			expect(Stream.prototype.forEach).toBe(Stream.prototype.observe);
+		});
+	});
+
+	describe('observe', function() {
 
 		it('should call callback and return a promise', function() {
 			var spy = this.spy();
 
 			return Stream.of(sentinel)
-				.forEach(spy)
+				.observe(spy)
 				.then(function() {
 					expect(spy).toHaveBeenCalledWith(sentinel);
 				});
@@ -42,7 +76,7 @@ describe('Stream', function() {
 			});
 
 			return Stream.from([sentinel, other])
-				.forEach(spy)
+				.observe(spy)
 				.then(function() {
 					expect(spy).toHaveBeenCalledOnceWith(sentinel);
 					expect(spy).not.toHaveBeenCalledWith(other);
@@ -51,11 +85,45 @@ describe('Stream', function() {
 
 	});
 
+	describe('tail', function() {
+		it('should contain all items except the first', function() {
+			var count = 0;
+			var items = [other, sentinel, sentinel];
+			return Stream.from(items)
+				.tail()
+				.observe(function(x) {
+					count++;
+					expect(x).toBe(sentinel);
+				}).then(function() {
+					expect(count).toBe(items.length-1);
+				});
+		});
+
+		it('should be empty when original contains only one item', function() {
+			var spy = this.spy();
+			return Stream.of(sentinel)
+				.tail()
+				.observe(spy)
+				.then(function() {
+					expect(spy).not.toHaveBeenCalled();
+				});
+		});
+
+		it('should be empty when original is empty', function() {
+			var spy = this.spy();
+			return Stream.empty()
+				.tail()
+				.observe(spy)
+				.then(function() {
+					expect(spy).not.toHaveBeenCalled();
+				});
+		});
+	});
 
 	describe('of', function() {
 
 		it('should create a stream of one item', function() {
-			return Stream.of(sentinel).forEach(function(x) {
+			return Stream.of(sentinel).observe(function(x) {
 				expect(x).toBe(sentinel);
 			});
 		});
@@ -90,7 +158,7 @@ describe('Stream', function() {
 		it('should not transform stream items', function() {
 			return Stream.of(sentinel).tap(function() {
 				return other;
-			}).forEach(function(x) {
+			}).observe(function(x) {
 				expect(x).toBe(sentinel);
 			});
 		});
@@ -167,7 +235,7 @@ describe('Stream', function() {
 		it('should return a stream containing only allowed items', function() {
 			return Stream.from([sentinel, other]).filter(function(x) {
 				return x === sentinel;
-			}).forEach(function(x) {
+			}).observe(function(x) {
 				expect(x).toBe(sentinel);
 			});
 		});
@@ -177,7 +245,7 @@ describe('Stream', function() {
 				.filter(function(x) {
 					return x % 2 === 0;
 				})
-				.forEach(function(x) {
+				.observe(function(x) {
 					expect(x % 2 === 0).toBeTrue();
 					if(x > 10) {
 						return new Stream.End();
@@ -192,7 +260,7 @@ describe('Stream', function() {
 		it('should call iterator with seed', function() {
 			return Stream.iterate(function(x) {
 				return x;
-			}, sentinel).forEach(function(x) {
+			}, sentinel).observe(function(x) {
 				expect(x).toBe(sentinel);
 				return new Stream.End();
 			});
@@ -204,7 +272,7 @@ describe('Stream', function() {
 
 			return Stream.iterate(function(x) {
 				return x - 1;
-			}, expected).forEach(function(x) {
+			}, expected).observe(function(x) {
 				if(x === 0) {
 					return new Stream.End();
 				}
@@ -217,9 +285,19 @@ describe('Stream', function() {
 		it('should reject on error', function() {
 			return Stream.iterate(function() {
 				throw sentinel;
-			}, 1).forEach(function() {}).catch(function(e) {
+			}, 1).observe(function() {}).catch(function(e) {
 				expect(e).toBe(sentinel);
 			});
+		});
+	});
+
+	describe('repeat', function() {
+		it('should repeat value', function() {
+			return Stream.repeat(sentinel)
+				.take(10)
+				.observe(function(x) {
+					expect(x).toBe(sentinel);
+				});
 		});
 	});
 
@@ -227,7 +305,7 @@ describe('Stream', function() {
 
 		it('should keep repeating', function() {
 			var buffer = [];
-			return Stream.from([1, 2, 3]).cycle().forEach(function(x) {
+			return Stream.from([1, 2, 3]).cycle().observe(function(x) {
 				buffer.push(x);
 				if(buffer.length === 9) {
 					return new Stream.End(buffer);
@@ -239,7 +317,7 @@ describe('Stream', function() {
 
 		it('should end on error ', function() {
 			return Stream.from([1, 2, 3]).cycle()
-				.forEach(function() { throw sentinel; }).catch(function(e) {
+				.observe(function() { throw sentinel; }).catch(function(e) {
 					expect(e).toBe(sentinel);
 				});
 		});
@@ -259,6 +337,26 @@ describe('Stream', function() {
 				});
 		});
 
+	});
+
+	describe('startWith', function() {
+		it('should return a stream containing item as head', function() {
+			return Stream.from([1,2,3])
+				.startWith(sentinel)
+				.head()
+				.then(function(x) {
+					expect(x).toBe(sentinel);
+				});
+		});
+
+		it('when empty, should return a stream containing item as head', function() {
+			return Stream.empty()
+				.startWith(sentinel)
+				.head()
+				.then(function(x) {
+					expect(x).toBe(sentinel);
+				});
+		});
 	});
 
 	describe('concat', function() {
@@ -329,6 +427,19 @@ describe('Stream', function() {
 			});
 		});
 
+	});
+
+	describe('scan', function() {
+		it('should yield combined values', function() {
+			var i = 0;
+			var expected = ['a','b','c'];
+			return Stream.from(expected).scan(function(arr, x) {
+				return arr.concat(x);
+			}, []).observe(function(arr) {
+				++i;
+				expect(arr).toEqual(expected.slice(0, i));
+			});
+		});
 	});
 
 	describe('reduce', function() {
@@ -408,7 +519,7 @@ describe('Stream', function() {
 //		it('should take only the last two elements', function(done) {
 //			var values = [1, 2, 3];
 //			var s1 = new Stream(function(next, end) {
-//				values.forEach(next);
+//				values.observe(next);
 //				end();
 //			});
 //
@@ -417,7 +528,7 @@ describe('Stream', function() {
 //			expect(s2 instanceof s1.constructor).toBeTrue();
 //
 //			var result = [];
-//			s2.forEach(function(x) {
+//			s2.observe(function(x) {
 //				result.push(x);
 //			}, function() {
 //				expect(result).toEqual([2, 3]);
@@ -429,7 +540,7 @@ describe('Stream', function() {
 //		it('should take only the last two elements with condition', function(done) {
 //			var values = [1, 2, 3];
 //			var s1 = new Stream(function(next, end) {
-//				values.forEach(next);
+//				values.observe(next);
 //				end();
 //			});
 //
@@ -441,7 +552,7 @@ describe('Stream', function() {
 //			expect(s2 instanceof s1.constructor).toBeTrue();
 //
 //			var result = [];
-//			s2.forEach(function(x) {
+//			s2.observe(function(x) {
 //				result.push(x);
 //			}, function() {
 //				expect(result).toEqual([2, 3]);
@@ -453,7 +564,7 @@ describe('Stream', function() {
 //		it('should call end on error', function(done) {
 //			Stream.of(1).dropWhile(function() {
 //				throw sentinel;
-//			}).forEach(function() {
+//			}).observe(function() {
 //					throw sentinel;
 //				}, function(e) {
 //					expect(e).toBe(sentinel);
@@ -464,7 +575,7 @@ describe('Stream', function() {
 //		it('should not call end when no error', function(done) {
 //			var nextSpy = this.spy();
 //
-//			fromArray([1, 2]).drop(1).forEach(nextSpy, function(e) {
+//			fromArray([1, 2]).drop(1).observe(nextSpy, function(e) {
 //				expect(e).not.toBeDefined();
 //				expect(nextSpy).toHaveBeenCalledOnce();
 //				done();
@@ -487,13 +598,13 @@ describe('Stream', function() {
 //				next(4);
 //				expect(spy).not.toHaveBeenCalledTwice();
 //				end();
-//			}).bufferCount(3).forEach(spy, done);
+//			}).bufferCount(3).observe(spy, done);
 //		});
 //
 //		it('should buffer N items even with infinite stream', function(done) {
 //			var s  = Stream.iterate(function(x) {return x+1;}, 1).bufferCount(3);
 //			var i = 0, result = [];
-//			var unsubscribe = s.forEach(function(x) {
+//			var unsubscribe = s.observe(function(x) {
 //				result.push(x);
 //				i++;
 //				(i >= 6) && unsubscribe();
@@ -529,7 +640,7 @@ describe('Stream', function() {
 //					end();
 //				}, 155);
 //
-//			}).bufferTime(100).forEach(spy, done);
+//			}).bufferTime(100).observe(spy, done);
 //		});
 //
 //	});
@@ -545,7 +656,7 @@ describe('Stream', function() {
 //				next(other);
 //				next(sentinel);
 //				setTimeout(end, 20);
-//			}).throttle(10).forEach(spy, function() {
+//			}).throttle(10).observe(spy, function() {
 //				expect(spy).toHaveBeenCalledOnceWith(sentinel);
 //				done();
 //			});
@@ -568,7 +679,7 @@ describe('Stream', function() {
 //				}, 30);
 //
 //				setTimeout(end, 100);
-//			}).throttle(15).forEach(function(x) {
+//			}).throttle(15).observe(function(x) {
 //				expect(x).toBe(sentinel);
 //			}, done);
 //		});
@@ -576,7 +687,7 @@ describe('Stream', function() {
 //		it('should throttle even with infinite stream', function(done) {
 //			var s  = Stream.iterate(function(x) {return x+1;}, 1).throttle(5);
 //			var i = 0, result = [];
-//			var unsubscribe = s.forEach(function(x) {
+//			var unsubscribe = s.observe(function(x) {
 //				result.push(x);
 //				i++;
 //				(i >= 6) && unsubscribe();
