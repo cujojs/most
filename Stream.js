@@ -465,4 +465,3 @@ function ensureScheduler(scheduler) {
 	}
 	return scheduler;
 }
-
