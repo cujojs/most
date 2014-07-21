@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.5.0-a",
+  "version": "0.5.1",
   "description": "Monadic streams",
   "main": "Stream.js",
   "scripts": {
