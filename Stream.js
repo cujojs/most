@@ -48,7 +48,7 @@ Stream.empty = function() {
  * @returns {Stream} stream that contains x as its only item
  */
 Stream.of = function(x) {
-	return new Stream(identity, once(x));
+	return new Stream(identity, one(x));
 };
 
 /**
@@ -66,7 +66,7 @@ Stream.from = function(iterable) {
  * @returns {Stream} stream containing p's fulfillment value as its only item
  */
 Stream.fromPromise = function(p) {
-	return new Stream(identity, p.then(once));
+	return new Stream(identity, p.then(one));
 };
 
 /**
@@ -181,7 +181,7 @@ Stream.prototype.debounce = function(period, scheduler) {
 };
 
 /**
- * Functor: Transform each value in the stream by applying f to each
+ * Transform each value in the stream by applying f to each
  * @param {function(*):*} f mapping function
  * @returns {Stream} stream containing items transformed by f
  */
@@ -209,9 +209,8 @@ Stream.prototype.tap = function(f) {
 };
 
 /**
- * Applicative: Apply each function in this stream to each item in the
- * provides stream.  This generates, in effect, a cross product.  This
- * stream must contain only functions.
+ * Assume this stream contains functions, and apply each function to each item
+ * in the provided stream.  This generates, in effect, a cross product.
  * @param {Stream} xs stream of items to which
  * @returns {Stream} stream containing the cross product of items
  */
@@ -222,12 +221,12 @@ Stream.prototype.ap = function(xs) {
 };
 
 /**
- * Chain: Map each value in the stream to a new stream, and emit its values
+ * Map each value in the stream to a new stream, and emit its values
  * into the returned stream.
  * @param {function(x:*):Stream} f chaining function, must return a Stream
  * @returns {Stream} new stream containing all items from each stream returned by f
  */
-Stream.prototype.chain = function(f) {
+Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return new Stream(stepChain, new Outer(f, this));
 
 	function stepChain(s) {
@@ -292,15 +291,14 @@ Stream.prototype.distinct = function(equals) {
  * @returns {Promise} a promise for the first item in the stream
  */
 Stream.prototype.head = function() {
-	return next(this.step, this.state).then(getValueOrFail);
+	return streamNext(this).then(getValueOrFail);
 };
 
 /**
  * @returns {Stream} a stream containing all items in this stream except the first
  */
 Stream.prototype.tail = function() {
-	var state = next(this.step, this.state).then(getState);
-	return new Stream(this.step, state);
+	return new Stream(this.step, streamNext(this).then(getState));
 };
 
 /**
@@ -356,7 +354,7 @@ Stream.prototype.startWith = function(x) {
  *  all items in s
  */
 Stream.prototype.concat = function(s) {
-	return Stream.from([this, s]).chain(identity);
+	return new Stream(identity, two(this, s)).chain(identity);
 };
 
 /**
@@ -423,8 +421,12 @@ function getState(s) {
 	return s.state;
 }
 
-function once(x) {
+function one(x) {
 	return new Yield(x, new End());
+}
+
+function two(x, y) {
+	return new Yield(x, new Yield(y, new End()));
 }
 
 function repeat(x) {

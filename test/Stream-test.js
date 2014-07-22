@@ -189,6 +189,12 @@ describe('Stream', function() {
 
 	});
 
+	describe('flatMap', function() {
+		it('should be an alias for chain', function() {
+			expect(Stream.prototype.flatMap).toBe(Stream.prototype.chain);
+		});
+	});
+
 	describe('chain', function() {
 
 		it('should satisfy associativity', function() {
