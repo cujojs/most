@@ -72,7 +72,7 @@ describe('Stream', function() {
 		});
 
 		it('should end if consumer returns End', function() {
-			var spy = this.spy(function(x) {
+			var spy = this.spy(function() {
 				return new Stream.End();
 			});
 
