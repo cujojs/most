@@ -6,6 +6,7 @@
 var Scheduler = require('./lib/Scheduler');
 var Promise = require('./lib/Promise');
 var delay = require('./lib/delay');
+var when = require('./lib/when');
 var step = require('./lib/step');
 var iterable = require('./lib/iterable');
 
@@ -472,14 +473,6 @@ function ensureScheduler(scheduler) {
 		return Scheduler.getDefault();
 	}
 	return scheduler;
-}
-
-function when(x, f) {
-	return isPromise(x) ? x.then(f) : f(x);
-}
-
-function isPromise(x) {
-	return x !== null && (typeof x === 'object' || typeof x === 'function' ) && typeof x.then === 'function';
 }
 
 var slice = Array.prototype.slice;
