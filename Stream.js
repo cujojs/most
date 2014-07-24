@@ -193,12 +193,16 @@ function debounceNext(stepper, s, period, scheduler) {
 Stream.prototype.map = function(f) {
 	var stepper = this.step;
 	return new Stream(function (state) {
-		return when(next(stepper, state), function(i) {
-			return i.done ? i
-				: new Yield(f(i.value), i.state);
-		});
+		return mapNext(f, stepper, state);
 	}, this.state);
 };
+
+function mapNext (f, stepper, state) {
+	return when(next(stepper, state), function (i) {
+		return i.done ? i
+			: new Yield(f(i.value), i.state);
+	});
+}
 
 /**
  * Perform a side effect for each item in the stream
@@ -207,11 +211,19 @@ Stream.prototype.map = function(f) {
  * @returns {Stream} new stream containing the same items as this stream
  */
 Stream.prototype.tap = function(f) {
-	return this.map(function(x) {
-		f(x);
-		return x;
-	});
+	var stepper = this.step;
+	return new Stream(function (state) {
+		return tapNext(f, stepper, state);
+	}, this.state);
 };
+
+function tapNext (f, stepper, state) {
+	return when(next(stepper, state), function (i) {
+		return i.done ? i : when(f(i.value), function() {
+			return i;
+		});
+	});
+}
 
 /**
  * Assume this stream contains functions, and apply each function to each item
@@ -381,16 +393,20 @@ Stream.prototype.concat = function(s) {
 Stream.prototype.scan = function(f, initial) {
 	var stepper = this.step;
 	return new Stream(function(s) {
-		return when(next(stepper, s.state), function(i) {
-			if(i.done) {
-				return i;
-			}
-
-			var value = f(s.value, i.value);
-			return new Yield(value, new Pair(value, i.state));
-		});
+		return scanNext(f, stepper, s);
 	}, new Pair(initial, this.state));
 };
+
+function scanNext (f, stepper, s) {
+	return when(next(stepper, s.state), function (i) {
+		if (i.done) {
+			return i;
+		}
+
+		var value = f(s.value, i.value);
+		return new Yield(value, new Pair(value, i.state));
+	});
+}
 
 /**
  * Reduce this stream to produce a single result.  Note that reducing an infinite
