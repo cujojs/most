@@ -17,6 +17,8 @@ module.exports = Stream;
 var Yield = Stream.Yield = step.Yield;
 var End   = Stream.End   = step.End;
 
+var next = when;
+
 var iterableFrom = iterable.from;
 var iterableHead = iterable.head;
 
@@ -128,16 +130,16 @@ Stream.prototype.forEach = Stream.prototype.observe = function(f) {
 };
 
 function runStream(f, stepper, state) {
-	return when(next(stepper, state), function(s) {
+	return when(function (s) {
 		if (s.done) {
 			return s.value;
 		}
 
-		return when(f(s.value), function (x) {
+		return when(function (x) {
 			return x instanceof End ? x.value
 				: runStream(f, stepper, s.state);
-		});
-	});
+		}, f(s.value));
+	}, next(stepper, state));
 }
 
 /**
@@ -150,10 +152,10 @@ Stream.prototype.delay = function(delayTime, scheduler) {
 
 	var stepper = this.step;
 	return new Stream(function(s) {
-		return when(next(stepper, s.state), function(i) {
+		return when(function(i) {
 			return i.done ? i
 				: delay(s.value, yieldPair(i, s.value), scheduler);
-		});
+		}, next(stepper, s.state));
 	}, new Pair(delayTime, this.state));
 };
 
@@ -173,7 +175,7 @@ Stream.prototype.debounce = function(period, scheduler) {
 };
 
 function debounceNext(stepper, s, period, scheduler) {
-	return when(next(stepper, s.state), function(i) {
+	return when(function(i) {
 		if(i.done) {
 			return i;
 		}
@@ -182,7 +184,7 @@ function debounceNext(stepper, s, period, scheduler) {
 		var end = s.value;
 		return now > end ? yieldPair(i, now + period)
 			: debounceNext(stepper, new Pair(end, i.state), period, scheduler);
-	});
+	}, next(stepper, s.state));
 }
 
 /**
@@ -198,10 +200,9 @@ Stream.prototype.map = function(f) {
 };
 
 function mapNext (f, stepper, state) {
-	return when(next(stepper, state), function (i) {
-		return i.done ? i
-			: new Yield(f(i.value), i.state);
-	});
+	return when(function (i) {
+		return i.map(f);
+	}, next(stepper, state));
 }
 
 /**
@@ -218,11 +219,11 @@ Stream.prototype.tap = function(f) {
 };
 
 function tapNext (f, stepper, state) {
-	return when(next(stepper, state), function (i) {
-		return i.done ? i : when(f(i.value), function() {
+	return when(function (i) {
+		return i.done ? i : when(function() {
 			return i;
-		});
-	});
+		}, f(i.value));
+	}, next(stepper, state));
 }
 
 /**
@@ -232,7 +233,7 @@ function tapNext (f, stepper, state) {
  * @returns {Stream} stream containing the cross product of items
  */
 Stream.prototype.ap = function(xs) {
-	return this.chain(function(f) {
+	return this.flatMap(function(f) {
 		return xs.map(f);
 	});
 };
@@ -247,23 +248,38 @@ Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return new Stream(stepChain, new Outer(f, this));
 
 	function stepChain(s) {
-		return s.inner === void 0 ? stepOuter(stepChain, s.f, s.outer)
-			: stepInner(stepChain, s.f, s.outer, s.inner);
+		return s.step(stepChain);
 	}
 };
 
-function stepOuter(stepChain, f, outer) {
-	return when(Promise.resolve(streamNext(outer)), function(i) {
-		return i.done ? i
-			: stepInner(stepChain, f, new Stream(outer.step, i.state), f(i.value));
-	});
+function Outer(f, outer) {
+	this.f = f; this.outer = outer; this.inner = void 0;
 }
 
-function stepInner(stepChain, f, outer, inner) {
-	return when(Promise.resolve(streamNext(inner)), function(ii) {
-		return ii.done ? stepChain(new Outer(f, outer))
+Outer.prototype.step = function(stepNext) {
+	return stepOuter(stepNext, this.f, this.outer);
+};
+
+function Inner(f, outer, inner) {
+	this.f = f; this.outer = outer; this.inner = inner;
+}
+
+Inner.prototype.step = function(stepNext) {
+	return stepInner(stepNext, this.f, this.outer, this.inner);
+};
+
+function stepOuter(stepNext, f, outer) {
+	return when(function(i) {
+		return i.done ? i
+			: stepInner(stepNext, f, new Stream(outer.step, i.state), f(i.value));
+	}, Promise.resolve(streamNext(outer)));
+}
+
+function stepInner(stepNext, f, outer, inner) {
+	return when(function(ii) {
+		return ii.done ? stepOuter(stepNext, f, outer)
 			: new Yield(ii.value, new Inner(f, outer, new Stream(inner.step, ii.state)));
-	});
+	}, Promise.resolve(streamNext(inner)));
 }
 
 /**
@@ -279,10 +295,10 @@ Stream.prototype.filter = function(p) {
 };
 
 function filterNext(p, stepper, state) {
-	return when(next(stepper, state), function(i) {
+	return when(function(i) {
 		return i.done || p(i.value) ? i
 			: filterNext(p, stepper, i.state);
-	});
+	}, next(stepper, state));
 }
 
 /**
@@ -303,28 +319,28 @@ Stream.prototype.distinct = function(equals) {
 };
 
 function distinctNext(equals, stepper, s) {
-	return when(next(stepper, s.state), function(i) {
+	return when(function(i) {
 		if(i.done) {
 			return i;
 		}
 		return equals(s.value, i.value)
 			? distinctNext(equals, stepper, new Pair(s.value, i.state))
 			: yieldPair(i, i.value);
-	});
+	}, next(stepper, s.state));
 }
 
 /**
  * @returns {Promise} a promise for the first item in the stream
  */
 Stream.prototype.head = function() {
-	return when(Promise.resolve(streamNext(this)), getValueOrFail);
+	return when(getValueOrFail, Promise.resolve(streamNext(this)));
 };
 
 /**
  * @returns {Stream} a stream containing all items in this stream except the first
  */
 Stream.prototype.tail = function() {
-	return new Stream(this.step, when(streamNext(this), getState));
+	return new Stream(this.step, when(getState, streamNext(this)));
 };
 
 /**
@@ -335,10 +351,10 @@ Stream.prototype.tail = function() {
 Stream.prototype.takeWhile = function(p) {
 	var stepper = this.step;
 	return new Stream(function(s) {
-		return when(next(stepper, s), function(i) {
+		return when(function (i) {
 			return i.done || p(i.value) ? i
 				: new End();
-		});
+		}, next(stepper, s));
 	}, this.state);
 };
 
@@ -349,12 +365,12 @@ Stream.prototype.takeWhile = function(p) {
 Stream.prototype.take = function(n) {
 	var stepper = this.step;
 	return new Stream(function(s) {
-		return when(next(stepper, s.state), function(i) {
+		return when(function (i) {
 			var remaining = s.value - 1;
 			return i.done ? i
 				: s.value === 0 ? new End(i.value)
 				: yieldPair(i, remaining);
-		});
+		}, next(stepper, s.state));
 	}, new Pair(n, this.state));
 };
 
@@ -398,14 +414,14 @@ Stream.prototype.scan = function(f, initial) {
 };
 
 function scanNext (f, stepper, s) {
-	return when(next(stepper, s.state), function (i) {
+	return when(function (i) {
 		if (i.done) {
 			return i;
 		}
 
 		var value = f(s.value, i.value);
 		return new Yield(value, new Pair(value, i.state));
-	});
+	}, next(stepper, s.state));
 }
 
 /**
@@ -421,17 +437,13 @@ Stream.prototype.reduce = function(f, initial) {
 };
 
 function reduce(f, z, stepper, state) {
-	return when(next(stepper, state), function(i) {
+	return when(function (i) {
 		return i.done ? z
 			: reduce(f, f(z, i.value), stepper, i.state);
-	});
+	}, next(stepper, state));
 }
 
 // Helpers
-
-function next(stepper, state) {
-	return when(state, stepper);
-}
 
 function streamNext(s) {
 	return next(s.step, s.state);
@@ -466,14 +478,6 @@ function Pair(x, s) {
 
 function yieldPair(step, x) {
 	return new Yield(step.value, new Pair(x, step.state));
-}
-
-function Outer(f, outer) {
-	this.f = f; this.outer = outer; this.inner = void 0;
-}
-
-function Inner(f, outer, inner) {
-	this.f = f; this.outer = outer; this.inner = inner;
 }
 
 function identity(x) {
