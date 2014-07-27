@@ -1,5 +1,5 @@
 var Scheduler = require('../lib/Scheduler');
-var Promise = require('../lib/Promise');
+var Promise = require('../lib/promises').Promise;
 
 module.exports = createTestScheduler;
 

@@ -1,7 +1,7 @@
 {
   "name": "most",
-  "main": "Stream.js",
-  "version": "0.5.2",
+  "main": "most.js",
+  "version": "0.6.0",
   "homepage": "https://github.com/cujojs/most",
   "authors": [
     "Brian Cavalier <brian@hovercraftstudios.com>"
