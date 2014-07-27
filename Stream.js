@@ -4,20 +4,23 @@
 /** @module */
 
 var Scheduler = require('./lib/Scheduler');
-var Promise = require('./lib/Promise');
-var delay = require('./lib/delay');
-var when = require('./lib/when');
+var promise = require('./lib/promises');
 var step = require('./lib/step');
 var iterable = require('./lib/iterable');
 
 module.exports = Stream;
 
+var Promise = promise.Promise;
+var delay = promise.delay;
+var when = promise.when;
+var next = when;
+
 /** @typedef {Yield|End} Step */
 
 var Yield = Stream.Yield = step.Yield;
 var End   = Stream.End   = step.End;
-
-var next = when;
+var getState = step.getState;
+var getValueOrFail = step.getValueOrFail;
 
 var iterableFrom = iterable.from;
 var iterableHead = iterable.head;
@@ -447,17 +450,6 @@ function reduce(f, z, stepper, state) {
 
 function streamNext(s) {
 	return next(s.step, s.state);
-}
-
-function getValueOrFail(s) {
-	if(s.done) {
-		throw new Error('empty stream');
-	}
-	return s.value;
-}
-
-function getState(s) {
-	return s.state;
 }
 
 function one(x) {

@@ -2,7 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../Stream');
-var Promise = require('../lib/Promise');
+var Promise = require('../lib/promises').Promise;
 
 var createTestScheduler = require('./createTestScheduler');
 
