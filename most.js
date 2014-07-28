@@ -58,6 +58,24 @@ Stream.prototype.zipWith = function(f, s) {
 };
 
 //-----------------------------------------------------------------------
+// Filtering
+
+var distinct = require('./lib/combinators/distinct');
+publish(distinct, exports);
+
+var distinctSame = distinct.distinct;
+var distinctBy = distinct.distinctBy;
+
+/**
+ * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
+ * @param {?function(a:*, b:*):boolean} equals optional function to compare items.
+ * @returns {Stream} stream with no adjacent duplicates
+ */
+Stream.prototype.distinct = function(equals) {
+	return arguments.length === 0 ? distinctSame(this) : distinctBy(equals, this);
+};
+
+//-----------------------------------------------------------------------
 // Merging
 
 var merge = require('./lib/combinators/merge');
