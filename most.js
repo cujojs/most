@@ -15,7 +15,6 @@ exports.empty       = Stream.empty;
 exports.of          = Stream.of;
 exports.from        = Stream.from;
 exports.fromPromise = Stream.fromPromise;
-exports.periodic    = Stream.periodic;
 
 //-----------------------------------------------------------------------
 // Building
@@ -33,6 +32,36 @@ exports.repeat  = repeat;
  */
 Stream.prototype.cycle = function() {
 	return repeat(this).flatMap(identity);
+};
+
+//-----------------------------------------------------------------------
+// Timers
+
+var timed = require('./lib/combinators/timed');
+var delay = timed.delay;
+var debounce = timed.debounce;
+
+exports.periodic = timed.periodic;
+exports.delay    = delay;
+exports.debounce = debounce;
+
+/**
+ * @param {Number} delayTime milliseconds to delay each item
+ * @param {Scheduler=} scheduler optional scheduler to use
+ * @returns {Stream} new stream containing the same items, but delayed by ms
+ */
+Stream.prototype.delay = function(delayTime, scheduler) {
+	return delay(delayTime, scheduler, this);
+};
+
+/**
+ * Skip events for period time after the most recent event
+ * @param {Number} period time to suppress events
+ * @param {Scheduler=} scheduler optional scheduler
+ * @returns {Stream} new stream that skips events for debounce period
+ */
+Stream.prototype.debounce = function(period, scheduler) {
+	return debounce(period, scheduler, this);
 };
 
 //-----------------------------------------------------------------------
@@ -97,8 +126,7 @@ exports.mergeArray = mergeArray;
 exports.mergeAll   = mergeAll;
 
 /**
- * Merge this stream and s
- * @param {Stream} s
+ * Merge this stream and all the provided streams
  * @returns {Stream} stream containing items from this stream and s in time
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.

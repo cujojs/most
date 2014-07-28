@@ -7,8 +7,6 @@ var iterate = build.iterate;
 var repeat = build.repeat;
 var Promise = require('../lib/promises').Promise;
 
-var createTestScheduler = require('./createTestScheduler');
-
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
@@ -444,54 +442,6 @@ describe('Stream', function() {
 				});
 		});
 
-	});
-
-	describe('delay', function() {
-		it('should delay events by delayTime', function() {
-			var scheduler = createTestScheduler();
-
-			var result = Stream.of(sentinel).delay(100, scheduler).observe(function(x) {
-				expect(x).toBe(sentinel);
-				expect(scheduler.now()).toBe(100);
-			});
-
-			scheduler.tick(100);
-			return result;
-		});
-	});
-
-	describe('periodic', function() {
-		it('should emit events at tick periods', function() {
-			var scheduler = createTestScheduler();
-
-			var count = 5;
-			var result = Stream.periodic(1, scheduler)
-				.take(count)
-				.reduce(function(c) {
-					return c - 1;
-				}, count).then(function(count) {
-					expect(count).toBe(0);
-				});
-
-			scheduler.tick(10, 1);
-			return result;
-		});
-	});
-
-	describe('debounce', function() {
-		it('should exclude items during debounce period', function() {
-			var scheduler = createTestScheduler();
-
-			var result = Stream.periodic(1, scheduler)
-				.take(5)
-				.debounce(1, scheduler)
-				.forEach(function(x) {
-					expect(x % 2 === 0).toBeTrue();
-				});
-
-			scheduler.tick(10, 1);
-			return result;
-		});
 	});
 
 //	describe('drop', function() {
