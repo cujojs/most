@@ -39,11 +39,16 @@ Stream.prototype.cycle = function() {
 
 var timed = require('./lib/combinators/timed');
 var delay = timed.delay;
+var delayOn = timed.delayOn;
 var debounce = timed.debounce;
+var debounceOn = timed.debounceOn;
 
-exports.periodic = timed.periodic;
-exports.delay    = delay;
-exports.debounce = debounce;
+exports.periodic   = timed.periodic;
+exports.periodicOn = timed.periodicOn;
+exports.delay      = delay;
+exports.delayOn    = delayOn;
+exports.debounce   = debounce;
+exports.debounceOn = debounceOn;
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
@@ -51,7 +56,8 @@ exports.debounce = debounce;
  * @returns {Stream} new stream containing the same items, but delayed by ms
  */
 Stream.prototype.delay = function(delayTime, scheduler) {
-	return delay(delayTime, scheduler, this);
+	return arguments.length > 1 ? delayOn(scheduler, delayTime, this)
+		: delay(delayTime, this);
 };
 
 /**
@@ -61,7 +67,8 @@ Stream.prototype.delay = function(delayTime, scheduler) {
  * @returns {Stream} new stream that skips events for debounce period
  */
 Stream.prototype.debounce = function(period, scheduler) {
-	return debounce(period, scheduler, this);
+	return arguments.length > 1 ? debounceOn(scheduler, period, this)
+		: debounce(period, this);
 };
 
 //-----------------------------------------------------------------------

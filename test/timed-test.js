@@ -12,7 +12,7 @@ describe('delay', function() {
 	it('should delay events by delayTime', function() {
 		var scheduler = createTestScheduler();
 
-		var result = timed.delay(100, scheduler, Stream.of(sentinel))
+		var result = timed.delayOn(scheduler, 100, Stream.of(sentinel))
 			.observe(function(x) {
 				expect(x).toBe(sentinel);
 				expect(scheduler.now()).toBe(100);
@@ -28,7 +28,7 @@ describe('periodic', function() {
 		var scheduler = createTestScheduler();
 
 		var count = 5;
-		var result = timed.periodic(1, scheduler)
+		var result = timed.periodicOn(scheduler, 1)
 			.take(count)
 			.reduce(function(c) {
 				return c - 1;
@@ -45,7 +45,7 @@ describe('debounce', function() {
 	it('should exclude items during debounce period', function() {
 		var scheduler = createTestScheduler();
 
-		var result = timed.debounce(1, scheduler, timed.periodic(1, scheduler).take(5))
+		var result = timed.debounceOn(scheduler, 1, timed.periodicOn(scheduler, 1).take(5))
 			.observe(function(x) {
 				expect(x % 2 === 0).toBeTrue();
 			});
