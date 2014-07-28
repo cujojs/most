@@ -1,15 +1,38 @@
+/** @license MIT License (c) copyright 2010-2014 original author or authors */
+/** @author Brian Cavalier */
+/** @author John Hann */
+/** @module */
+
+var identity = require('./lib/fn').identity;
+
 /**
- * Discrete event stream type
+ * Core event stream type
  * @type {Stream}
  */
 var Stream = require('./lib/Stream');
-addExports(Stream, exports);
+publish(Stream, exports);
 
 //-----------------------------------------------------------------------
-// Zip
+// Building
+
+var build = require('./lib/combinators/build');
+publish(build, exports);
+
+var repeat = build.repeat;
+
+/**
+ * Tie this stream into a circle, thus creating an infinite stream
+ * @returns {Stream} infinite stream that replays all items from this stream
+ */
+Stream.prototype.cycle = function() {
+	return repeat(this).flatMap(identity);
+};
+
+//-----------------------------------------------------------------------
+// Zipping
 
 var zip = require('./lib/combinators/zip');
-addExports(zip, exports);
+publish(zip, exports);
 
 var zip2 = zip.zip;
 var zip2With = zip.zipWith;
@@ -35,10 +58,10 @@ Stream.prototype.zipWith = function(f, s) {
 };
 
 //-----------------------------------------------------------------------
-// Merge
+// Merging
 
 var merge = require('./lib/combinators/merge');
-addExports(merge, exports);
+publish(merge, exports);
 
 var merge2 = merge.merge;
 var mergeAll = merge.mergeAll;
@@ -65,7 +88,7 @@ Stream.prototype.mergeAll = function() {
 //-----------------------------------------------------------------------
 // Helpers
 
-function addExports(module, exports) {
+function publish(module, exports) {
 	return Object.keys(module).reduce(function(exports, k) {
 		exports[k] = module[k];
 		return exports;

@@ -2,6 +2,9 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../lib/Stream');
+var build = require('../lib/combinators/build');
+var iterate = build.iterate;
+var repeat = build.repeat;
 var Promise = require('../lib/promises').Promise;
 
 var createTestScheduler = require('./createTestScheduler');
@@ -271,7 +274,7 @@ describe('Stream', function() {
 		});
 
 		it('should filter an infinite stream', function() {
-			return Stream.iterate(function(x) {return x+1;}, 0)
+			return iterate(function(x) {return x+1;}, 0)
 				.filter(function(x) {
 					return x % 2 === 0;
 				})
@@ -280,115 +283,6 @@ describe('Stream', function() {
 					if(x > 10) {
 						return new Stream.End();
 					}
-				});
-		});
-
-	});
-
-	describe('unfold', function() {
-		it('should call unfold with seed', function() {
-			return Stream.unfold(function(x) {
-				return new Stream.Yield(x, x);
-			}, sentinel).observe(function(x) {
-				expect(x).toBe(sentinel);
-				return new Stream.End();
-			});
-		});
-
-		it('should unfold until end', function() {
-			var count = 0;
-			var expected = 3;
-
-			return Stream.unfold(function(x) {
-				return new Stream.Yield(x, x - 1);
-			}, expected).observe(function(x) {
-				if(x === 0) {
-					return new Stream.End();
-				}
-				count++;
-			}).then(function() {
-				expect(count).toBe(expected);
-			});
-		});
-
-		it('should reject on error', function() {
-			var spy = this.spy();
-			return Stream.unfold(function() {
-				throw sentinel;
-			}, other).observe(spy).catch(function(e) {
-				expect(spy).not.toHaveBeenCalled();
-				expect(e).toBe(sentinel);
-			});
-		});
-
-	});
-
-	describe('iterate', function() {
-
-		it('should call iterator with seed', function() {
-			return Stream.iterate(function(x) {
-				return x;
-			}, sentinel).observe(function(x) {
-				expect(x).toBe(sentinel);
-				return new Stream.End();
-			});
-		});
-
-		it('should iterate until end', function() {
-			var count = 0;
-			var expected = 3;
-
-			return Stream.iterate(function(x) {
-				return x - 1;
-			}, expected).observe(function(x) {
-				if(x === 0) {
-					return new Stream.End();
-				}
-				count++;
-			}).then(function() {
-				expect(count).toBe(expected);
-			});
-		});
-
-		it('should reject on error', function() {
-			var spy = this.spy();
-			return Stream.iterate(function() {
-				throw sentinel;
-			}, other).observe(spy).catch(function(e) {
-				expect(spy).not.toHaveBeenCalled();
-				expect(e).toBe(sentinel);
-			});
-		});
-	});
-
-	describe('repeat', function() {
-		it('should repeat value', function() {
-			return Stream.repeat(sentinel)
-				.take(10)
-				.observe(function(x) {
-					expect(x).toBe(sentinel);
-				});
-		});
-	});
-
-	describe('cycle', function() {
-
-		it('should keep repeating', function() {
-			var buffer = [];
-			return Stream.from([1, 2, 3]).cycle().observe(function(x) {
-				buffer.push(x);
-				if(buffer.length === 9) {
-					return new Stream.End(buffer);
-				}
-			}).then(function(buffer) {
-				expect(buffer).toEqual([1, 2, 3, 1, 2, 3, 1, 2, 3]);
-			});
-		});
-
-		it('should end on error ', function() {
-			return Stream.from([1, 2, 3]).cycle()
-				.observe(function() { throw sentinel; }).catch(function(e) {
-					expect(e).toBe(sentinel);
 				});
 		});
 
@@ -473,7 +367,7 @@ describe('Stream', function() {
 	describe('take', function() {
 
 		it('should take first n elements', function () {
-			return Stream.repeat(sentinel)
+			return repeat(sentinel)
 				.take(2)
 				.reduce(function (count) {
 					return count + 1;
@@ -485,7 +379,7 @@ describe('Stream', function() {
 
 	describe('takeWhile', function() {
 		it('should take elements until condition becomes false', function() {
-			return Stream.iterate(function(x) {
+			return iterate(function(x) {
 				return x + 1;
 			}, 0).takeWhile(function(x) {
 				return x < 10;
@@ -529,7 +423,7 @@ describe('Stream', function() {
 		describe('when stream errors', function() {
 
 			it('should reject', function() {
-				return Stream.iterate(function() {
+				return iterate(function() {
 					throw sentinel;
 				}).reduce(function() {
 					return other;
