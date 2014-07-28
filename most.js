@@ -10,15 +10,22 @@ var identity = require('./lib/fn').identity;
  * @type {Stream}
  */
 var Stream = require('./lib/Stream');
-publish(Stream, exports);
+
+exports.empty       = Stream.empty;
+exports.of          = Stream.of;
+exports.from        = Stream.from;
+exports.fromPromise = Stream.fromPromise;
+exports.periodic    = Stream.periodic;
 
 //-----------------------------------------------------------------------
 // Building
 
 var build = require('./lib/combinators/build');
-publish(build, exports);
-
 var repeat = build.repeat;
+
+exports.unfold  = build.unfold;
+exports.iterate = build.iterate;
+exports.repeat  = repeat;
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -32,39 +39,42 @@ Stream.prototype.cycle = function() {
 // Zipping
 
 var zip = require('./lib/combinators/zip');
-publish(zip, exports);
+var zipArray = zip.zipArray;
+var zipArrayWith = zip.zipArrayWith;
 
-var zip2 = zip.zip;
-var zip2With = zip.zipWith;
+exports.zip          = zip.zip;
+exports.zipWith      = zip.zipWith;
+exports.zipArray     = zipArray;
+exports.zipArrayWith = zipArrayWith;
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
  * [1,2,3] zip [4,5,6] -> [[1,4],[2,5],[3,6]]
- * @param {Stream} s
  * @returns {Stream} new stream containing pairs
  */
-Stream.prototype.zip = function(s) {
-	return zip2(this, s);
+Stream.prototype.zip = function(/*,...ss*/) {
+	return zipArray(cons(this, arguments));
 };
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
  * [1,2,3] zipWith f [4,5,6] -> [f(1,4),f(2,5),f(3,6)]
- * @param {Stream} s
+ * @param {function(a:Stream, b:Stream, ...):*} f function to combine items
  * @returns {Stream} new stream containing pairs
  */
-Stream.prototype.zipWith = function(f, s) {
-	return zip2With(f, this, s);
+Stream.prototype.zipWith = function(f /*,...ss*/) {
+	return zipArrayWith(f, cons(this, arguments));
 };
 
 //-----------------------------------------------------------------------
 // Filtering
 
 var distinct = require('./lib/combinators/distinct');
-publish(distinct, exports);
-
 var distinctSame = distinct.distinct;
 var distinctBy = distinct.distinctBy;
+
+exports.distinct   = distinctSame;
+exports.distinctBy = distinctBy;
 
 /**
  * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
@@ -79,10 +89,12 @@ Stream.prototype.distinct = function(equals) {
 // Merging
 
 var merge = require('./lib/combinators/merge');
-publish(merge, exports);
-
-var merge2 = merge.merge;
+var mergeArray = merge.mergeArray;
 var mergeAll = merge.mergeAll;
+
+exports.merge      = merge.merge;
+exports.mergeArray = mergeArray;
+exports.mergeAll   = mergeAll;
 
 /**
  * Merge this stream and s
@@ -91,8 +103,8 @@ var mergeAll = merge.mergeAll;
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-Stream.prototype.merge = function(s) {
-	return merge2(this, s);
+Stream.prototype.merge = function(/*,...ss*/) {
+	return mergeArray(cons(this, arguments));
 };
 
 /**
@@ -106,9 +118,12 @@ Stream.prototype.mergeAll = function() {
 //-----------------------------------------------------------------------
 // Helpers
 
-function publish(module, exports) {
-	return Object.keys(module).reduce(function(exports, k) {
-		exports[k] = module[k];
-		return exports;
-	}, exports);
+function cons(x, array) {
+	var l = array.length;
+	var a = new Array(l + 1);
+	a[0] = x;
+	for(var i=0; i<l; ++i) {
+		a[i + 1] = array[i];
+	}
+	return a;
 }
