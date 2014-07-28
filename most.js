@@ -27,6 +27,7 @@ var repeat = build.repeat;
 exports.unfold  = build.unfold;
 exports.iterate = build.iterate;
 exports.repeat  = repeat;
+exports.cons = exports.startsWith = consStream;
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -34,6 +35,23 @@ exports.repeat  = repeat;
  */
 Stream.prototype.cycle = function() {
 	return repeat(this).flatMap(identity);
+};
+
+/**
+ * @param {*} x
+ * @param {Stream} stream
+ * @returns {Stream} new stream containing x followed by all items in this stream
+ */
+function consStream(x, stream) {
+	return concat(Stream.of(x), stream);
+}
+
+/**
+ * @param {*} x item to prepend
+ * @returns {Stream} a new stream with x prepended
+ */
+Stream.prototype.cons = Stream.prototype.startWith = function(x) {
+	return consStream(x, this);
 };
 
 //-----------------------------------------------------------------------
@@ -163,17 +181,6 @@ var concat = monoid.concat;
 
 exports.empty = monoid.empty;
 exports.concat = concat;
-exports.cons = exports.startsWith = consStream;
-
-/**
- * @param {*} x
- * @param {Stream} stream
- * @returns {Stream} new stream containing x followed by all items in this stream
- */
-function consStream(x, stream) {
-	return concat(Stream.of(x), stream);
-}
-
 /**
  * @param {Stream} right
  * @returns {Stream} new stream containing all items in this followed by
@@ -181,14 +188,6 @@ function consStream(x, stream) {
  */
 Stream.prototype.concat = function(right) {
 	return concat(this, right);
-};
-
-/**
- * @param {*} x item to prepend
- * @returns {Stream} a new stream with x prepended
- */
-Stream.prototype.cons = Stream.prototype.startWith = function(x) {
-	return consStream(x, this);
 };
 
 //-----------------------------------------------------------------------
