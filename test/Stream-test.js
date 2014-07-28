@@ -2,9 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var Stream = require('../lib/Stream');
-var build = require('../lib/combinators/build');
-var iterate = build.iterate;
-var repeat = build.repeat;
+var iterate = require('../lib/combinators/build').iterate;
 var Promise = require('../lib/promises').Promise;
 
 var sentinel = { value: 'sentinel' };
@@ -261,46 +259,6 @@ describe('Stream', function() {
 
 	});
 
-	describe('filter', function() {
-
-		it('should return a stream containing only allowed items', function() {
-			return Stream.from([sentinel, other]).filter(function(x) {
-				return x === sentinel;
-			}).observe(function(x) {
-				expect(x).toBe(sentinel);
-			});
-		});
-
-		it('should filter an infinite stream', function() {
-			return iterate(function(x) {return x+1;}, 0)
-				.filter(function(x) {
-					return x % 2 === 0;
-				})
-				.observe(function(x) {
-					expect(x % 2 === 0).toBeTrue();
-					if(x > 10) {
-						return new Stream.End();
-					}
-				});
-		});
-
-	});
-
-	describe('distinct', function() {
-
-		it('should return a stream with adjacent duplicates removed', function() {
-			return Stream.from([1, 2, 2, 3, 4, 4])
-				.distinct()
-				.reduce(function(a, x) {
-					a.push(x);
-					return a;
-				}, []).then(function(a) {
-					expect(a).toEqual([1,2,3,4]);
-				});
-		});
-
-	});
-
 	describe('startWith', function() {
 		it('should return a stream containing item as head', function() {
 			return Stream.from([1,2,3])
@@ -357,35 +315,6 @@ describe('Stream', function() {
 				return count + 1;
 			}, 0).then(function(count) {
 				expect(count).toBe(1);
-			});
-		});
-
-	});
-
-	describe('take', function() {
-
-		it('should take first n elements', function () {
-			return repeat(sentinel)
-				.take(2)
-				.reduce(function (count) {
-					return count + 1;
-				}, 0).then(function (count) {
-					expect(count).toBe(2);
-				});
-		});
-	});
-
-	describe('takeWhile', function() {
-		it('should take elements until condition becomes false', function() {
-			return iterate(function(x) {
-				return x + 1;
-			}, 0).takeWhile(function(x) {
-				return x < 10;
-			}).reduce(function(count, x) {
-				expect(x).toBeLessThan(10);
-				return count + 1;
-			}, 0).then(function(count) {
-				expect(count).toBe(10);
 			});
 		});
 

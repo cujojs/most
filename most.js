@@ -35,40 +35,54 @@ Stream.prototype.cycle = function() {
 };
 
 //-----------------------------------------------------------------------
-// Timers
+// Filtering
 
-var timed = require('./lib/combinators/timed');
-var delay = timed.delay;
-var delayOn = timed.delayOn;
-var debounce = timed.debounce;
-var debounceOn = timed.debounceOn;
+var filter = require('./lib/combinators/filter');
+var filterStream = filter.filter;
+var take = filter.take;
+var takeWhile = filter.takeWhile;
+var distinctSame = filter.distinct;
+var distinctBy = filter.distinctBy;
 
-exports.periodic   = timed.periodic;
-exports.periodicOn = timed.periodicOn;
-exports.delay      = delay;
-exports.delayOn    = delayOn;
-exports.debounce   = debounce;
-exports.debounceOn = debounceOn;
+exports.filter     = filterStream;
+exports.take       = take;
+exports.takeWhile  = takeWhile;
+exports.distinct   = distinctSame;
+exports.distinctBy = distinctBy;
 
 /**
- * @param {Number} delayTime milliseconds to delay each item
- * @param {Scheduler=} scheduler optional scheduler to use
- * @returns {Stream} new stream containing the same items, but delayed by ms
+ * Retain only items matching a predicate
+ * @param {function(x:*):boolean} p filtering predicate called for each item
+ * @returns {Stream} stream containing only items for which predicate returns truthy
  */
-Stream.prototype.delay = function(delayTime, scheduler) {
-	return arguments.length > 1 ? delayOn(scheduler, delayTime, this)
-		: delay(delayTime, this);
+Stream.prototype.filter = function(p) {
+	return filterStream(p, this);
 };
 
 /**
- * Skip events for period time after the most recent event
- * @param {Number} period time to suppress events
- * @param {Scheduler=} scheduler optional scheduler
- * @returns {Stream} new stream that skips events for debounce period
+ * @param {Number} n
+ * @returns {Stream} stream containing at most the first n items from this stream
  */
-Stream.prototype.debounce = function(period, scheduler) {
-	return arguments.length > 1 ? debounceOn(scheduler, period, this)
-		: debounce(period, this);
+Stream.prototype.take = function(n) {
+	return take(n, this);
+};
+
+/**
+ * @param {function(x:*):boolean} p
+ * @returns {Stream} stream containing items up to, but not including, the
+ * first item for which p returns falsy.
+ */
+Stream.prototype.takeWhile = function(p) {
+	return takeWhile(p, this);
+};
+
+/**
+ * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
+ * @param {?function(a:*, b:*):boolean} equals optional function to compare items.
+ * @returns {Stream} stream with no adjacent duplicates
+ */
+Stream.prototype.distinct = function(equals) {
+	return arguments.length === 0 ? distinctSame(this) : distinctBy(equals, this);
 };
 
 //-----------------------------------------------------------------------
@@ -103,25 +117,6 @@ Stream.prototype.zipWith = function(f /*,...ss*/) {
 };
 
 //-----------------------------------------------------------------------
-// Filtering
-
-var distinct = require('./lib/combinators/distinct');
-var distinctSame = distinct.distinct;
-var distinctBy = distinct.distinctBy;
-
-exports.distinct   = distinctSame;
-exports.distinctBy = distinctBy;
-
-/**
- * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
- * @param {?function(a:*, b:*):boolean} equals optional function to compare items.
- * @returns {Stream} stream with no adjacent duplicates
- */
-Stream.prototype.distinct = function(equals) {
-	return arguments.length === 0 ? distinctSame(this) : distinctBy(equals, this);
-};
-
-//-----------------------------------------------------------------------
 // Merging
 
 var merge = require('./lib/combinators/merge');
@@ -148,6 +143,43 @@ Stream.prototype.merge = function(/*,...ss*/) {
  */
 Stream.prototype.mergeAll = function() {
 	return mergeAll(this);
+};
+
+//-----------------------------------------------------------------------
+// Timers
+
+var timed = require('./lib/combinators/timed');
+var delay = timed.delay;
+var delayOn = timed.delayOn;
+var debounce = timed.debounce;
+var debounceOn = timed.debounceOn;
+
+exports.periodic   = timed.periodic;
+exports.periodicOn = timed.periodicOn;
+exports.delay      = delay;
+exports.delayOn    = delayOn;
+exports.debounce   = debounce;
+exports.debounceOn = debounceOn;
+
+/**
+ * @param {Number} delayTime milliseconds to delay each item
+ * @param {Scheduler=} scheduler optional scheduler to use
+ * @returns {Stream} new stream containing the same items, but delayed by ms
+ */
+Stream.prototype.delay = function(delayTime, scheduler) {
+	return arguments.length > 1 ? delayOn(scheduler, delayTime, this)
+		: delay(delayTime, this);
+};
+
+/**
+ * Skip events for period time after the most recent event
+ * @param {Number} period time to suppress events
+ * @param {Scheduler=} scheduler optional scheduler
+ * @returns {Stream} new stream that skips events for debounce period
+ */
+Stream.prototype.debounce = function(period, scheduler) {
+	return arguments.length > 1 ? debounceOn(scheduler, period, this)
+		: debounce(period, this);
 };
 
 //-----------------------------------------------------------------------
