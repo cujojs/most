@@ -24,3 +24,34 @@ describe('cycle', function() {
 	});
 });
 
+describe('cons', function() {
+	it('should return a stream containing item as head', function() {
+		return most.from([1,2,3])
+			.startWith(sentinel)
+			.head()
+			.then(function(x) {
+				expect(x).toBe(sentinel);
+			});
+	});
+
+	it('when empty, should return a stream containing item as head', function() {
+		return most.empty()
+			.startWith(sentinel)
+			.head()
+			.then(function(x) {
+				expect(x).toBe(sentinel);
+			});
+	});
+});
+
+describe('startWith', function() {
+	it('should be an alias for cons', function() {
+		expect(most.Stream.prototype.startWith).toBe(most.Stream.prototype.cons);
+	});
+});
+
+describe('chain', function() {
+	it('should be an alias for flatMap', function() {
+		expect(most.Stream.prototype.chain).toBe(most.Stream.prototype.flatMap);
+	});
+});

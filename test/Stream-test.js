@@ -8,11 +8,9 @@ var Promise = require('../lib/promises').Promise;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-function assertSame(p1, p2) {
-	return p1.observe(function(x) {
-		return p2.observe(function(y) {
-			expect(x).toBe(y);
-		});
+function empty() {
+	return new Stream(function() {
+		return new Stream.End();
 	});
 }
 
@@ -22,16 +20,6 @@ describe('Stream', function() {
 		// This is for Node 0.11.13's Promise, which is astonishingly slow.
 		// You really should use when.js's es6-shim
 //		this.timeout = 5000;
-	});
-
-	describe('empty', function() {
-		it('should yield no items before end', function() {
-			return Stream.empty().observe(function(x) {
-				throw new Error('not empty ' + x);
-			}).then(function() {
-				expect(true).toBeTrue();
-			});
-		});
 	});
 
 	describe('head', function() {
@@ -44,7 +32,7 @@ describe('Stream', function() {
 		});
 
 		it('should fail when empty', function() {
-			return Stream.empty().head().then(function(x) {
+			return empty().head().then(function(x) {
 				throw new Error('should not have returned ' + x);
 			}).catch(function(e) {
 				expect(e).toBeDefined();
@@ -144,7 +132,7 @@ describe('Stream', function() {
 
 		it('should be empty when original is empty', function() {
 			var spy = this.spy();
-			return Stream.empty()
+			return empty()
 				.tail()
 				.observe(spy)
 				.then(function() {
@@ -153,192 +141,12 @@ describe('Stream', function() {
 		});
 	});
 
-	describe('map', function() {
-
-		it('should satisfy identity', function() {
-			// u.map(function(a) { return a; })) ~= u
-			var u = Stream.of(sentinel);
-			return assertSame(u.map(function(x) { return x; }), u);
-		});
-
-		it('should satisfy composition', function() {
-			//u.map(function(x) { return f(g(x)); }) ~= u.map(g).map(f)
-			function f(x) { return x + 'f'; }
-			function g(x) { return x + 'g'; }
-
-			var u = Stream.of('e');
-
-			return assertSame(
-				u.map(function(x) { return f(g(x)); }),
-				u.map(g).map(f)
-			);
-		});
-
-	});
-
-	describe('tap', function() {
-
-		it('should not transform stream items', function() {
-			return Stream.of(sentinel).tap(function() {
-				return other;
-			}).observe(function(x) {
-				expect(x).toBe(sentinel);
-			});
-		});
-
-	});
-
-	describe('flatMap', function() {
-		it('should be an alias for chain', function() {
-			expect(Stream.prototype.flatMap).toBe(Stream.prototype.chain);
-		});
-	});
-
-	describe('chain', function() {
-
-		it('should satisfy associativity', function() {
-			// m.flatMap(f).flatMap(g) ~= m.flatMap(function(x) { return f(x).flatMap(g); })
-			function f(x) { return Stream.of(x + 'f'); }
-			function g(x) { return Stream.of(x + 'g'); }
-
-			var m = Stream.of('m');
-
-			return assertSame(
-				m.chain(function(x) { return f(x).chain(g); }),
-				m.chain(f).chain(g)
-			);
-		});
-
-	});
-
-	describe('ap', function() {
-
-		it('should satisfy identity', function() {
-			// P.of(function(a) { return a; }).ap(v) ~= v
-			var v = Stream.of(sentinel);
-			return assertSame(Stream.of(function(x) { return x; }).ap(v), v);
-		});
-
-		it('should satisfy composition', function() {
-			//P.of(function(f) { return function(g) { return function(x) { return f(g(x))}; }; }).ap(u).ap(v
-			var u = Stream.of(function(x) { return 'u' + x; });
-			var v = Stream.of(function(x) { return 'v' + x; });
-			var w = Stream.of('w');
-
-			return assertSame(
-				Stream.of(function(f) {
-					return function(g) {
-						return function(x) {
-							return f(g(x));
-						};
-					};
-				}).ap(u).ap(v).ap(w),
-				u.ap(v.ap(w))
-			);
-		});
-
-		it('should satisfy homomorphism', function() {
-			//P.of(f).ap(P.of(x)) ~= P.of(f(x)) (homomorphism)
-			function f(x) { return x + 'f'; }
-			var x = 'x';
-			return assertSame(Stream.of(f).ap(Stream.of(x)), Stream.of(f(x)));
-		});
-
-		it('should satisfy interchange', function() {
-			// u.ap(a.of(y)) ~= a.of(function(f) { return f(y); }).ap(u)
-			function f(x) { return x + 'f'; }
-
-			var u = Stream.of(f);
-			var y = 'y';
-
-			return assertSame(
-				u.ap(Stream.of(y)),
-				Stream.of(function(f) { return f(y); }).ap(u)
-			);
-		});
-
-	});
-
-	describe('startWith', function() {
-		it('should return a stream containing item as head', function() {
-			return Stream.from([1,2,3])
-				.startWith(sentinel)
-				.head()
-				.then(function(x) {
-					expect(x).toBe(sentinel);
-				});
-		});
-
-		it('when empty, should return a stream containing item as head', function() {
-			return Stream.empty()
-				.startWith(sentinel)
-				.head()
-				.then(function(x) {
-					expect(x).toBe(sentinel);
-				});
-		});
-	});
-
-	describe('concat', function() {
-
-		it('should return a stream containing items from both streams in correct order', function() {
-			var a1 = [1,2,3];
-			var a2 = [4,5,6];
-			var s1 = Stream.from(a1);
-			var s2 = Stream.from(a2);
-
-			return s1.concat(s2)
-				.reduce(function(a, x) {
-					a.push(x);
-					return a;
-				}, []).then(function(a) {
-					expect(a).toEqual(a1.concat(a2));
-				});
-		});
-
-		it('should satisfy left identity', function() {
-			var s = Stream.of(sentinel).concat(Stream.empty());
-
-			return s.reduce(function(count, x) {
-				expect(x).toBe(sentinel);
-				return count + 1;
-			}, 0).then(function(count) {
-				expect(count).toBe(1);
-			});
-		});
-
-		it('should satisfy right identity', function() {
-			var s = Stream.empty().concat(Stream.of(sentinel));
-
-			return s.reduce(function(count, x) {
-				expect(x).toBe(sentinel);
-				return count + 1;
-			}, 0).then(function(count) {
-				expect(count).toBe(1);
-			});
-		});
-
-	});
-
-	describe('scan', function() {
-		it('should yield combined values', function() {
-			var i = 0;
-			var expected = ['a','b','c'];
-			return Stream.from(expected).scan(function(arr, x) {
-				return arr.concat(x);
-			}, []).observe(function(arr) {
-				++i;
-				expect(arr).toEqual(expected.slice(0, i));
-			});
-		});
-	});
-
 	describe('reduce', function() {
 
 		describe('when stream is empty', function() {
 
 			it('should reduce to initial', function() {
-				return Stream.empty().reduce(function() {
+				return empty().reduce(function() {
 					throw new Error();
 				}, sentinel).then(function(result) {
 					expect(result).toBe(sentinel);

@@ -12,8 +12,8 @@ var cons = base.cons;
  * @type {Stream}
  */
 var Stream = require('./lib/Stream');
+exports.Stream      = Stream;
 
-exports.empty       = Stream.empty;
 exports.of          = Stream.of;
 exports.from        = Stream.from;
 exports.fromPromise = Stream.fromPromise;
@@ -34,6 +34,73 @@ exports.repeat  = repeat;
  */
 Stream.prototype.cycle = function() {
 	return repeat(this).flatMap(identity);
+};
+
+//-----------------------------------------------------------------------
+// Transforming
+
+var transform = require('./lib/combinators/transform');
+
+var map = transform.map;
+var ap = transform.ap;
+var flatMap = transform.flatMap;
+var scan = transform.scan;
+var tap = transform.tap;
+
+exports.map = map;
+exports.ap = ap;
+exports.flatMap = flatMap;
+exports.scan = scan;
+exports.tap = tap;
+
+/**
+ * Transform each value in the stream by applying f to each
+ * @param {function(*):*} f mapping function
+ * @returns {Stream} stream containing items transformed by f
+ */
+Stream.prototype.map = function(f) {
+	return map(f, this);
+};
+
+/**
+ * Assume this stream contains functions, and apply each function to each item
+ * in the provided stream.  This generates, in effect, a cross product.
+ * @param {Stream} xs stream of items to which
+ * @returns {Stream} stream containing the cross product of items
+ */
+Stream.prototype.ap = function(xs) {
+	return ap(this, xs);
+};
+
+/**
+ * Map each value in the stream to a new stream, and emit its values
+ * into the returned stream.
+ * @param {function(x:*):Stream} f chaining function, must return a Stream
+ * @returns {Stream} new stream containing all items from each stream returned by f
+ */
+Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
+	return flatMap(f, this);
+};
+
+/**
+ * Create a stream containing successive reduce results of applying f to
+ * the previous reduce result and the current stream item.
+ * @param {function(result:*, x:*):*} f reducer function
+ * @param {*} initial initial value
+ * @returns {Stream} new stream containing successive reduce results
+ */
+Stream.prototype.scan = function(f, initial) {
+	return scan(f, initial, this);
+};
+
+/**
+ * Perform a side effect for each item in the stream
+ * @param {function(x:*):*} f side effect to execute for each item. The
+ *  return value will be discarded.
+ * @returns {Stream} new stream containing the same items as this stream
+ */
+Stream.prototype.tap = function(f) {
+	return tap(f, this);
 };
 
 //-----------------------------------------------------------------------
@@ -85,6 +152,43 @@ Stream.prototype.takeWhile = function(p) {
  */
 Stream.prototype.distinct = function(equals) {
 	return arguments.length === 0 ? distinctSame(this) : distinctBy(equals, this);
+};
+
+//-----------------------------------------------------------------------
+// Monoid
+
+var monoid = require('./lib/combinators/monoid');
+
+var concat = monoid.concat;
+
+exports.empty = monoid.empty;
+exports.concat = concat;
+exports.cons = exports.startsWith = consStream;
+
+/**
+ * @param {*} x
+ * @param {Stream} stream
+ * @returns {Stream} new stream containing x followed by all items in this stream
+ */
+function consStream(x, stream) {
+	return concat(Stream.of(x), stream);
+}
+
+/**
+ * @param {Stream} right
+ * @returns {Stream} new stream containing all items in this followed by
+ *  all items in right
+ */
+Stream.prototype.concat = function(right) {
+	return concat(this, right);
+};
+
+/**
+ * @param {*} x item to prepend
+ * @returns {Stream} a new stream with x prepended
+ */
+Stream.prototype.cons = Stream.prototype.startWith = function(x) {
+	return consStream(x, this);
 };
 
 //-----------------------------------------------------------------------
