@@ -3,7 +3,9 @@
 /** @author John Hann */
 /** @module */
 
-var identity = require('./lib/fn').identity;
+var base = require('./lib/base');
+var identity = base.identity;
+var cons = base.cons;
 
 /**
  * Core event stream type
@@ -181,16 +183,3 @@ Stream.prototype.debounce = function(period, scheduler) {
 	return arguments.length > 1 ? debounceOn(scheduler, period, this)
 		: debounce(period, this);
 };
-
-//-----------------------------------------------------------------------
-// Helpers
-
-function cons(x, array) {
-	var l = array.length;
-	var a = new Array(l + 1);
-	a[0] = x;
-	for(var i=0; i<l; ++i) {
-		a[i + 1] = array[i];
-	}
-	return a;
-}
