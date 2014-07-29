@@ -2,7 +2,7 @@
 
 # Monadic Stream
 
-Most.js is toolkit for composing asynchronous operations on streams of data and values that vary over time, without many of the hazards of mutable shared state.  It provides a powerful set of observable streams and operations for merging, filtering, transforming, and reducing them.
+Most.js is a toolkit for composing asynchronous operations on streams of data and values that vary over time, without many of the hazards of mutable shared state.  It provides a powerful set of observable streams and operations for merging, filtering, transforming, and reducing them.
 
 ## What can it do?
 
