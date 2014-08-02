@@ -181,6 +181,7 @@ var concat = monoid.concat;
 
 exports.empty = monoid.empty;
 exports.concat = concat;
+
 /**
  * @param {Stream} right
  * @returns {Stream} new stream containing all items in this followed by
@@ -251,20 +252,37 @@ Stream.prototype.mergeAll = function() {
 };
 
 //-----------------------------------------------------------------------
+// Switching
+
+var switching = require('./lib/combinators/switch');
+var switchLatest = switching.switch;
+
+exports.switch = switchLatest;
+
+/**
+ * Given a stream of streams, return a new stream that adopts the behavior
+ * of the most recent inner stream.
+ * @returns {Stream} switching stream
+ */
+Stream.prototype.switch = Stream.prototype.switchLatest = function() {
+	return switchLatest(this);
+};
+
+//-----------------------------------------------------------------------
 // Timers
 
 var timed = require('./lib/combinators/timed');
 var delay = timed.delay;
 var delayOn = timed.delayOn;
-var debounce = timed.debounce;
-var debounceOn = timed.debounceOn;
+var throttle = timed.throttle;
+var throttleOn = timed.throttleOn;
 
 exports.periodic   = timed.periodic;
 exports.periodicOn = timed.periodicOn;
 exports.delay      = delay;
 exports.delayOn    = delayOn;
-exports.debounce   = debounce;
-exports.debounceOn = debounceOn;
+exports.throttle   = throttle;
+exports.throttleOn = throttleOn;
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
@@ -280,9 +298,9 @@ Stream.prototype.delay = function(delayTime, scheduler) {
  * Skip events for period time after the most recent event
  * @param {Number} period time to suppress events
  * @param {Scheduler=} scheduler optional scheduler
- * @returns {Stream} new stream that skips events for debounce period
+ * @returns {Stream} new stream that skips events for throttle period
  */
-Stream.prototype.debounce = function(period, scheduler) {
-	return arguments.length > 1 ? debounceOn(scheduler, period, this)
-		: debounce(period, this);
+Stream.prototype.throttle = function(period, scheduler) {
+	return arguments.length > 1 ? throttleOn(scheduler, period, this)
+		: throttle(period, this);
 };

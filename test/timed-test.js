@@ -3,6 +3,7 @@ var expect = require('buster').expect;
 
 var timed = require('../lib/combinators/timed');
 var Stream = require('../lib/Stream');
+var flatMap = require('../lib/combinators/transform').flatMap;
 
 var createTestScheduler = require('./createTestScheduler');
 
@@ -41,13 +42,39 @@ describe('periodic', function() {
 	});
 });
 
-describe('debounce', function() {
-	it('should exclude items during debounce period', function() {
+describe('throttle', function() {
+	it('should exclude items that are too frequent', function() {
 		var scheduler = createTestScheduler();
 
-		var result = timed.debounceOn(scheduler, 1, timed.periodicOn(scheduler, 1).take(5))
-			.observe(function(x) {
-				expect(x % 2 === 0).toBeTrue();
+		var result = timed.throttleOn(scheduler, 1, timed.periodicOn(scheduler, 1).take(5))
+			.reduce(function(a, x) {
+				return a.concat(x);
+			}, [])
+			.then(function(x) {
+				expect(x).toEqual([0,2,4]);
+			});
+
+		scheduler.tick(10, 1);
+		return result;
+	});
+
+	it('should include items beyond throttle window', function() {
+		var scheduler = createTestScheduler();
+		function identity(x) {
+			return x;
+		}
+
+		var s = Stream.from([
+			Stream.of('a'),
+			timed.delayOn(scheduler, 1, Stream.of('z')),
+			timed.delayOn(scheduler, 2, Stream.of('b'))
+		]);
+		var result = timed.throttleOn(scheduler, 1, flatMap(identity, s))
+			.reduce(function(r, x) {
+				return r+x;
+			}, '')
+			.then(function(r) {
+				expect(r).toBe('ab');
 			});
 
 		scheduler.tick(10, 1);
