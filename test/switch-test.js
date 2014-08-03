@@ -3,9 +3,11 @@ var expect = require('buster').expect;
 
 var switchLatest = require('../lib/combinators/switch').switch;
 var Stream = require('../lib/Stream');
-var delay = require('../lib/combinators/timed').delay;
+var delayOn = require('../lib/combinators/timed').delayOn;
 
-function containsAll(array, stream) {
+var createTestScheduler = require('./createTestScheduler');
+
+function sequenceEqual(array, stream) {
 	return stream.reduce(function(a, x) {
 		return a.concat(x);
 	}, [])
@@ -32,7 +34,7 @@ describe('switch', function() {
 			var expected = [1, 2, 3];
 			var s = Stream.of(Stream.from(expected));
 
-			return containsAll(expected, switchLatest(s));
+			return sequenceEqual(expected, switchLatest(s));
 		});
 	});
 
@@ -45,17 +47,21 @@ describe('switch', function() {
 					Stream.from(expected)
 				]);
 
-				return containsAll(expected, switchLatest(s));
+				return sequenceEqual(expected, switchLatest(s));
 			});
 		});
 		it('should switch when new stream arrives', function() {
-			var s = delay(25, Stream.from([
-				delay(10, Stream.from([1,2,3])),
-				delay(10, Stream.from([4,5,6])),
-				delay(10, Stream.from([7,8,9]))
+			var scheduler = createTestScheduler();
+			var s = delayOn(scheduler, 2, Stream.from([
+				delayOn(scheduler, 1, Stream.from([1,2,3])),
+				delayOn(scheduler, 1, Stream.from([4,5,6])),
+				delayOn(scheduler, 1, Stream.from([7,8,9]))
 			]));
 
-			return containsAll([1,2,4,5,7,8,9], switchLatest(s));
+			var result = sequenceEqual([1,2,4,5,7,8,9], switchLatest(s));
+
+			scheduler.tick(10, 1);
+			return result;
 		});
 	});
 });
