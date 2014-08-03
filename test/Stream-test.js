@@ -141,46 +141,6 @@ describe('Stream', function() {
 		});
 	});
 
-	describe('reduce', function() {
-
-		describe('when stream is empty', function() {
-
-			it('should reduce to initial', function() {
-				return empty().reduce(function() {
-					throw new Error();
-				}, sentinel).then(function(result) {
-					expect(result).toBe(sentinel);
-				});
-			});
-
-		});
-
-		describe('when stream errors', function() {
-
-			it('should reject', function() {
-				return iterate(function() {
-					throw sentinel;
-				}).reduce(function() {
-					return other;
-				}).catch(function(e) {
-					expect(e).toBe(sentinel);
-				});
-			});
-
-		});
-
-		it('should reduce values', function() {
-			return Stream.from(['b', 'c', 'd'])
-				.reduce(function(s, x) {
-					return s+x;
-				}, 'a')
-				.then(function(s) {
-					expect(s).toBe('abcd');
-				});
-		});
-
-	});
-
 //	describe('drop', function() {
 //
 //		it('should take only the last two elements', function(done) {
@@ -311,59 +271,6 @@ describe('Stream', function() {
 //		});
 //
 //	});
-//
-//	describe('throttle', function() {
-//
-//		it('should emit the most recent element', function(done) {
-//			var spy = this.spy();
-//			new Stream(function(next, end) {
-//				next(other);
-//				next(other);
-//				next(other);
-//				next(other);
-//				next(sentinel);
-//				setTimeout(end, 20);
-//			}).throttle(10).observe(spy, function() {
-//				expect(spy).toHaveBeenCalledOnceWith(sentinel);
-//				done();
-//			});
-//		});
-//
-//		it('should allow only 1 item within the interval', function(done) {
-//			var spy = this.spy();
-//			new Stream(function(next, end) {
-//				setTimeout(function() {
-//					next(other);
-//				}, 0);
-//				setTimeout(function() {
-//					next(sentinel);
-//				}, 10);
-//				setTimeout(function() {
-//					next(other);
-//				}, 20);
-//				setTimeout(function() {
-//					next(sentinel);
-//				}, 30);
-//
-//				setTimeout(end, 100);
-//			}).throttle(15).observe(function(x) {
-//				expect(x).toBe(sentinel);
-//			}, done);
-//		});
-//
-//		it('should throttle even with infinite stream', function(done) {
-//			var s  = Stream.iterate(function(x) {return x+1;}, 1).throttle(5);
-//			var i = 0, result = [];
-//			var unsubscribe = s.observe(function(x) {
-//				result.push(x);
-//				i++;
-//				(i >= 6) && unsubscribe();
-//			}, function() {
-//				expect(i).toEqual(6);
-//				done();
-//			});
-//		});
-//
-//	});
+
 
 });

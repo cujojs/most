@@ -65,11 +65,11 @@ var flatMap = transform.flatMap;
 var scan = transform.scan;
 var tap = transform.tap;
 
-exports.map = map;
-exports.ap = ap;
+exports.map     = map;
+exports.ap      = ap;
 exports.flatMap = flatMap;
-exports.scan = scan;
-exports.tap = tap;
+exports.scan    = scan;
+exports.tap     = tap;
 
 /**
  * Transform each value in the stream by applying f to each
@@ -173,13 +173,37 @@ Stream.prototype.distinct = function(equals) {
 };
 
 //-----------------------------------------------------------------------
+// Reducing
+
+var reducing = require('./lib/combinators/reduce');
+var reduce = reducing.reduce;
+var reduce1 = reducing.reduce1;
+
+exports.reduce  = reduce;
+exports.reduce1 = reduce1;
+
+/**
+ * Reduce the stream to produce a single result.  Note that reducing an infinite
+ * stream will return a Promise that never fulfills, but that may reject if an error
+ * occurs.
+ * If the initial value is not provided, the first item in the stream will be
+ * used--note that the stream *must not* be empty.  If the stream *is* empty
+ * and no initial value is provided, returns a rejected promise.
+ * @param {function(result:*, x:*):*} f reducer function
+ * @param {*} initial optional initial value
+ * @returns {Promise} promise for the file result of the reduce
+ */
+Stream.prototype.reduce = function(f, initial) {
+	return arguments.length > 1 ? reduce(f, initial, this) : reduce1(f, this);
+};
+
+//-----------------------------------------------------------------------
 // Monoid
 
 var monoid = require('./lib/combinators/monoid');
-
 var concat = monoid.concat;
 
-exports.empty = monoid.empty;
+exports.empty  = monoid.empty;
 exports.concat = concat;
 
 /**
