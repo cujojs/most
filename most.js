@@ -55,6 +55,20 @@ Stream.prototype.cons = Stream.prototype.startWith = function(x) {
 };
 
 //-----------------------------------------------------------------------
+// Creating
+// EXPERIMENTAL: API may change
+
+var create = require('./lib/combinators/create');
+
+/**
+ * Create a stream by calling producer with functions for adding items to
+ * the stream and for ending the stream.
+ * @param {function(add:function(x:*), end:function(error?:Error))} producer
+ * @returns {Stream}
+ */
+exports.create = create.create;
+
+//-----------------------------------------------------------------------
 // Transforming
 
 var transform = require('./lib/combinators/transform');
@@ -68,8 +82,9 @@ var tap = transform.tap;
 exports.map     = map;
 exports.ap      = ap;
 exports.flatMap = flatMap;
-exports.scan    = scan;
-exports.tap     = tap;
+exports.flatten = flatten;
+exports.scan = scan;
+exports.tap = tap;
 
 /**
  * Transform each value in the stream by applying f to each
@@ -99,6 +114,23 @@ Stream.prototype.ap = function(xs) {
 Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return flatMap(f, this);
 };
+
+/**
+ * Flatten a stream of stream of x into a stream of x
+ * @returns {Stream} stream of x
+ */
+Stream.prototype.flatten = function() {
+	return flatMap(identity, this);
+};
+
+/**
+ * Flatten a stream of stream of x into a stream of x
+ * @param {Stream} stream stream of stream of x
+ * @returns {Stream} stream of x
+ */
+function flatten(stream) {
+	return flatMap(identity, stream);
+}
 
 /**
  * Create a stream containing successive reduce results of applying f to
