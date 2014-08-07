@@ -6,6 +6,7 @@
 var base = require('./lib/base');
 var identity = base.identity;
 var cons = base.cons;
+var tail = base.tail;
 
 /**
  * Core event stream type
@@ -27,7 +28,7 @@ var repeat = build.repeat;
 exports.unfold  = build.unfold;
 exports.iterate = build.iterate;
 exports.repeat  = repeat;
-exports.cons = exports.startsWith = consStream;
+exports.cons = exports.startWith = consStream;
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -56,9 +57,8 @@ Stream.prototype.cons = Stream.prototype.startWith = function(x) {
 
 //-----------------------------------------------------------------------
 // Creating
-// EXPERIMENTAL: API may change
 
-var create = require('./lib/combinators/create');
+var create = require('./lib/source/create');
 
 /**
  * Create a stream by calling producer with functions for adding items to
@@ -67,6 +67,40 @@ var create = require('./lib/combinators/create');
  * @returns {Stream}
  */
 exports.create = create.create;
+
+//-----------------------------------------------------------------------
+// Adapting other sources
+
+var events = require('./lib/source/event');
+
+/**
+ * Create a stream of events from the supplied EventTarget or EventEmitter
+ * @param {String} event event name
+ * @param {EventTarget|EventEmitter} source EventTarget or EventEmitter. The source
+ *  must support either addEventListener/removeEventListener (w3c EventTarget:
+ *  http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget),
+ *  or addListener/removeListener (node EventEmitter: http://nodejs.org/api/events.html)
+ * @returns {Stream} stream of events of the specified type from the source
+ */
+exports.fromEvent = events.fromEvent;
+
+//-----------------------------------------------------------------------
+// Observing
+
+var observing = require('./lib/combinators/observe');
+var observe = observing.observe;
+var observeUntil = observing.observeUntil;
+
+exports.forEach      = exports.observe      = observe;
+exports.forEachUntil = exports.observeUntil = observeUntil;
+
+/**
+ * Process all the events in the stream
+ * @type {Function}
+ */
+Stream.prototype.forEach = Stream.prototype.observe = function(f, signal) {
+	return arguments.length < 2 ? observe(f, this) : observeUntil(f, signal, this);
+};
 
 //-----------------------------------------------------------------------
 // Transforming
@@ -81,10 +115,10 @@ var tap = transform.tap;
 
 exports.map     = map;
 exports.ap      = ap;
-exports.flatMap = flatMap;
+exports.flatMap = exports.chain = flatMap;
 exports.flatten = flatten;
-exports.scan = scan;
-exports.tap = tap;
+exports.scan    = scan;
+exports.tap     = tap;
 
 /**
  * Transform each value in the stream by applying f to each
@@ -275,7 +309,7 @@ Stream.prototype.zip = function(/*,...ss*/) {
  * @returns {Stream} new stream containing pairs
  */
 Stream.prototype.zipWith = function(f /*,...ss*/) {
-	return zipArrayWith(f, cons(this, arguments));
+	return zipArrayWith(f, cons(this, tail(arguments)));
 };
 
 //-----------------------------------------------------------------------

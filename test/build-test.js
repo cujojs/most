@@ -9,7 +9,7 @@ var End = step.End;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-describe('most', function() {
+describe('build', function() {
 
 	beforeAll(function() {
 		// This is for Node 0.11.13's Promise, which is astonishingly slow.
@@ -20,10 +20,10 @@ describe('most', function() {
 	describe('unfold', function() {
 		it('should call unfold with seed', function() {
 			return build.unfold(function(x) {
-				return new Yield(x, x);
+				return new Yield(0, x, x);
 			}, sentinel).observe(function(x) {
 				expect(x).toBe(sentinel);
-				return new End();
+				return new End(0);
 			});
 		});
 
@@ -32,10 +32,10 @@ describe('most', function() {
 			var expected = 3;
 
 			return build.unfold(function(x) {
-				return new Yield(x, x - 1);
+				return new Yield(0, x, x - 1);
 			}, expected).observe(function(x) {
 				if(x === 0) {
-					return new End();
+					return new End(0);
 				}
 				count++;
 			}).then(function() {
@@ -74,7 +74,7 @@ describe('most', function() {
 				return x - 1;
 			}, expected).observe(function(x) {
 				if(x === 0) {
-					return new End();
+					return new End(0);
 				}
 				count++;
 			}).then(function() {

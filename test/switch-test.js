@@ -3,14 +3,23 @@ var expect = require('buster').expect;
 
 var switchLatest = require('../lib/combinators/switch').switch;
 var Stream = require('../lib/Stream');
-var delayOn = require('../lib/combinators/timed').delayOn;
+var reduce = require('../lib/combinators/reduce').reduce;
+var sync = require('../lib/combinators/timed').sync;
+
+var step = require('../lib/step');
+var Yield = step.Yield;
+var End = step.End;
 
 var createTestScheduler = require('./createTestScheduler');
 
+function identity(x) {
+	return x;
+}
+
 function sequenceEqual(array, stream) {
-	return stream.reduce(function(a, x) {
+	return reduce(function(a, x) {
 		return a.concat(x);
-	}, [])
+	}, [], stream)
 		.then(function(a) {
 			expect(a).toEqual(array);
 		});
@@ -50,17 +59,25 @@ describe('switch', function() {
 				return sequenceEqual(expected, switchLatest(s));
 			});
 		});
+
 		it('should switch when new stream arrives', function() {
 			var scheduler = createTestScheduler();
-			var s = delayOn(scheduler, 2, Stream.from([
-				delayOn(scheduler, 1, Stream.from([1,2,3])),
-				delayOn(scheduler, 1, Stream.from([4,5,6])),
-				delayOn(scheduler, 1, Stream.from([7,8,9]))
-			]));
+			var times = [[0,1,3], [2,3,5], [4,5,6]];
 
-			var result = sequenceEqual([1,2,4,5,7,8,9], switchLatest(s));
+			var steps = times.reduceRight(function(step, ts, i) {
+				var innerSteps = ts.reduceRight(function(s, t) {
+					return new Yield(t, i, s);
+				}, new End(ts[ts.length-1] + 1));
 
-			scheduler.tick(10, 1);
+				var s = sync(new Stream(identity, innerSteps, scheduler));
+				return new Yield(ts[0], s, step);
+			}, new End(7));
+
+			var s = sync(new Stream(identity, steps, scheduler));
+
+			var result = sequenceEqual([0,0,1,1,2,2,2], switchLatest(s));
+
+			scheduler.tick(8, 1);
 			return result;
 		});
 	});
