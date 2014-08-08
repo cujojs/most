@@ -355,7 +355,9 @@ Stream.prototype.delay = function(delayTime, scheduler) {
 };
 
 /**
- * Skip events for period time after the most recent event
+ * Limit the rate of events
+ * stream:              abcd----abcd----
+ * throttle(2, stream): a-c-----a-c-----
  * @param {Number} period time to suppress events
  * @param {Scheduler=} scheduler optional scheduler
  * @returns {Stream} new stream that skips events for throttle period
