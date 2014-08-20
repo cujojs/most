@@ -3,7 +3,7 @@ var expect = require('buster').expect;
 
 var Stream = require('../lib/Stream');
 var iterate = require('../lib/combinators/build').iterate;
-var Promise = require('../lib/promises').Promise;
+var resolve = require('../lib/promises').Promise.resolve;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -66,7 +66,7 @@ describe('Stream', function() {
 
 	describe('fromPromise', function() {
 		it('should contain only promise\'s fulfillment value', function() {
-			return Stream.fromPromise(Promise.resolve(sentinel))
+			return Stream.fromPromise(resolve(sentinel))
 				.observe(function(x) {
 					expect(x).toBe(sentinel);
 				});

@@ -2,10 +2,6 @@
 	"browser": true,
 	"node": true,
 
-	"globals": {
-		"Promise": true
-	},
-
 	"boss": true,
 	"curly": true,
 	"eqnull": true,
