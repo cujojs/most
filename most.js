@@ -61,17 +61,19 @@ Stream.prototype.cons = Stream.prototype.startWith = function(x) {
 var create = require('./lib/source/create');
 
 /**
- * Create a stream by calling producer with functions for adding items to
- * the stream and for ending the stream.
- * @param {function(add:function(x:*), end:function(error?:Error))} producer
- * @returns {Stream}
+ * Create a stream by imperatively pushing events.
+ * @param {function(add:function(x), end:function(e)):function} run function
+ *  that will receive 2 functions as arguments, the first to add new values to the
+ *  stream and the second to end the stream. It may *return* a function that
+ *  will be called once all consumers have stopped observing the stream.
+ * @returns {Stream} stream containing all events added by run before end
  */
 exports.create = create.create;
 
 //-----------------------------------------------------------------------
 // Adapting other sources
 
-var events = require('./lib/source/event');
+var events = require('./lib/source/fromEvent');
 
 /**
  * Create a stream of events from the supplied EventTarget or EventEmitter
