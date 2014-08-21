@@ -12,23 +12,13 @@ var other = { value: 'other' };
 
 describe('filter', function() {
 	it('should return a stream containing only allowed items', function() {
+		var s = Stream.from([sentinel, other, sentinel, other]);
+
 		return filter.filter(function(x) {
 			return x === sentinel;
-		}, Stream.from([sentinel, other])).observe(function(x) {
+		}, s).observe(function(x) {
 			expect(x).toBe(sentinel);
 		});
-	});
-
-	it('should filter an infinite stream', function() {
-		return filter.filter(function(x) {
-			return x % 2 === 0;
-		}, iterate(function(x) {return x+1;}, 0))
-			.observe(function(x) {
-				expect(x % 2 === 0).toBeTrue();
-				if(x > 10) {
-					return new Stream.End();
-				}
-			});
 	});
 });
 

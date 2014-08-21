@@ -7,6 +7,10 @@ var Stream = require('../lib/Stream');
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
+function identity(x) {
+	return x;
+}
+
 describe('observe', function() {
 
 	it('should call callback and return a promise', function() {
@@ -18,15 +22,30 @@ describe('observe', function() {
 			});
 	});
 
-	it('should end if consumer returns End', function() {
-		var spy = this.spy(function() {
-			return new Stream.End();
+	it('should return a promise for the end signal value', function() {
+		var s = new Stream(identity, new Stream.End(0, sentinel));
+		return observe.observe(function() {}, s)
+			.then(function(x) {
+				expect(x).toBe(sentinel);
+			});
+	});
+
+	it('should call callback with expected values until end', function() {
+
+		var values = [0,1,2,3,4];
+		var steps = values.reduceRight(function(s, x) {
+			return new Stream.Yield(x, x, s);
+		}, new Stream.End(values.length));
+
+		var s = new Stream(identity, steps);
+
+		var spy = this.spy(function(x) {
+			expect(x).toBe(values.shift());
 		});
 
-		return observe.observe(spy, Stream.from([sentinel, other]))
+		return observe.observe(spy, s)
 			.then(function() {
-				expect(spy).toHaveBeenCalledOnceWith(sentinel);
-				expect(spy).not.toHaveBeenCalledWith(other);
+				expect(values.length).toBe(0);
 			});
 	});
 
