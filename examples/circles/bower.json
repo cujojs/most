@@ -1,0 +1,32 @@
+{
+  "name": "most-circles",
+  "version": "0.6.0",
+  "homepage": "https://github.com/cujojs/most",
+  "authors": [
+    "Brian Cavalier <brian@hovercraftstudios.com>"
+  ],
+  "main": "main.js",
+	"rave": {
+		"overrides": {
+			"rxjs": {
+				"browser": "dist/rx.all.js"
+			}
+		}
+	},
+	"moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "most": "cujojs/most#master",
+    "rave": "~0.2.1",
+    "when": "~3.4.3"
+  }
+}
