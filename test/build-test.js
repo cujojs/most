@@ -2,6 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var build = require('../lib/combinators/build');
+var take = require('../lib/combinators/filter').take;
 var step = require('../lib/step');
 var Yield = step.Yield;
 var End = step.End;
@@ -9,7 +10,7 @@ var End = step.End;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-describe('most', function() {
+describe('build', function() {
 
 	beforeAll(function() {
 		// This is for Node 0.11.13's Promise, which is astonishingly slow.
@@ -19,11 +20,10 @@ describe('most', function() {
 
 	describe('unfold', function() {
 		it('should call unfold with seed', function() {
-			return build.unfold(function(x) {
-				return new Yield(x, x);
-			}, sentinel).observe(function(x) {
+			return build.unfold(function(step) {
+				return step;
+			}, new Yield(0, sentinel, new End())).observe(function(x) {
 				expect(x).toBe(sentinel);
-				return new End();
 			});
 		});
 
@@ -32,11 +32,8 @@ describe('most', function() {
 			var expected = 3;
 
 			return build.unfold(function(x) {
-				return new Yield(x, x - 1);
-			}, expected).observe(function(x) {
-				if(x === 0) {
-					return new End();
-				}
+				return x === 0 ? new End() : new Yield(0, x, x - 1);
+			}, expected).observe(function() {
 				count++;
 			}).then(function() {
 				expect(count).toBe(expected);
@@ -58,27 +55,11 @@ describe('most', function() {
 	describe('iterate', function() {
 
 		it('should call iterator with seed', function() {
-			return build.iterate(function(x) {
+			return take(1, build.iterate(function(x) {
 				return x;
-			}, sentinel).observe(function(x) {
+			}, sentinel)).observe(function(x) {
 				expect(x).toBe(sentinel);
 				return new End();
-			});
-		});
-
-		it('should iterate until end', function() {
-			var count = 0;
-			var expected = 3;
-
-			return build.iterate(function(x) {
-				return x - 1;
-			}, expected).observe(function(x) {
-				if(x === 0) {
-					return new End();
-				}
-				count++;
-			}).then(function() {
-				expect(count).toBe(expected);
 			});
 		});
 
@@ -95,8 +76,7 @@ describe('most', function() {
 
 	describe('repeat', function() {
 		it('should repeat value', function() {
-			return build.repeat(sentinel)
-				.take(10)
+			return take(10, build.repeat(sentinel))
 				.observe(function(x) {
 					expect(x).toBe(sentinel);
 				});

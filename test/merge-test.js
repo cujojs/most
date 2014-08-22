@@ -2,16 +2,17 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var merge = require('../lib/combinators/merge');
+var delay = require('../lib/combinators/timed').delay;
+var reduce = require('../lib/combinators/reduce').reduce;
 var Stream = require('../lib/Stream');
 
 describe('merge', function() {
 	it('should include items from all inputs', function() {
 		var a = [1,2,3];
 		var b = [4,5,6];
-		return merge.merge(Stream.from(a).delay(0), Stream.from(b).delay(0))
-			.reduce(function(result, x) {
-				return result.concat(x);
-			}, [])
+		return reduce(function(result, x) {
+			return result.concat(x);
+		}, [], merge.merge(delay(0, Stream.from(a)), delay(0, Stream.from(b))))
 			.then(function(result) {
 				// Include all items
 				expect(result.sort()).toEqual(a.concat(b).sort());
@@ -29,10 +30,9 @@ describe('mergeArray', function() {
 	it('should include items from all inputs', function() {
 		var a = [1,2,3];
 		var b = [4,5,6];
-		return merge.mergeArray([Stream.from(a).delay(0), Stream.from(b).delay(0)])
-			.reduce(function(result, x) {
-				return result.concat(x);
-			}, [])
+		return reduce(function(result, x) {
+			return result.concat(x);
+		}, [], merge.mergeArray([delay(0, Stream.from(a)), delay(0, Stream.from(b))]))
 			.then(function(result) {
 				// Include all items
 				expect(result.sort()).toEqual(a.concat(b).sort());
@@ -50,10 +50,11 @@ describe('mergeAll', function() {
 	it('should include items from all inputs', function() {
 		var a = [1,2,3];
 		var b = [4,5,6];
-		return merge.mergeAll(Stream.from([Stream.from(a).delay(0), Stream.from(b).delay(0)]))
-			.reduce(function(result, x) {
-				return result.concat(x);
-			}, [])
+		var streamsToMerge = Stream.from([delay(0, Stream.from(a)), delay(0, Stream.from(b))]);
+
+		return reduce(function(result, x) {
+			return result.concat(x);
+		}, [], merge.mergeAll(streamsToMerge))
 			.then(function(result) {
 				// Include all items
 				expect(result.sort()).toEqual(a.concat(b).sort());

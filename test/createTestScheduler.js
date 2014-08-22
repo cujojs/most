@@ -1,5 +1,7 @@
 var Scheduler = require('../lib/Scheduler');
-var Promise = require('../lib/promises').Promise;
+var promise = require('../lib/promises');
+
+var resolve = promise.Promise.resolve;
 
 module.exports = createTestScheduler;
 
@@ -18,7 +20,7 @@ function createTestScheduler() {
 		}
 
 		var s = this;
-		var p = Promise.resolve();
+		var p = resolve();
 		for(var i=0; i<ticks; ++i) {
 			p = p.then(tickStep);
 		}
@@ -39,7 +41,7 @@ function createTestScheduler() {
 }
 
 function tick(s, step) {
-	return new Promise(function(resolve) {
+	return new promise.Promise(function(resolve) {
 		setTimeout(function() {
 			s._now += step;
 			s._runReadyTasks();

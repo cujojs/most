@@ -3,7 +3,7 @@ var expect = require('buster').expect;
 
 var Stream = require('../lib/Stream');
 var iterate = require('../lib/combinators/build').iterate;
-var Promise = require('../lib/promises').Promise;
+var resolve = require('../lib/promises').Promise.resolve;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -40,39 +40,6 @@ describe('Stream', function() {
 		});
 	});
 
-	describe('forEach', function() {
-		it('should be an alias for observe', function() {
-			expect(Stream.prototype.forEach).toBe(Stream.prototype.observe);
-		});
-	});
-
-	describe('observe', function() {
-
-		it('should call callback and return a promise', function() {
-			var spy = this.spy();
-
-			return Stream.of(sentinel)
-				.observe(spy)
-				.then(function() {
-					expect(spy).toHaveBeenCalledWith(sentinel);
-				});
-		});
-
-		it('should end if consumer returns End', function() {
-			var spy = this.spy(function() {
-				return new Stream.End();
-			});
-
-			return Stream.from([sentinel, other])
-				.observe(spy)
-				.then(function() {
-					expect(spy).toHaveBeenCalledOnceWith(sentinel);
-					expect(spy).not.toHaveBeenCalledWith(other);
-				});
-		});
-
-	});
-
 	describe('of', function() {
 
 		it('should contain one item', function() {
@@ -99,7 +66,7 @@ describe('Stream', function() {
 
 	describe('fromPromise', function() {
 		it('should contain only promise\'s fulfillment value', function() {
-			return Stream.fromPromise(Promise.resolve(sentinel))
+			return Stream.fromPromise(resolve(sentinel))
 				.observe(function(x) {
 					expect(x).toBe(sentinel);
 				});
