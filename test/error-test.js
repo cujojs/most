@@ -43,7 +43,7 @@ describe('flatMapError', function() {
 
 	});
 
-	it('when an error is thrown should continue with returned stream', function() {
+	it('when a promise rejection is returned should continue with returned stream', function() {
 
 		var s = error.flatMapError(function () {
 			return Stream.of(sentinel);
