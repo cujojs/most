@@ -416,3 +416,27 @@ Stream.prototype.debounce = function(period, scheduler) {
 	return arguments.length > 1 ? debounceOn(scheduler, period, this)
 		: debounce(period, this);
 };
+
+//-----------------------------------------------------------------------
+// Error handling
+
+var error = require('./lib/combinators/error');
+
+var flatMapError = error.flatMapError;
+var throwError = error.throwError;
+
+exports.flatMapError = flatMapError;
+exports.throwError   = throwError;
+
+/**
+ * If this stream encounters an error, recover and continue with items from stream
+ * returned by f.
+ * stream:                  -a-b-c-X-
+ * f(X):                           d-e-f-g-
+ * flatMapError(f, stream): -a-b-c-d-e-f-g-
+ * @param {function(error:*):Stream} f function which returns a new stream
+ * @returns {Stream} new stream which will recover from an error by calling f
+ */
+Stream.prototype.flatMapError = function(f) {
+	return flatMapError(f, this);
+};
