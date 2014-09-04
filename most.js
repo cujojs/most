@@ -194,12 +194,14 @@ Stream.prototype.tap = function(f) {
 
 var filter = require('./lib/combinators/filter');
 var filterStream = filter.filter;
+var takeUntil = filter.takeUntil;
 var take = filter.take;
 var takeWhile = filter.takeWhile;
 var distinctSame = filter.distinct;
 var distinctBy = filter.distinctBy;
 
 exports.filter     = filterStream;
+exports.takeUntil  = takeUntil;
 exports.take       = take;
 exports.takeWhile  = takeWhile;
 exports.distinct   = distinctSame;
@@ -207,6 +209,8 @@ exports.distinctBy = distinctBy;
 
 /**
  * Retain only items matching a predicate
+ * stream:                           -12345678-
+ * filter(x => x % 2 === 0, stream): --2-4-6-8-
  * @param {function(x:*):boolean} p filtering predicate called for each item
  * @returns {Stream} stream containing only items for which predicate returns truthy
  */
@@ -215,7 +219,23 @@ Stream.prototype.filter = function(p) {
 };
 
 /**
- * @param {Number} n
+ * stream:                    -a-b-c-d-e-f-g-
+ * signal:                    -------x
+ * takeUntil(signal, stream): -a-b-c-
+ * @param {Stream} signal retain only events in stream before the first
+ * event in signal
+ * @param {Stream} stream events to retain
+ * @returns {Stream} new stream containing only events that occur before
+ * the first event in signal.
+ */
+Stream.prototype.takeUntil = function(signal) {
+	return takeUntil(signal, this);
+};
+
+/**
+ * stream:          -abcd-
+ * take(2, stream): -ab
+ * @param {Number} n take up to this many events
  * @returns {Stream} stream containing at most the first n items from this stream
  */
 Stream.prototype.take = function(n) {
@@ -223,6 +243,8 @@ Stream.prototype.take = function(n) {
 };
 
 /**
+ * stream:                        -123451234-
+ * takeWhile(x => x < 5, stream): -1234
  * @param {function(x:*):boolean} p
  * @returns {Stream} stream containing items up to, but not including, the
  * first item for which p returns falsy.
@@ -232,7 +254,9 @@ Stream.prototype.takeWhile = function(p) {
 };
 
 /**
- * Remove adjacent duplicates: [a,b,b,c,b] -> [a,b,c,b]
+ * Remove adjacent duplicates
+ * stream:           -abbcd-
+ * distinct(stream): -ab-cd-
  * @param {?function(a:*, b:*):boolean} equals optional function to compare items.
  * @returns {Stream} stream with no adjacent duplicates
  */
