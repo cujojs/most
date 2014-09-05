@@ -3,6 +3,7 @@ var expect = require('buster').expect;
 
 var build = require('../lib/combinators/build');
 var take = require('../lib/combinators/filter').take;
+var observe = require('../lib/combinators/observe').observe;
 var step = require('../lib/step');
 var Yield = step.Yield;
 var End = step.End;
@@ -55,19 +56,22 @@ describe('build', function() {
 	describe('iterate', function() {
 
 		it('should call iterator with seed', function() {
-			return take(1, build.iterate(function(x) {
+			var s = take(1, build.iterate(function (x) {
 				return x;
-			}, sentinel)).observe(function(x) {
+			}, sentinel));
+
+			return observe(function(x) {
 				expect(x).toBe(sentinel);
-				return new End();
-			});
+			}, s);
 		});
 
 		it('should reject on error', function() {
 			var spy = this.spy();
-			return build.iterate(function() {
+			var s = build.iterate(function () {
 				throw sentinel;
-			}, other).observe(spy).catch(function(e) {
+			}, other);
+
+			return observe(spy, s).catch(function(e) {
 				expect(spy).not.toHaveBeenCalled();
 				expect(e).toBe(sentinel);
 			});
@@ -76,10 +80,10 @@ describe('build', function() {
 
 	describe('repeat', function() {
 		it('should repeat value', function() {
-			return take(10, build.repeat(sentinel))
-				.observe(function(x) {
-					expect(x).toBe(sentinel);
-				});
+			var s = take(10, build.repeat(sentinel));
+			return observe(function(x) {
+				expect(x).toBe(sentinel);
+			}, s);
 		});
 	});
 
