@@ -91,6 +91,7 @@ function verifyUnlistenOnEnd (evented) {
 		count++;
 	}, s).then(function () {
 		expect(count).toBe(1);
+	}).then(function() {
 		expect(spy).toHaveBeenCalled();
 	});
 }
