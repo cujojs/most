@@ -19,6 +19,6 @@
   ],
   "dependencies": {
     "most": "cujojs/most#master",
-    "rave": "~0.2.1"
+    "rave": "~0.3"
   }
 }
