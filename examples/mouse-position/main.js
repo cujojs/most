@@ -1,14 +1,16 @@
 var most = require('most');
 
 module.exports = function run() {
-	var el = document.body;
-
+	// Turn mouse events into "x,y"
+	// Insert an initial string at the beginning of the stream, to
+	//   display a message *before* the first mousemove
+	// Render each string
 	most.fromEvent('mousemove', document)
 		.map(function(e) {
 			return e.clientX + ',' + e.clientY;
 		})
-		.cons('move the mouse, please')
+		.startWith('move the mouse, please')
 		.forEach(function(s) {
-			el.innerHTML = s;
+			document.body.innerHTML = s;
 		});
 };
