@@ -3,7 +3,9 @@
 /** @author John Hann */
 /** @module */
 
+var curry = require('./lib/curry');
 var base = require('./lib/base');
+
 var identity = base.identity;
 var cons = base.cons;
 var tail = base.tail;
@@ -25,10 +27,10 @@ exports.fromPromise = Stream.fromPromise;
 var build = require('./lib/combinators/build');
 var repeat = build.repeat;
 
-exports.unfold  = build.unfold;
-exports.iterate = build.iterate;
+exports.unfold  = curry(build.unfold);
+exports.iterate = curry(build.iterate);
 exports.repeat  = repeat;
-exports.cons = exports.startWith = consStream;
+exports.cons = exports.startWith = curry(consStream);
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -84,24 +86,22 @@ var events = require('./lib/source/fromEvent');
  *  or addListener/removeListener (node EventEmitter: http://nodejs.org/api/events.html)
  * @returns {Stream} stream of events of the specified type from the source
  */
-exports.fromEvent = events.fromEvent;
+exports.fromEvent = curry(events.fromEvent);
 
 //-----------------------------------------------------------------------
 // Observing
 
 var observing = require('./lib/combinators/observe');
 var observe = observing.observe;
-var observeUntil = observing.observeUntil;
 
-exports.forEach      = exports.observe      = observe;
-exports.forEachUntil = exports.observeUntil = observeUntil;
+exports.forEach      = exports.observe      = curry(observe);
 
 /**
  * Process all the events in the stream
  * @type {Function}
  */
-Stream.prototype.forEach = Stream.prototype.observe = function(f, signal) {
-	return arguments.length < 2 ? observe(f, this) : observeUntil(f, signal, this);
+Stream.prototype.forEach = Stream.prototype.observe = function(f) {
+	return observe(f, this);
 };
 
 //-----------------------------------------------------------------------
@@ -115,12 +115,12 @@ var flatMap = transform.flatMap;
 var scan = transform.scan;
 var tap = transform.tap;
 
-exports.map     = map;
-exports.ap      = ap;
-exports.flatMap = exports.chain = flatMap;
+exports.map     = curry(map);
+exports.ap      = curry(ap);
+exports.flatMap = exports.chain = curry(flatMap);
 exports.flatten = flatten;
-exports.scan    = scan;
-exports.tap     = tap;
+exports.scan    = curry(scan);
+exports.tap     = curry(tap);
 
 /**
  * Transform each value in the stream by applying f to each
@@ -200,12 +200,12 @@ var takeWhile = filter.takeWhile;
 var distinctSame = filter.distinct;
 var distinctBy = filter.distinctBy;
 
-exports.filter     = filterStream;
-exports.takeUntil  = takeUntil;
-exports.take       = take;
-exports.takeWhile  = takeWhile;
-exports.distinct   = distinctSame;
-exports.distinctBy = distinctBy;
+exports.filter     = curry(filterStream);
+exports.takeUntil  = curry(takeUntil);
+exports.take       = curry(take);
+exports.takeWhile  = curry(takeWhile);
+exports.distinct   = curry(distinctSame);
+exports.distinctBy = curry(distinctBy);
 
 /**
  * Retain only items matching a predicate
@@ -271,8 +271,8 @@ var reducing = require('./lib/combinators/reduce');
 var reduce = reducing.reduce;
 var reduce1 = reducing.reduce1;
 
-exports.reduce  = reduce;
-exports.reduce1 = reduce1;
+exports.reduce  = curry(reduce);
+exports.reduce1 = curry(reduce1);
 
 /**
  * Reduce the stream to produce a single result.  Note that reducing an infinite
@@ -296,7 +296,7 @@ var monoid = require('./lib/combinators/monoid');
 var concat = monoid.concat;
 
 exports.empty  = monoid.empty;
-exports.concat = concat;
+exports.concat = curry(concat);
 
 /**
  * @param {Stream} right
@@ -314,10 +314,10 @@ var zip = require('./lib/combinators/zip');
 var zipArray = zip.zipArray;
 var zipArrayWith = zip.zipArrayWith;
 
-exports.zip          = zip.zip;
-exports.zipWith      = zip.zipWith;
-exports.zipArray     = zipArray;
-exports.zipArrayWith = zipArrayWith;
+exports.zip          = curry(zip.zip);
+exports.zipWith      = curry(zip.zipWith);
+exports.zipArray     = curry(zipArray);
+exports.zipArrayWith = curry(zipArrayWith);
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
@@ -345,9 +345,9 @@ var merge = require('./lib/combinators/merge');
 var mergeArray = merge.mergeArray;
 var mergeAll = merge.mergeAll;
 
-exports.merge      = merge.merge;
-exports.mergeArray = mergeArray;
-exports.mergeAll   = mergeAll;
+exports.merge      = curry(merge.merge);
+exports.mergeArray = curry(mergeArray);
+exports.mergeAll   = curry(mergeAll);
 
 /**
  * Merge this stream and all the provided streams
@@ -396,13 +396,13 @@ var debounce = timed.debounce;
 var debounceOn = timed.debounceOn;
 
 exports.periodic   = timed.periodic;
-exports.periodicOn = timed.periodicOn;
-exports.delay      = delay;
-exports.delayOn    = delayOn;
-exports.throttle   = throttle;
-exports.throttleOn = throttleOn;
-exports.debounce   = debounce;
-exports.debounceOn = debounceOn;
+exports.periodicOn = curry(timed.periodicOn);
+exports.delay      = curry(delay);
+exports.delayOn    = curry(delayOn);
+exports.throttle   = curry(throttle);
+exports.throttleOn = curry(throttleOn);
+exports.debounce   = curry(debounce);
+exports.debounceOn = curry(debounceOn);
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
@@ -449,7 +449,7 @@ var error = require('./lib/combinators/error');
 var flatMapError = error.flatMapError;
 var throwError = error.throwError;
 
-exports.flatMapError = flatMapError;
+exports.flatMapError = curry(flatMapError);
 exports.throwError   = throwError;
 
 /**
