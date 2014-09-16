@@ -1,0 +1,24 @@
+{
+	"name": "most-websocket",
+	"version": "0.6.0",
+	"homepage": "https://github.com/cujojs/most",
+	"authors": [
+		"Brian Cavalier <brian@hovercraftstudios.com>"
+	],
+	"main": "main.js",
+	"moduleType": [
+		"node"
+	],
+	"license": "MIT",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	],
+	"dependencies": {
+		"most": "cujojs/most#master",
+		"rave": "~0.3"
+	}
+}
