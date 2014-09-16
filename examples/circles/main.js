@@ -62,26 +62,20 @@ function makeTail(circle, color) {
 
 // Generate a random color
 function colorGenerator() {
-	return 'hsl(' + randomIntBetween(0, 360) + ',' +
-		randomIntBetween(20, 80) + '%,' +
-		randomIntBetween(20, 80) + '%)';
+	return 'hsl(' + randInt(0, 360) + ',' + randInt(20, 80) + '%,' + randInt(20, 80) + '%)';
 }
 
-function randomIntBetween(low, high) {
+// Generate a random int between low and high
+function randInt(low, high) {
 	return Math.floor(Math.random() * (high - low)) + low;
 }
 
 // Sniff for the particular css transform property we need to use
 function sniffTransformStyleProp (circle) {
-	var transformProp = 'transform';
-	if ('webkitTransform' in circle.style) {
-		transformProp = 'webkitTransform';
-	} else if ('mozTransform' in circle.style) {
-		transformProp = 'mozTransform';
-	} else if ('msTransform' in circle.style) {
-		transformProp = 'msTransform';
-	}
-	return transformProp;
+	return 'webkitTransform' in circle.style ? 'webkitTransform'
+		 : 'mozTransform' in circle.style ? 'mozTransform'
+		 : 'msTransform' in circle.style ? 'msTransform'
+		 : 'transform';
 }
 
 // Log stuff to the console if you want to see the *firehose*
