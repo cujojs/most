@@ -1,12 +1,9 @@
 var most = require('most');
 var rest = require('rest/client/jsonp');
-var mime = require('rest/interceptor/mime');
-var entity = require('rest/interceptor/entity');
 
 module.exports = function run() {
 
 	var url = 'http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=';
-	var fetchResults = rest.wrap(mime).wrap(entity);
 
 	var input = document.getElementById('search');
 	var resultList = document.getElementById('results');
@@ -15,7 +12,7 @@ module.exports = function run() {
 	// Fetch results with rest.js
 	// Returns a promise for the wikipedia json response
 	function getResults(text) {
-		return fetchResults(url + text);
+		return rest(url + text).entity();
 	}
 
 	// Debounce keystrokes and get input value when it changes
