@@ -417,3 +417,27 @@ most.from([1,2,3]).cycle(): 123123123123->
 ```
 
 Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.
+
+## Merging streams
+
+### merge
+
+####`stream1.merge(stream2) -> Stream`
+####`most.merge(stream1, stream2) -> Stream`
+
+Create a new stream containing events from `stream1` and `stream2`.
+
+```
+stream1:                -a--b----c--->
+stream2:                --w---x-y--z->
+stream1.merge(stream2): -aw-b-x-yc-z->
+```
+
+In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
+
+### mergeAll
+
+####`most.mergeAll(streamOfStreams) -> Stream`
+####`streamOfStreams.mergeAll() -> Stream`
+
+Assumes `streamOfStreams` is a stream whose events are streams, and merges all events from these "inner streams" into a new stream.
