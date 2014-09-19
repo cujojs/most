@@ -35,10 +35,10 @@ exports.repeat  = repeat;
 var extend = require('./lib/combinators/extend');
 
 var cycle = extend.cycle;
-var cons = extend.cons;
+var consStream = extend.cons;
 
 exports.cycle = cycle;
-exports.cons  = exports.startWith = cons;
+exports.cons  = exports.startWith = consStream;
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -53,7 +53,7 @@ Stream.prototype.cycle = function() {
  * @returns {Stream} a new stream with x prepended
  */
 Stream.prototype.cons = Stream.prototype.startWith = function(x) {
-	return cons(x, this);
+	return consStream(x, this);
 };
 
 //-----------------------------------------------------------------------
