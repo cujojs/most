@@ -11,20 +11,18 @@ API
 1. Adapting to other event sources
 	* [most.fromEvent](#mostfromevent)
 	* [most.fromEventWhere](#mostfromeventwhere)
-	* [most.create](#mostcreate)
+	* [most.create](#create)
 1. Building streams
-	* most.iterate
-	* most.unfold
-	* most.repeat
-1. Handling stream errors
-	* flatMapError
-1. Generating errors
-	* throwError
+	* [most.iterate](#mostiterate)
+	* [most.unfold](#mostunfold)
+	* [most.repeat](#mostrepeat)
+1. Handling errors
+	* [flatMapError](#flatmaperror)
+	* [throwError](#throwerror)
 1. Extending streams
-	* startWith
-	* cons
-	* concat
-	* cycle
+	* [startWith](#startwith)
+	* [concat](#concat)
+	* [cycle](#cycle)
 1. Merging streams
 	* merge
 	* mergeArray
@@ -96,8 +94,9 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 
 ## Creating streams
 
-<a name="mostof" />
-### most.of(x) -> Stream
+### most.of
+
+####`most.of(x) -> Stream`
 
 ```
 most.of(x): x|
@@ -110,8 +109,9 @@ var stream = most.of('hello');
 stream.forEach(console.log.bind(console)); // logs hello
 ```
 
-<a name="mostfrom"/>
-### most.from(iterable) -> Stream
+### most.from
+
+####`most.from(iterable) -> Stream`
 
 ```
 most.from([1,2,3,4]): 1234|
@@ -140,8 +140,9 @@ stream.take(100)
 	.forEach(console.log.bind(console));
 ```
 
-<a name="mostfrompromise"/>
-### most.fromPromise(promise) -> Stream
+### most.fromPromise
+
+####`most.fromPromise(promise) -> Stream`
 
 ```
 promise:                   ----a
@@ -150,8 +151,9 @@ most.fromPromise(promise): ----a|
 
 Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.
 
-<a name="mostperiodic"/>
-### most.periodic(period) -> Stream
+### most.periodic
+
+####`most.periodic(period) -> Stream`
 
 ```
 most.periodic(2): a-b-c-d-e-f->
@@ -160,8 +162,9 @@ most.periodic(5): a----b----c->
 
 Create an infinite stream containing events that arrive every `interval` milliseconds. The value of each event is its arrival time in milliseconds.
 
-<a name="mostempty"/>
-### most.empty() -> Stream
+### most.empty
+
+####`most.empty() -> Stream`
 
 ```
 most.empty(): |
@@ -169,8 +172,9 @@ most.empty(): |
 
 Create an already-ended stream containing no events.
 
-<a name="mostnever"/>
-### most.never() -> Stream
+### most.never
+
+####`most.never() -> Stream`
 
 ```
 most.never(): ---->
@@ -180,8 +184,9 @@ Create a stream that contains no events and never ends.
 
 ## Adapting to other event sources
 
-<a name="mostfromevent"/>
-### most.fromEvent(eventType, source) -> Stream
+### most.fromEvent
+
+####`most.fromEvent(eventType, source) -> Stream`
 
 ```
 source:                            -a--b-c---d->
@@ -194,8 +199,9 @@ Create a stream containing events from the provided [EventTarget](https://develo
 var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 ```
 
-<a name="mostfromeventwhere"/>
-### most.fromEventWhere(predicate, eventType, source) -> Stream
+### most.fromEventWhere
+
+####`most.fromEventWhere(predicate, eventType, source) -> Stream`
 
 Like [most.fromEvent](#mostfromevent), create a stream containing, but apply a `predicate` function synchronously to each event.  This allows preventDefault, filtering based on CSS selectors using [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element.matches), and any other filtering or side effects that must be performed immediately in the DOM event call stack.
 
@@ -208,8 +214,19 @@ most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
 	.forEach(postToServer);
 ```
 
+```js
+// Using preventDefault
+var form = document.querySelector('form');
+most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
+	.map(parseForm)
+	.map(JSON.stringify)
+	.forEach(postToServer);
+```
+
 <a name="mostcreate"/>
-### most.create(publisher) -> Stream
+### most.create
+
+####`most.create(publisher) -> Stream`
 
 Create a push-stream for imperatively pushing events, primarily for adapting existing event sources.
 
@@ -288,8 +305,9 @@ stream
 
 # Building streams
 
-<a name="mostiterate">
-### most.iterate(f, initial) -> Stream
+### most.iterate
+
+####`most.iterate(f, initial) -> Stream`
 
 Build an infinite stream by computing successive items iteratively.  Conceptually, the stream will contain: `[initial, f(initial), f(f(initial)), ...]`
 
@@ -301,7 +319,101 @@ most.iterate(function(x) {
 }, 0);
 ```
 
-<a name="mostunfold"/>
-### most.unfold(f, initial) -> Stream
+### most.unfold
+
+####`most.unfold(f, initial) -> Stream`
 
 Build an infinite stream by computing successive items.  This operates a lower level than [most.iterate](#mostiterate), allowing you to explicitly set event timestamps, and to explicitly end the stream.
+
+### most.repeat
+
+####`most.repeat(x) -> Stream`
+
+Create a stream containing infinite occurrences of `x`.
+
+```
+most.repeat(x): xxxxxxx->
+```
+
+## Handling errors
+
+### flatMapError
+
+####`stream.flatMapError(f) -> Stream`
+####`most.flatMapError(f, stream) -> Stream`
+
+Recover from a stream failure by calling a function to create a new stream.
+
+```
+stream:                 -a-b-c-X
+f(X):                   -d-e-f->
+stream.flatMapError(f): -a-b-c-d-e-f->
+```
+
+When a stream fails with an error, the error will be passed to `f`.  `f` must return a new stream to replace the error.
+
+```js
+var rest = require('rest');
+
+var stream = most.fromPromise(rest('http://myapi.com/things'));
+
+// Try to process data from the real API, but fall back
+// to some default data if that fails.
+stream.map(JSON.parse)
+	.flatMapError(function(e) {
+		// console.error(e);
+		return most.of(defaultData);
+	})
+	.forEach(processData);
+```
+
+### most.throwError
+
+####`most.throwError(error) -> Stream`
+
+Create a stream in the error state.  This can be useful for functions that need to return a stream, but need to signal an error.
+
+```js
+most.throwError(X): X
+```
+
+## Extending streams
+
+### startWith
+
+####`stream.startWith(x) -> Stream`
+####`most.startWith(x, stream) -> Stream`
+
+Create a new stream containing `x` followed by all events in `stream`.
+
+```js
+stream:              a-b-c-d->
+stream.startWith(x): xa-b-c-d->
+```
+
+### concat
+
+####`stream1.concat(stream2) -> Stream`
+####`most.concat(stream1, stream2) -> Stream`
+
+Create a new stream containing all events in `stream1` followed by all events in `stream2`.
+
+```js
+stream1:                 -a-b-c|
+stream2:                 -d-e-f->
+stream1.concat(stream2): -a-b-c-d-e-f->
+```
+
+### cycle
+
+####`stream.cycle() -> Stream`
+####`most.cycle(stream) -> Stream`
+
+Tie a stream into a circle.
+
+```
+most.from([1,2,3]):         123|
+most.from([1,2,3]).cycle(): 123123123123->
+```
+
+Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.
