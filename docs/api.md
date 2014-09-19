@@ -215,12 +215,14 @@ most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
 ```
 
 ```js
-// Using preventDefault
-var form = document.querySelector('form');
-most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
-	.map(parseForm)
-	.map(JSON.stringify)
-	.forEach(postToServer);
+// Using event delegation with Element.matches
+// This allows only events with the .toggle-button class
+// It also only calls preventDefault on allowed events
+var form = document.querySelector('.container');
+most.fromEventWhere(function(e) {
+		return e.matches('.toggle-button') && e.preventDefault();
+	}, 'click', container)
+	.forEach(doSomething);
 ```
 
 <a name="mostcreate"/>
