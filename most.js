@@ -28,31 +28,32 @@ var repeat = build.repeat;
 exports.unfold  = build.unfold;
 exports.iterate = build.iterate;
 exports.repeat  = repeat;
-exports.cons = exports.startWith = consStream;
+
+//-----------------------------------------------------------------------
+// Extending
+
+var extend = require('./lib/combinators/extend');
+
+var cycle = extend.cycle;
+var cons = extend.cons;
+
+exports.cycle = cycle;
+exports.cons  = exports.startWith = cons;
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
- * @returns {Stream} infinite stream that replays all items from this stream
+ * @returns {Stream} new infinite stream
  */
 Stream.prototype.cycle = function() {
-	return repeat(this).flatMap(identity);
+	return cycle(this);
 };
-
-/**
- * @param {*} x
- * @param {Stream} stream
- * @returns {Stream} new stream containing x followed by all items in this stream
- */
-function consStream(x, stream) {
-	return concat(Stream.of(x), stream);
-}
 
 /**
  * @param {*} x item to prepend
  * @returns {Stream} a new stream with x prepended
  */
 Stream.prototype.cons = Stream.prototype.startWith = function(x) {
-	return consStream(x, this);
+	return cons(x, this);
 };
 
 //-----------------------------------------------------------------------
@@ -85,6 +86,7 @@ var events = require('./lib/source/fromEvent');
  * @returns {Stream} stream of events of the specified type from the source
  */
 exports.fromEvent = events.fromEvent;
+exports.fromEventWhere = events.fromEventWhere;
 
 //-----------------------------------------------------------------------
 // Observing
