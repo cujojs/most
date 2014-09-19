@@ -4,7 +4,6 @@
 /** @module */
 
 var base = require('./lib/base');
-var identity = base.identity;
 var cons = base.cons;
 var tail = base.tail;
 
@@ -114,6 +113,7 @@ var transform = require('./lib/combinators/transform');
 var map = transform.map;
 var ap = transform.ap;
 var flatMap = transform.flatMap;
+var flatten = transform.flatten;
 var scan = transform.scan;
 var tap = transform.tap;
 
@@ -158,17 +158,8 @@ Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
  * @returns {Stream} stream of x
  */
 Stream.prototype.flatten = function() {
-	return flatMap(identity, this);
+	return flatten(this);
 };
-
-/**
- * Flatten a stream of stream of x into a stream of x
- * @param {Stream} stream stream of stream of x
- * @returns {Stream} stream of x
- */
-function flatten(stream) {
-	return flatMap(identity, stream);
-}
 
 /**
  * Create a stream containing successive reduce results of applying f to
