@@ -23,11 +23,10 @@ API
 	* [startWith](#startwith)
 	* [concat](#concat)
 	* [cycle](#cycle)
-1. Merging streams
+1. Combining streams
 	* merge
 	* mergeArray
 	* mergeAll
-1. Zipping streams
 	* zip
 	* zipWith
 	* zipArray
@@ -422,6 +421,8 @@ Makes an infinite stream from a finite one.  If the input `stream` is infinite, 
 
 ## Merging streams
 
+Merging multiple streams creates a new stream containing all events from the input stream without affecting the arrival time of and of the events.  You can think of the events from the input streams simply being interleaved into the new, merged stream.
+
 ### merge
 
 ####`stream1.merge(stream2) -> Stream`
@@ -437,9 +438,100 @@ stream1.merge(stream2): -aw-b-x-yc-z->
 
 In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
 
+### mergeArray
+
+####`most.mergeArray(streams) -> Stream`
+
+Create a new stream containing events from all of streams in the `streams` array.
+
 ### mergeAll
 
 ####`most.mergeAll(streamOfStreams) -> Stream`
 ####`streamOfStreams.mergeAll() -> Stream`
 
 Assumes `streamOfStreams` is a stream whose events are streams, and merges all events from these "inner streams" into a new stream.
+
+## Zipping streams
+
+Zipping correlates corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
+
+### zip
+
+####`stream1.zip(stream2) -> Stream`
+####`most.zip(stream1, stream2) -> Stream`
+
+Create a new stream containing corresponding pairs (as an array) of events from the input streams.
+
+```
+stream1:              -a---b---c->
+stream2:              ---x--y-z-->
+stream1.zip(stream2): ---a--b--c->
+                         x  y  z
+```
+
+```js
+// Logs [1,4] [2,5] [3,6]
+most.from([1,2,3])
+	.zip(most.from(4,5,6))
+	.forEach(console.log.bind(console));
+```
+
+### zipWith
+
+####`stream1.zipWith(f, stream2) -> Stream`
+####`most.zipWith(f, stream1, stream2) -> Stream`
+
+Create a new stream by applying a function to corresponding pairs of events from the inputs streams.
+
+```js
+function add(x, y) {
+	return x + y;
+}
+
+// Logs 5 7 9
+// In other words: add(1, 4) add(2, 5) add(3, 6)
+most.from([1,2,3])
+	.zipWith(add, most.from(4,5,6))
+	.forEach(console.log.bind(console));
+```
+
+### zipArray
+
+####`most.zipArray(streams) -> Stream`
+
+Create a new stream containing corresponding events (as an array) from the input streams
+
+```js
+var streams = [
+	most.from([1,2,3])
+	most.from([4,5,6])
+	most.from([7,8,9])
+];
+
+// Logs [1,4,7] [2,5,8] [3,6,9]
+most.zipArray(streams)
+	.forEach(console.log.bind(console));
+```
+
+### zipArrayWith
+
+####`most.zipArrayWith(f, streams) -> Stream`
+
+Create a new stream by applying a function to corresponding events from the inputs streams.
+
+```js
+function add3(x, y, z) {
+	return x + y + z;
+}
+
+var streams = [
+	most.from([1,2,3])
+	most.from([4,5,6])
+	most.from([7,8,9])
+];
+
+// Logs 12 15 18
+// In other words: add3(1,4,7) add3(2,5,8) add3(3,6,9)
+most.zipArrayWith(adde3, streams)
+	.forEach(console.log.bind(console));
+```
