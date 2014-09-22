@@ -23,24 +23,25 @@ API
 	* [startWith](#startwith)
 	* [concat](#concat)
 	* [cycle](#cycle)
-1. Combining streams
-	* merge
-	* mergeArray
-	* mergeAll
-	* zip
-	* zipWith
-	* zipArray
-	* zipArrayWith
+1. Merging streams
+	* [merge](#merge)
+	* [mergeArray](#mergearray)
+	* [mergeAll](#mergeall)
+1. Zipping streams
+	* [zip](#zip)
+	* [zipWith](#zipWith)
+	* [zipArray](#zipArray)
+	* [zipArrayWith](#zipArrayWith)
 1. Behavior switching
-	* switch
+	* [switch](#switch)
 1. Transforming streams
-	* map
-	* ap
-	* flatMap
-	* scan
-	* tap
+	* [map](#map)
+	* [ap](#ap)
+	* [flatMap](#flatMap)
+	* [scan](#scan)
+	* [tap](#tap)
 1. Filtering streams
-	* filter
+	* [filter](#filter)
 	* take
 	* takeWhile
 	* distinct
@@ -534,4 +535,114 @@ var streams = [
 // In other words: add3(1,4,7) add3(2,5,8) add3(3,6,9)
 most.zipArrayWith(adde3, streams)
 	.forEach(console.log.bind(console));
+```
+
+## Behavior switching
+
+### switch
+
+####`stream.switch() -> Stream`
+####`most.switch(stream) -> Stream`
+
+*TODO*
+
+## Transforming streams
+
+### map
+
+####`stream.map(f) -> Stream`
+####`most.map(f, stream) -> Stream`
+
+Create a new stream by applying `f` to each event of the input stream.
+
+```
+stream:           -a-b-c-d->
+stream.map(add1): -f(a)-f(b)-f(c)-f(d)->
+```
+
+```js
+// Logs 2 3 4 5
+most.from([1,2,3,4])
+	.map(function(x) {
+		return x + 1;
+	})
+	.forEach(console.log.bind(console));
+```
+
+### ap
+
+####`streamOfFunctions.ap(stream) -> Stream`
+####`most.ap(streamOfFunctions, stream) -> Stream`
+
+Apply all the functions in `streamOfFunctions` to all the values in `stream`.
+
+```
+streamOfFunctions:            f-g-h|
+stream:                       x-y-z|
+streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
+```
+
+This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
+
+### flatMap
+
+####`stream.flatMap(f) -> Stream`
+####`most.flatMap(f, stream) -> Stream`
+
+Transform each event in `stream` into a stream, and then flatten it into the resulting stream. Note that `f` *must* return a stream.
+
+`function f(x) -> Stream`
+
+```js
+// Logs 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3
+most.from([1, 2, 3])
+	.flatMap(function(x) {
+		return most.repeat(x).take(5);
+	})
+	.forEach(console.log.bind(console));
+```
+
+### scan
+
+####`stream.scan(f, initial) -> Stream`
+####`most.scan(f, initial, stream) -> Stream`
+
+Create a new stream containing incrementally accumulated results.
+
+`function f(accumulated, x) -> newAccumulated`
+
+```js
+// Logs a ab abc abcd
+most.from(['a', 'b', 'c', 'd'])
+	.scan(function(string, letter) {
+		return string + letter;
+	}, '');
+```
+
+### tap
+
+####`stream.tap(f) -> Stream`
+####`most.map(f, stream) -> Stream`
+
+Perform a side-effect for each event in `stream`.
+
+```
+stream:        -a-b-c-d->
+stream.tap(f): -a-b-c-d->
+```
+
+For each event in `stream`, `f` is called, but the value of its result is ignored.  However, `f` may return a promise to delay subsequent events.  If `f` fails (ie throws), then the returned stream will also fail.  The stream returned by `tap` will contain the same events as the original stream (although they may be delayed when `f` returns promises).
+
+## Filtering streams
+
+### filter
+
+####`stream.filter(predicate) -> Stream`
+####`most.filter(predicate, stream) -> Stream`
+
+Create a stream containing only events for which `predicate` returns truthy.
+
+```
+stream:              -1-2-3-4->
+stream.filter(even): ---2---4->
 ```
