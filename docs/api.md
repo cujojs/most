@@ -696,3 +696,23 @@ stream.distinctBy(equalsIgnoreCase): -a-b---c-D---e->
 The `equals` function should accept two values and return truthy if the two values are equal, or falsy if they are not equal.
 
 `function equals(a, b) -> boolean`
+
+## Reducing streams
+
+### reduce
+
+####`stream.reduce(f, initial) -> Promise`
+####`most.reduce(f, initial, stream) -> Promise`
+
+Reduce a stream, returning a promise for the ultimate result.
+
+```
+stream:                -1-2-3-4-|
+stream.reduce(sum, 0):           10
+```
+
+The returned promise will fulfill with the final reduced result, or will reject if a failure occurs while reducing the stream.
+
+The reduce function (`f` above)
+
+*TODO: Example*
