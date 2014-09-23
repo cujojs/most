@@ -25,14 +25,12 @@ API
 	* [cycle](#cycle)
 1. Merging streams
 	* [merge](#merge)
-	* [mergeArray](#mergearray)
 	* [mergeAll](#mergeall)
+1. Combining streams
+	* [combine](#combine)
 1. Zipping streams
 	* [zip](#zip)
-	* [zipWith](#zipWith)
-	* [zipArray](#zipArray)
-	* [zipArrayWith](#zipArrayWith)
-1. Behavior switching
+1. Switching streams
 	* [switch](#switch)
 1. Transforming streams
 	* [map](#map)
@@ -42,10 +40,11 @@ API
 	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
-	* take
-	* takeWhile
-	* distinct
-	* distinctBy
+	* [take](#take)
+	* [takeWhile](#takeWhile)
+	* [takeUntil](#takeUntil)
+	* [distinct](#distinct)
+	* [distinctBy](#distinctBy)
 1. Reducing streams
 	* reduce
 1. Rate limiting streams
@@ -422,7 +421,7 @@ Makes an infinite stream from a finite one.  If the input `stream` is infinite, 
 
 ## Merging streams
 
-Merging multiple streams creates a new stream containing all events from the input stream without affecting the arrival time of and of the events.  You can think of the events from the input streams simply being interleaved into the new, merged stream.
+Merging multiple streams creates a new stream containing all events from the input stream without affecting the arrival time of the events.  You can think of the events from the input streams simply being interleaved into the new, merged stream.
 
 ### merge
 
@@ -439,12 +438,6 @@ stream1.merge(stream2): -aw-b-x-yc-z->
 
 In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
 
-### mergeArray
-
-####`most.mergeArray(streams) -> Stream`
-
-Create a new stream containing events from all of streams in the `streams` array.
-
 ### mergeAll
 
 ####`most.mergeAll(streamOfStreams) -> Stream`
@@ -452,35 +445,59 @@ Create a new stream containing events from all of streams in the `streams` array
 
 Assumes `streamOfStreams` is a stream whose events are streams, and merges all events from these "inner streams" into a new stream.
 
+## Combining streams
+
+Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.  A combined stream ends with any one of its input streams ends.
+
+### combine
+
+####`stream1.combine(f, stream2) -> Stream`
+####`most.combine(f, stream1, stream2) -> Stream`
+
+```
+stream1:                       -0--1----2--->
+stream2:                       --3---4-5--6->
+stream1.combine(add, stream2): --3-4-5-67-8->
+```
+
+```js
+// Add the current value of two inputs
+// Updates the result whenever *either* of the inputs changes!
+
+// Create a stream from an <input> value
+function fromInput(input) {
+	return most.fromEvent('change', input)
+		.map(function(e) { return e.target.value })
+		.map(Number);
+}
+
+// Add two numbers
+function add(x, y) {
+	return x + y;
+}
+
+// Create streams for the current value of x and y
+var xStream = fromInput(document.querySelector('input.x'));
+var yStream = fromInput(document.querySelector('input.y'));
+
+// Create a result stream by adding x and y
+// This always adds the latest value of x and y
+var resultStream = xStream.combine(add, yStream);
+
+var resultNode = document.querySelector('.result');
+result.forEach(function(z) {
+	resultNode.textContent = z;
+});
+```
+
 ## Zipping streams
 
 Zipping correlates corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
 
 ### zip
 
-####`stream1.zip(stream2) -> Stream`
-####`most.zip(stream1, stream2) -> Stream`
-
-Create a new stream containing corresponding pairs (as an array) of events from the input streams.
-
-```
-stream1:              -a---b---c->
-stream2:              ---x--y-z-->
-stream1.zip(stream2): ---a--b--c->
-                         x  y  z
-```
-
-```js
-// Logs [1,4] [2,5] [3,6]
-most.from([1,2,3])
-	.zip(most.from(4,5,6))
-	.forEach(console.log.bind(console));
-```
-
-### zipWith
-
-####`stream1.zipWith(f, stream2) -> Stream`
-####`most.zipWith(f, stream1, stream2) -> Stream`
+####`stream1.zip(f, stream2) -> Stream`
+####`most.zip(f, stream1, stream2) -> Stream`
 
 Create a new stream by applying a function to corresponding pairs of events from the inputs streams.
 
@@ -492,52 +509,11 @@ function add(x, y) {
 // Logs 5 7 9
 // In other words: add(1, 4) add(2, 5) add(3, 6)
 most.from([1,2,3])
-	.zipWith(add, most.from(4,5,6))
+	.zip(add, most.from(4,5,6))
 	.forEach(console.log.bind(console));
 ```
 
-### zipArray
-
-####`most.zipArray(streams) -> Stream`
-
-Create a new stream containing corresponding events (as an array) from the input streams
-
-```js
-var streams = [
-	most.from([1,2,3])
-	most.from([4,5,6])
-	most.from([7,8,9])
-];
-
-// Logs [1,4,7] [2,5,8] [3,6,9]
-most.zipArray(streams)
-	.forEach(console.log.bind(console));
-```
-
-### zipArrayWith
-
-####`most.zipArrayWith(f, streams) -> Stream`
-
-Create a new stream by applying a function to corresponding events from the inputs streams.
-
-```js
-function add3(x, y, z) {
-	return x + y + z;
-}
-
-var streams = [
-	most.from([1,2,3])
-	most.from([4,5,6])
-	most.from([7,8,9])
-];
-
-// Logs 12 15 18
-// In other words: add3(1,4,7) add3(2,5,8) add3(3,6,9)
-most.zipArrayWith(adde3, streams)
-	.forEach(console.log.bind(console));
-```
-
-## Behavior switching
+## Switching streams
 
 ### switch
 
@@ -646,3 +622,77 @@ Create a stream containing only events for which `predicate` returns truthy.
 stream:              -1-2-3-4->
 stream.filter(even): ---2---4->
 ```
+
+### take
+
+####`stream.take(n) -> Stream`
+####`most.take(n, stream) -> Stream`
+
+Create a new stream containing at most `n` events from `stream`.
+
+```
+stream:         -a-b-c-d-e-f->
+stream.take(3): -a-b-c|
+
+stream:         -a-b|
+stream.take(3): -a-b|
+```
+
+If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream`.
+
+### takeWhile
+
+####`stream.takeWhile(predicate) -> Stream`
+####`most.takeWhile(predicate, stream) -> Stream`
+
+Create a new stream containing all events until `predicate` returns false.
+
+```
+stream:                 -2-4-5-6-8->
+stream.takeWhile(even): -2-4-|
+```
+
+### takeUntil
+
+####`stream.takeUntil(signalStream) -> Stream`
+####`most.takeUntil(signalStream, stream) -> Stream`
+
+Create a new stream containing all events until `signalStream` emits an event.
+
+```
+stream:                         -a-b-c-d-e-f->
+signalStream:                   ------z->
+stream.takeUntil(signalStream): -a-b-c|
+```
+
+If `signalStream` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+
+### distinct
+
+####`stream.distinct() -> Stream`
+####`most.distinct(stream) -> Stream`
+
+Create a new stream with *adjacent duplicates* removed.
+
+```
+stream:            -1-2-2-3-4-4-5->
+stream.distinct(): -1-2---3-4---5->
+```
+
+Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctBy)
+
+### distinctBy
+
+####`stream.distinctBy(equals) -> Stream`
+####`most.distinctBy(equals, stream) -> Stream`
+
+Create a new stream with *adjacent duplicates* removed, using the provided `equals` function.
+
+```
+stream:                              -a-b-B-c-D-d-e->
+stream.distinctBy(equalsIgnoreCase): -a-b---c-D---e->
+```
+
+The `equals` function should accept two values and return truthy if the two values are equal, or falsy if they are not equal.
+
+`function equals(a, b) -> boolean`
