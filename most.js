@@ -5,7 +5,7 @@
 
 var base = require('./lib/base');
 var cons = base.cons;
-var tail = base.tail;
+var replace = base.replace;
 
 /**
  * Core event stream type
@@ -301,6 +301,20 @@ Stream.prototype.concat = function(right) {
 };
 
 //-----------------------------------------------------------------------
+// Combining
+
+var combine = require('./lib/combinators/combine');
+
+var combineArrayWith = combine.combineArrayWith;
+
+exports.combineWith      = combine.combineWith;
+exports.combineArrayWith = combineArrayWith;
+
+Stream.prototype.combineWith = function(f /*,...ss*/) {
+	return combineArrayWith(f, replace(this, 0, arguments));
+};
+
+//-----------------------------------------------------------------------
 // Zipping
 
 var zip = require('./lib/combinators/zip');
@@ -328,7 +342,7 @@ Stream.prototype.zip = function(/*,...ss*/) {
  * @returns {Stream} new stream containing pairs
  */
 Stream.prototype.zipWith = function(f /*,...ss*/) {
-	return zipArrayWith(f, cons(this, tail(arguments)));
+	return zipArrayWith(f, replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------

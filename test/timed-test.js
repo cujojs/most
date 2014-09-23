@@ -70,7 +70,7 @@ describe('debounce', function() {
 
 			var s = timed.sync(new Stream(identity, steps, scheduler));
 
-			var result = reduce(function(count, x) {
+			var result = reduce(function(count) {
 				return count + 1;
 			}, 0, timed.debounce(1, s))
 				.then(function(count) {
