@@ -29,9 +29,7 @@ describe('switch', function() {
 	describe('when input is empty', function() {
 		it('should return empty', function() {
 			var spy = this.spy();
-			return switchLatest(new Stream(function() {
-				return new Stream.End();
-			})).observe(spy)
+			return switchLatest(new Stream(identity, new End(0))).observe(spy)
 				.then(function() {
 					expect(spy).not.toHaveBeenCalled();
 				});
