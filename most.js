@@ -304,14 +304,18 @@ Stream.prototype.concat = function(right) {
 // Combining
 
 var combine = require('./lib/combinators/combine');
+var combineArray = combine.combineArray;
 
-var combineArrayWith = combine.combineArrayWith;
+exports.combine      = combine.combine;
 
-exports.combineWith      = combine.combineWith;
-exports.combineArrayWith = combineArrayWith;
-
-Stream.prototype.combineWith = function(f /*,...ss*/) {
-	return combineArrayWith(f, replace(this, 0, arguments));
+/**
+ * Combine latest events from all input streams
+ * @param {function(...events):*} f function to combine most recent events
+ * @returns {Stream} stream containing the result of applying f to the most recent
+ *  event of each input stream, whenever a new event arrives on any stream.
+ */
+Stream.prototype.combine = function(f /*,...streams*/) {
+	return combineArray(f, replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------
