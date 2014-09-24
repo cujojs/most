@@ -46,15 +46,16 @@ API
 	* [distinct](#distinct)
 	* [distinctBy](#distinctBy)
 1. Reducing streams
-	* reduce
+	* [reduce](#reduce)
+1. Delaying streams
+	* [delay](#delay)
 1. Rate limiting streams
-	* debounce
-	* delay
-	* throttle
+	* [debounce](#debounce)
+	* [throttle](#throttle)
 
 ### Notation
 
-You'll see various diagrams like the following:
+You'll see diagrams like the following:
 
 ```
 stream1: -a-b-c-d->
@@ -716,3 +717,65 @@ The returned promise will fulfill with the final reduced result, or will reject 
 The reduce function (`f` above)
 
 *TODO: Example*
+
+## Delaying streams
+
+####`stream.delay(delayTime) -> Stream`
+####`most.delay(delayTime, stream) -> Stream`
+
+Timeshift a `stream` by `delayTime`.
+
+```
+stream:          -a-b-c-d->
+stream.delay(1): --a-b-c-d->
+stream.delay(5): ------a-b-c-d->
+```
+
+Delaying a stream shifts all the events by the same amount.  It doesn't change the time *between* events.
+
+*TODO: Example*
+
+## Rate limiting streams
+
+### debounce
+
+####`stream.debounce(debounceTime) -> Stream`
+####`most.debounce(debounceTime, stream) -> Stream`
+
+Wait for a burst of events to subside and emit only the last event in the burst.
+
+```
+stream:             abcd----abcd---->
+stream.debounce(2): -----d-------d-->
+```
+
+Debouncing can be extremely useful when dealing with bursts of similar events, for example, debouncing keypress events before initiating a remote search query in a browser application.
+
+```js
+var searchInput = document.querySelector('[name="search-text"]');
+var searchText = most.fromEvent('input', searchInput);
+
+// Logs the current value of the searchInput, only after the
+// user stops typing for 500 millis
+searchText.debounce(500)
+	.map(function(e) {
+		return e.target.value;
+	})
+	.forEach(console.log.bind(console));
+```
+
+See the [type-to-search example](../examples) for a more complete example of using `debounce`.
+
+### throttle
+
+####`stream.throttle(throttlePeriod) -> Stream`
+####`most.throttle(throttlePeriod, stream) -> Stream`
+
+Limit the rate of events to at most one per throttlePeriod.
+
+```
+stream:              abcd----abcd---->
+stream.throttle(2):  a-c-----a-c----->
+```
+
+In contrast to debounce, throttle simply drops events that occur more often than `throttlePeriod`, whereas debounce waits for a "quiet period".
