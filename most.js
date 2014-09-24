@@ -306,7 +306,7 @@ Stream.prototype.concat = function(right) {
 var combine = require('./lib/combinators/combine');
 var combineArray = combine.combineArray;
 
-exports.combine      = combine.combine;
+exports.combine = combine.combine;
 
 /**
  * Combine latest events from all input streams
@@ -323,21 +323,8 @@ Stream.prototype.combine = function(f /*,...streams*/) {
 
 var zip = require('./lib/combinators/zip');
 var zipArray = zip.zipArray;
-var zipArrayWith = zip.zipArrayWith;
 
-exports.zip          = zip.zip;
-exports.zipWith      = zip.zipWith;
-exports.zipArray     = zipArray;
-exports.zipArrayWith = zipArrayWith;
-
-/**
- * Pair-wise combine items with those in s. Given 2 streams:
- * [1,2,3] zip [4,5,6] -> [[1,4],[2,5],[3,6]]
- * @returns {Stream} new stream containing pairs
- */
-Stream.prototype.zip = function(/*,...ss*/) {
-	return zipArray(cons(this, arguments));
-};
+exports.zip = zip.zip;
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
@@ -345,8 +332,8 @@ Stream.prototype.zip = function(/*,...ss*/) {
  * @param {function(a:Stream, b:Stream, ...):*} f function to combine items
  * @returns {Stream} new stream containing pairs
  */
-Stream.prototype.zipWith = function(f /*,...ss*/) {
-	return zipArrayWith(f, replace(this, 0, arguments));
+Stream.prototype.zip = function(f /*,...ss*/) {
+	return zipArray(f, replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------
@@ -356,9 +343,8 @@ var merge = require('./lib/combinators/merge');
 var mergeArray = merge.mergeArray;
 var mergeAll = merge.mergeAll;
 
-exports.merge      = merge.merge;
-exports.mergeArray = mergeArray;
-exports.mergeAll   = mergeAll;
+exports.merge    = merge.merge;
+exports.mergeAll = mergeAll;
 
 /**
  * Merge this stream and all the provided streams
@@ -366,7 +352,7 @@ exports.mergeAll   = mergeAll;
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-Stream.prototype.merge = function(/*,...ss*/) {
+Stream.prototype.merge = function(/*,...streams*/) {
 	return mergeArray(cons(this, arguments));
 };
 

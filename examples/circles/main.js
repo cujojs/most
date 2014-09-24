@@ -28,7 +28,7 @@ module.exports = function run() {
 	// Merge the flurry of circles into one stream and start observing it
 	// so that it will actually run (streams are lazy: when not observing
 	// then, they are inert!)
-	most.zipWith(makeDelayedTail, delays, colors)
+	most.zip(makeDelayedTail, delays, colors)
 		.take(nTails)
 		.mergeAll()
 		.forEach(noop);
@@ -43,7 +43,7 @@ module.exports = function run() {
 	// and whose color will be the provided color
 	function makeDelayedTail(delay, color) {
 		var tail = makeTail(circle, color);
-		return mousemoves.delay(delay).zipWith(translate, most.repeat(tail));
+		return mousemoves.delay(delay).zip(translate, most.repeat(tail));
 	}
 
 	// Turn a mouse event into a css translate3d string
