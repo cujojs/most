@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "most": "~0.7",
-    "rave": "~0.3",
+    "rave": "~0.4",
     "rest": "~1.2"
   }
 }
