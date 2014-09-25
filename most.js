@@ -113,14 +113,12 @@ var transform = require('./lib/combinators/transform');
 var map = transform.map;
 var ap = transform.ap;
 var flatMap = transform.flatMap;
-var flatten = transform.flatten;
 var scan = transform.scan;
 var tap = transform.tap;
 
 exports.map     = map;
 exports.ap      = ap;
 exports.flatMap = exports.chain = flatMap;
-exports.flatten = flatten;
 exports.scan    = scan;
 exports.tap     = tap;
 
@@ -151,14 +149,6 @@ Stream.prototype.ap = function(xs) {
  */
 Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return flatMap(f, this);
-};
-
-/**
- * Flatten a stream of stream of x into a stream of x
- * @returns {Stream} stream of x
- */
-Stream.prototype.flatten = function() {
-	return flatten(this);
 };
 
 /**
@@ -341,10 +331,8 @@ Stream.prototype.zip = function(f /*,...ss*/) {
 
 var merge = require('./lib/combinators/merge');
 var mergeArray = merge.mergeArray;
-var mergeAll = merge.mergeAll;
 
 exports.merge    = merge.merge;
-exports.mergeAll = mergeAll;
 
 /**
  * Merge this stream and all the provided streams
@@ -356,12 +344,24 @@ Stream.prototype.merge = function(/*,...streams*/) {
 	return mergeArray(cons(this, arguments));
 };
 
+//-----------------------------------------------------------------------
+// Higher-order stream
+//-----------------------------------------------------------------------
+
+//-----------------------------------------------------------------------
+// Joining (flattening)
+
+var join = require('./lib/combinators/join').join;
+
+exports.join = join;
+
 /**
- * Assumes this is a stream of streams, and merges all items into a single stream.
- * @returns {Stream} stream containing items from all streams.
+ * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
+ * streams to the outer.  Event arrival times are preserved.
+ * @returns {Stream}
  */
-Stream.prototype.mergeAll = function() {
-	return mergeAll(this);
+Stream.prototype.join = function() {
+	return join(this);
 };
 
 //-----------------------------------------------------------------------
@@ -386,29 +386,20 @@ Stream.prototype.switch = Stream.prototype.switchLatest = function() {
 
 var timed = require('./lib/combinators/timed');
 var delay = timed.delay;
-var delayOn = timed.delayOn;
 var throttle = timed.throttle;
-var throttleOn = timed.throttleOn;
 var debounce = timed.debounce;
-var debounceOn = timed.debounceOn;
 
 exports.periodic   = timed.periodic;
-exports.periodicOn = timed.periodicOn;
 exports.delay      = delay;
-exports.delayOn    = delayOn;
 exports.throttle   = throttle;
-exports.throttleOn = throttleOn;
 exports.debounce   = debounce;
-exports.debounceOn = debounceOn;
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
- * @param {Scheduler=} scheduler optional scheduler to use
  * @returns {Stream} new stream containing the same items, but delayed by ms
  */
-Stream.prototype.delay = function(delayTime, scheduler) {
-	return arguments.length > 1 ? delayOn(scheduler, delayTime, this)
-		: delay(delayTime, this);
+Stream.prototype.delay = function(delayTime) {
+	return delay(delayTime, this);
 };
 
 /**
@@ -416,12 +407,10 @@ Stream.prototype.delay = function(delayTime, scheduler) {
  * stream:              abcd----abcd----
  * throttle(2, stream): a-c-----a-c-----
  * @param {Number} period time to suppress events
- * @param {Scheduler=} scheduler optional scheduler
  * @returns {Stream} new stream that skips events for throttle period
  */
-Stream.prototype.throttle = function(period, scheduler) {
-	return arguments.length > 1 ? throttleOn(scheduler, period, this)
-		: throttle(period, this);
+Stream.prototype.throttle = function(period) {
+	return throttle(period, this);
 };
 
 /**
@@ -430,12 +419,10 @@ Stream.prototype.throttle = function(period, scheduler) {
  * debounce(2, stream): -----d-------d--
  * @param {Number} period events occuring more frequently than this
  *  on the provided scheduler will be suppressed
- * @param {Scheduler=} scheduler optional scheduler
  * @returns {Stream} new debounced stream
  */
-Stream.prototype.debounce = function(period, scheduler) {
-	return arguments.length > 1 ? debounceOn(scheduler, period, this)
-		: debounce(period, this);
+Stream.prototype.debounce = function(period) {
+	return debounce(period, this);
 };
 
 //-----------------------------------------------------------------------

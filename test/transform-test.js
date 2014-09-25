@@ -2,6 +2,9 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var transform = require('../lib/combinators/transform');
+var observe = require('../lib/combinators/observe').observe;
+var delay = require('../lib/combinators/timed').delay;
+var reduce = require('../lib/combinators/reduce').reduce;
 var Stream = require('../lib/Stream');
 
 var map = transform.map;
@@ -14,11 +17,11 @@ var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
 function assertSame(p1, p2) {
-	return p1.observe(function(x) {
-		return p2.observe(function(y) {
+	return observe(function(x) {
+		return observe(function(y) {
 			expect(x).toBe(y);
-		});
-	});
+		}, p2);
+	}, p1);
 }
 
 describe('map', function() {
@@ -66,11 +69,23 @@ describe('flatMap', function() {
 		var m = Stream.of('m');
 
 		return assertSame(
-			m.chain(function(x) { return f(x).chain(g); }),
-			m.chain(f).chain(g)
+			flatMap(function(x) { return flatMap(g, f(x)); }, m),
+			flatMap(g, flatMap(f, m))
 		);
 	});
 
+	it('should preserve time order', function() {
+		var s = flatMap(function(x) {
+			return delay(x, Stream.of(x));
+		}, Stream.from([20, 10]));
+
+		return reduce(function(a, x) {
+			return a.concat(x);
+		}, [], s)
+			.then(function(a) {
+				expect(a).toEqual([10, 20]);
+			});
+	});
 });
 
 describe('ap', function() {

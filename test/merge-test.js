@@ -45,25 +45,3 @@ describe('mergeArray', function() {
 			});
 	});
 });
-
-describe('mergeAll', function() {
-	it('should include items from all inputs', function() {
-		var a = [1,2,3];
-		var b = [4,5,6];
-		var streamsToMerge = Stream.from([delay(0, Stream.from(a)), delay(0, Stream.from(b))]);
-
-		return reduce(function(result, x) {
-			return result.concat(x);
-		}, [], merge.mergeAll(streamsToMerge))
-			.then(function(result) {
-				// Include all items
-				expect(result.sort()).toEqual(a.concat(b).sort());
-
-				// Relative order of items in each stream must be preserved
-				expect(result.indexOf(1) < result.indexOf(2)).toBeTrue();
-				expect(result.indexOf(2) < result.indexOf(3)).toBeTrue();
-				expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
-				expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
-			});
-	});
-});

@@ -30,7 +30,7 @@ module.exports = function run() {
 	// then, they are inert!)
 	most.zip(makeDelayedTail, delays, colors)
 		.take(nTails)
-		.mergeAll()
+		.join()
 		.forEach(noop);
 
 	// Move a circle by setting its css transform to the provided translate3d
