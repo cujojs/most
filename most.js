@@ -19,6 +19,14 @@ exports.from        = Stream.from;
 exports.fromPromise = Stream.fromPromise;
 
 //-----------------------------------------------------------------------
+// Lifting functions
+
+var lift = require('./lib/combinators/lift').lift;
+
+exports.lift = lift;
+
+
+//-----------------------------------------------------------------------
 // Building
 
 var build = require('./lib/combinators/build');
