@@ -2,8 +2,22 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var lift = require('../lib/combinators/lift').lift;
-var reduce = require('../lib/combinators/reduce').reduce;
+var observe = require('../lib/combinators/observe').observe;
+var transform = require('../lib/combinators/transform');
+var map = transform.map;
+var flatMap = transform.flatMap;
 var Stream = require('../lib/Stream');
+
+function assertSame(p1, p2) {
+	return new Promise(function(resolve, reject) {
+		observe(function(x) {
+			observe(function(y) {
+				expect(x).toBe(y);
+				resolve();
+			}, p2).catch(reject);
+		}, p1);
+	});
+}
 
 describe('lift', function() {
 	it('should return function with same arity', function() {
@@ -23,15 +37,21 @@ describe('lift', function() {
 			return x + y + z;
 		}
 
-		var fl = lift(f);
-		var abc = fl(Stream.of('a'), Stream.of('b'), Stream.of('c'));
+		var lifted = lift(f);
 
+		var a = Stream.of('a');
+		var b = Stream.of('b');
+		var c = Stream.of('c');
 
-		return reduce(function(s, x) {
-			return x;
-		}, '', abc)
-			.then(function(result) {
-				expect(result).toBe(f('a', 'b', 'c'));
-			});
+		return assertSame(
+			lifted(a, b, c),
+			flatMap(function(a) {
+				return flatMap(function(b) {
+					return map(function(c) {
+						return f(a, b, c);
+					}, c);
+				}, b);
+			}, a)
+		);
 	});
 });
