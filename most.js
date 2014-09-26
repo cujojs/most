@@ -25,7 +25,6 @@ var lift = require('./lib/combinators/lift').lift;
 
 exports.lift = lift;
 
-
 //-----------------------------------------------------------------------
 // Building
 

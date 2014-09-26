@@ -510,12 +510,14 @@ console.log(result);
 // Lift the append function to operate on values that change over time
 var liftedAppend = most.lift(append);
 
-var input1 = most.fromEvent('change', document.querySelector('input.s1'))
+// A stream representing the "current value" of <input name="s1">
+var input1 = most.fromEvent('change', document.querySelector('[name="s1"]'))
 	.map(function(e) {
 		return e.target.value;
 	});
 
-var input2 = most.fromEvent('change', document.querySelector('input.s1'))
+// A stream representing the "current value" of <input name="s2">
+var input2 = most.fromEvent('change', document.querySelector('[name="s2"]'))
 	.map(function(e) {
 		return e.target.value;
 	});
