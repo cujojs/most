@@ -1,5 +1,5 @@
-API
-===
+most.js API
+===========
 
 1. Reading these docs
 	* [Notation](#notation)
