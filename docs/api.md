@@ -27,15 +27,16 @@ API
 	* [merge](#merge)
 1. Combining streams
 	* [combine](#combine)
+	* [most.lift](#mostlift)
 1. Switching streams
 	* [switch](#switch)
 1. Zipping streams
 	* [zip](#zip)
 1. Transforming streams
 	* [map](#map)
-	* [ap](#ap)
-	* [flatMap](#flatMap)
 	* [scan](#scan)
+	* [flatMap](#flatMap)
+	* [ap](#ap)
 	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
@@ -483,6 +484,52 @@ result.forEach(function(z) {
 });
 ```
 
+### most.lift
+
+####`most.lift(f) -> function`
+
+Lifts a function to act on streams.  Lifting returns a function that accepts streams as arguments, and returns a stream as a result.
+
+One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
+
+```js
+// return the concatenation of 2 strings
+function append(s1, s2) {
+	return s1 + s2;
+}
+
+var s1 = 'foo';
+var s2 = 'bar';
+
+// result is a string
+var result = append(s1, s2);
+
+// Logs 'foobar'
+console.log(result);
+
+// Lift the append function to operate on values that change over time
+var liftedAppend = most.lift(append);
+
+var input1 = most.fromEvent('change', document.querySelector('input.s1'))
+	.map(function(e) {
+		return e.target.value;
+	});
+
+var input2 = most.fromEvent('change', document.querySelector('input.s1'))
+	.map(function(e) {
+		return e.target.value;
+	});
+
+// resultStream is a stream of strings
+// Whenever either input changes, resultStream will emit a new event
+// It's like a live-updating value
+var resultStream = liftedAppend(input1, input2);
+
+// Logs the concatenated value of input1 and input2
+// *whenever either input changes*
+resultStream.forEach(console.log.bind(console));
+```
+
 ## Switching streams
 
 ### switch
@@ -538,20 +585,50 @@ most.from([1,2,3,4])
 	.forEach(console.log.bind(console));
 ```
 
-### ap
+### scan
 
-####`streamOfFunctions.ap(stream) -> Stream`
-####`most.ap(streamOfFunctions, stream) -> Stream`
+####`stream.scan(f, initial) -> Stream`
+####`most.scan(f, initial, stream) -> Stream`
 
-Apply all the functions in `streamOfFunctions` to all the values in `stream`.
+Create a new stream containing incrementally accumulated results.
+
+`function f(accumulated, x) -> newAccumulated`
 
 ```
-streamOfFunctions:            f-g-h|
-stream:                       x-y-z|
-streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
+stream:              -1-2-3->
+stream.scan(add, 0): -1-3-6->
 ```
 
-This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
+Unlike [reduce](#reduce) which produces a single, final result, scan emits incremental results.  The resulting stream is of the same proportion as the original.  For example, if the original contains 10 events, the resulting stream will contain 10.  If the original stream is infinite, the resulting stream will be infinite.
+
+```js
+// Logs a ab abc abcd
+most.from(['a', 'b', 'c', 'd'])
+	.scan(function(string, letter) {
+		return string + letter;
+	}, '')
+	.forEach(console.log.bind(console);
+```
+
+```js
+// Maintain a sliding window of (up to) 3 values in an array
+
+// A stream containing all integers >= 0
+var numbers = most.iterate(function(x) {
+	return x+1;
+}, 0);
+
+// Logs
+// [0]
+// [0,1]
+// [0,1,2]
+// [1,2,3]
+// [2,3,4]
+// ... etc ...
+numbers.scan(function(slidingWindow, x) {
+	return slidingWindow.concat(x).slice(-10);
+}, [])
+	.forEach(console.log.bind(console));
 
 ### flatMap
 
@@ -571,22 +648,20 @@ most.from([1, 2, 3])
 	.forEach(console.log.bind(console));
 ```
 
-### scan
+### ap
 
-####`stream.scan(f, initial) -> Stream`
-####`most.scan(f, initial, stream) -> Stream`
+####`streamOfFunctions.ap(stream) -> Stream`
+####`most.ap(streamOfFunctions, stream) -> Stream`
 
-Create a new stream containing incrementally accumulated results.
+Apply all the functions in `streamOfFunctions` to all the values in `stream`.
 
-`function f(accumulated, x) -> newAccumulated`
-
-```js
-// Logs a ab abc abcd
-most.from(['a', 'b', 'c', 'd'])
-	.scan(function(string, letter) {
-		return string + letter;
-	}, '');
 ```
+streamOfFunctions:            f-g-h|
+stream:                       x-y-z|
+streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
+```
+
+This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
 
 ### tap
 
