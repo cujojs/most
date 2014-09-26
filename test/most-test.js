@@ -24,7 +24,7 @@ describe('cycle', function() {
 	});
 });
 
-describe('cons', function() {
+describe('startWith', function() {
 	it('should return a stream containing item as head', function() {
 		return most.from([1,2,3])
 			.startWith(sentinel)
@@ -44,12 +44,6 @@ describe('cons', function() {
 	});
 });
 
-describe('startWith', function() {
-	it('should be an alias for cons', function() {
-		expect(most.startWith).toBe(most.cons);
-		expect(most.Stream.prototype.startWith).toBe(most.Stream.prototype.cons);
-	});
-});
 
 describe('chain', function() {
 	it('should be an alias for flatMap', function() {
