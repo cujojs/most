@@ -25,13 +25,12 @@ API
 	* [cycle](#cycle)
 1. Merging streams
 	* [merge](#merge)
-	* [mergeAll](#mergeall)
 1. Combining streams
 	* [combine](#combine)
-1. Zipping streams
-	* [zip](#zip)
 1. Switching streams
 	* [switch](#switch)
+1. Zipping streams
+	* [zip](#zip)
 1. Transforming streams
 	* [map](#map)
 	* [ap](#ap)
@@ -439,13 +438,6 @@ stream1.merge(stream2): -aw-b-x-yc-z->
 
 In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
 
-### mergeAll
-
-####`most.mergeAll(streamOfStreams) -> Stream`
-####`streamOfStreams.mergeAll() -> Stream`
-
-Assumes `streamOfStreams` is a stream whose events are streams, and merges all events from these "inner streams" into a new stream.
-
 ## Combining streams
 
 Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.  A combined stream ends with any one of its input streams ends.
@@ -491,6 +483,15 @@ result.forEach(function(z) {
 });
 ```
 
+## Switching streams
+
+### switch
+
+####`stream.switch() -> Stream`
+####`most.switch(stream) -> Stream`
+
+*TODO*
+
 ## Zipping streams
 
 Zipping correlates corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
@@ -513,15 +514,6 @@ most.from([1,2,3])
 	.zip(add, most.from(4,5,6))
 	.forEach(console.log.bind(console));
 ```
-
-## Switching streams
-
-### switch
-
-####`stream.switch() -> Stream`
-####`most.switch(stream) -> Stream`
-
-*TODO*
 
 ## Transforming streams
 
