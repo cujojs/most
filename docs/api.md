@@ -1,43 +1,33 @@
 API
 ===
 
+1. Reading these docs
+	* [Notation](#notation)
 1. Creating streams
 	* [most.of](#mostof)
-	* [most.from](#mostfrom)
 	* [most.fromPromise](#mostfrompromise)
+	* [most.from](#mostfrom)
+	* [most.repeat](#mostrepeat)
 	* [most.periodic](#mostperiodic)
 	* [most.empty](#mostempty)
 	* [most.never](#mostnever)
-1. Adapting to other event sources
+	* [most.iterate](#mostiterate)
+	* [most.unfold](#mostunfold)
 	* [most.fromEvent](#mostfromevent)
 	* [most.fromEventWhere](#mostfromeventwhere)
 	* [most.create](#create)
-1. Building streams
-	* [most.iterate](#mostiterate)
-	* [most.unfold](#mostunfold)
-	* [most.repeat](#mostrepeat)
-1. Handling errors
-	* [flatMapError](#flatmaperror)
-	* [throwError](#throwerror)
-1. Extending streams
 	* [startWith](#startwith)
 	* [concat](#concat)
 	* [cycle](#cycle)
-1. Merging streams
-	* [merge](#merge)
-1. Combining streams
-	* [combine](#combine)
-	* [most.lift](#mostlift)
-1. Switching streams
-	* [switch](#switch)
-1. Zipping streams
-	* [zip](#zip)
+1. Handling errors
+	* [flatMapError](#flatmaperror)
+	* [throwError](#throwerror)
 1. Transforming streams
 	* [map](#map)
 	* [scan](#scan)
+	* [tap](#tap)
 	* [flatMap](#flatMap)
 	* [ap](#ap)
-	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
 	* [take](#take)
@@ -45,15 +35,24 @@ API
 	* [takeUntil](#takeUntil)
 	* [distinct](#distinct)
 	* [distinctBy](#distinctBy)
-1. Reducing streams
+1. Consuming streams
 	* [reduce](#reduce)
+	* [forEach](#forEach)
+1. Combining streams
+	* [merge](#merge)
+	* [combine](#combine)
+	* [most.lift](#mostlift)
+	* [zip](#zip)
+1. Combining higher order streams
+	* [switch](#switch)
+	* [join](#join)
 1. Delaying streams
 	* [delay](#delay)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
 
-### Notation
+## Notation
 
 You'll see diagrams like the following:
 
@@ -74,7 +73,7 @@ These are timeline diagrams that try to give a simple, representative notion of 
 * `>` - stream continues infinitely
 	* Typically, `>` means you can assume that a stream will continue to repeat some common pattern infinitely
 
-#### Examples
+### Examples
 
 `stream: a|`
 
@@ -109,6 +108,17 @@ var stream = most.of('hello');
 stream.forEach(console.log.bind(console)); // logs hello
 ```
 
+### most.fromPromise
+
+####`most.fromPromise(promise) -> Stream`
+
+```
+promise:                   ----a
+most.fromPromise(promise): ----a|
+```
+
+Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.
+
 ### most.from
 
 ####`most.from(iterable) -> Stream`
@@ -140,16 +150,15 @@ stream.take(100)
 	.forEach(console.log.bind(console));
 ```
 
-### most.fromPromise
+### most.repeat
 
-####`most.fromPromise(promise) -> Stream`
+####`most.repeat(x) -> Stream`
+
+Create a stream containing infinite occurrences of `x`.
 
 ```
-promise:                   ----a
-most.fromPromise(promise): ----a|
+most.repeat(x): xxxxxxx->
 ```
-
-Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.
 
 ### most.periodic
 
@@ -182,7 +191,25 @@ most.never(): ---->
 
 Create a stream that contains no events and never ends.
 
-## Adapting to other event sources
+### most.iterate
+
+####`most.iterate(f, initial) -> Stream`
+
+Build an infinite stream by computing successive items iteratively.  Conceptually, the stream will contain: `[initial, f(initial), f(f(initial)), ...]`
+
+```js
+// An infinite stream of all integers >= 0, ie
+// 0, 1, 2, 3, 4, 5, ...
+most.iterate(function(x) {
+	return x + 1;
+}, 0);
+```
+
+### most.unfold
+
+####`most.unfold(f, initial) -> Stream`
+
+Build an infinite stream by computing successive items.  This operates a lower level than [most.iterate](#mostiterate), allowing you to explicitly set event timestamps, and to explicitly end the stream.
 
 ### most.fromEvent
 
@@ -304,38 +331,46 @@ stream
 	.catch(console.log.bind(console)); // Catch the error as a promise
 ```
 
+### startWith
 
-# Building streams
+####`stream.startWith(x) -> Stream`
+####`most.startWith(x, stream) -> Stream`
 
-### most.iterate
-
-####`most.iterate(f, initial) -> Stream`
-
-Build an infinite stream by computing successive items iteratively.  Conceptually, the stream will contain: `[initial, f(initial), f(f(initial)), ...]`
+Create a new stream containing `x` followed by all events in `stream`.
 
 ```js
-// An infinite stream of all integers >= 0, ie
-// 0, 1, 2, 3, 4, 5, ...
-most.iterate(function(x) {
-	return x + 1;
-}, 0);
+stream:              a-b-c-d->
+stream.startWith(x): xa-b-c-d->
 ```
 
-### most.unfold
+### concat
 
-####`most.unfold(f, initial) -> Stream`
+####`stream1.concat(stream2) -> Stream`
+####`most.concat(stream1, stream2) -> Stream`
 
-Build an infinite stream by computing successive items.  This operates a lower level than [most.iterate](#mostiterate), allowing you to explicitly set event timestamps, and to explicitly end the stream.
+Create a new stream containing all events in `stream1` followed by all events in `stream2`.
 
-### most.repeat
+```js
+stream1:                 -a-b-c|
+stream2:                 -d-e-f->
+stream1.concat(stream2): -a-b-c-d-e-f->
+```
 
-####`most.repeat(x) -> Stream`
+Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), ['flatMap`](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
 
-Create a stream containing infinite occurrences of `x`.
+### cycle
+
+####`stream.cycle() -> Stream`
+####`most.cycle(stream) -> Stream`
+
+Tie a stream into a circle.
 
 ```
-most.repeat(x): xxxxxxx->
+most.from([1,2,3]):         123|
+most.from([1,2,3]).cycle(): 123123123123->
 ```
+
+Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.
 
 ## Handling errors
 
@@ -379,190 +414,6 @@ Create a stream in the error state.  This can be useful for functions that need 
 most.throwError(X): X
 ```
 
-## Extending streams
-
-### startWith
-
-####`stream.startWith(x) -> Stream`
-####`most.startWith(x, stream) -> Stream`
-
-Create a new stream containing `x` followed by all events in `stream`.
-
-```js
-stream:              a-b-c-d->
-stream.startWith(x): xa-b-c-d->
-```
-
-### concat
-
-####`stream1.concat(stream2) -> Stream`
-####`most.concat(stream1, stream2) -> Stream`
-
-Create a new stream containing all events in `stream1` followed by all events in `stream2`.
-
-```js
-stream1:                 -a-b-c|
-stream2:                 -d-e-f->
-stream1.concat(stream2): -a-b-c-d-e-f->
-```
-
-### cycle
-
-####`stream.cycle() -> Stream`
-####`most.cycle(stream) -> Stream`
-
-Tie a stream into a circle.
-
-```
-most.from([1,2,3]):         123|
-most.from([1,2,3]).cycle(): 123123123123->
-```
-
-Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.
-
-## Merging streams
-
-Merging multiple streams creates a new stream containing all events from the input stream without affecting the arrival time of the events.  You can think of the events from the input streams simply being interleaved into the new, merged stream.
-
-### merge
-
-####`stream1.merge(stream2) -> Stream`
-####`most.merge(stream1, stream2) -> Stream`
-
-Create a new stream containing events from `stream1` and `stream2`.
-
-```
-stream1:                -a--b----c--->
-stream2:                --w---x-y--z->
-stream1.merge(stream2): -aw-b-x-yc-z->
-```
-
-In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
-
-## Combining streams
-
-Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.  A combined stream ends with any one of its input streams ends.
-
-### combine
-
-####`stream1.combine(f, stream2) -> Stream`
-####`most.combine(f, stream1, stream2) -> Stream`
-
-```
-stream1:                       -0--1----2--->
-stream2:                       --3---4-5--6->
-stream1.combine(add, stream2): --3-4-5-67-8->
-```
-
-```js
-// Add the current value of two inputs
-// Updates the result whenever *either* of the inputs changes!
-
-// Create a stream from an <input> value
-function fromInput(input) {
-	return most.fromEvent('change', input)
-		.map(function(e) { return e.target.value })
-		.map(Number);
-}
-
-// Add two numbers
-function add(x, y) {
-	return x + y;
-}
-
-// Create streams for the current value of x and y
-var xStream = fromInput(document.querySelector('input.x'));
-var yStream = fromInput(document.querySelector('input.y'));
-
-// Create a result stream by adding x and y
-// This always adds the latest value of x and y
-var resultStream = xStream.combine(add, yStream);
-
-var resultNode = document.querySelector('.result');
-result.forEach(function(z) {
-	resultNode.textContent = z;
-});
-```
-
-### most.lift
-
-####`most.lift(f) -> function`
-
-Lifts a function to act on streams.  Lifting returns a function that accepts streams as arguments, and returns a stream as a result.
-
-One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
-
-```js
-// return the concatenation of 2 strings
-function append(s1, s2) {
-	return s1 + s2;
-}
-
-var s1 = 'foo';
-var s2 = 'bar';
-
-// result is a string
-var result = append(s1, s2);
-
-// Logs 'foobar'
-console.log(result);
-
-// Lift the append function to operate on values that change over time
-var liftedAppend = most.lift(append);
-
-// A stream representing the "current value" of <input name="s1">
-var input1 = most.fromEvent('change', document.querySelector('[name="s1"]'))
-	.map(function(e) {
-		return e.target.value;
-	});
-
-// A stream representing the "current value" of <input name="s2">
-var input2 = most.fromEvent('change', document.querySelector('[name="s2"]'))
-	.map(function(e) {
-		return e.target.value;
-	});
-
-// resultStream is a stream of strings
-// Whenever either input changes, resultStream will emit a new event
-// It's like a live-updating value
-var resultStream = liftedAppend(input1, input2);
-
-// Logs the concatenated value of input1 and input2
-// *whenever either input changes*
-resultStream.forEach(console.log.bind(console));
-```
-
-## Switching streams
-
-### switch
-
-####`stream.switch() -> Stream`
-####`most.switch(stream) -> Stream`
-
-*TODO*
-
-## Zipping streams
-
-Zipping correlates corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
-
-### zip
-
-####`stream1.zip(f, stream2) -> Stream`
-####`most.zip(f, stream1, stream2) -> Stream`
-
-Create a new stream by applying a function to corresponding pairs of events from the inputs streams.
-
-```js
-function add(x, y) {
-	return x + y;
-}
-
-// Logs 5 7 9
-// In other words: add(1, 4) add(2, 5) add(3, 6)
-most.from([1,2,3])
-	.zip(add, most.from(4,5,6))
-	.forEach(console.log.bind(console));
-```
 
 ## Transforming streams
 
@@ -631,6 +482,21 @@ numbers.scan(function(slidingWindow, x) {
 	return slidingWindow.concat(x).slice(-10);
 }, [])
 	.forEach(console.log.bind(console));
+```
+
+### tap
+
+####`stream.tap(f) -> Stream`
+####`most.map(f, stream) -> Stream`
+
+Perform a side-effect for each event in `stream`.
+
+```
+stream:        -a-b-c-d->
+stream.tap(f): -a-b-c-d->
+```
+
+For each event in `stream`, `f` is called, but the value of its result is ignored.  However, `f` may return a promise to delay subsequent events.  If `f` fails (ie throws), then the returned stream will also fail.  The stream returned by `tap` will contain the same events as the original stream (although they may be delayed when `f` returns promises).
 
 ### flatMap
 
@@ -664,20 +530,6 @@ streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
 ```
 
 This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
-
-### tap
-
-####`stream.tap(f) -> Stream`
-####`most.map(f, stream) -> Stream`
-
-Perform a side-effect for each event in `stream`.
-
-```
-stream:        -a-b-c-d->
-stream.tap(f): -a-b-c-d->
-```
-
-For each event in `stream`, `f` is called, but the value of its result is ignored.  However, `f` may return a promise to delay subsequent events.  If `f` fails (ie throws), then the returned stream will also fail.  The stream returned by `tap` will contain the same events as the original stream (although they may be delayed when `f` returns promises).
 
 ## Filtering streams
 
@@ -767,7 +619,7 @@ The `equals` function should accept two values and return truthy if the two valu
 
 `function equals(a, b) -> boolean`
 
-## Reducing streams
+## Consuming streams
 
 ### reduce
 
@@ -786,6 +638,188 @@ The returned promise will fulfill with the final reduced result, or will reject 
 The reduce function (`f` above)
 
 *TODO: Example*
+
+### forEach
+
+Alias: **observe**
+
+####`stream.forEach(f) -> Promise`
+####`stream.observe(f) -> Promise`
+####`most.forEach(f, stream) -> Promise`
+####`most.observe(f, stream) -> Promise`
+
+Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
+
+```js
+// Log mouse movements until the user clicks, then stop.
+most.fromEvent('mousemove', document)
+	.takeUntil(most.fromEvent('click', document))
+	.forEach(console.log.bind(console));
+	.then(function() {
+		console.log('All done');
+	});
+```
+
+## Combining streams
+
+### merge
+
+####`stream1.merge(stream2) -> Stream`
+####`most.merge(stream1, stream2) -> Stream`
+
+Create a new stream containing events from `stream1` and `stream2`.
+
+```
+stream1:                -a--b----c--->
+stream2:                --w---x-y--z->
+stream1.merge(stream2): -aw-b-x-yc-z->
+```
+
+Merging multiple streams creates a new stream containing all events from the input stream without affecting the arrival time of the events.  You can think of the events from the input streams simply being interleaved into the new, merged stream.  A merged stream ends when *all* of its input streams have ended.
+
+In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
+
+### combine
+
+####`stream1.combine(f, stream2) -> Stream`
+####`most.combine(f, stream1, stream2) -> Stream`
+
+Create a new stream that emits the set of latest event values from all input streams whenever a new event arrives on any input stream.
+
+```
+stream1:                       -0--1----2--->
+stream2:                       --3---4-5--6->
+stream1.combine(add, stream2): --3-4-5-67-8->
+```
+
+Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.  A combined stream ends with any one of its input streams ends.
+
+```js
+// Add the current value of two inputs
+// Updates the result whenever *either* of the inputs changes!
+
+// Create a stream from an <input> value
+function fromInput(input) {
+	return most.fromEvent('change', input)
+		.map(function(e) { return e.target.value })
+		.map(Number);
+}
+
+// Add two numbers
+function add(x, y) {
+	return x + y;
+}
+
+// Create streams for the current value of x and y
+var xStream = fromInput(document.querySelector('input.x'));
+var yStream = fromInput(document.querySelector('input.y'));
+
+// Create a result stream by adding x and y
+// This always adds the latest value of x and y
+var resultStream = xStream.combine(add, yStream);
+
+var resultNode = document.querySelector('.result');
+result.forEach(function(z) {
+	resultNode.textContent = z;
+});
+```
+
+### most.lift
+
+####`most.lift(f) -> function`
+
+Lifts a function to act on streams.  Lifting returns a function that accepts streams as arguments, and returns a stream as a result.
+
+One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
+
+```js
+// return the concatenation of 2 strings
+function append(s1, s2) {
+	return s1 + s2;
+}
+
+var s1 = 'foo';
+var s2 = 'bar';
+
+// result is a string
+var result = append(s1, s2);
+
+// Logs 'foobar'
+console.log(result);
+
+// Lift the append function to operate on values that change over time
+var liftedAppend = most.lift(append);
+
+// A stream representing the "current value" of <input name="s1">
+var input1 = most.fromEvent('change', document.querySelector('[name="s1"]'))
+	.map(function(e) {
+		return e.target.value;
+	});
+
+// A stream representing the "current value" of <input name="s2">
+var input2 = most.fromEvent('change', document.querySelector('[name="s2"]'))
+	.map(function(e) {
+		return e.target.value;
+	});
+
+// resultStream is a stream of strings
+// Whenever either input changes, resultStream will emit a new event
+// It's like a live-updating value
+var resultStream = liftedAppend(input1, input2);
+
+// Logs the concatenated value of input1 and input2
+// *whenever either input changes*
+resultStream.forEach(console.log.bind(console));
+```
+
+### zip
+
+####`stream1.zip(f, stream2) -> Stream`
+####`most.zip(f, stream1, stream2) -> Stream`
+
+Create a new stream by applying a function to corresponding pairs of events from the inputs streams.
+
+```
+stream1:                   -1--2--3--4->
+stream2:                   -1---2---3---4->
+stream1.zip(add, stream2): -2---4---6---8->
+```
+
+Zipping correlates *by index* corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
+
+A zipped stream ends when any one of its input streams ends.
+
+```js
+function add(x, y) {
+	return x + y;
+}
+
+// Logs 5 7 9
+// In other words: add(1, 4) add(2, 5) add(3, 6)
+most.from([1,2,3])
+	.zip(add, most.from([4,5,6,7,8]))
+	.forEach(console.log.bind(console));
+```
+
+## Combining higher-order streams
+
+A Higher-order stream is a "stream of streams".  That is, it is a stream whose event values are themselves, streams.  Conceptually, you might think of a higher-order stream like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.
+
+### switch
+
+####`stream.switch() -> Stream`
+####`most.switch(stream) -> Stream`
+
+*TODO*
+
+### join
+
+####`stream.join() -> Stream`
+####`most.join(stream) -> Stream`
+
+Flatten a higher-order stream one level.
+
+*TODO*
 
 ## Delaying streams
 
