@@ -27,7 +27,6 @@ function assertSame(p1, p2) {
 }
 
 function makeStreamFromTimes(times, endTime, scheduler) {
-	var total = times[times.length - 1];
 	var steps = times.reduceRight(function(s, t) {
 		return new Yield(t, t, s);
 	}, new End(endTime));
