@@ -7,8 +7,8 @@ var fromEvent = events.fromEvent;
 var reduce = require('../../lib/combinators/reduce').reduce;
 var observe = require('../../lib/combinators/observe').observe;
 var take = require('../../lib/combinators/filter').take;
-var FakeEventTarget = require('./FakeEventTarget');
-var FakeEventEmitter = require('./FakeEventEmitter');
+var FakeEventTarget = require('../helper/FakeEventTarget');
+var FakeEventEmitter = require('../helper/FakeEventEmitter');
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
