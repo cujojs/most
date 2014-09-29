@@ -2,7 +2,12 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var monoid = require('../lib/combinators/monoid');
+var reduce = require('../lib/combinators/reduce').reduce;
 var Stream = require('../lib/Stream');
+
+var streamHelper = require('./helper/stream-helper');
+var makeStreamFromTimes = streamHelper.makeStreamFromTimes;
+var createTestScheduler = streamHelper.createTestScheduler;
 
 var sentinel = { value: 'sentinel' };
 
@@ -19,18 +24,20 @@ describe('empty', function() {
 describe('concat', function() {
 
 	it('should return a stream containing items from both streams in correct order', function() {
-		var a1 = [1,2,3];
-		var a2 = [4,5,6];
-		var s1 = Stream.from(a1);
-		var s2 = Stream.from(a2);
+		var scheduler = createTestScheduler();
 
-		return monoid.concat(s1, s2)
-			.reduce(function(a, x) {
-				a.push(x);
-				return a;
-			}, []).then(function(a) {
-				expect(a).toEqual(a1.concat(a2));
-			});
+		var s1 = makeStreamFromTimes([3,4], 5, scheduler);
+		var s2 = makeStreamFromTimes([1,2], 3, scheduler);
+
+		var result = reduce(function(a, x) {
+			return a.concat(x);
+		}, [], monoid.concat(s1, s2)).then(function(a) {
+			expect(a).toEqual([3,4,1,2]);
+		});
+
+		scheduler.tick(5);
+
+		return result;
 	});
 
 	it('should satisfy left identity', function() {

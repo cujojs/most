@@ -13,7 +13,9 @@ var End = step.End;
 
 var take = filter.take;
 
-var createTestScheduler = require('./createTestScheduler');
+var streamHelper = require('./helper/stream-helper');
+var makeStreamFromTimes = streamHelper.makeStreamFromTimes;
+var createTestScheduler = streamHelper.createTestScheduler;
 
 var sentinel = { value: 'sentinel' };
 
@@ -63,12 +65,7 @@ describe('debounce', function() {
 			var scheduler = createTestScheduler();
 
 			var times = [0,2,4,6,8];
-			var total = times[times.length - 1];
-			var steps = times.reduceRight(function(s, t) {
-				return new Yield(t, t, s);
-			}, new End(total+2));
-
-			var s = timed.sync(new Stream(identity, steps, scheduler));
+			var s = makeStreamFromTimes(times, 10, scheduler);
 
 			var result = reduce(function(count) {
 				return count + 1;
@@ -77,9 +74,8 @@ describe('debounce', function() {
 					expect(count).toBe(times.length);
 				});
 
-			scheduler.tick(total+2, 1);
+			scheduler.tick(10, 1);
 			return result;
-
 		});
 	});
 
@@ -88,12 +84,7 @@ describe('debounce', function() {
 			var scheduler = createTestScheduler();
 
 			var times = [1,2,3,4,5];
-			var total = times[times.length - 1];
-			var steps = times.reduceRight(function(s, t) {
-				return new Yield(t, t, s);
-			}, new End(total+1));
-
-			var s = timed.sync(new Stream(identity, steps, scheduler));
+			var s = makeStreamFromTimes(times, 6, scheduler);
 
 			var result = reduce(function(count) {
 					return count + 1;
@@ -102,7 +93,7 @@ describe('debounce', function() {
 					expect(count).toBe(0);
 				});
 
-			scheduler.tick(total+1, 1);
+			scheduler.tick(6, 1);
 			return result;
 		});
 	});
@@ -111,12 +102,7 @@ describe('debounce', function() {
 		var scheduler = createTestScheduler();
 
 		var times = [0,1,2,4,5,6,8,9];
-		var total = times[times.length-1];
-		var steps = times.reduceRight(function(s, t) {
-			return new Yield(t, t, s);
-		}, new End(total));
-
-		var s = timed.sync(new Stream(identity, steps, scheduler));
+		var s = makeStreamFromTimes(times, 9, scheduler);
 
 		var result = reduce(function(a, x) {
 			return a.concat(x);
@@ -125,7 +111,7 @@ describe('debounce', function() {
 				expect(a).toEqual([2,6]);
 			});
 
-		scheduler.tick(total, 1);
+		scheduler.tick(9, 1);
 		return result;
 	});
 });

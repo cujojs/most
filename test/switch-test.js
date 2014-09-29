@@ -4,13 +4,15 @@ var expect = require('buster').expect;
 var switchLatest = require('../lib/combinators/switch').switch;
 var Stream = require('../lib/Stream');
 var reduce = require('../lib/combinators/reduce').reduce;
+var observe = require('../lib/combinators/observe').observe;
 var sync = require('../lib/combinators/timed').sync;
 
 var step = require('../lib/step');
 var Yield = step.Yield;
 var End = step.End;
 
-var createTestScheduler = require('./createTestScheduler');
+var streamHelper = require('./helper/stream-helper');
+var createTestScheduler = streamHelper.createTestScheduler;
 
 function identity(x) {
 	return x;
@@ -29,7 +31,7 @@ describe('switch', function() {
 	describe('when input is empty', function() {
 		it('should return empty', function() {
 			var spy = this.spy();
-			return switchLatest(new Stream(identity, new End(0))).observe(spy)
+			return observe(spy, switchLatest(new Stream(identity, new End(0))))
 				.then(function() {
 					expect(spy).not.toHaveBeenCalled();
 				});

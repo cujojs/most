@@ -1,5 +1,6 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
+var assertSame = require('./helper/stream-helper').assertSame;
 
 var lift = require('../lib/combinators/lift').lift;
 var observe = require('../lib/combinators/observe').observe;
@@ -7,17 +8,6 @@ var transform = require('../lib/combinators/transform');
 var map = transform.map;
 var flatMap = transform.flatMap;
 var Stream = require('../lib/Stream');
-
-function assertSame(p1, p2) {
-	return new Promise(function(resolve, reject) {
-		observe(function(x) {
-			observe(function(y) {
-				expect(x).toBe(y);
-				resolve();
-			}, p2).catch(reject);
-		}, p1);
-	});
-}
 
 describe('lift', function() {
 	it('should return function with same arity', function() {

@@ -11,7 +11,7 @@ var step = require('../lib/step');
 var Yield = step.Yield;
 var End = step.End;
 
-var createTestScheduler = require('./createTestScheduler');
+var createTestScheduler = require('./helper/stream-helper').createTestScheduler;
 
 function identity(x) {
 	return x;

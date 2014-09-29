@@ -1,5 +1,6 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
+var assertSame = require('./helper/stream-helper').assertSame;
 
 var transform = require('../lib/combinators/transform');
 var observe = require('../lib/combinators/observe').observe;
@@ -15,14 +16,6 @@ var tap = transform.tap;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
-
-function assertSame(p1, p2) {
-	return observe(function(x) {
-		return observe(function(y) {
-			expect(x).toBe(y);
-		}, p2);
-	}, p1);
-}
 
 describe('map', function() {
 
