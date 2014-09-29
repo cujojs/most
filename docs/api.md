@@ -744,6 +744,8 @@ Lifts a function to act on streams.  Lifting returns a function that accepts str
 
 One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
 
+Lifting should be done at "initialization time": you should lift a function once and then use it many times.
+
 ```js
 // return the concatenation of 2 strings
 function append(s1, s2) {
@@ -815,7 +817,7 @@ most.from([1,2,3])
 
 ## Combining higher-order streams
 
-A Higher-order stream is a "stream of streams".  That is, it is a stream whose event values are themselves, streams.  Conceptually, you might think of a higher-order stream like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.
+A Higher-order stream is a "stream of streams": a stream whose event values are themselves streams.  Conceptually, you might think of a higher-order stream like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.
 
 ### switch
 
