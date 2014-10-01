@@ -10,6 +10,12 @@ It provides a small but powerful set of operations for merging, filtering, trans
 
 Here is a simple program that displays the result of adding two inputs.  The result is reactive and updates whenever *either* input changes.
 
+```html
+<input class="x" value="0"> +
+<input class="y" value="0"> =
+<span class="result"></span>
+```
+
 ```js
 var most = require('most');
 
