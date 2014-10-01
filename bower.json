@@ -29,6 +29,6 @@
     "package.json"
   ],
   "dependencies": {
-    "when": "~3.4"
+    "when": "~3.5"
   }
 }

@@ -4,35 +4,28 @@ var xInput = document.querySelector('input.x');
 var yInput = document.querySelector('input.y');
 var resultNode = document.querySelector('.result');
 
-module.exports = function() {
-	// Create "signals" (aka time-varying values) representing
-	// the x and y <input>s' current values
-	var x = signalFromInput(xInput).map(Number);
-	var y = signalFromInput(yInput).map(Number);
+exports.main = function() {
+	// x represents the current value of xInput
+	var x = most.fromEvent('input', xInput).map(toNumber);
 
-	// Add the two signals in to produce a new signal that
-	// changes whenever either input changes
+	// x represents the current value of yInput
+	var y = most.fromEvent('input', yInput).map(toNumber);
+
+	// result is the live current value of adding x and y
 	var result = most.combine(add, x, y);
 
-	// observe the result over time, ie render it in the UI
-	result.observe(setText(resultNode));
+	// Observe the result value by rendering it to the resultNode
+	result.observe(renderResult);
 };
 
 function add(x, y) {
 	return x + y;
 }
 
-function setText(node) {
-	return function(text) {
-		node.textContent = text;
-	};
+function toNumber(e) {
+	return Number(e.target.value);
 }
 
-function signalFromInput(input) {
-	return most.fromEvent('input', input).map(toValue).startWith(input.value);
-}
-
-function toValue(e) {
-	console.log(e);
-	return e.target.value;
+function renderResult(result) {
+	resultNode.textContent = result;
 }
