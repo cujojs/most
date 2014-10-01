@@ -824,7 +824,9 @@ A Higher-order stream is a "stream of streams": a stream whose event values are 
 ####`stream.switch() -> Stream`
 ####`most.switch(stream) -> Stream`
 
-*TODO*
+Given a higher-order stream, return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
+
+*TODO: Example*
 
 ### join
 
@@ -833,7 +835,7 @@ A Higher-order stream is a "stream of streams": a stream whose event values are 
 
 Flatten a higher-order stream one level.
 
-*TODO*
+*TODO: Example*
 
 ## Delaying streams
 
@@ -848,7 +850,7 @@ stream.delay(1): --a-b-c-d->
 stream.delay(5): ------a-b-c-d->
 ```
 
-Delaying a stream shifts all the events by the same amount.  It doesn't change the time *between* events.
+Delaying a stream timeshifts all the events by the same amount.  Delaying doesn't change the time *between* events.
 
 *TODO: Example*
 
