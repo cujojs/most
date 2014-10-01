@@ -1,5 +1,8 @@
 var most = require('most');
 
+// Display the result of adding two inputs.
+// The result is reactive and updates whenever *either* input changes.
+
 var xInput = document.querySelector('input.x');
 var yInput = document.querySelector('input.y');
 var resultNode = document.querySelector('.result');
