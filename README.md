@@ -10,11 +10,15 @@ It provides a small but powerful set of operations for merging, filtering, trans
 
 Here is a simple program that displays the result of adding two inputs.  The result is reactive and updates whenever *either* input changes.
 
+First, the HTML fragment for the inputs and a place to display the live result:
+
 ```html
-<input class="x" value="0"> +
-<input class="y" value="0"> =
-<span class="result"></span>
+<form>
+	<input class="x"> + <input class="y"> = <span class="result"></span>
+</form>
 ```
+
+Using most.js to make it reactive:
 
 ```js
 var most = require('most');
@@ -51,12 +55,12 @@ function renderResult(result) {
 
 ## Get it
 
-```
-npm install --save most
-```
+`npm install --save most` or `bower install --save most`
 
-```
-bower install --save most
+then
+
+```js
+var most = require('most');
 ```
 
 ## But what about
