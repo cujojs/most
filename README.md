@@ -6,6 +6,10 @@ Most.js is a toolkit for reactive programming.  It helps you compose asynchronou
 
 It provides a small but powerful set of operations for merging, filtering, transforming, and reducing event streams and time-varying values.
 
+* [API docs](docs/api.md)
+* [Examples](examples)
+* [Get it](#get-it)
+
 ## Simple example
 
 Here's a simple program that displays the result of adding two inputs.  The result is reactive and updates whenever *either* input changes.
