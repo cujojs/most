@@ -1,16 +1,57 @@
 [![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
 
-# Monadic Stream
+# Monadic streams for reactive programming
 
-Most.js is a toolkit for composing asynchronous operations on streams of events and for managing values that change over time, without many of the hazards of mutable shared state.  It provides a powerful set of reactive streams and operations for merging, filtering, transforming, and reducing them.
+Most.js is a toolkit for reactive programming.  It helps you compose asynchronous operations on sequences of values and events, e.g. WebSocket messages, DOM events, etc, and on values that change over time, e.g. the "current value" of an &lt;input&gt;, without many of the hazards of side effects and mutable shared state.
 
-## What can it do?
+It provides a small but powerful set of operations for merging, filtering, transforming, and reducing event streams and time-varying values.
 
-*Examples coming soon*
+## Simple example
 
-## Why use it?
+Here is a simple program that displays the result of adding two inputs.  The result is reactive and updates whenever *either* input changes.
 
-*Coming soon*
+```js
+var most = require('most');
+
+// Get the input nodes and a result node
+var xInput = document.querySelector('input.x');
+var yInput = document.querySelector('input.y');
+var resultNode = document.querySelector('.result');
+
+// x represents the current value of xInput
+var x = most.fromEvent('input', xInput).map(toNumber);
+
+// x represents the current value of yInput
+var y = most.fromEvent('input', yInput).map(toNumber);
+
+// result is the live current value of adding x and y
+var result = most.combine(add, x, y);
+
+// Observe the result value by rendering it to the resultNode
+result.observe(renderResult);
+
+function add(x, y) {
+	return x + y;
+}
+
+function toNumber(e) {
+	return Number(e.target.value);
+}
+
+function renderResult(result) {
+	resultNode.textContent = result;
+}
+```
+
+## Get it
+
+```
+npm install --save most
+```
+
+```
+bower install --save most
+```
 
 ## But what about
 
@@ -18,7 +59,7 @@ Most.js is a toolkit for composing asynchronous operations on streams of events 
 
 Promises are another elegant and powerful data structure for composing asynchronous operations.  Promises and observable streams are clearly related in that they provide tools for managing asynchrony.  However, they each have their strengths.
 
-Promises deal with single, asynchronous, immutable values and provide operations for transforming them, and providing asynchronous error handling and flow control.  Observable streams deal with *sequences of asynchronous values*, and as such, provide a similar but typically broader set of operations.
+Promises deal with single, asynchronous, immutable values and provide operations for transforming them, and provide asynchronous error handling and flow control.  Event streams represent sequences of asynchronous values or values that vary over time.  They provide a similar, but typically broader, set of operations.
 
 Most.js interoperates seamlessly with ES6 and Promises/A+ promises.  In fact, it even uses promises internally.  For example, reducing a stream returns a promise for the final result:
 
