@@ -826,6 +826,13 @@ A Higher-order stream is a "stream of streams": a stream whose event values are 
 
 Given a higher-order stream, return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
 
+```
+s:               -a-b-c-d-e-f->
+t:               -1-2-3-4-5-6->
+stream:          -s-----t----->
+stream.switch(): -a-b-c-4-5-6->
+```
+
 *TODO: Example*
 
 ### join
@@ -833,7 +840,14 @@ Given a higher-order stream, return a new stream that adopts the behavior of (ie
 ####`stream.join() -> Stream`
 ####`most.join(stream) -> Stream`
 
-Flatten a higher-order stream one level.
+Given a higher-order stream, return a new stream that merges all the inner streams as they arrive.
+
+```
+s:             ---a---b---c---d-->
+t:             -1--2--3--4--5--6->
+stream:        -s------t--------->
+stream.join(): ---a---b--4c-5-d6->
+```
 
 *TODO: Example*
 
