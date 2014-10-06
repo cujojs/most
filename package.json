@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "Monadic streams",
   "main": "most.js",
   "scripts": {
@@ -11,14 +11,20 @@
     "url": "https://github.com/cujojs/most"
   },
   "keywords": [
-    "cujojs",
-    "cujo",
+    "reactive",
+	"reactive programming",
+	"reactive streams",
     "stream",
     "streams",
     "event stream",
+	"promise",
+	"promises",
     "monad",
     "monadic",
-    "functional"
+    "functional",
+	"async",
+	"cujojs",
+	"cujo"
   ],
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",

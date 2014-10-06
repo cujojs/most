@@ -1,7 +1,7 @@
 {
   "name": "most",
   "main": "most.js",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "homepage": "https://github.com/cujojs/most",
   "authors": [
     "Brian Cavalier <brian@hovercraftstudios.com>"
@@ -11,12 +11,20 @@
     "node"
   ],
   "keywords": [
-    "stream",
-    "promise",
-    "promises",
-    "async",
-    "monad",
-    "cujo"
+	"reactive",
+	"reactive programming",
+	"reactive streams",
+	"stream",
+	"streams",
+	"event stream",
+	"promise",
+	"promises",
+	"monad",
+	"monadic",
+	"functional",
+	"async",
+	"cujojs",
+	"cujo"
   ],
   "license": "MIT",
   "ignore": [
