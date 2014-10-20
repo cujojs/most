@@ -4,7 +4,14 @@ var expect = require('buster').expect;
 var join = require('../lib/combinators/join').join;
 var delay = require('../lib/combinators/timed').delay;
 var reduce = require('../lib/combinators/reduce').reduce;
+var observe = require('../lib/combinators/observe').observe;
 var Stream = require('../lib/Stream');
+
+var sentinel = { value: 'sentinel' };
+
+function identity(x) {
+	return x;
+}
 
 describe('join', function() {
 	it('should merge items from all inner streams', function() {
@@ -25,5 +32,40 @@ describe('join', function() {
 					expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
 					expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
 				});
+	});
+
+	it('should dispose outer stream', function() {
+		var dispose = this.spy();
+		var inner = Stream.of(sentinel);
+		var items = new Stream.Yield(0, inner, new Stream.End(1, sentinel, sentinel));
+		var s = join(new Stream(identity, items, void 0, dispose));
+
+		return observe(function() {}, s).then(function() {
+			expect(dispose).toHaveBeenCalled();
+		});
+	});
+
+	it('should dispose inner stream', function() {
+		var dispose = this.spy();
+		var items = new Stream.Yield(0, sentinel, new Stream.End(1, sentinel, sentinel));
+		var inner = new Stream(identity, items, void 0, dispose);
+
+		var s = join(Stream.from([inner]));
+
+		return observe(function() {}, s).then(function() {
+			expect(dispose).toHaveBeenCalled();
+		});
+	});
+
+	it('should dispose all inner streams', function() {
+		var dispose = this.spy();
+		var items = new Stream.Yield(0, sentinel, new Stream.End(1, sentinel, sentinel));
+		var inner = new Stream(identity, items, void 0, dispose);
+
+		var s = join(Stream.from([inner, inner]));
+
+		return observe(function() {}, s).then(function() {
+			expect(dispose).toHaveBeenCalledTwice();
+		});
 	});
 });
