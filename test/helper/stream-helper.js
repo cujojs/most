@@ -6,6 +6,7 @@ var observe = require('../../lib/combinators/observe').observe;
 var Scheduler = require('../../lib/Scheduler');
 var promise = require('../../lib/promises');
 
+var PromiseImpl = promise.Promise;
 var resolve = promise.Promise.resolve;
 
 var Yield = step.Yield;
@@ -16,7 +17,7 @@ exports.makeStreamFromTimes = makeStreamFromTimes;
 exports.createTestScheduler = createTestScheduler;
 
 function assertSame(p1, p2) {
-	return new Promise(function(resolve, reject) {
+	return new PromiseImpl(function(resolve, reject) {
 		observe(function(x) {
 			observe(function(y) {
 				expect(x).toBe(y);

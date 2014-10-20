@@ -100,8 +100,7 @@ var observing = require('./lib/combinators/observe');
 var observe = observing.observe;
 var observeUntil = observing.observeUntil;
 
-exports.forEach      = exports.observe      = observe;
-exports.forEachUntil = exports.observeUntil = observeUntil;
+exports.forEach = exports.observe = observe;
 
 /**
  * Process all the events in the stream
