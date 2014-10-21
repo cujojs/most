@@ -13,6 +13,7 @@ var ap = transform.ap;
 var flatMap = transform.flatMap;
 var scan = transform.scan;
 var tap = transform.tap;
+var constant = transform.constant;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -35,6 +36,22 @@ describe('map', function() {
 		return assertSame(
 			map(function(x) { return f(g(x)); }, u),
 			map(f, map(g, u))
+		);
+	});
+
+});
+
+
+describe('constant', function() {
+
+	it('should satisfy identity', function() {
+		// u.constant(x) ~= u.map(function(){return x;})
+		var u = Stream.of('e');
+		var x = 1;
+		function f() { return x; }
+		return assertSame(
+			constant(x, u),
+			map(f, u)
 		);
 	});
 
