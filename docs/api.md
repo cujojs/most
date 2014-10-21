@@ -24,6 +24,7 @@ most.js API
 	* [throwError](#throwerror)
 1. Transforming streams
 	* [map](#map)
+	* [constant](#constant)
 	* [scan](#scan)
 	* [tap](#tap)
 	* [flatMap](#flatMap)
@@ -439,6 +440,25 @@ most.from([1,2,3,4])
 	.map(function(x) {
 		return x + 1;
 	})
+	.forEach(console.log.bind(console));
+```
+
+### constant
+
+####`stream.constant(x) -> Stream`
+####`most.constant(x, stream) -> Stream`
+
+Create a new stream by replacing each event of the input stream with `x`
+
+```
+stream:             -a-b-c-d->
+stream.constant(x): -x-x-x-x->
+```
+
+```js
+// Logs 1 1 1 1
+most.from([1,2,3,4])
+	.constant(1)
 	.forEach(console.log.bind(console));
 ```
 
