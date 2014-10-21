@@ -128,6 +128,7 @@ exports.ap      = ap;
 exports.flatMap = exports.chain = flatMap;
 exports.scan    = scan;
 exports.tap     = tap;
+exports.constant = constant;
 
 /**
  * Transform each value in the stream by applying f to each
