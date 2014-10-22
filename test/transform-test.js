@@ -140,5 +140,18 @@ describe('scan', function() {
 			expect(arr).toEqual(expected.slice(0, i));
 		});
 	});
+
+	it('should dispose', function() {
+		var dispose = this.spy();
+		var end = new Stream.End(1, 0, sentinel);
+		var source = new Stream(function(x) {
+			return x;
+		}, new Stream.Yield(0, 0, end), void 0, dispose);
+
+		var s = scan(function(z, x) { return x; }, 0, source);
+		return observe(function() {}, s).then(function() {
+			expect(dispose).toHaveBeenCalledWith(1, 0, sentinel);
+		});
+	});
 });
 
