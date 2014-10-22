@@ -120,12 +120,14 @@ var ap = transform.ap;
 var flatMap = transform.flatMap;
 var scan = transform.scan;
 var tap = transform.tap;
+var constant = transform.constant;
 
 exports.map     = map;
 exports.ap      = ap;
 exports.flatMap = exports.chain = flatMap;
 exports.scan    = scan;
 exports.tap     = tap;
+exports.constant = constant;
 
 /**
  * Transform each value in the stream by applying f to each
@@ -135,6 +137,16 @@ exports.tap     = tap;
 Stream.prototype.map = function(f) {
 	return map(f, this);
 };
+
+/**
+ * Replace each value in the stream with x
+ * @param {*} x
+ * @returns {Stream} stream containing items replaced with x
+ */
+Stream.prototype.constant = function(x){
+	return constant(x, this);
+};
+
 
 /**
  * Assume this stream contains functions, and apply each function to each item
