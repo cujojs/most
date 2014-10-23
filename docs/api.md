@@ -467,16 +467,16 @@ most.from([1,2,3,4])
 ####`stream.scan(f, initial) -> Stream`
 ####`most.scan(f, initial, stream) -> Stream`
 
-Create a new stream containing incrementally accumulated results.
+Create a new stream containing incrementally accumulated results, starting with the provided initial value.
 
 `function f(accumulated, x) -> newAccumulated`
 
 ```
 stream:              -1-2-3->
-stream.scan(add, 0): -1-3-6->
+stream.scan(add, 0): 01-3-6->
 ```
 
-Unlike [reduce](#reduce) which produces a single, final result, scan emits incremental results.  The resulting stream is of the same proportion as the original.  For example, if the original contains 10 events, the resulting stream will contain 10.  If the original stream is infinite, the resulting stream will be infinite.
+Unlike [reduce](#reduce) which produces a single, final result, scan emits incremental results.  The resulting stream is of the same proportion as the original.  For example, if the original contains 10 events, the resulting stream will contain 11 (the initial value, followed by 10 incremental events).  If the original stream is infinite, the resulting stream will be infinite.
 
 ```js
 // Logs a ab abc abcd
