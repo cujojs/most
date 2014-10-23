@@ -149,10 +149,10 @@ describe('ap', function() {
 describe('scan', function() {
 	it('should yield combined values', function() {
 		var i = 0;
-		var expected = ['a','b','c'];
+		var expected = ['a', 'b', 'c', 'd'];
 		return scan(function(arr, x) {
 			return arr.concat(x);
-		}, [], Stream.from(expected)).observe(function(arr) {
+		}, expected.slice(0, 1), Stream.from(expected.slice(1))).observe(function(arr) {
 			++i;
 			expect(arr).toEqual(expected.slice(0, i));
 		});
