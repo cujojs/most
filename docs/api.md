@@ -131,9 +131,16 @@ most.from([1,2,3,4]): 1234|
 Create a stream containing all items from an iterable.  The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
 
 ```js
-// Log 1 2 3 4
+// Logs 1 2 3 4
 most.from([1,2,3,4])
 	.forEach(console.log.bind(console));
+```
+
+```js
+// Strings are Array-like, this works
+// Logs a b c d
+most.from('abcd')
+.forEach(console.log.bind(console));
 ```
 
 ```js
@@ -448,7 +455,7 @@ most.from([1,2,3,4])
 ####`stream.constant(x) -> Stream`
 ####`most.constant(x, stream) -> Stream`
 
-Create a new stream by replacing each event of the input stream with `x`
+Create a new stream by replacing each event of the input stream with `x`.
 
 ```
 stream:             -a-b-c-d->
@@ -496,6 +503,7 @@ var numbers = most.iterate(function(x) {
 }, 0);
 
 // Logs
+// []
 // [0]
 // [0,1]
 // [0,1,2]
