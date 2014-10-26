@@ -519,7 +519,7 @@ numbers.scan(function(slidingWindow, x) {
 ### tap
 
 ####`stream.tap(f) -> Stream`
-####`most.map(f, stream) -> Stream`
+####`most.tap(f, stream) -> Stream`
 
 Perform a side-effect for each event in `stream`.
 
