@@ -3,6 +3,7 @@ var expect = require('buster').expect;
 
 var observe = require('../lib/combinators/observe');
 var Stream = require('../lib/Stream');
+var makeStreamFromTimes = require('./helper/stream-helper').makeStreamFromTimes;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -33,11 +34,7 @@ describe('observe', function() {
 	it('should call callback with expected values until end', function() {
 
 		var values = [0,1,2,3,4];
-		var steps = values.reduceRight(function(s, x) {
-			return new Stream.Yield(x, x, s);
-		}, new Stream.End(values.length));
-
-		var s = new Stream(identity, steps);
+		var s = makeStreamFromTimes(values, 5);
 
 		var spy = this.spy(function(x) {
 			expect(x).toBe(values.shift());

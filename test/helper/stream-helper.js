@@ -13,6 +13,7 @@ var Yield = step.Yield;
 var End = step.End;
 
 exports.assertSame = assertSame;
+exports.makeStepsFromTimes = makeStepsFromTimes;
 exports.makeStreamFromTimes = makeStreamFromTimes;
 exports.createTestScheduler = createTestScheduler;
 
@@ -28,12 +29,13 @@ function assertSame(p1, p2) {
 }
 
 function makeStreamFromTimes(times, endTime, scheduler) {
-	var steps = times.reduceRight(function(s, t) {
+	return sync(new Stream(identity, makeStepsFromTimes(times, endTime), scheduler));
+}
+
+function makeStepsFromTimes(times, endTime) {
+	return times.reduceRight(function(s, t) {
 		return new Yield(t, t, s);
 	}, new End(endTime));
-
-	return sync(new Stream(identity, steps, scheduler));
-
 }
 
 /**
