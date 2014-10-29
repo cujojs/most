@@ -39,6 +39,7 @@ most.js API
 1. Consuming streams
 	* [reduce](#reduce)
 	* [forEach](#forEach)
+	* [drain](#drain)
 1. Combining streams
 	* [merge](#merge)
 	* [combine](#combine)

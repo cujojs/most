@@ -31,7 +31,7 @@ module.exports = function run() {
 	most.zip(makeDelayedTail, delays, colors)
 		.take(nTails)
 		.join()
-		.forEach(noop);
+		.drain();
 
 	// Move a circle by setting its css transform to the provided translate3d
 	function translate(tx, circle) {
@@ -76,9 +76,4 @@ function sniffTransformStyleProp (circle) {
 		 : 'mozTransform' in circle.style ? 'mozTransform'
 		 : 'msTransform' in circle.style ? 'msTransform'
 		 : 'transform';
-}
-
-// Log stuff to the console if you want to see the *firehose*
-function noop(x) {
-	//console.log(x);
 }
