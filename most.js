@@ -96,18 +96,31 @@ exports.fromEventWhere = events.fromEventWhere;
 //-----------------------------------------------------------------------
 // Observing
 
-var observing = require('./lib/combinators/observe');
-var observe = observing.observe;
-var observeUntil = observing.observeUntil;
+var observe = require('./lib/combinators/observe').observe;
+var drain = require('./lib/combinators/drain').drain;
 
 exports.forEach = exports.observe = observe;
+exports.drain   = drain;
 
 /**
  * Process all the events in the stream
- * @type {Function}
+ * @returns {Promise} promise that fulfills when the stream ends, or rejects
+ *  if the stream fails with an unhandled error.
  */
-Stream.prototype.forEach = Stream.prototype.observe = function(f, signal) {
-	return arguments.length < 2 ? observe(f, this) : observeUntil(f, signal, this);
+Stream.prototype.forEach = Stream.prototype.observe = function(f) {
+	return observe(f, this);
+};
+
+/**
+ * Consume all events in the stream, without providing a function to process each.
+ * This causes a stream to become active and begin emitting events, and is useful
+ * in cases where all processing has been setup upstream via other combinators, and
+ * there is no need to process the terminal events.
+ * @returns {Promise} promise that fulfills when the stream ends, or rejects
+ *  if the stream fails with an unhandled error.
+ */
+Stream.prototype.drain = function() {
+	return drain(this);
 };
 
 //-----------------------------------------------------------------------
