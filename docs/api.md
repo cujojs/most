@@ -48,6 +48,8 @@ most.js API
 1. Combining higher order streams
 	* [switch](#switch)
 	* [join](#join)
+1. Awaiting promises
+	* [await](#await)
 1. Delaying streams
 	* [delay](#delay)
 1. Rate limiting streams
@@ -888,6 +890,39 @@ stream.join(): ---a---b--4c-5-d6->
 ```
 
 *TODO: Example*
+
+## Awaiting promises
+
+### await
+
+####`stream.await() -> Stream`
+####`most.await(stream) -> Stream`
+
+Given a stream of promises, ie Stream<Promise<X>>, return a new stream containing the fulfillment values, ie Stream<X>.
+
+```
+promise p:      ---1
+promise q:      ------2
+promise r:      -3
+stream:         -p---q---r->
+stream.await(): ---1--2--3->
+```
+
+Note that event order is preserved, regardless of promise fulfillment order.  The fulfilled event values will arrive at the later of the original event time and the promise fulfillment time.
+
+```js
+var urls = [url1, url2, url3, ...];
+
+function fetchContent(url) {
+   // return a promise
+}
+
+var streamOfPromises = Stream.from(urls).map(fetchContent);
+
+var streamOfContent = streamOfPromises.await();
+
+streamOfContent.forEach(console.log.bind(console));
+```
 
 ## Delaying streams
 
