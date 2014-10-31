@@ -375,6 +375,22 @@ Stream.prototype.merge = function(/*,...streams*/) {
 };
 
 //-----------------------------------------------------------------------
+// Awaiting Promises
+
+var await = require('./lib/combinators/await').await;
+
+exports.await = await;
+
+/**
+ * Await promises, turning a Stream<Promise<X>> into Stream<X>.  Preserves
+ * event order, but timeshifts events based on promise resolution time.
+ * @returns {Stream<X>} stream containing non-promise values
+ */
+Stream.prototype.await = function() {
+	return await(this);
+};
+
+//-----------------------------------------------------------------------
 // Higher-order stream
 //-----------------------------------------------------------------------
 
