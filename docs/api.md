@@ -708,7 +708,7 @@ most.fromEvent('mousemove', document)
 ####`stream.drain() -> Promise`
 ####`most.drain(stream) -> Promise`
 
-Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.
+Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#forEach) to consume *and process* terminal events.
 
 The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
 
