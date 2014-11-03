@@ -898,7 +898,7 @@ stream.join(): ---a---b--4c-5-d6->
 ####`stream.await() -> Stream`
 ####`most.await(stream) -> Stream`
 
-Given a stream of promises, ie Stream<Promise<X>>, return a new stream containing the fulfillment values, ie Stream<X>.
+Given a stream of promises, ie Stream&lt;Promise&lt;X&gt;&gt;, return a new stream containing the fulfillment values, ie Stream&lt;X&gt;.
 
 ```
 promise p:      ---1
