@@ -910,6 +910,19 @@ stream.await(): ---1--2--3->
 
 Note that event order is preserved, regardless of promise fulfillment order.  The fulfilled event values will arrive at the later of the original event time and the promise fulfillment time.
 
+If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  For example:
+
+```
+promise p:      ---1
+promise q:      ------X
+promise r:      -3
+stream:         -p---q---r->
+stream.await(): ---1--X
+```
+
+Functionally, `stream.await()` and `stream.flatMap(most.fromPromise)` are equivalent, but `await` is much more efficient.
+
+
 ```js
 var urls = [url1, url2, url3, ...];
 
