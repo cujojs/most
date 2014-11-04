@@ -40,7 +40,7 @@ describe('cycle', function() {
 		var s = new Stream(identity, items, void 0, dispose);
 
 		return drain(take(1, extend.cycle(s))).then(function() {
-			expect(dispose).toHaveBeenCalledWith(0, 1, sentinel);
+			expect(dispose).toHaveBeenCalledWith(0, 0, sentinel);
 		});
 	});
 });
