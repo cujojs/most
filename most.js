@@ -16,6 +16,7 @@ exports.Stream      = Stream;
 exports.of          = Stream.of;
 exports.from        = Stream.from;
 exports.fromPromise = Stream.fromPromise;
+exports.never       = Stream.never;
 
 //-----------------------------------------------------------------------
 // Lifting functions
