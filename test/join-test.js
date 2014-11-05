@@ -3,8 +3,10 @@ var expect = require('buster').expect;
 
 var join = require('../lib/combinators/join').join;
 var delay = require('../lib/combinators/timed').delay;
+var concat = require('../lib/combinators/monoid').concat;
+var take = require('../lib/combinators/filter').take;
 var reduce = require('../lib/combinators/reduce').reduce;
-var observe = require('../lib/combinators/observe').observe;
+var drain = require('../lib/combinators/drain').drain;
 var Stream = require('../lib/Stream');
 
 var sentinel = { value: 'sentinel' };
@@ -40,7 +42,7 @@ describe('join', function() {
 		var items = new Stream.Yield(0, inner, new Stream.End(1, sentinel, sentinel));
 		var s = join(new Stream(identity, items, void 0, dispose));
 
-		return observe(function() {}, s).then(function() {
+		return drain(s).then(function() {
 			expect(dispose).toHaveBeenCalled();
 		});
 	});
@@ -52,8 +54,16 @@ describe('join', function() {
 
 		var s = join(Stream.from([inner]));
 
-		return observe(function() {}, s).then(function() {
+		return drain(s).then(function() {
 			expect(dispose).toHaveBeenCalled();
+		});
+	});
+
+	it('should dispose inner stream immediately', function() {
+		var s = Stream.of(concat(Stream.of(1), Stream.never()));
+
+		return drain(take(1, join(s))).then(function() {
+			expect(true).toBe(true);
 		});
 	});
 
@@ -64,7 +74,7 @@ describe('join', function() {
 
 		var s = join(Stream.from([inner, inner]));
 
-		return observe(function() {}, s).then(function() {
+		return drain(s).then(function() {
 			expect(dispose).toHaveBeenCalledTwice();
 		});
 	});
