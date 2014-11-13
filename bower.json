@@ -1,7 +1,7 @@
 {
   "name": "most",
   "main": "most.js",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "homepage": "https://github.com/cujojs/most",
   "authors": [
     "Brian Cavalier <brian@hovercraftstudios.com>"
@@ -37,6 +37,6 @@
     "package.json"
   ],
   "dependencies": {
-    "when": "~3.5"
+    "when": "~3.6.2"
   }
 }

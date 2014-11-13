@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Monadic streams",
   "main": "most.js",
   "scripts": {
@@ -33,6 +33,6 @@
     "jshint": "~2"
   },
   "dependencies": {
-    "when": "~3.5"
+    "when": "~3.6.2"
   }
 }
