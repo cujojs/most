@@ -55,39 +55,3 @@ describe('reduce', function() {
 	});
 
 });
-
-describe('reduce1', function() {
-
-	describe('when stream is empty', function() {
-
-		it('should reject', function() {
-			var spy = this.spy();
-			return reduce.reduce1(spy, empty())
-				.catch(function() {
-					expect(spy).not.toHaveBeenCalled();
-				});
-		});
-
-	});
-
-	describe('when stream contains 1 item', function() {
-		it('should reduce to that item', function() {
-			return reduce.reduce1(function() {
-				throw new Error();
-			}, Stream.of(sentinel))
-				.then(function(result) {
-					expect(result).toBe(sentinel);
-				});
-		});
-	});
-
-	it('should reduce values, using first item as initial value', function() {
-		return reduce.reduce1(function(s, x) {
-			return s+x;
-		}, Stream.from(['a', 'b', 'c', 'd']))
-			.then(function(result) {
-				expect(result).toBe('abcd');
-			});
-	});
-
-});

@@ -22,24 +22,6 @@ describe('Stream', function() {
 //		this.timeout = 5000;
 	});
 
-	describe('head', function() {
-		it('should return a promise for first item', function() {
-			return Stream.from([sentinel, other])
-				.head()
-				.then(function(x) {
-					expect(x).toBe(sentinel);
-				});
-		});
-
-		it('should fail when empty', function() {
-			return empty().head().then(function(x) {
-				throw new Error('should not have returned ' + x);
-			}).catch(function(e) {
-				expect(e).toBeDefined();
-			});
-		});
-	});
-
 	describe('of', function() {
 
 		it('should contain one item', function() {
@@ -69,41 +51,6 @@ describe('Stream', function() {
 			return Stream.fromPromise(resolve(sentinel))
 				.observe(function(x) {
 					expect(x).toBe(sentinel);
-				});
-		});
-	});
-
-	describe('tail', function() {
-		it('should contain all items except the first', function() {
-			var count = 0;
-			var items = [other, sentinel, sentinel];
-			return Stream.from(items)
-				.tail()
-				.observe(function(x) {
-					count++;
-					expect(x).toBe(sentinel);
-				}).then(function() {
-					expect(count).toBe(items.length-1);
-				});
-		});
-
-		it('should be empty when original contains only one item', function() {
-			var spy = this.spy();
-			return Stream.of(sentinel)
-				.tail()
-				.observe(spy)
-				.then(function() {
-					expect(spy).not.toHaveBeenCalled();
-				});
-		});
-
-		it('should be empty when original is empty', function() {
-			var spy = this.spy();
-			return empty()
-				.tail()
-				.observe(spy)
-				.then(function() {
-					expect(spy).not.toHaveBeenCalled();
 				});
 		});
 	});

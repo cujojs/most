@@ -8,6 +8,7 @@ var drain = require('../lib/combinators/drain').drain;
 var reduce = require('../lib/combinators/reduce').reduce;
 var observe = require('../lib/combinators/observe').observe;
 var Stream = require('../lib/Stream');
+var resolve = require('../lib/promises').Promise.resolve;
 
 var sentinel = { value: 'sentinel' };
 
@@ -47,19 +48,17 @@ describe('cycle', function() {
 
 describe('startWith', function() {
 	it('should return a stream containing item as head', function() {
-		return extend.cons(sentinel, Stream.from([1,2,3]))
-			.head()
-			.then(function(x) {
-				expect(x).toBe(sentinel);
-			});
+		var s = extend.cons(sentinel, Stream.from([1, 2, 3]));
+		return resolve(s.step(s.state)).then(function(event) {
+			expect(event.value).toBe(sentinel);
+		});
 	});
 
 	it('when empty, should return a stream containing item as head', function() {
-		return extend.cons(sentinel, empty())
-			.head()
-			.then(function(x) {
-				expect(x).toBe(sentinel);
-			});
+		var s = extend.cons(sentinel, empty());
+		return resolve(s.step(s.state)).then(function(event) {
+			expect(event.value).toBe(sentinel);
+		});
 	});
 });
 
