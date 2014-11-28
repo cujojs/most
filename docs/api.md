@@ -27,18 +27,18 @@ most.js API
 	* [constant](#constant)
 	* [scan](#scan)
 	* [tap](#tap)
-	* [flatMap](#flatMap)
+	* [flatMap](#flatmap)
 	* [ap](#ap)
 1. Filtering streams
 	* [filter](#filter)
 	* [take](#take)
-	* [takeWhile](#takeWhile)
-	* [takeUntil](#takeUntil)
+	* [takeWhile](#takewhile)
+	* [takeUntil](#takeuntil)
 	* [distinct](#distinct)
-	* [distinctBy](#distinctBy)
+	* [distinctBy](#distinctby)
 1. Consuming streams
 	* [reduce](#reduce)
-	* [forEach](#forEach)
+	* [forEach](#foreach)
 	* [drain](#drain)
 1. Combining streams
 	* [merge](#merge)
@@ -233,7 +233,7 @@ most.fromEvent(eventType, source): -a--b-c---d->
 
 Create a stream containing events from the provided [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), such as a DOM element, or [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).  This provides a simple way to coerce existing event sources into streams.
 
-Note that when the stream ends (for example, by using [take](#take), [takeUntil](#takeUntil), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
+Note that when the stream ends (for example, by using [take](#take), [takeUntil](#takeuntil), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
 
 ```js
 var clicks = most.fromEvent('click', document.querySelector('.the-button'));
@@ -644,7 +644,7 @@ stream:            -1-2-2-3-4-4-5->
 stream.distinct(): -1-2---3-4---5->
 ```
 
-Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctBy)
+Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctby)
 
 ### distinctBy
 
@@ -708,7 +708,7 @@ most.fromEvent('mousemove', document)
 ####`stream.drain() -> Promise`
 ####`most.drain(stream) -> Promise`
 
-Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#forEach) to consume *and process* terminal events.
+Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#foreach) to consume *and process* terminal events.
 
 The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
 
