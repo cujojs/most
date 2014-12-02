@@ -35,7 +35,7 @@ exports.main = function() {
 	// x represents the current value of xInput
 	var x = most.fromEvent('input', xInput).map(toNumber);
 
-	// x represents the current value of yInput
+	// y represents the current value of yInput
 	var y = most.fromEvent('input', yInput).map(toNumber);
 
 	// result is the live current value of adding x and y
