@@ -2,16 +2,15 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 var assertSame = require('./helper/stream-helper').assertSame;
 
-var transform = require('../lib/combinators/transform');
-var observe = require('../lib/combinators/observe').observe;
-var delay = require('../lib/combinators/timed').delay;
-var reduce = require('../lib/combinators/reduce').reduce;
-var Stream = require('../lib/Stream');
+var transform = require('../lib/combinator/transform');
+var observe = require('../lib/combinator/observe').observe;
+var delay = require('../lib/combinator/delay').delay;
+var reduce = require('../lib/combinator/accumulate').reduce;
+var streamOf = require('../lib/source/core').of;
 
 var map = transform.map;
 var ap = transform.ap;
 var flatMap = transform.flatMap;
-var scan = transform.scan;
 var tap = transform.tap;
 var constant = transform.constant;
 
@@ -22,7 +21,7 @@ describe('map', function() {
 
 	it('should satisfy identity', function() {
 		// u.map(function(a) { return a; })) ~= u
-		var u = Stream.of(sentinel);
+		var u = streamOf(sentinel);
 		return assertSame(map(function(x) { return x; }, u), u);
 	});
 
@@ -31,7 +30,7 @@ describe('map', function() {
 		function f(x) { return x + 'f'; }
 		function g(x) { return x + 'g'; }
 
-		var u = Stream.of('e');
+		var u = streamOf('e');
 
 		return assertSame(
 			map(function(x) { return f(g(x)); }, u),
@@ -46,7 +45,7 @@ describe('constant', function() {
 
 	it('should satisfy identity', function() {
 		// u.constant(x) ~= u.map(function(){return x;})
-		var u = Stream.of('e');
+		var u = streamOf('e');
 		var x = 1;
 		function f() { return x; }
 		return assertSame(
@@ -60,67 +59,40 @@ describe('constant', function() {
 describe('tap', function() {
 
 	it('should not transform stream items', function() {
-		return tap(function() {
+		var s = tap(function() {
 			return other;
-		}, Stream.of(sentinel)).observe(function(x) {
+		}, streamOf(sentinel));
+
+		return observe(function(x) {
 			expect(x).toBe(sentinel);
-		});
+		}, s);
 	});
 
-});
-
-describe('flatMap', function() {
-
-	it('should satisfy associativity', function() {
-		// m.flatMap(f).flatMap(g) ~= m.flatMap(function(x) { return f(x).flatMap(g); })
-		function f(x) { return Stream.of(x + 'f'); }
-		function g(x) { return Stream.of(x + 'g'); }
-
-		var m = Stream.of('m');
-
-		return assertSame(
-			flatMap(function(x) { return flatMap(g, f(x)); }, m),
-			flatMap(g, flatMap(f, m))
-		);
-	});
-
-	it('should preserve time order', function() {
-		var s = flatMap(function(x) {
-			return delay(x, Stream.of(x));
-		}, Stream.from([20, 10]));
-
-		return reduce(function(a, x) {
-			return a.concat(x);
-		}, [], s)
-			.then(function(a) {
-				expect(a).toEqual([10, 20]);
-			});
-	});
 });
 
 describe('ap', function() {
 
 	it('should satisfy identity', function() {
 		// P.of(function(a) { return a; }).ap(v) ~= v
-		var v = Stream.of(sentinel);
-		return assertSame(Stream.of(function(x) { return x; }).ap(v), v);
+		var v = streamOf(sentinel);
+		return assertSame(ap(streamOf(function(x) { return x; }), v), v);
 	});
 
 	it('should satisfy composition', function() {
 		//P.of(function(f) { return function(g) { return function(x) { return f(g(x))}; }; }).ap(u).ap(v
-		var u = Stream.of(function(x) { return 'u' + x; });
-		var v = Stream.of(function(x) { return 'v' + x; });
-		var w = Stream.of('w');
+		var u = streamOf(function(x) { return 'u' + x; });
+		var v = streamOf(function(x) { return 'v' + x; });
+		var w = streamOf('w');
 
 		return assertSame(
-			Stream.of(function(f) {
+			ap(ap(ap(streamOf(function(f) {
 				return function(g) {
 					return function(x) {
 						return f(g(x));
 					};
 				};
-			}).ap(u).ap(v).ap(w),
-			u.ap(v.ap(w))
+			}), u), v), w),
+			ap(u, ap(v, w))
 		);
 	});
 
@@ -128,52 +100,21 @@ describe('ap', function() {
 		//P.of(f).ap(P.of(x)) ~= P.of(f(x)) (homomorphism)
 		function f(x) { return x + 'f'; }
 		var x = 'x';
-		return assertSame(Stream.of(f).ap(Stream.of(x)), Stream.of(f(x)));
+		return assertSame(ap(streamOf(f), streamOf(x)), streamOf(f(x)));
 	});
 
 	it('should satisfy interchange', function() {
 		// u.ap(a.of(y)) ~= a.of(function(f) { return f(y); }).ap(u)
 		function f(x) { return x + 'f'; }
 
-		var u = Stream.of(f);
+		var u = streamOf(f);
 		var y = 'y';
 
 		return assertSame(
-			u.ap(Stream.of(y)),
-			Stream.of(function(f) { return f(y); }).ap(u)
+			ap(u, streamOf(y)),
+			ap(streamOf(function(f) { return f(y); }), u)
 		);
 	});
 
-});
-
-describe('scan', function() {
-	it('should yield combined values', function() {
-		var i = 0;
-		var items = 'abcd';
-
-		var stream = scan(function (s, x) {
-			return s + x;
-		}, items[0], Stream.from(items.slice(1)));
-
-		return observe(function(s) {
-			++i;
-			expect(s).toEqual(items.slice(0, i));
-		}, stream);
-	});
-
-	it('should dispose', function() {
-		var dispose = this.spy();
-
-		var items = new Stream.Yield(0, 0, new Stream.End(1, 0, sentinel));
-
-		var stream = new Stream(function(x) {
-			return x;
-		}, items, void 0, dispose);
-
-		var s = scan(function(z, x) { return x; }, 0, stream);
-		return observe(function() {}, s).then(function() {
-			expect(dispose).toHaveBeenCalledWith(1, 0, sentinel);
-		});
-	});
 });
 

@@ -1,56 +1,45 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var combine = require('../lib/combinators/combine').combine;
-var timed = require('../lib/combinators/timed');
-var observe = require('../lib/combinators/observe').observe;
-var reduce = require('../lib/combinators/reduce').reduce;
+var combine = require('../lib/combinator/combine').combine;
+var map = require('../lib/combinator/transform').map;
+var take = require('../lib/combinator/slice').take;
+var delay = require('../lib/combinator/delay').delay;
+var observe = require('../lib/combinator/observe').observe;
+var reduce = require('../lib/combinator/accumulate').reduce;
+var periodic = require('../lib/source/periodic').periodic;
+var streamOf = require('../lib/source/core').of;
 var Stream = require('../lib/Stream');
 
-var step = require('../lib/step');
-var Yield = step.Yield;
-var End = step.End;
-
-var createTestScheduler = require('./helper/stream-helper').createTestScheduler;
-
-function identity(x) {
-	return x;
-}
-
-function createStream(scheduler, times) {
-	var iterations = times.slice(0, times.length-1).reduceRight(function(s, t) {
-		return new Yield(t, t, s);
-	}, new End(times[times.length-1]));
-
-	return new Stream(identity, iterations, scheduler);
-}
+var sentinel = { value: 'sentinel' };
 
 describe('combine', function() {
 	it('should yield initial only after all inputs yield', function() {
-		var scheduler = createTestScheduler();
+		var s1 = periodic(1);
+		var s2 = streamOf(sentinel);
 
-		var s1 = createStream(scheduler, [1,3]);
-		var s2 = createStream(scheduler, [2,3]);
+		var sc = combine(Array, s1, delay(2, s2));
 
-		var sc = combine(Array, timed.delay(1,s1), timed.delay(1, s2));
-
-		var result = observe(function(x) {
-			expect(x).toEqual([1,2]);
+		return observe(function(x) {
+			expect(x[1]).toBe(sentinel);
 		}, sc);
-
-		scheduler.tick(3);
-		return result;
 	});
 
 	it('should yield when any input stream yields', function() {
-		var scheduler = createTestScheduler();
 
-		var s1 = createStream(scheduler, [0,2,4,6]);
-		var s2 = createStream(scheduler, [1,3,5,6]);
+		var a1 = [0,2,4,6];
+		var s1 = map(function() {
+			return a1.shift();
+		}, periodic(10));
 
-		var sc = combine(Array, timed.delay(1,s1), timed.delay(1,s2));
+		var a2 = [1,3,5];
+		var s2 = map(function() {
+			return a2.shift();
+		}, periodic(12));
 
-		var result = reduce(function(array, x) {
+		var sc = combine(Array, take(a1.length, s1), take(a2.length, s2));
+
+		return reduce(function(array, x) {
 			array.push(x);
 			return array;
 		}, [], sc)
@@ -63,9 +52,5 @@ describe('combine', function() {
 					[4,5]
 				]);
 			});
-
-		scheduler.tick(10);
-		return result;
-
 	});
 });

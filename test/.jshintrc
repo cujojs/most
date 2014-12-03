@@ -3,5 +3,6 @@
 		"describe": true,
 		"it": true
 	},
+	"predef": [ "-Promise" ],
 	"expr": true
 }

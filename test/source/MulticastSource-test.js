@@ -2,92 +2,67 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var MulticastSource = require('../../lib/source/MulticastSource');
-var iterable = require('../../lib/iterable');
-var promise = require('../../lib/promises');
-var resolve = promise.Promise.all;
-var all = promise.Promise.all;
+var streamOf = require('../../lib/source/core').of;
+var repeat = require('../../lib/combinator/build').repeat;
+var take = require('../../lib/combinator/slice').take;
+var reduce = require('../../lib/combinator/accumulate').reduce;
+var drain = require('../../lib/combinator/observe').drain;
+var Stream = require('../../lib/Stream');
+var Promise = require('../../lib/Promise');
+
+var FakeDisposeSource = require('../helper/FakeDisposeSource');
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
 describe('MulticastSource', function() {
 
-	it('should use the supplied scheduler', function() {
-		var scheduler = {};
-		var s = new MulticastSource(scheduler, function(){});
-		expect(s.scheduler).toBe(scheduler);
-	});
-
-	it('should pass buffer policy through', function() {
-		var spy = this.spy(function(x, array) {
-			return array;
-		});
-
-		var s = new MulticastSource(Date, function(add) {
-			add();
-		}, spy);
-
-		iterable.getIterator(s).next();
-		expect(spy).toHaveBeenCalled();
-	});
-
 	it('should call producer on first subscriber', function() {
-		var spy = this.spy();
-		var s = new MulticastSource(Date, spy);
+		var eventSpy = this.spy();
+		var s = new MulticastSource({ run: function() {} });
 
-		iterable.getIterator(s);
-		expect(spy).toHaveBeenCalledOnce();
+		s.run({ event: eventSpy });
+		s.sink.event(sentinel);
+
+		expect(eventSpy).toHaveBeenCalledOnceWith(sentinel);
 	});
 
 	it('should call producer ONLY on first subscriber', function() {
-		var spy = this.spy();
-		var s = new MulticastSource(Date, spy);
+		var sourceSpy = this.spy();
+		var s = new MulticastSource({ run: sourceSpy });
 
-		iterable.getIterator(s);
-		iterable.getIterator(s);
-		expect(spy).toHaveBeenCalledOnce();
+		return Promise.all([
+			s.run({ event: function() {} }),
+			s.run({ event: function() {} }),
+			s.run({ event: function() {} }),
+			s.run({ event: function() {} })
+		]).then(function() {
+			expect(sourceSpy).toHaveBeenCalledOnce();
+		});
 	});
 
 	it('should publish events to all subscribers', function() {
-		var s = new MulticastSource(Date, function(add) {
-			setTimeout(function() {
-				add(sentinel);
-			}, 0);
-		});
+		var s = new MulticastSource(streamOf(sentinel).source);
 
-		var i1 = iterable.getIterator(s);
-		var i2 = iterable.getIterator(s);
+		function second(_, y) {
+			return y;
+		}
 
-		return all([i1.next(), i2.next()]).then(function(events) {
-			expect(events[0].value).toBe(sentinel);
-			expect(events[1].value).toBe(sentinel);
-		});
-	});
-
-	it('should call dispose on end', function() {
-		var spy = this.spy();
-		var s = new MulticastSource(Date, function(add, end) {
-			end();
-			return spy;
-		});
-
-		var i = resolve(iterable.getIterator(s).next());
-
-		return i.then(function() {
-			expect(spy).toHaveBeenCalled();
-		});
+		return Promise.all([reduce(second, other, s), reduce(second, other, s)])
+			.then(function(values) {
+				expect(values[0]).toBe(sentinel);
+				expect(values[1]).toBe(sentinel);
+			});
 	});
 
 	it('should call dispose if all subscribers disconnect', function() {
 		var spy = this.spy();
-		var s = new MulticastSource(Date, function() {
-			return spy;
-		});
+		var s = new Stream(new MulticastSource(FakeDisposeSource.from(spy, repeat(sentinel))));
 
-		var end1 = iterable.getIterator(s).queue.end();
-		var end2 = iterable.getIterator(s).queue.end();
+		var s1 = take(1, s);
+		var s2 = take(1, s);
 
-		return all([end1, end2]).then(function() {
+		return Promise.all([drain(s1), drain(s2)]).then(function() {
 			expect(spy).toHaveBeenCalledOnce();
 		});
 	});

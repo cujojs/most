@@ -11,30 +11,22 @@ module.exports = function run() {
 	var h = parseInt(s.height, 10)/2;
 
 	// Number of mouse tails (circles) to create
-	var nTails = 20;
+	var nTails = 50;
 
 	// Stream mouse movements and turn them into translate3d style rules
 	var mousemoves = most.fromEvent('mousemove', document).map(toTranslate3d);
 
-	// create an infinite stream of delay times: 0,100,200,300,400...etc
-	// We'll limit this with take() later
-	var delays = most.iterate(function (x) { return x + 100; }, 0);
-
-	// Create an infinite stream of random colors
-	var colors = most.iterate(colorGenerator, colorGenerator());
-
-	// For each delay,color pair, create a tail and start translating it
-	// Limit the number of tails to nTails
-	// Merge the flurry of circles into one stream and start observing it
-	// so that it will actually run (streams are lazy: when not observing
+	// Unfold nTails circles.
+	// Merge the flurry of circles into one stream, and start observing it
+	// so it will actually run (streams are lazy: when not observing
 	// then, they are inert!)
-	most.zip(makeDelayedTail, delays, colors)
-		.take(nTails)
-		.join()
-		.drain();
+	most.unfold(unfoldTail, 0).take(nTails).join().drain();
 
+	function unfoldTail(x) {
+		return { value: makeDelayedTail(x*100, colorGenerator()), state: x+1 };
+	}
 	// Move a circle by setting its css transform to the provided translate3d
-	function translate(tx, circle) {
+	function translate(circle, tx) {
 		circle.style[transformProp] = tx;
 		return circle;
 	}
@@ -42,8 +34,7 @@ module.exports = function run() {
 	// Create a tail whose movements will be delayed by the provided delay
 	// and whose color will be the provided color
 	function makeDelayedTail(delay, color) {
-		var tail = makeTail(circle, color);
-		return mousemoves.delay(delay).zip(translate, most.repeat(tail));
+		return mousemoves.delay(delay).scan(translate, makeTail(circle, color));
 	}
 
 	// Turn a mouse event into a css translate3d string

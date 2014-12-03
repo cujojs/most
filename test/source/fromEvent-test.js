@@ -4,9 +4,9 @@ var expect = require('buster').expect;
 var events = require('../../lib/source/fromEvent');
 var fromEventWhere = events.fromEventWhere;
 var fromEvent = events.fromEvent;
-var reduce = require('../../lib/combinators/reduce').reduce;
-var observe = require('../../lib/combinators/observe').observe;
-var take = require('../../lib/combinators/filter').take;
+var reduce = require('../../lib/combinator/accumulate').reduce;
+var observe = require('../../lib/combinator/observe').observe;
+var take = require('../../lib/combinator/slice').take;
 var FakeEventTarget = require('../helper/FakeEventTarget');
 var FakeEventEmitter = require('../helper/FakeEventEmitter');
 
