@@ -108,15 +108,20 @@ var build = require('./lib/combinator/build');
 exports.iterate   = build.iterate;
 exports.unfold    = build.unfold;
 exports.repeat    = build.repeat;
+exports.concat    = build.cycle;
 exports.concat    = build.concat;
 exports.startWith = build.cons;
 
-Stream.prototype.startWith = function(x) {
-	return build.cons(x, this);
+Stream.prototype.cycle = function() {
+	return build.cycle(this);
 };
 
 Stream.prototype.concat = function(tail) {
 	return build.concat(this, tail);
+};
+
+Stream.prototype.startWith = function(x) {
+	return build.cons(x, this);
 };
 
 //-----------------------------------------------------------------------
