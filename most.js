@@ -304,3 +304,25 @@ exports.await       = promises.await;
 Stream.prototype.await = function() {
 	return promises.await(this);
 };
+
+//-----------------------------------------------------------------------
+// Error handling
+
+var errors = require('./lib/combinator/errors');
+
+
+exports.flatMapError = errors.flatMapError;
+exports.throwError   = errors.throwError;
+
+/**
+ * If this stream encounters an error, recover and continue with items from stream
+ * returned by f.
+ * stream:                  -a-b-c-X-
+ * f(X):                           d-e-f-g-
+ * flatMapError(f, stream): -a-b-c-d-e-f-g-
+ * @param {function(error:*):Stream} f function which returns a new stream
+ * @returns {Stream} new stream which will recover from an error by calling f
+ */
+Stream.prototype.flatMapError = function(f) {
+	return errors.flatMapError(f, this);
+};
