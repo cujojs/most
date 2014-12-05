@@ -11,6 +11,6 @@ module.exports = function run() {
 		})
 		.startWith('move the mouse, please')
 		.observe(function(s) {
-			document.body.innerHTML = s;
+			document.body.textContent = s;
 		});
 };
