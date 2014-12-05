@@ -4,16 +4,14 @@
 
 var Stream = require('./lib/Stream');
 var base = require('./lib/base');
-
-exports.empty = Stream.empty;
-exports.never = Stream.never;
-
-var of = require('./lib/source/of').of;
+var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
 
-exports.of = of;
-exports.from = from;
+exports.of       = core.of;
+exports.empty    = core.empty;
+exports.never    = core.never;
+exports.from     = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------

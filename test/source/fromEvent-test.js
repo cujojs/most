@@ -17,7 +17,7 @@ function isSentinel(x) {
 	return x === sentinel;
 }
 
-describe('=>fromEventWhere', function() {
+describe('fromEventWhere', function() {
 
 	describe('given an EventTarget', function() {
 
@@ -65,7 +65,7 @@ describe('=>fromEventWhere', function() {
 });
 
 
-describe('=>fromEvent', function() {
+describe('fromEvent', function() {
 
 	describe('given an EventTarget', function() {
 

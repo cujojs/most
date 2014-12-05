@@ -2,7 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var create = require('../../lib/source/create').create;
-var observe = require('../../lib/combinators/observe').observe;
+var observe = require('../../lib/combinator/observe').observe;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -44,10 +44,13 @@ describe('create', function() {
 	});
 
 	it('should call disposer on end', function() {
+		var spy = this.spy();
 		function producer(add, end) {
 			add(sentinel);
 			end();
 			add(other);
+
+			return spy();
 		}
 
 		var count = 0;
@@ -57,6 +60,7 @@ describe('create', function() {
 			expect(x).toBe(sentinel);
 		}, create(producer)).then(function() {
 			expect(count).toBe(1);
+			expect(spy).toHaveBeenCalled();
 		});
 	});
 });
