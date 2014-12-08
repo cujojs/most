@@ -179,6 +179,28 @@ Stream.prototype.merge = function(stream) {
 };
 
 //-----------------------------------------------------------------------
+// Combining
+
+var combine = require('./lib/combinator/combine');
+
+exports.combine = combine.combine;
+
+Stream.prototype.combine = function(f /*, ...streams*/) {
+	return combine.combineArray(f, base.replace(this, 0, arguments));
+};
+
+//-----------------------------------------------------------------------
+// Zipping
+
+var zip = require('./lib/combinator/zip');
+
+exports.zip = zip.zip;
+
+Stream.prototype.zip = function(f /*, ...streams*/) {
+	return zip.zipArray(f, base.replace(this, 0, arguments));
+};
+
+//-----------------------------------------------------------------------
 // Switching
 
 var switchLatest = require('./lib/combinator/switch').switch;
@@ -256,17 +278,6 @@ Stream.prototype.takeUntil = function(signal) {
 
 Stream.prototype.skipUntil = function(signal) {
 	return timeslice.skipUntil(signal, this);
-};
-
-//-----------------------------------------------------------------------
-// Combining
-
-var combine = require('./lib/combinator/combine');
-
-exports.combine = combine.combine;
-
-Stream.prototype.combine = function(f /*, ...streams*/) {
-	return combine.combineArray(f, base.replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------
