@@ -118,34 +118,3 @@ describe('ap', function() {
 
 });
 
-//describe('scan', function() {
-//	it('should yield combined values', function() {
-//		var i = 0;
-//		var items = 'abcd';
-//
-//		var stream = scan(function (s, x) {
-//			return s + x;
-//		}, items[0], Stream.from(items.slice(1)));
-//
-//		return observe(function(s) {
-//			++i;
-//			expect(s).toEqual(items.slice(0, i));
-//		}, stream);
-//	});
-//
-//	it('should dispose', function() {
-//		var dispose = this.spy();
-//
-//		var items = new Stream.Yield(0, 0, new Stream.End(1, 0, sentinel));
-//
-//		var stream = new Stream(function(x) {
-//			return x;
-//		}, items, void 0, dispose);
-//
-//		var s = scan(function(z, x) { return x; }, 0, stream);
-//		return observe(function() {}, s).then(function() {
-//			expect(dispose).toHaveBeenCalledWith(1, 0, sentinel);
-//		});
-//	});
-//});
-
