@@ -13,12 +13,6 @@ var other = { value: 'other' };
 
 describe('build', function() {
 
-	beforeAll(function() {
-		// This is for Node 0.11.13's Promise, which is astonishingly slow.
-		// You really should use when.js's es6-shim
-//		this.timeout = 5000;
-	});
-
 	describe('unfold', function() {
 		it('should call unfold with seed', function() {
 			return build.unfold(function(step) {
