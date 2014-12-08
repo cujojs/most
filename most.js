@@ -8,8 +8,9 @@ var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
 
-exports.of       = core.of;
-exports.empty    = core.empty;
+// Add of and empty to constructor for fantasy-land compat
+exports.of       = Stream.of    = core.of;
+exports.empty    = Stream.empty = core.empty;
 exports.never    = core.never;
 exports.from     = from;
 exports.periodic = periodic;
@@ -160,7 +161,8 @@ Stream.prototype.join = function() {
 	return join.join(this);
 };
 
-Stream.prototype.flatMap = function(f) {
+// alias chain for fantasy-land compat
+Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return join.flatMap(f, this);
 };
 
