@@ -130,6 +130,7 @@ var transform = require('./lib/combinator/transform');
 exports.map      = transform.map;
 exports.ap       = transform.ap;
 exports.constant = transform.constant;
+exports.tap      = transform.tap;
 
 Stream.prototype.map = function(f) {
 	return transform.map(f, this);
@@ -141,6 +142,10 @@ Stream.prototype.ap = function(f) {
 
 Stream.prototype.constant = function(x) {
 	return transform.constant(x, this);
+};
+
+Stream.prototype.tap = function(f) {
+	return transform.tap(f, this);
 };
 
 //-----------------------------------------------------------------------
