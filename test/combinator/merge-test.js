@@ -9,15 +9,15 @@ var streamOf = require('../../lib/source/core').of;
 var all = require('../../lib/Promise').all;
 
 function testMerge(merge) {
-	var a = [1,2,3];
-	var b = [4,5,6];
+	var a = [1, 2, 3];
+	var b = [4, 5, 6];
 	var sa = fromArray(a);
 	var sb = fromArray(b);
 
-	return reduce(function(result, x) {
+	return reduce(function (result, x) {
 		return result.concat(x);
 	}, [], merge(delay(0, sa), delay(0, sb)))
-		.then(function(result) {
+		.then(function (result) {
 			// Include all items
 			expect(result.slice().sort()).toEqual(a.concat(b).sort());
 
@@ -28,7 +28,6 @@ function testMerge(merge) {
 			expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
 			expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
 		});
-
 }
 
 function toArray(s) {
@@ -56,7 +55,7 @@ describe('merge', function() {
 
 			expect(p1).toEqual(p2);
 		});
-	})
+	});
 });
 
 describe('mergeArray', function() {
