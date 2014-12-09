@@ -1,12 +1,12 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var build = require('../lib/combinators/build');
-var take = require('../lib/combinators/filter').take;
-var observe = require('../lib/combinators/observe').observe;
-var step = require('../lib/step');
-var Yield = step.Yield;
-var End = step.End;
+var build = require('../lib/combinator/build');
+var take = require('../lib/combinator/slice').take;
+var observe = require('../lib/combinator/observe').observe;
+//var step = require('../lib/step');
+//var Yield = step.Yield;
+//var End = step.End;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -15,31 +15,38 @@ describe('build', function() {
 
 	describe('unfold', function() {
 		it('should call unfold with seed', function() {
-			return build.unfold(function(step) {
-				return step;
-			}, new Yield(0, sentinel, new End())).observe(function(x) {
+			var s = take(1, build.unfold(function (x) {
+				return { value: x, state: x };
+			}, sentinel));
+
+			return observe(function(x) {
 				expect(x).toBe(sentinel);
-			});
+			}, s);
 		});
 
 		it('should unfold until end', function() {
 			var count = 0;
 			var expected = 3;
 
-			return build.unfold(function(x) {
-				return x === 0 ? new End() : new Yield(0, x, x - 1);
-			}, expected).observe(function() {
+			var s = take(expected, build.unfold(function (x) {
+				return { value: x, state: x+1 };
+			}, 0));
+
+			return observe(function(x) {
+				expect(x).toBe(count);
 				count++;
-			}).then(function() {
+			}, s).then(function() {
 				expect(count).toBe(expected);
 			});
 		});
 
 		it('should reject on error', function() {
 			var spy = this.spy();
-			return build.unfold(function() {
+			var s = build.unfold(function () {
 				throw sentinel;
-			}, other).observe(spy).catch(function(e) {
+			}, other);
+
+			return observe(spy, s).catch(function(e) {
 				expect(spy).not.toHaveBeenCalled();
 				expect(e).toBe(sentinel);
 			});
@@ -66,7 +73,7 @@ describe('build', function() {
 			}, other);
 
 			return observe(spy, s).catch(function(e) {
-				expect(spy).not.toHaveBeenCalled();
+				expect(spy).toHaveBeenCalledOnceWith(other);
 				expect(e).toBe(sentinel);
 			});
 		});
