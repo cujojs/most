@@ -10,10 +10,6 @@ var streamOf = require('../lib/source/core').of;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-function identity(x) {
-	return x;
-}
-
 describe('observe', function() {
 
 	it('should call callback and return a promise', function() {
