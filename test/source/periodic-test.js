@@ -2,29 +2,28 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var periodic = require('../../lib/source/periodic').periodic;
-var filter = require('../../lib/combinator/filter');
+var take = require('../../lib/combinator/slice').take;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var flatMap = require('../../lib/combinator/join').flatMap;
 var Stream = require('../../lib/Stream');
 
-var take = filter.take;
-
-var sentinel = { value: 'sentinel' };
-
-describe('//periodic', function() {
+describe('periodic', function() {
 	it('should emit events at tick periods', function() {
-		var scheduler = createTestScheduler();
+		var n = 10;
+		var s = take(n, periodic(1));
 
-		var count = 5;
-		var result = reduce(function(c) {
-			return c - 1;
-		}, count, filter.take(count, timed.periodicOn(scheduler, 1)))
-			.then(function(count) {
-				expect(count).toBe(0);
-			});
+		return reduce(function(t0, t1) {
+			--n;
 
-		scheduler.tick(10, 1);
-		return result;
+			if(t0 >= 0) {
+				expect(t1 - t0).toBe(1);
+			}
+
+			return t1;
+		}, -1, s).then(function(t) {
+			expect(Date.now()).not.toBeLessThan(t);
+			expect(n).toBe(0);
+		});
 	});
 });
 
