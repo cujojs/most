@@ -3,69 +3,76 @@ var expect = require('buster').expect;
 
 var limit = require('../lib/combinator/limit');
 var periodic = require('../lib/source/periodic').periodic;
-var map = require('../lib/combinator/transform').map;
+var delay = require('../lib/combinator/delay').delay;
+var transform = require('../lib/combinator/transform');
+var merge = require('../lib/combinator/merge').merge;
+var flatMap = require('../lib/combinator/join').flatMap;
+var flatMapEnd = require('../lib/combinator/flatMapEnd').flatMapEnd;
 var take = require('../lib/combinator/slice').take;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var observe = require('../lib/combinator/observe').observe;
 var fromArray = require('../lib/source/fromArray').fromArray;
+var empty = require('../lib/source/core').empty;
+
+var map = transform.map;
+var constant = transform.constant;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-describe('//debounce', function() {
+describe('debounce', function() {
 	describe('when events always occur less frequently than debounce period', function() {
 		it('should be identity', function() {
-			var scheduler = createTestScheduler();
+			var a = [0,1,2,3,4,5,6,7,8,9];
+			var expected = a.slice(0, -1);
 
-			var times = [0,2,4,6,8];
-			var s = makeStreamFromTimes(times, 10, scheduler);
+			var s = take(10, map(function() {
+				return a.shift();
+			}, periodic(10)));
 
-			var result = reduce(function(count) {
-				return count + 1;
-			}, 0, timed.debounce(1, s))
-				.then(function(count) {
-					expect(count).toBe(times.length);
+			var debounced = limit.debounce(1, s);
+
+			return reduce(function(a, x) {
+				return a.concat(x);
+			}, [], debounced)
+				.then(function(array) {
+					expect(array).toEqual(expected);
 				});
-
-			scheduler.tick(10, 1);
-			return result;
 		});
 	});
 
 	describe('when events always occur more frequently than debounce period', function() {
 		it('should be empty', function() {
-			var scheduler = createTestScheduler();
+			var a = [0,1,2,3,4,5,6,7,8,9];
+			var expected = [];
 
-			var times = [1,2,3,4,5];
-			var s = makeStreamFromTimes(times, 6, scheduler);
+			var s = take(10, map(function() {
+				return a.shift();
+			}, periodic(1)));
 
-			var result = reduce(function(count) {
-				return count + 1;
-			}, 0, timed.debounce(1, s))
-				.then(function(count) {
-					expect(count).toBe(0);
+			var debounced = limit.debounce(10, s);
+
+			return reduce(function(a, x) {
+				return a.concat(x);
+			}, [], debounced)
+				.then(function(array) {
+					expect(array).toEqual(expected);
 				});
-
-			scheduler.tick(6, 1);
-			return result;
 		});
 	});
 
 	it('should allow events that occur less frequently than debounce period', function() {
-		var scheduler = createTestScheduler();
 
-		var times = [0,1,2,4,5,6,8,9];
-		var s = makeStreamFromTimes(times, 9, scheduler);
+		var s1 = constant(1, periodic(30));
+		var s2 = delay(10, constant(0, periodic(30)));
 
-		var result = reduce(function(a, x) {
-			return a.concat(x);
-		}, [], timed.debounce(1, s))
-			.then(function(a) {
-				expect(a).toEqual([2,6]);
-			});
+		// s: 10-10-10-10->
 
-		scheduler.tick(9, 1);
-		return result;
+		var s = take(5, limit.debounce(15, merge(s1, s2)));
+
+		return observe(function(x) {
+			expect(x).toBe(0);
+		}, s);
 	});
 });
 
