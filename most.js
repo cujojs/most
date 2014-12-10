@@ -8,6 +8,8 @@ var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
 
+exports.Stream = Stream;
+
 // Add of and empty to constructor for fantasy-land compat
 exports.of       = Stream.of    = core.of;
 exports.empty    = Stream.empty = core.empty;
@@ -154,7 +156,7 @@ Stream.prototype.tap = function(f) {
 
 var join = require('./lib/combinator/join');
 
-exports.flatMap = join.flatMap;
+exports.flatMap = exports.chain = join.flatMap;
 exports.join    = join.join;
 
 Stream.prototype.join = function() {
