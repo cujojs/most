@@ -280,6 +280,7 @@ var timeslice = require('./lib/combinator/timeslice');
 
 exports.takeUntil = timeslice.takeUntil;
 exports.skipUntil = timeslice.skipUntil;
+exports.timeslice = timeslice.timeslice;
 
 Stream.prototype.takeUntil = function(signal) {
 	return timeslice.takeUntil(signal, this);
@@ -287,6 +288,10 @@ Stream.prototype.takeUntil = function(signal) {
 
 Stream.prototype.skipUntil = function(signal) {
 	return timeslice.skipUntil(signal, this);
+};
+
+Stream.prototype.timeslice = function(min, max) {
+	return timeslice.timeslice(min, max, this);
 };
 
 //-----------------------------------------------------------------------
@@ -298,6 +303,17 @@ exports.delay = delay;
 
 Stream.prototype.delay = function(dt) {
 	return delay(dt, this);
+};
+
+//-----------------------------------------------------------------------
+// Getting event timestamp
+
+var timestamp = require('./lib/combinator/timestamp').timestamp;
+
+exports.timestamp = timestamp;
+
+Stream.prototype.timestamp = function() {
+	return timestamp(this);
 };
 
 //-----------------------------------------------------------------------
