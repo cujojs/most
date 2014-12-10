@@ -1,21 +1,13 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var timed = require('../lib/combinators/timed');
-var filter = require('../lib/combinators/filter');
-var reduce = require('../lib/combinators/reduce').reduce;
+var delay = require('../lib/combinator/delay');
+var filter = require('../lib/combinator/filter');
+var reduce = require('../lib/combinator/accumulate').reduce;
+var flatMap = require('../lib/combinator/join').flatMap;
 var Stream = require('../lib/Stream');
-var flatMap = require('../lib/combinators/transform').flatMap;
-
-var step = require('../lib/step');
-var Yield = step.Yield;
-var End = step.End;
 
 var take = filter.take;
-
-var streamHelper = require('./helper/stream-helper');
-var makeStreamFromTimes = streamHelper.makeStreamFromTimes;
-var createTestScheduler = streamHelper.createTestScheduler;
 
 var sentinel = { value: 'sentinel' };
 
@@ -23,7 +15,7 @@ function identity(x) {
 	return x;
 }
 
-describe('delay', function() {
+describe('//delay', function() {
 	it('should delay events by delayTime', function() {
 		var scheduler = createTestScheduler();
 
@@ -42,7 +34,7 @@ describe('delay', function() {
 	});
 });
 
-describe('periodic', function() {
+describe('//periodic', function() {
 	it('should emit events at tick periods', function() {
 		var scheduler = createTestScheduler();
 
@@ -59,7 +51,7 @@ describe('periodic', function() {
 	});
 });
 
-describe('debounce', function() {
+describe('//debounce', function() {
 	describe('when events always occur less frequently than debounce period', function() {
 		it('should be identity', function() {
 			var scheduler = createTestScheduler();
@@ -116,7 +108,7 @@ describe('debounce', function() {
 	});
 });
 
-describe('throttle', function() {
+describe('//throttle', function() {
 	it('should exclude items that are too frequent', function() {
 		var scheduler = createTestScheduler();
 
