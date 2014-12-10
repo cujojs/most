@@ -18,6 +18,37 @@ for(var i = 0; i< a.length; ++i) {
 
 console.log('ready: ' + n);
 
+timeMost()
+	.then(timeLodash)
+	.then(timeArray)
+	.then(timeKefir)
+	.then(timeRx)
+	.then(timeBacon);
+
+function runArray(a) {
+	return a.filter(even).map(add1).reduce(sum, 0);
+}
+
+function runLodash(a) {
+	return lodash(a).filter(even).map(add1).reduce(sum, 0);
+}
+
+function runMost(a) {
+	return most.from(a).filter(even).map(add1).reduce(sum, 0);
+}
+
+function runRx(a) {
+	return rx.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0);
+}
+
+function runBacon(a) {
+	return bacon.fromArray(a).filter(even).map(add1).reduce(0, sum);
+}
+
+function runKefir(a) {
+	return kefirFromArray(a).filter(even).map(add1).reduce(sum, 0);
+}
+
 function timeRx () {
 	return new Promise(function (resolve, reject) {
 		runRx(a).subscribe({
@@ -83,6 +114,15 @@ function timeKefir() {
 	});
 }
 
+function kefirFromArray(array) {
+	return kefir.fromBinder(function(emitter) {
+		for(var i=0; i<array.length; ++i) {
+			emitter.emit(array[i]);
+		}
+		emitter.end();
+	});
+}
+
 function timeMost () {
 	return runMost(a).then(function() {
 		var start = Date.now();
@@ -106,81 +146,12 @@ function timeLodash() {
 	console.log('Lodash', Date.now() - start, z);
 }
 
-
-//timeMost(); // or
-//timeRx(); // or
-//timeBacon();
-timeMost()
-//timeArray()
-//timeMost()
-		.then(timeLodash)
-		//.then(timeArray)
-		.then(timeKefir)
-		.then(timeRx)
-		.then(timeBacon);
-
-function runArray(a) {
-	//return Promise.resolve(a.filter(even).map(add1).reduce(sum, 0));
-	return a.filter(even).map(add1).reduce(sum, 0);
-}
-
-function runLodash(a) {
-	//return Promise.resolve(lodash.reduce(lodash.map(lodash.filter(a, even), add1), sum, 0));
-	//return Promise.resolve(lodash(a).filter(even).map(add1).reduce(sum, 0));
-	return lodash(a).filter(even).map(add1).reduce(sum, 0);
-}
-
-function runMost(a) {
-	return most.from(a).filter(even).map(add1).reduce(sum, 0);
-	//return most2.from(a).flatMap(add1s(most.of)).filter(even).map(add1).reduce(sum, 0);
-}
-
-function runRx(a) {
-	return rx.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0);
-	//return rx.Observable.fromArray(a).filter(even).flatMap(add1s(rx.Observable.of)).reduce(sum, 0);
-	//return rx.Observable.fromArray(a).flatMap(add1s(rx.Observable.of)).filter(even).map(add1).reduce(sum, 0);
-}
-
-function runBacon(a) {
-	return bacon.fromArray(a).filter(even).map(add1).reduce(0, sum);
-	//return bacon.fromArray(a).filter(even).flatMap(add1s(bacon.once)).reduce(0, sum);
-	//return bacon.fromArray(a).flatMap(add1s(bacon.once)).filter(even).map(add1).reduce(0, sum);
-}
-
-function runKefir(a) {
-	return kefirFromArray(a).filter(even).map(add1).reduce(sum, 0);
-	//return kefirFromArray(a).filter(even).flatMap(add1s(kefirOf)).reduce(sum, 0);
-	//return kefirFromArray(a).flatMap(add1s(kefirOf)).filter(even).map(add1).reduce(0, sum);
-}
-
-function kefirOf(x) {
-	return kefir.fromBinder(function(emitter) {
-		emitter.emit(x);
-		emitter.end();
-	});
-}
-
-function kefirFromArray(array) {
-	return kefir.fromBinder(function(emitter) {
-		for(var i=0; i<array.length; ++i) {
-			emitter.emit(array[i]);
-		}
-		emitter.end();
-	});
-}
-
 function sum(x, y) {
 	return x + y;
 }
 
 function add1(x) {
 	return x + 1;
-}
-
-function add1s(of) {
-	return function(x) {
-		return of(add1(x));
-	}
 }
 
 function even(x) {
