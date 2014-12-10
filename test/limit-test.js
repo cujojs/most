@@ -1,55 +1,13 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var delay = require('../lib/combinator/delay');
-var filter = require('../lib/combinator/filter');
+var limit = require('../lib/combinator/limit');
 var reduce = require('../lib/combinator/accumulate').reduce;
-var flatMap = require('../lib/combinator/join').flatMap;
-var Stream = require('../lib/Stream');
-
-var take = filter.take;
+var observe = require('../lib/combinator/observe').observe;
+var fromArray = require('../lib/source/fromArray').fromArray;
 
 var sentinel = { value: 'sentinel' };
-
-function identity(x) {
-	return x;
-}
-
-describe('//delay', function() {
-	it('should delay events by delayTime', function() {
-		var scheduler = createTestScheduler();
-
-		var dt = 100;
-
-		var s = new Stream(identity, new Yield(0, sentinel, new End(0)), scheduler);
-		s = timed.delay(dt, s);
-		var result = s.step(s.state).then(function(iteration) {
-			expect(iteration.value).toBe(sentinel);
-			expect(iteration.time).toBe(dt);
-			expect(scheduler.now()).toBe(dt);
-		});
-
-		scheduler.tick(100);
-		return result;
-	});
-});
-
-describe('//periodic', function() {
-	it('should emit events at tick periods', function() {
-		var scheduler = createTestScheduler();
-
-		var count = 5;
-		var result = reduce(function(c) {
-			return c - 1;
-		}, count, filter.take(count, timed.periodicOn(scheduler, 1)))
-			.then(function(count) {
-				expect(count).toBe(0);
-			});
-
-		scheduler.tick(10, 1);
-		return result;
-	});
-});
+var other = { value: 'other' };
 
 describe('//debounce', function() {
 	describe('when events always occur less frequently than debounce period', function() {
@@ -79,8 +37,8 @@ describe('//debounce', function() {
 			var s = makeStreamFromTimes(times, 6, scheduler);
 
 			var result = reduce(function(count) {
-					return count + 1;
-				}, 0, timed.debounce(1, s))
+				return count + 1;
+			}, 0, timed.debounce(1, s))
 				.then(function(count) {
 					expect(count).toBe(0);
 				});
@@ -115,8 +73,8 @@ describe('//throttle', function() {
 		var s = timed.throttleOn(scheduler, 1, take(5, timed.periodicOn(scheduler, 1)));
 
 		var result = reduce(function(a, x) {
-				return a.concat(x);
-			}, [], s)
+			return a.concat(x);
+		}, [], s)
 			.then(function(x) {
 				expect(x).toEqual([0,2,4]);
 			});
@@ -135,8 +93,8 @@ describe('//throttle', function() {
 		]);
 
 		var result = reduce(function(r, x) {
-				return r+x;
-			}, '', timed.throttle(1, flatMap(identity, s)))
+			return r+x;
+		}, '', timed.throttle(1, flatMap(identity, s)))
 			.then(function(r) {
 				expect(r).toBe('ab');
 			});

@@ -19,10 +19,6 @@ var never = core.never;
 
 var sentinel = { value: 'sentinel' };
 
-function identity(x) {
-	return x;
-}
-
 describe('flatMap', function() {
 
 	it('should satisfy associativity', function() {
