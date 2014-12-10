@@ -3,6 +3,10 @@ var CompoundDisposable = require('../../lib/disposable/CompoundDisposable');
 
 module.exports = FakeDisposeSource;
 
+FakeDisposeSource.from = function(dispose, stream) {
+	return new FakeDisposeSource(dispose, stream.source);
+}
+
 function FakeDisposeSource(dispose, source) {
 	this.source = source;
 	this.disposable = new Disposable(dispose);
