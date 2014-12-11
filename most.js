@@ -469,7 +469,6 @@ Stream.prototype.skipUntil = function(signal) {
  * @returns {Stream} new stream containing only events that occur at or after
  * the first event in min and before the first event in max
  */
-
 Stream.prototype.timeslice = function(min, max) {
 	return timeslice.timeslice(min, max, this);
 };
