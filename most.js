@@ -117,9 +117,6 @@ Stream.prototype.scan = function(f, initial) {
  * Reduce the stream to produce a single result.  Note that reducing an infinite
  * stream will return a Promise that never fulfills, but that may reject if an error
  * occurs.
- * If the initial value is not provided, the first item in the stream will be
- * used--note that the stream *must not* be empty.  If the stream *is* empty
- * and no initial value is provided, returns a rejected promise.
  * @param {function(result:*, x:*):*} f reducer function
  * @param {*} initial optional initial value
  * @returns {Promise} promise for the file result of the reduce
