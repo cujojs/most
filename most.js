@@ -265,7 +265,7 @@ exports.merge = merge.merge;
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-Stream.prototype.merge = function(stream) {
+Stream.prototype.merge = function(/*...streams*/) {
 	return merge.mergeArray(base.cons(this, arguments));
 };
 
