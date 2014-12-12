@@ -4,10 +4,12 @@ var expect = require('buster').expect;
 var timeslice = require('../lib/combinator/timeslice');
 var take = require('../lib/combinator/slice').take;
 var periodic = require('../lib/source/periodic').periodic;
-var streamOf = require('../lib/source/core').of;
+var core = require('../lib/source/core');
+var streamOf = core.of;
+var never = core.never;
 var delay = require('../lib/combinator/delay').delay;
 var reduce = require('../lib/combinator/accumulate').reduce;
-var observe = require('../lib/combinator/observe').observe;
+var drain = require('../lib/combinator/observe').drain;
 var Stream = require('../lib/Stream');
 
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
@@ -87,6 +89,18 @@ describe('takeUntil', function() {
 		}, 0, timeslice.takeUntil(signal, stream))
 			.then(function(count) {
 				expect(count).toBe(3);
+				expect(dispose).toHaveBeenCalledOnce();
+			});
+
+	});
+
+	it('should end immediately on signal', function() {
+		var dispose = this.spy();
+		var stream = new Stream(FakeDisposeSource.from(dispose, never()));
+		var signal = streamOf();
+
+		return drain(timeslice.takeUntil(signal, stream))
+			.then(function(count) {
 				expect(dispose).toHaveBeenCalledOnce();
 			});
 
