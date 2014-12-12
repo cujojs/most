@@ -38,7 +38,7 @@ most.js API
 	* [distinctBy](#distinctby)
 1. Consuming streams
 	* [reduce](#reduce)
-	* [forEach](#foreach)
+	* [observe](#observe), alias [forEach](#observe)
 	* [drain](#drain)
 1. Combining streams
 	* [merge](#merge)
@@ -717,14 +717,14 @@ The reduce function (`f` above)
 
 *TODO: Example*
 
-### forEach
+### observe
 
-Alias: **observe**
+Alias: **forEach**
 
-####`stream.forEach(f) -> Promise`
 ####`stream.observe(f) -> Promise`
-####`most.forEach(f, stream) -> Promise`
+####`stream.forEach(f) -> Promise`
 ####`most.observe(f, stream) -> Promise`
+####`most.forEach(f, stream) -> Promise`
 
 Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
 
@@ -732,7 +732,7 @@ Start consuming events from `stream`, processing each with `f`.  The returned pr
 // Log mouse movements until the user clicks, then stop.
 most.fromEvent('mousemove', document)
 	.takeUntil(most.fromEvent('click', document))
-	.forEach(console.log.bind(console));
+	.observe(console.log.bind(console))
 	.then(function() {
 		console.log('All done');
 	});
@@ -743,7 +743,7 @@ most.fromEvent('mousemove', document)
 ####`stream.drain() -> Promise`
 ####`most.drain(stream) -> Promise`
 
-Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#foreach) to consume *and process* terminal events.
+Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
 The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
 
