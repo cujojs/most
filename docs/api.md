@@ -316,6 +316,8 @@ function publisher(add:function(x:*), end:function(x:*), error:function(e:Error)
 
 The publisher function receives 3 functions as arguments, which it can use to publish events, end the stream, or signal an error.  It may return a *dispose* function.  The dispose function will be called once all consumers have lost interest in the stream, and should free any resources held by the publisher.
 
+Note that the publisher will not be called until there is *demand* for the stream's events.  Specifically, the publisher will be called when the number of observers goes from zero to one.  Likewise, the *dispose* function will be called when the number of observers again returns to zero.  The publisher would then be called again if the number of observers subsequently goes from zero to one, and so on.
+
 #### add, end, and error
 The publisher function can use `add`, `end`, and `error`:
 
