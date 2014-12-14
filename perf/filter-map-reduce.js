@@ -3,6 +3,7 @@ var rx = require('rx');
 var bacon = require('baconjs');
 var kefir = require('kefir');
 var lodash = require('lodash');
+var highland = require('highland');
 var Promise = require('when/lib/Promise');
 
 rx.config.Promise = Promise; // ensure rx uses the same Promise
@@ -22,6 +23,7 @@ timeMost()
 	.then(timeLodash)
 	.then(timeArray)
 	.then(timeKefir)
+	.then(timeHighland)
 	.then(timeRx)
 	.then(timeBacon);
 
@@ -31,6 +33,10 @@ function runArray(a) {
 
 function runLodash(a) {
 	return lodash(a).filter(even).map(add1).reduce(sum, 0);
+}
+
+function runHighland(a) {
+	return highland(a).filter(even).map(add1).reduce(0, sum);
 }
 
 function runMost(a) {
@@ -144,6 +150,28 @@ function timeLodash() {
 	var start = Date.now();
 	var z = runLodash(a);
 	console.log('Lodash', Date.now() - start, z);
+}
+
+function timeHighland() {
+	return new Promise(function(resolve, reject) {
+		runHighland(a).pull(function(err) {
+			if(err) {
+				reject(err);
+				return;
+			}
+
+			var start = Date.now();
+			runHighland(a).pull(function(err, z) {
+				if(err) {
+					reject(err);
+					return;
+				}
+
+				console.log('highland', Date.now() - start, z);
+				resolve(z);
+			});
+		});
+	});
 }
 
 function sum(x, y) {

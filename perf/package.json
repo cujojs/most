@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "baconjs": "^0.7.37",
+    "highland": "^2.2.0",
     "kefir": "^0.4.1",
     "lodash": "^2.4.1",
     "rx": "^2.3.20"

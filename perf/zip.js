@@ -3,6 +3,7 @@ var rx = require('rx');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
+var highland = require('highland');
 var Promise = require('when/lib/Promise');
 
 rx.config.Promise = Promise; // ensure rx uses the same Promise
@@ -20,12 +21,12 @@ for(var i = 0; i<n; ++i) {
 
 console.log('ready: ' + n + ' x 2');
 
-//timeRx()
 timeMost()
 	.then(timeLodash)
 	.then(timeKefir)
 	.then(timeRx)
-	.then(timeBacon);
+	.then(timeBacon)
+	.then(timeHighland);
 
 function timeMost() {
 	return runMost(a, b).then(function() {
@@ -49,12 +50,38 @@ function timeLodash() {
 
 function runLodash(a, b) {
 	var pairs = lodash.zip(a, b);
-	var added = lodash.map(pairs, lodashAddPair);
+	var added = lodash.map(pairs, addPair);
 	return lodash.reduce(added, add, 0);
 }
 
-function lodashAddPair(pair) {
+function addPair(pair) {
 	return pair[0] + pair[1];
+}
+
+function timeHighland() {
+	return new Promise(function(resolve, reject) {
+		runHighland(a).pull(function(err) {
+			if(err) {
+				reject(err);
+				return;
+			}
+
+			var start = Date.now();
+			runHighland(a).pull(function(err, z) {
+				if(err) {
+					reject(err);
+					return;
+				}
+
+				console.log('highland', Date.now() - start, z);
+				resolve(z);
+			});
+		});
+	});
+}
+
+function runHighland(a) {
+	return highland(a).zip(highland(b)).map(addPair).reduce(0, add);
 }
 
 function timeRx () {
