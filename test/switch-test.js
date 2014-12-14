@@ -1,22 +1,19 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var switchLatest = require('../lib/combinators/switch').switch;
+var switchLatest = require('../lib/combinator/switch').switch;
+var reduce = require('../lib/combinator/accumulate').reduce;
+var observe = require('../lib/combinator/observe').observe;
+var take = require('../lib/combinator/slice').take;
+var repeat = require('../lib/combinator/build').repeat;
+var transform = require('../lib/combinator/transform');
+var periodic = require('../lib/source/periodic').periodic;
+var fromArray = require('../lib/source/fromArray').fromArray;
+var core = require('../lib/source/core');
 var Stream = require('../lib/Stream');
-var reduce = require('../lib/combinators/reduce').reduce;
-var observe = require('../lib/combinators/observe').observe;
-var sync = require('../lib/combinators/timed').sync;
 
-var step = require('../lib/step');
-var Yield = step.Yield;
-var End = step.End;
-
-var streamHelper = require('./helper/stream-helper');
-var createTestScheduler = streamHelper.createTestScheduler;
-
-function identity(x) {
-	return x;
-}
+var constant = transform.constant;
+var map = transform.map;
 
 function sequenceEqual(array, stream) {
 	return reduce(function(a, x) {
@@ -31,7 +28,7 @@ describe('switch', function() {
 	describe('when input is empty', function() {
 		it('should return empty', function() {
 			var spy = this.spy();
-			return observe(spy, switchLatest(new Stream(identity, new End(0))))
+			return observe(spy, switchLatest(core.empty()))
 				.then(function() {
 					expect(spy).not.toHaveBeenCalled();
 				});
@@ -41,7 +38,7 @@ describe('switch', function() {
 	describe('when input contains a single stream', function() {
 		it('should return an equivalent stream', function() {
 			var expected = [1, 2, 3];
-			var s = Stream.of(Stream.from(expected));
+			var s = core.of(fromArray(expected));
 
 			return sequenceEqual(expected, switchLatest(s));
 		});
@@ -51,9 +48,9 @@ describe('switch', function() {
 		describe('and all items are instantaneous', function() {
 			it('should be equivalent to the last inner stream', function() {
 				var expected = [1, 2, 3];
-				var s = Stream.from([
-					Stream.from([4, 5, 6]),
-					Stream.from(expected)
+				var s = fromArray([
+					fromArray([4, 5, 6]),
+					fromArray(expected)
 				]);
 
 				return sequenceEqual(expected, switchLatest(s));
@@ -61,24 +58,12 @@ describe('switch', function() {
 		});
 
 		it('should switch when new stream arrives', function() {
-			var scheduler = createTestScheduler();
-			var times = [[0,1,3], [2,3,5], [4,5,6]];
+			var i = 0;
+			var s = map(function() {
+				return constant(++i, periodic(10));
+			}, periodic(25));
 
-			var steps = times.reduceRight(function(step, ts, i) {
-				var innerSteps = ts.reduceRight(function(s, t) {
-					return new Yield(t, i, s);
-				}, new End(ts[ts.length-1] + 1));
-
-				var s = sync(new Stream(identity, innerSteps, scheduler));
-				return new Yield(ts[0], s, step);
-			}, new End(7));
-
-			var s = sync(new Stream(identity, steps, scheduler));
-
-			var result = sequenceEqual([0,0,1,1,2,2,2], switchLatest(s));
-
-			scheduler.tick(8, 1);
-			return result;
+			return sequenceEqual([1,1,1,2,2,2,3,3,3,4], take(10, switchLatest(s)));
 		});
 	});
 });

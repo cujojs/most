@@ -1,7 +1,7 @@
 {
 	"browser": true,
 	"node": true,
-
+	"predef": [ "-Promise" ],
 	"boss": true,
 	"curly": true,
 	"eqnull": true,

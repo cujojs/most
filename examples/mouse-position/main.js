@@ -10,7 +10,7 @@ module.exports = function run() {
 			return e.clientX + ',' + e.clientY;
 		})
 		.startWith('move the mouse, please')
-		.forEach(function(s) {
-			document.body.innerHTML = s;
+		.observe(function(s) {
+			document.body.textContent = s;
 		});
 };

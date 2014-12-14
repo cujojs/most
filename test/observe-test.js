@@ -1,48 +1,61 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var observe = require('../lib/combinators/observe');
+var observe = require('../lib/combinator/observe');
+var iterate = require('../lib/combinator/build').iterate;
+var take = require('../lib/combinator/slice').take;
 var Stream = require('../lib/Stream');
-var makeStreamFromTimes = require('./helper/stream-helper').makeStreamFromTimes;
+var streamOf = require('../lib/source/core').of;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
-
-function identity(x) {
-	return x;
-}
 
 describe('observe', function() {
 
 	it('should call callback and return a promise', function() {
 		var spy = this.spy();
 
-		return observe.observe(spy, Stream.of(sentinel))
+		return observe.observe(spy, streamOf(sentinel))
 			.then(function() {
 				expect(spy).toHaveBeenCalledWith(sentinel);
 			});
 	});
 
-	it('should return a promise for the end signal value', function() {
-		var s = new Stream(identity, new Stream.End(0, sentinel));
-		return observe.observe(function() {}, s)
-			.then(function(x) {
-				expect(x).toBe(sentinel);
-			});
-	});
-
 	it('should call callback with expected values until end', function() {
 
-		var values = [0,1,2,3,4];
-		var s = makeStreamFromTimes(values, 5);
+		var n = 5;
+		var s = take(n, iterate(function(x) {
+			return x+1;
+		}, 0));
 
+		var y = 0;
 		var spy = this.spy(function(x) {
-			expect(x).toBe(values.shift());
+			expect(x).toBe(y++);
 		});
 
 		return observe.observe(spy, s)
 			.then(function() {
-				expect(values.length).toBe(0);
+				expect(y).toBe(n);
+			});
+	});
+
+});
+
+describe('drain', function() {
+
+	it('should drain all events', function() {
+
+		var n = 5;
+		var s = take(n, iterate(function(x) {
+			n -= 1;
+			return x+1;
+		}, 0));
+
+		n -= 1; // The initial value is emitted without calling the iterator function
+
+		return observe.drain(s)
+			.then(function() {
+				expect(n).toBe(0);
 			});
 	});
 
