@@ -1,17 +1,21 @@
 var expect = require('buster').expect;
 
-var observe = require('../../lib/combinator/observe').observe;
+var reduce = require('../../lib/combinator/accumulate').reduce;
 var Promise = require('../../lib/Promise');
 
 exports.assertSame = assertSame;
 
-function assertSame(p1, p2) {
-	return new Promise(function(resolve, reject) {
-		observe(function(x) {
-			observe(function(y) {
-				expect(x).toBe(y);
-				resolve();
-			}, p2).catch(reject);
-		}, p1);
-	});
+function assertSame(s1, s2) {
+	return Promise.all([toArray(s1), toArray(s2)]).then(arrayEquals);
+}
+
+function toArray(s) {
+	return reduce(function(a, x) {
+		a.push(x);
+		return a;
+	}, [], s);
+}
+
+function arrayEquals(ss) {
+	expect(ss[0]).toEqual(ss[1]);
 }
