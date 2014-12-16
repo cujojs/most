@@ -222,18 +222,18 @@ exports.join    = join.join;
 
 /**
  * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
- * streams to the outer.  Event arrival times are preserved.
- * @returns {Stream}
+ * streams to the outer. Event arrival times are preserved.
+ * @returns {Stream<X>} new stream containing all events of all inner streams
  */
 Stream.prototype.join = function() {
 	return join.join(this);
 };
 
 /**
- * Map each value in the stream to a new stream, and emit its values
- * into the returned stream.
+ * Map each value in the stream to a new stream, and merge it into the
+ * returned outer stream. Event arrival times are preserved.
  * @param {function(x:*):Stream} f chaining function, must return a Stream
- * @returns {Stream} new stream containing all items from each stream returned by f
+ * @returns {Stream} new stream containing all events from each stream returned by f
  */
 Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
 	return join.flatMap(f, this);
