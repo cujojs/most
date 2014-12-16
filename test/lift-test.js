@@ -2,7 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var lift = require('../lib/combinator/lift').lift;
-var repeat = require('../lib/combinator/build').repeat;
+var repeat = require('../lib/source/iterate').repeat;
 var observe = require('../lib/combinator/observe').observe;
 var streamOf = require('../lib/source/core').of;
 

@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var iterate = require('../lib/combinator/build').iterate;
+var iterate = require('../lib/source/iterate').iterate;
 var take = require('../lib/combinator/slice').take;
 var zip = require('../lib/combinator/zip').zip;
 var delay = require('../lib/combinator/delay').delay;

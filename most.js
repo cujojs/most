@@ -128,11 +128,13 @@ Stream.prototype.reduce = function(f, initial) {
 //-----------------------------------------------------------------------
 // Building and extending
 
+var unfold = require('./lib/source/unfold');
+var iterate = require('./lib/source/iterate');
 var build = require('./lib/combinator/build');
 
-exports.iterate   = build.iterate;
-exports.unfold    = build.unfold;
-exports.repeat    = build.repeat;
+exports.unfold    = unfold.unfold;
+exports.iterate   = iterate.iterate;
+exports.repeat    = iterate.repeat;
 exports.concat    = build.cycle;
 exports.concat    = build.concat;
 exports.startWith = build.cons;
@@ -155,7 +157,7 @@ Stream.prototype.concat = function(tail) {
 };
 
 /**
- * @param {*} x item to prepend
+ * @param {*} x value to prepend
  * @returns {Stream} a new stream with x prepended
  */
 Stream.prototype.startWith = function(x) {

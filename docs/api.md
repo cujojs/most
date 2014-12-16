@@ -216,11 +216,46 @@ most.iterate(function(x) {
 }, 0);
 ```
 
+The iterating function may return a promise.  This allows `most.iterate` to be used to build asynchronous streams of future values.  For example:
+
+```js
+var when = require('when');
+// An infinite stream of all integers >= 0, each delayed by 1 more
+// millisecond than the previous.
+// IOW, a stream that decelerates as it produces values:
+// 0 (immediately)
+// 1 (1 millisecond after 0)
+// 2 (2 millisecond after 1)
+// 3 (3 millisecond after 2)
+// ... etc
+most.iterate(function(x) {
+	var y = x + 1;
+	return when(y).delay(y);
+}, 0);
+```
+
 ### most.unfold
 
-####`most.unfold(f, initial) -> Stream`
+####`most.unfold(f, seed) -> Stream`
 
-Build an infinite stream by computing successive items.  This operates a lower level than [most.iterate](#mostiterate), allowing you to explicitly set event timestamps, and to explicitly end the stream.
+Build a stream by computing successive items using a seed value.
+
+The unfolding function accepts a seed value and must return a tuple: `{value:*, seed:*, done:boolean}`.  It may return a promise for a tuple.  This allows `most.unfold` to be used to build asynchronous streams of future values.
+
+The unfold will stop when the unfolding function returns a tuple with `tuple.done == true`, or will produce an infinite stream by never returning a tuple with `tuple.done == true`.
+
+```js
+var rest = require('rest');
+var urlPrefix = 'product/';
+
+// Unfold an infinite stream of products, producing a stream of:
+// [rest('product/1'), rest('product/2'), rest('product/3'), ...]
+most.unfold(function(id) {
+	return rest(urlPrefix + id).then(function(content) {
+		return { value: content, seed: id + 1 };
+	});
+}, 1);
+```
 
 ### most.fromEvent
 

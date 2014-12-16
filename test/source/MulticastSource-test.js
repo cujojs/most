@@ -3,7 +3,7 @@ var expect = require('buster').expect;
 
 var MulticastSource = require('../../lib/source/MulticastSource');
 var streamOf = require('../../lib/source/core').of;
-var repeat = require('../../lib/combinator/build').repeat;
+var repeat = require('../../lib/source/iterate').repeat;
 var take = require('../../lib/combinator/slice').take;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;
