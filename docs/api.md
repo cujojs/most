@@ -26,16 +26,23 @@ most.js API
 	* [map](#map)
 	* [constant](#constant)
 	* [scan](#scan)
-	* [tap](#tap)
 	* [flatMap](#flatmap)
 	* [ap](#ap)
+	* [timestamp](#timestamp)
+	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
-	* [take](#take)
-	* [takeWhile](#takewhile)
-	* [takeUntil](#takeuntil)
 	* [distinct](#distinct)
 	* [distinctBy](#distinctby)
+1. Slicing streams
+	* [slice](#slice)
+	* [take](#take)
+	* [skip](#skip)
+	* [takeWhile](#takewhile)
+	* [skipWhile](#skipwhile)
+	* [timeslice](#timeslice)
+	* [takeUntil](#takeuntil)
+	* [skipUntil](#skipuntil)
 1. Consuming streams
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
@@ -555,21 +562,6 @@ numbers.scan(function(slidingWindow, x) {
 }, [])
 	.forEach(console.log.bind(console));
 ```
-
-### tap
-
-####`stream.tap(f) -> Stream`
-####`most.tap(f, stream) -> Stream`
-
-Perform a side-effect for each event in `stream`.
-
-```
-stream:        -a-b-c-d->
-stream.tap(f): -a-b-c-d->
-```
-
-For each event in `stream`, `f` is called, but the value of its result is ignored.  However, `f` may return a promise to delay subsequent events.  If `f` fails (ie throws), then the returned stream will also fail.  The stream returned by `tap` will contain the same events as the original stream (although they may be delayed when `f` returns promises).
-
 ### flatMap
 
 ####`stream.flatMap(f) -> Stream`
@@ -603,6 +595,39 @@ streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
 
 This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
 
+### timestamp
+
+####`stream.timestamp() -> Stream`
+####`most.timestamp(stream) -> Stream`
+
+Materialize event timestamps, transforming `Stream<X>` into `Stream<{ time:number, value:X }>`
+
+```
+// Logs
+// { time: 1418740004085, value: 'hello' }
+// { time: 1418740005085, value: 'hello' }
+// { time: 1418740006085, value: 'hello' }
+// { time: 1418740007085, value: 'hello' }
+// ... etc
+most.periodic(1000).constant('hello')
+	.timestamp()
+	.observe(console.log.bind(console));
+```
+
+### tap
+
+####`stream.tap(f) -> Stream`
+####`most.tap(f, stream) -> Stream`
+
+Perform a side-effect for each event in `stream`.
+
+```
+stream:        -a-b-c-d->
+stream.tap(f): -a-b-c-d->
+```
+
+For each event in `stream`, `f` is called, but the value of its result is ignored. If `f` fails (ie throws), then the returned stream will also fail.  The stream returned by `tap` will contain the same events as the original stream.
+
 ## Filtering streams
 
 ### filter
@@ -615,58 +640,6 @@ Create a stream containing only events for which `predicate` returns truthy.
 ```
 stream:              -1-2-3-4->
 stream.filter(even): ---2---4->
-```
-
-### take
-
-####`stream.take(n) -> Stream`
-####`most.take(n, stream) -> Stream`
-
-Create a new stream containing at most `n` events from `stream`.
-
-```
-stream:         -a-b-c-d-e-f->
-stream.take(3): -a-b-c|
-
-stream:         -a-b|
-stream.take(3): -a-b|
-```
-
-If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream`.
-
-### takeWhile
-
-####`stream.takeWhile(predicate) -> Stream`
-####`most.takeWhile(predicate, stream) -> Stream`
-
-Create a new stream containing all events until `predicate` returns false.
-
-```
-stream:                 -2-4-5-6-8->
-stream.takeWhile(even): -2-4-|
-```
-
-### takeUntil
-
-####`stream.takeUntil(signalStream) -> Stream`
-####`most.takeUntil(signalStream, stream) -> Stream`
-
-Create a new stream containing all events until `signalStream` emits an event.
-
-```
-stream:                         -a-b-c-d-e-f->
-signalStream:                   ------z->
-stream.takeUntil(signalStream): -a-b-c|
-```
-
-If `signalStream` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
-
-```js
-// Log mouse events until the user clicks. Note that DOM event handlers will
-// automatically be unregistered.
-most.fromEvent('mousemove', document)
-	.takeUntil(most.fromEvent('click', document)
-	.forEach(console.log.bind(console));
 ```
 
 ### distinct
@@ -698,6 +671,155 @@ stream.distinctBy(equalsIgnoreCase): -a-b---c-D---e->
 The `equals` function should accept two values and return truthy if the two values are equal, or falsy if they are not equal.
 
 `function equals(a, b) -> boolean`
+
+## Slicing streams
+
+### slice
+
+####`stream.slice(start, end) -> Stream`
+####`most.slice(start, end, stream) -> Stream`
+
+Create a new stream containing only events where `start <= index < end`, where `index` is the ordinal index of an event in `stream`.
+
+```
+stream:             -a-b-c-d-e-f->
+stream.slice(1, 4): ---b-c-d|
+
+stream:             -a-b-c|
+stream.slice(1, 4): ---b-c|
+```
+
+If stream contains fewer than `start` events, the returned stream will be empty.
+
+### take
+
+####`stream.take(n) -> Stream`
+####`most.take(n, stream) -> Stream`
+
+Create a new stream containing at most `n` events from `stream`.
+
+```
+stream:         -a-b-c-d-e-f->
+stream.take(3): -a-b-c|
+
+stream:         -a-b|
+stream.take(3): -a-b|
+```
+
+If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream`.
+
+### skip
+
+####`stream.skip(n) -> Stream`
+####`most.skip(n, stream) -> Stream`
+
+Create a new stream that omits the first `n` events from `stream`.
+
+```
+stream:         -a-b-c-d-e-f->
+stream.skip(3): -------d-e-f->
+
+stream:         -a-b-c-d-e|
+stream.skip(3): -------d-e|
+
+stream:         -a-b-c|
+stream.skip(3): ------|
+```
+
+If `stream` contains fewer than `n` events, the returned stream will be empty.
+
+### takeWhile
+
+####`stream.takeWhile(predicate) -> Stream`
+####`most.takeWhile(predicate, stream) -> Stream`
+
+Create a new stream containing all events until `predicate` returns false.
+
+```
+stream:                 -2-4-5-6-8->
+stream.takeWhile(even): -2-4-|
+```
+
+### skipWhile
+
+####`stream.takeWhile(predicate) -> Stream`
+####`most.takeWhile(predicate, stream) -> Stream`
+
+Create a new stream containing all events after `predicate` returns false.
+
+```
+stream:                 -2-4-5-6-8->
+stream.skipWhile(even): -----5-6-8->
+```
+
+### timeslice
+
+####`stream.timeslice(startSignal, endSignal)`
+####`most.timeslice(startSignal, endSignal, stream)`
+
+Create a new stream containing only events that occur at or after the time of the first event of `startSignal` and before the time of the first event of `endSignal`.
+
+```
+stream:                                   -a-b-c-d-e-f-g->
+startSignal:                              -----t
+endSignal:                                -----------u
+stream.timeslice(startSignal, endSignal): -----c-d-e-|
+```
+
+This is similar to [slice](#slice), but based on times, represented by `startSignal` and `endSignal`, rather than on indexes.  The event values of `startSignal` and `endSignal` aren't used, only the time of the first event in each is used.
+
+```js
+// Log mouse events until the user clicks. Note that DOM event handlers will
+// automatically be unregistered.
+most.fromEvent('mousemove', document)
+	.timeslice(most.of().delay(1000), most.of().delay(5000))
+	.forEach(console.log.bind(console));
+```
+
+### takeUntil
+
+####`stream.takeUntil(endSignal) -> Stream`
+####`most.takeUntil(endSignal, stream) -> Stream`
+
+Create a new stream containing all events until `endSignal` emits an event.
+
+```
+stream:                      -a-b-c-d-e-f->
+endSignal:                   ------z->
+stream.takeUntil(endSignal): -a-b-c|
+```
+
+If `endSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+
+```js
+// Log mouse events until the user clicks. Note that DOM event handlers will
+// automatically be unregistered.
+most.fromEvent('mousemove', document)
+	.takeUntil(most.fromEvent('click', document)
+	.forEach(console.log.bind(console));
+```
+
+### skipUntil
+
+####`stream.takeUntil(startSignal) -> Stream`
+####`most.takeUntil(startSignal, stream) -> Stream`
+
+Create a new stream containing all events until `startSignal` emits an event.
+
+```
+stream:                         -a-b-c-d-e-f->
+startSignal:                   ------z->
+stream.skipUntil(startSignal): -a-b-c|
+```
+
+If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+
+```js
+// Start logging mouse events when the user clicks.
+most.fromEvent('mousemove', document)
+	.skipUntil(most.fromEvent('click', document)
+	.forEach(console.log.bind(console));
+```
 
 ## Consuming streams
 
