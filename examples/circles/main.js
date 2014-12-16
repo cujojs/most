@@ -23,7 +23,7 @@ module.exports = function run() {
 	most.unfold(unfoldTail, 0).take(nTails).join().drain();
 
 	function unfoldTail(x) {
-		return { value: makeDelayedTail(x*100, colorGenerator()), state: x+1 };
+		return { value: makeDelayedTail(x*100, colorGenerator()), seed: x+1 };
 	}
 	// Move a circle by setting its css transform to the provided translate3d
 	function translate(circle, tx) {
