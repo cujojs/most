@@ -3,6 +3,7 @@ most.js API
 
 1. Reading these docs
 	* [Notation](#notation)
+	* [Concepts](#concepts)
 1. Creating streams
 	* [most.of](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -40,9 +41,9 @@ most.js API
 	* [skip](#skip)
 	* [takeWhile](#takewhile)
 	* [skipWhile](#skipwhile)
-	* [timeslice](#timeslice)
-	* [takeUntil](#takeuntil)
-	* [skipUntil](#skipuntil)
+	* [until](#until), alias [takeUntil](#until)
+	* [since](#since), alias [skipUntil](#since)
+	* [within](#within)
 1. Consuming streams
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
@@ -101,6 +102,32 @@ A stream that emits `a`, then `b`, then fails.
 `stream: abc-def->`
 
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
+
+## Concepts
+
+### Stream
+
+A stream is a sequence of events that occur at specific times.  Streams are asynchronous and may be infinite.
+
+In some ways, streams are like Arrays or lists.
+
+### Higher order stream
+
+A Higher-order stream is a "stream of streams": a stream whose event values are themselves streams.
+
+Conceptually, a higher-order stream is like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.  For example, to create a higher-order stream similar to that:
+
+```
+most.from([most.from[
+
+### Timespan
+
+A timespan is a period of time, anchored at a particular start time.  For example: "from 1pm to 2pm on Tuesday", or "the time between the first mouse click and the second".
+
+A timespan can be represented as a higher-order stream.
+
+```
+most.delay(1000, most.delay(5000, most.of()));
 
 ## Creating streams
 
@@ -245,11 +272,15 @@ most.iterate(function(x) {
 
 ####`most.unfold(f, seed) -> Stream`
 
-Build a stream by computing successive items using a seed value.
+Build a stream by computing successive items.  Whereas [`reduce`](#reduce) tears down a stream to a final value, `unfold` builds up a stream from a seed value.
 
-The unfolding function accepts a seed value and must return a tuple: `{value:*, seed:*, done:boolean}`.  It may return a promise for a tuple.  This allows `most.unfold` to be used to build asynchronous streams of future values.
+The unfolding function accepts a seed value and must return a tuple: `{value:*, seed:*, done:boolean}`, or a promise for a tuple.  Returning a promise allows `most.unfold` to be used to build asynchronous streams of future values.
 
-The unfold will stop when the unfolding function returns a tuple with `tuple.done == true`, or will produce an infinite stream by never returning a tuple with `tuple.done == true`.
+* `tuple.value` will be emitted as an event.
+* `tuple.seed` will be passed to the next invocation of the unfolding function.
+* `tuple.done` can be used to stop unfolding.  When `tuple.done == true`, unfolding will stop.
+
+Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
 ```js
 var rest = require('rest');
@@ -752,41 +783,19 @@ stream:                 -2-4-5-6-8->
 stream.skipWhile(even): -----5-6-8->
 ```
 
-### timeslice
+### until
 
-####`stream.timeslice(startSignal, endSignal)`
-####`most.timeslice(startSignal, endSignal, stream)`
+Alias: **takeUntil**
 
-Create a new stream containing only events that occur at or after the time of the first event of `startSignal` and before the time of the first event of `endSignal`.
-
-```
-stream:                                   -a-b-c-d-e-f-g->
-startSignal:                              -----t
-endSignal:                                -----------u
-stream.timeslice(startSignal, endSignal): -----c-d-e-|
-```
-
-This is similar to [slice](#slice), but based on times, represented by `startSignal` and `endSignal`, rather than on indexes.  The event values of `startSignal` and `endSignal` aren't used, only the time of the first event in each is used.
-
-```js
-// Log mouse events until the user clicks. Note that DOM event handlers will
-// automatically be unregistered.
-most.fromEvent('mousemove', document)
-	.timeslice(most.of().delay(1000), most.of().delay(5000))
-	.forEach(console.log.bind(console));
-```
-
-### takeUntil
-
-####`stream.takeUntil(endSignal) -> Stream`
-####`most.takeUntil(endSignal, stream) -> Stream`
+####`stream.until(endSignal) -> Stream`
+####`most.until(endSignal, stream) -> Stream`
 
 Create a new stream containing all events until `endSignal` emits an event.
 
 ```
-stream:                      -a-b-c-d-e-f->
-endSignal:                   ------z->
-stream.takeUntil(endSignal): -a-b-c|
+stream:                  -a-b-c-d-e-f->
+endSignal:               ------z->
+stream.until(endSignal): -a-b-c|
 ```
 
 If `endSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
@@ -795,21 +804,23 @@ If `endSignal` is empty or never emits an event, then the returned stream will b
 // Log mouse events until the user clicks. Note that DOM event handlers will
 // automatically be unregistered.
 most.fromEvent('mousemove', document)
-	.takeUntil(most.fromEvent('click', document)
+	.until(most.fromEvent('click', document)
 	.forEach(console.log.bind(console));
 ```
 
-### skipUntil
+### since
 
-####`stream.takeUntil(startSignal) -> Stream`
-####`most.takeUntil(startSignal, stream) -> Stream`
+Alias: **skipUntil**
+
+####`stream.since(startSignal) -> Stream`
+####`most.since(startSignal, stream) -> Stream`
 
 Create a new stream containing all events until `startSignal` emits an event.
 
 ```
-stream:                         -a-b-c-d-e-f->
-startSignal:                   ------z->
-stream.skipUntil(startSignal): -a-b-c|
+stream:                    -a-b-c-d-e-f->
+startSignal:               ------z->
+stream.since(startSignal): -a-b-c|
 ```
 
 If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
@@ -817,8 +828,38 @@ If `startSignal` is empty or never emits an event, then the returned stream will
 ```js
 // Start logging mouse events when the user clicks.
 most.fromEvent('mousemove', document)
-	.skipUntil(most.fromEvent('click', document)
+	.since(most.fromEvent('click', document)
 	.forEach(console.log.bind(console));
+```
+
+### within
+
+####`stream.within(timespan)`
+####`most.within(timespan, stream)`
+
+Create a new stream containing only events that occur within a [timespan](#timespan).
+
+```
+stream:                  -a-b-c-d-e-f-g->
+timespan:                -----s
+s:                             -----t
+stream.within(timespan): -----c-d-e-|
+```
+
+This is similar to [slice](#slice), but uses time signals rather than indices to limit the stream.
+
+```js
+var timespan = most.delay(1000, most.of(most.delay(1000, most.of()));
+
+```js
+// After the first click, log mouse move events for 1 second.
+// Note that DOM event handlers will automatically be unregistered.
+var start = most.fromEvent('click', document);
+var end = most.of().delay(1000);
+
+most.fromEvent('mousemove', document)
+	.within(start.constant(end))
+	.observe(console.log.bind(console));
 ```
 
 ## Consuming streams
@@ -1016,7 +1057,7 @@ most.from([1,2,3])
 
 ## Combining higher-order streams
 
-A Higher-order stream is a "stream of streams": a stream whose event values are themselves streams.  Conceptually, you might think of a higher-order stream like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.
+You can read more about higher-order streams in the [Concepts section](#higherorderstreams).
 
 ### switch
 

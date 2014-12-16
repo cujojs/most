@@ -6,6 +6,7 @@ var sentinel = { value: 'sentinel' };
 
 describe('chain', function() {
 	it('should be an alias for flatMap', function() {
+		expect(typeof most.chain).toBe('function');
 		expect(most.chain).toBe(most.flatMap);
 		expect(most.Stream.prototype.chain).toBe(most.Stream.prototype.flatMap);
 	});
@@ -13,9 +14,24 @@ describe('chain', function() {
 
 describe('forEach', function() {
 	it('should be an alias for observe', function() {
+		expect(typeof most.forEach).toBe('function');
 		expect(most.forEach).toBe(most.observe);
-		expect(most.forEachUntil).toBe(most.observeUntil);
 		expect(most.Stream.prototype.forEach).toBe(most.Stream.prototype.observe);
-		expect(most.Stream.prototype.forEachUntil).toBe(most.Stream.prototype.observeUntil);
+	});
+});
+
+describe('takeUntil', function() {
+	it('should be an alias for until', function() {
+		expect(typeof most.takeUntil).toBe('function');
+		expect(most.takeUntil).toBe(most.until);
+		expect(most.Stream.prototype.takeUntil).toBe(most.Stream.prototype.until);
+	});
+});
+
+describe('skipUntil', function() {
+	it('should be an alias for since', function() {
+		expect(typeof most.skipUntil).toBe('function');
+		expect(most.skipUntil).toBe(most.since);
+		expect(most.Stream.prototype.skipUntil).toBe(most.Stream.prototype.since);
 	});
 });

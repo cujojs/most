@@ -431,9 +431,21 @@ Stream.prototype.skipWhile = function(p) {
 
 var timeslice = require('./lib/combinator/timeslice');
 
-exports.takeUntil = timeslice.takeUntil;
-exports.skipUntil = timeslice.skipUntil;
-exports.timeslice = timeslice.timeslice;
+exports.within = timeslice.within;
+exports.until  = exports.takeUntil = timeslice.takeUntil;
+exports.since  = exports.skipUntil = timeslice.skipUntil;
+
+/**
+ * stream:                  -a-b-c-d-e-f-g->
+ * timespan:                -----s
+ * s:                             -----t
+ * stream.within(timespan): -----c-d-e-|
+ * @param {Stream<Stream>} timespan
+ * @returns {Stream} new stream containing only events within the provided timespan
+ */
+Stream.prototype.within = function(timespan) {
+	return timeslice.within(timespan, this);
+};
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -444,7 +456,7 @@ exports.timeslice = timeslice.timeslice;
  * @returns {Stream} new stream containing only events that occur before
  * the first event in signal.
  */
-Stream.prototype.takeUntil = function(signal) {
+Stream.prototype.until = Stream.prototype.takeUntil = function(signal) {
 	return timeslice.takeUntil(signal, this);
 };
 
@@ -457,22 +469,8 @@ Stream.prototype.takeUntil = function(signal) {
  * @returns {Stream} new stream containing only events that occur after
  * the first event in signal.
  */
-Stream.prototype.skipUntil = function(signal) {
+Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
 	return timeslice.skipUntil(signal, this);
-};
-
-/**
- * stream:                      -a-b-c-d-e-f-g->
- * min:                         -----x
- * max:                         -----------x
- * timeslice(min, max, stream): -----c-d-e-|
- * @param {Stream} min retain only events in stream at or after the first event in min
- * @param {Stream} max retain only events in stream before the first event in min
- * @returns {Stream} new stream containing only events that occur at or after
- * the first event in min and before the first event in max
- */
-Stream.prototype.timeslice = function(min, max) {
-	return timeslice.timeslice(min, max, this);
 };
 
 //-----------------------------------------------------------------------
@@ -486,8 +484,8 @@ exports.delay = delay;
  * @param {Number} delayTime milliseconds to delay each item
  * @returns {Stream} new stream containing the same items, but delayed by ms
  */
-Stream.prototype.delay = function(dt) {
-	return delay(dt, this);
+Stream.prototype.delay = function(delayTime) {
+	return delay(delayTime, this);
 };
 
 //-----------------------------------------------------------------------
