@@ -117,17 +117,57 @@ A Higher-order stream is a "stream of streams": a stream whose event values are 
 
 Conceptually, a higher-order stream is like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.  For example, to create a higher-order stream similar to that:
 
+```js
+most.from([most.from([1,2,3]), most.from([4,5,6]), most.from([7,8,9])]);
 ```
-most.from([most.from[
+
+That's not a terribly interesting higher-order stream since it can be easily done with Arrays.  Here's another, more useful example:
+
+```js
+var firstClick = most.fromEvent('click', document).take(1);
+var mousemovesAfterFirstClick = firstClick.map(function() {
+	return most.fromEvent('mousemove', document);
+});
+```
+
+In that case `mousemovesAfterFirstClick` is a higher order stream containing one event, whose value is a *stream* of `mousemove` events.
+
+Events from the "inner" streams can be surfaced using the [higher-order stream combinators](#combining-higher-order-streams).  For example, the following will log all `mousemove` events after the first click:
+
+```js
+mousemovesAfterFirstClick.join()
+	.observe(console.log.bind(console));
+```
 
 ### Timespan
 
-A timespan is a period of time, anchored at a particular start time.  For example: "from 1pm to 2pm on Tuesday", or "the time between the first mouse click and the second".
+A timespan is a time period, anchored at a particular start time.  For example: "from 1pm to 2pm on Tuesday", or "the time between the first mouse click and the second".
 
-A timespan can be represented as a higher-order stream.
+A timespan can be represented as a higher-order stream.  The first event of the outer stream defines the start time, and the first event of the inner stream defines the end of the time period.
 
+```js
+// a timespan starting 1 second after it is observed, and
+// lasting 5 seconds
+most.of().delay(1000).constant(most.of().delay(5000));
 ```
-most.delay(1000, most.delay(5000, most.of()));
+
+A more interesting timespan might be the time between the first and second mouse click:
+
+```js
+var click = most.fromEvent('click', document);
+
+var timeBetweenFirstTwoClicks = click.map(function() {
+	return most.fromEvent('click', document);
+});
+
+// Which can be written slightly more succinctly as:
+var timeBetweenFirstTwoClicks = click.map(function() {
+	return click;
+});
+
+// Or even moreso using constant():
+var timeBetweenFirstTwoClicks = click.constant(click);
+```
 
 ## Creating streams
 
