@@ -50,7 +50,7 @@ function runTest(p, name, runner, test, x) {
 
 		return runner(test, x);
 	}).catch(function(e) {
-		console.error('FAILED: ' + name, e);
+		console.error(pad(10, name) + 'FAILED: ' + e);
 	});
 }
 
@@ -64,7 +64,7 @@ function noop() {}
 
 function elapsed(name, start, z) {
 	var t = Date.now() - start;
-	var s = pad(10, name)+ pad(10, t + 'ms');
+	var s = pad(10, name) + pad(10, t + 'ms');
 	if(arguments.length > 2) {
 		s += 'result: ' + z;
 	}
