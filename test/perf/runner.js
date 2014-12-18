@@ -38,14 +38,20 @@ function run(libs, msg, x) {
 	gc();
 
 	return Object.keys(runners).reduce(function(p, lib) {
-		return p.then(function() {
-			if(typeof libs[lib] !== 'function') {
-				return Promise.resolve();
-			}
-
-			return runners[lib](libs[lib], x);
-		});
+		return runTest(p, lib, runners[lib], libs[lib], x);
 	}, Promise.resolve()).then(separator);
+}
+
+function runTest(p, name, runner, test, x) {
+	return p.then(function() {
+		if(typeof test !== 'function') {
+			return Promise.resolve();
+		}
+
+		return runner(test, x);
+	}).catch(function(e) {
+		console.error('FAILED: ' + name, e);
+	});
 }
 
 function gc() {
