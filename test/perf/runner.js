@@ -1,4 +1,4 @@
-var most = require('../most');
+var most = require('../../most');
 var rx = require('rx');
 var bacon = require('baconjs');
 var kefir = require('kefir');

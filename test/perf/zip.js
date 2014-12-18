@@ -1,4 +1,4 @@
-var most = require('../most');
+var most = require('../../most');
 var rx = require('rx');
 var kefir = require('kefir');
 var bacon = require('baconjs');
@@ -28,7 +28,7 @@ runner.run({
 	highland: runHighland,
 	rx: runRx,
 	bacon: runBacon
-}, 'ready: ' + n + ' x 2', { a:a, b:b }).then(function() {
+}, 'zip ' + n + ' x 2', { a:a, b:b }).then(function() {
 	console.log('DONE');
 });
 

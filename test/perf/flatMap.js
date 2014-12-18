@@ -1,4 +1,4 @@
-var most = require('../most');
+var most = require('../../most');
 var rx = require('rx');
 var bacon = require('baconjs');
 var kefir = require('kefir');
@@ -16,7 +16,6 @@ var kefirFromArray = runner.kefirFromArray;
 // and flatten it to an Array of length n x m.
 var n = 1000, m = 1000;
 var a = build(m, n);
-console.log('ready: ' + n + ' x ' + m);
 
 function build(m, n) {
 	var a = new Array(n);
