@@ -98,7 +98,7 @@ describe('takeUntil', function() {
 		var signal = streamOf();
 
 		return drain(timeslice.takeUntil(signal, stream))
-			.then(function(count) {
+			.then(function() {
 				expect(dispose).toHaveBeenCalledOnce();
 			});
 
