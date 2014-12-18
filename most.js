@@ -431,21 +431,9 @@ Stream.prototype.skipWhile = function(p) {
 
 var timeslice = require('./lib/combinator/timeslice');
 
-exports.within = timeslice.within;
 exports.until  = exports.takeUntil = timeslice.takeUntil;
 exports.since  = exports.skipUntil = timeslice.skipUntil;
-
-/**
- * stream:                  -a-b-c-d-e-f-g->
- * timespan:                -----s
- * s:                             -----t
- * stream.within(timespan): -----c-d-e-|
- * @param {Stream<Stream>} timespan
- * @returns {Stream} new stream containing only events within the provided timespan
- */
-Stream.prototype.within = function(timespan) {
-	return timeslice.within(timespan, this);
-};
+exports.within = timeslice.within; // EXPERIMENTAL
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -471,6 +459,21 @@ Stream.prototype.until = Stream.prototype.takeUntil = function(signal) {
  */
 Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
 	return timeslice.skipUntil(signal, this);
+};
+
+/**
+ * **EXPERIMENTAL**
+ * stream:                    -a-b-c-d-e-f-g->
+ * timeWindow:                -----s
+ * s:                               -----t
+ * stream.within(timeWindow): -----c-d-e-|
+ * @param {Stream<Stream>} timeWindow a stream whose first event (s) represents
+ *  the window start time.  That event (s) is itself a stream whose first event (t)
+ *  represents the window end time
+ * @returns {Stream} new stream containing only events within the provided timespan
+ */
+Stream.prototype.within = function(timeWindow) {
+	return timeslice.within(timeWindow, this);
 };
 
 //-----------------------------------------------------------------------

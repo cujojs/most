@@ -103,72 +103,6 @@ A stream that emits `a`, then `b`, then fails.
 
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
 
-## Concepts
-
-### Stream
-
-A stream is a sequence of events that occur at specific times.  Streams are asynchronous and may be infinite.
-
-In some ways, streams are like Arrays or lists.
-
-### Higher order stream
-
-A Higher-order stream is a "stream of streams": a stream whose event values are themselves streams.
-
-Conceptually, a higher-order stream is like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.  For example, to create a higher-order stream similar to that:
-
-```js
-most.from([most.from([1,2,3]), most.from([4,5,6]), most.from([7,8,9])]);
-```
-
-That's not a terribly interesting higher-order stream since it can be easily done with Arrays.  Here's another, more useful example:
-
-```js
-var firstClick = most.fromEvent('click', document).take(1);
-var mousemovesAfterFirstClick = firstClick.map(function() {
-	return most.fromEvent('mousemove', document);
-});
-```
-
-In that case `mousemovesAfterFirstClick` is a higher order stream containing one event, whose value is a *stream* of `mousemove` events.
-
-Events from the "inner" streams can be surfaced using the [higher-order stream combinators](#combining-higher-order-streams).  For example, the following will log all `mousemove` events after the first click:
-
-```js
-mousemovesAfterFirstClick.join()
-	.observe(console.log.bind(console));
-```
-
-### Timespan
-
-A timespan is a time period, anchored at a particular start time.  For example: "from 1pm to 2pm on Tuesday", or "the time between the first mouse click and the second".
-
-A timespan can be represented as a higher-order stream.  The first event of the outer stream defines the start time, and the first event of the inner stream defines the end of the time period.
-
-```js
-// a timespan starting 1 second after it is observed, and
-// lasting 5 seconds
-most.of().delay(1000).constant(most.of().delay(5000));
-```
-
-A more interesting timespan might be the time between the first and second mouse click:
-
-```js
-var click = most.fromEvent('click', document);
-
-var timeBetweenFirstTwoClicks = click.map(function() {
-	return most.fromEvent('click', document);
-});
-
-// Which can be written slightly more succinctly as:
-var timeBetweenFirstTwoClicks = click.map(function() {
-	return click;
-});
-
-// Or even moreso using constant():
-var timeBetweenFirstTwoClicks = click.constant(click);
-```
-
 ## Creating streams
 
 ### most.of
@@ -874,22 +808,21 @@ most.fromEvent('mousemove', document)
 
 ### within
 
-####`stream.within(timespan)`
-####`most.within(timespan, stream)`
+**EXPERIMENTAL**
 
-Create a new stream containing only events that occur within a [timespan](#timespan).
+####`stream.within(timeWindow)`
+####`most.within(timeWindow, stream)`
+
+Create a new stream containing only events that occur within a dynamic [time window](concepts.md#time-windows).
 
 ```
-stream:                  -a-b-c-d-e-f-g->
-timespan:                -----s
-s:                             -----t
-stream.within(timespan): -----c-d-e-|
+stream:                    -a-b-c-d-e-f-g->
+timeWindow:                -----s
+s:                               -----t
+stream.within(timeWindow): -----c-d-e-|
 ```
 
 This is similar to [slice](#slice), but uses time signals rather than indices to limit the stream.
-
-```js
-var timespan = most.delay(1000, most.of(most.delay(1000, most.of()));
 
 ```js
 // After the first click, log mouse move events for 1 second.
@@ -897,8 +830,13 @@ var timespan = most.delay(1000, most.of(most.delay(1000, most.of()));
 var start = most.fromEvent('click', document);
 var end = most.of().delay(1000);
 
+// Map the first click to a stream containing a 1 second delay
+// The click represents the window start time, after which
+// the window will be open for 1 second.
+var timeWindow = start.constant(end);
+
 most.fromEvent('mousemove', document)
-	.within(start.constant(end))
+	.within(timeWindow)
 	.observe(console.log.bind(console));
 ```
 
@@ -1097,7 +1035,7 @@ most.from([1,2,3])
 
 ## Combining higher-order streams
 
-You can read more about higher-order streams in the [Concepts section](#higherorderstreams).
+You can read more about higher-order streams in the [Concepts doc](concepts.md#higher-order-streams).
 
 ### switch
 
