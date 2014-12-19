@@ -396,9 +396,10 @@ Stream.prototype.skip = function(n) {
 /**
  * Slice a stream by event index. Equivalent to, but more efficient than
  * stream.take(end).skip(start);
+ * NOTE: Negative start and end are not supported
  * @param {Number} start skip all events before the start index
  * @param {Number} end allow all events from the start index to the end index
- * @returns {Stream} stream containing items at indexes >= start and < end
+ * @returns {Stream} stream containing items where start <= index < end
  */
 Stream.prototype.slice = function(start, end) {
 	return slice.slice(start, end, this);

@@ -5,3 +5,4 @@ examples/
 benchmark/
 experiments/
 perf/
+test/perf/
