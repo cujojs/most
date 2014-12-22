@@ -61,7 +61,7 @@ var lift = require('./lib/combinator/lift').lift;
 /**
  * Lift a function that accepts values and returns a value, and return a function
  * that accepts streams and returns a stream.
- * @type {function(...args):function(...streams)}
+ * @type {function(f:function(...args):*):function(...streams):Stream<*>}
  */
 exports.lift = lift;
 
