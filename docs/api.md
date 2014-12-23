@@ -1035,14 +1035,12 @@ most.from([1,2,3])
 
 ## Combining higher-order streams
 
-You can read more about higher-order streams in the [Concepts doc](concepts.md#higher-order-streams).
-
 ### switch
 
 ####`stream.switch() -> Stream`
 ####`most.switch(stream) -> Stream`
 
-Given a higher-order stream, return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
+Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
 
 ```
 s:               -a-b-c-d-e-f->
@@ -1058,7 +1056,7 @@ stream.switch(): -a-b-c-4-5-6->
 ####`stream.join() -> Stream`
 ####`most.join(stream) -> Stream`
 
-Given a higher-order stream, return a new stream that merges all the inner streams as they arrive.
+Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that merges all the inner streams as they arrive.
 
 ```
 s:             ---a---b---c---d-->
