@@ -47,7 +47,7 @@ var mousemovesAfterFirstClick = firstClick.map(function() {
 
 In that case `mousemovesAfterFirstClick` is a higher order stream containing one event, whose value is a *stream* of `mousemove` events.
 
-Events from the "inner" streams can be surfaced using the [higher-order stream combinators](#combining-higher-order-streams).  For example, the following will log all `mousemove` events after the first click:
+Events from the "inner" streams can be surfaced using the [higher-order stream combinators](api.md#combining-higher-order-streams).  For example, the following will log all `mousemove` events after the first click:
 
 ```js
 // join() "flattens" a higher order stream
