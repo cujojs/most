@@ -188,7 +188,7 @@ most.periodic(2): a-b-c-d-e-f->
 most.periodic(5): a----b----c->
 ```
 
-Create an infinite stream containing events that arrive every `interval` milliseconds. The value of each event is its arrival time in milliseconds.
+Create an infinite stream containing events that arrive every `period` milliseconds. The value of each event is its arrival time in milliseconds.
 
 ### most.empty
 
