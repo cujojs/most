@@ -22,7 +22,7 @@ most.js provides operations for creating, transforming, and composing streams.
 
 A stream is a sequence of events that occur over time.  Streams are asynchronous and may be infinite.
 
-In some ways, streams are like Arrays or lists, except that each event in a stream has a specific *time* at which it arrives.  Streams provide many operations that are similar to those of Arrays, such as [`map`](api.md#map), and [`filter`](api.md#filter).  They also provide other operations that don't make sense for Arrays--operations related to *time*.  For example, [`takeUntil`](api.md#takeuntil), and [`skipUntil`](api.md#skipuntil) allow you to slice a stream based on time rather than on indices.
+In some ways, streams are like Arrays or lists, except that each event in a stream has a specific *time* at which it arrives.  Streams provide many operations that are similar to those of Arrays, such as [`map`](api.md#map), and [`filter`](api.md#filter).  They also provide other operations that don't make sense for Arrays--operations related to *time*.  For example, [`until`](api.md#until), and [`skip`](api.md#skip) allow you to slice a stream based on time rather than on indices.
 
 Streams provide a powerful abstraction and API to create and compose asynchronous operations.
 
