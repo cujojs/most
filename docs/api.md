@@ -3,7 +3,7 @@ most.js API
 
 1. Reading these docs
 	* [Notation](#notation)
-	* [Concepts](#concepts)
+	* [Concepts](./concepts.md)
 1. Creating streams
 	* [most.of](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -16,13 +16,13 @@ most.js API
 	* [most.unfold](#mostunfold)
 	* [most.fromEvent](#mostfromevent)
 	* [most.fromEventWhere](#mostfromeventwhere)
-	* [most.create](#create)
+	* [most.create](#mostcreate)
 	* [startWith](#startwith)
 	* [concat](#concat)
 	* [cycle](#cycle)
 1. Handling errors
 	* [flatMapError](#flatmaperror)
-	* [throwError](#throwerror)
+	* [throwError](#mostthrowerror)
 1. Transforming streams
 	* [map](#map)
 	* [constant](#constant)
@@ -280,7 +280,7 @@ most.fromEvent(eventType, source): -a--b-c---d->
 
 Create a stream containing events from the provided [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), such as a DOM element, or [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).  This provides a simple way to coerce existing event sources into streams.
 
-Note that when the stream ends (for example, by using [take](#take), [takeUntil](#takeuntil), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
+Note that when the stream ends (for example, by using [take](#take), [takeUntil](#until), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
 
 ```js
 var clicks = most.fromEvent('click', document.querySelector('.the-button'));
@@ -420,7 +420,7 @@ stream2:                 -d-e-f->
 stream1.concat(stream2): -a-b-c-d-e-f->
 ```
 
-Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), ['flatMap`](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
+Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), [flatMap](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
 
 ### cycle
 
@@ -869,7 +869,7 @@ Alias: **forEach**
 ####`most.observe(f, stream) -> Promise`
 ####`most.forEach(f, stream) -> Promise`
 
-Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
+Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ```js
 // Log mouse movements until the user clicks, then stop.
@@ -888,7 +888,7 @@ most.fromEvent('mousemove', document)
 
 Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
-The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handlingerrors).
+The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ## Combining streams
 
@@ -1116,6 +1116,8 @@ streamOfContent.forEach(console.log.bind(console));
 ```
 
 ## Delaying streams
+
+### delay
 
 ####`stream.delay(delayTime) -> Stream`
 ####`most.delay(delayTime, stream) -> Stream`
