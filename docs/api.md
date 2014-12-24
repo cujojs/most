@@ -43,7 +43,7 @@ most.js API
 	* [skipWhile](#skipwhile)
 	* [until](#until), alias [takeUntil](#until)
 	* [since](#since), alias [skipUntil](#since)
-	* [within](#within)
+	* [during](#during)
 1. Consuming streams
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
@@ -806,20 +806,20 @@ most.fromEvent('mousemove', document)
 	.forEach(console.log.bind(console));
 ```
 
-### within
+### during
 
 **EXPERIMENTAL**
 
-####`stream.within(timeWindow)`
-####`most.within(timeWindow, stream)`
+####`stream.during(timeWindow)`
+####`most.during(timeWindow, stream)`
 
-Create a new stream containing only events that occur within a dynamic [time window](concepts.md#time-windows).
+Create a new stream containing only events that occur during a dynamic [time window](concepts.md#time-windows).
 
 ```
 stream:                    -a-b-c-d-e-f-g->
 timeWindow:                -----s
 s:                               -----t
-stream.within(timeWindow): -----c-d-e-|
+stream.during(timeWindow): -----c-d-e-|
 ```
 
 This is similar to [slice](#slice), but uses time signals rather than indices to limit the stream.
@@ -836,7 +836,7 @@ var end = most.of().delay(1000);
 var timeWindow = start.constant(end);
 
 most.fromEvent('mousemove', document)
-	.within(timeWindow)
+	.during(timeWindow)
 	.observe(console.log.bind(console));
 ```
 

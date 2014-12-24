@@ -18,14 +18,14 @@ var FakeDisposeSource = require('./helper/FakeDisposeSource');
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-describe('within', function() {
+describe('during', function() {
 	it('should contain events at or later than min and earlier than max', function() {
 		var stream = periodic(10);
 		var timespan = delay(30, streamOf(delay(41, streamOf())));
 
 		return reduce(function(count) {
 			return count + 1;
-		}, 0, timeslice.within(timespan, stream))
+		}, 0, timeslice.during(timespan, stream))
 			.then(function(count) {
 				expect(count).toBe(5);
 			});
@@ -38,7 +38,7 @@ describe('within', function() {
 
 		return reduce(function(count) {
 			return count + 1;
-		}, 0, timeslice.within(timespan, stream))
+		}, 0, timeslice.during(timespan, stream))
 			.then(function(count) {
 				expect(count).toBe(5);
 				expect(dispose).toHaveBeenCalledOnce();
@@ -55,7 +55,7 @@ describe('within', function() {
 
 		return reduce(function(count) {
 			return count + 1;
-		}, 0, timeslice.within(dt, stream))
+		}, 0, timeslice.during(dt, stream))
 			.then(function(count) {
 				expect(count).toBe(5);
 				expect(dispose).toHaveBeenCalledOnce();

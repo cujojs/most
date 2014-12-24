@@ -75,6 +75,6 @@ var end = most.of().delay(1000);
 var timeWindow = start.constant(end);
 
 most.fromEvent('mousemove', document)
-	.within(timeWindow)
+	.during(timeWindow)
 	.observe(console.log.bind(console));
 ```
