@@ -2,7 +2,9 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var create = require('../../lib/source/create').create;
+var streamOf = require('../../lib/source/core').of;
 var observe = require('../../lib/combinator/observe').observe;
+var flatMapError = require('../../lib/combinator/errors').flatMapError;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -63,4 +65,20 @@ describe('create', function() {
 			expect(spy).toHaveBeenCalled();
 		});
 	});
+
+	it('should propagate error thrown synchronously from publisher', function() {
+		var s1 = create(function() {
+			throw sentinel;
+		});
+
+		var s2 = flatMapError(function(e) {
+			expect(e).toBe(sentinel);
+			return streamOf(other);
+		}, s1);
+
+		return observe(function(x) {
+			expect(x).toBe(other);
+		}, s2);
+	});
+
 });
