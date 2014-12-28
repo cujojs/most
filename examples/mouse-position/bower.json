@@ -18,7 +18,7 @@
 		"tests"
 	],
 	"dependencies": {
-		"most": "~0.9",
+		"most": "~0.10",
 		"rave": "~0.4"
 	}
 }
