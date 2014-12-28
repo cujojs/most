@@ -37,6 +37,6 @@
     "package.json"
   ],
   "dependencies": {
-    "when": "~3.6.3"
+    "when": "~3.6.4"
   }
 }
