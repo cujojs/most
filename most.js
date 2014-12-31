@@ -289,6 +289,17 @@ Stream.prototype.combine = function(f /*, ...streams*/) {
 };
 
 //-----------------------------------------------------------------------
+// Sampling
+
+var sample = require('./lib/combinator/sample');
+
+exports.sample = sample.sample;
+
+Stream.prototype.sample = function(events) {
+	return sample.sample(events, this);
+};
+
+//-----------------------------------------------------------------------
 // Zipping
 
 var zip = require('./lib/combinator/zip');
