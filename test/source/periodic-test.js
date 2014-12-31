@@ -4,7 +4,7 @@ var expect = require('buster').expect;
 var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
 var reduce = require('../../lib/combinator/accumulate').reduce;
-var scheduler = require('../../lib/Scheduler');
+var scheduler = require('../../lib/scheduler/defaultScheduler');
 
 describe('periodic', function() {
 	it('should emit events at tick periods', function() {
