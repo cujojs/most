@@ -12,18 +12,14 @@ var sentinel = { value: 'sentinel' };
 describe('delay', function() {
 	it('should delay events by delayTime', function() {
 		var dt = 20;
-		var original;
 
 		var s = timestamp(delay(0, streamOf(sentinel)));
-
-		var ds = delay(dt, tap(function(timeValue) {
-			original = timeValue.time;
-		}, s));
+		var ds = timestamp(delay(dt, s));
 
 		return reduce(function(_, x) {
 			return x;
-		}, void 0, timestamp(ds)).then(function(timeValue) {
-			expect(timeValue.time).not.toBeLessThan(original + dt);
+		}, void 0, ds).then(function(timeValue) {
+			expect(timeValue.time).not.toBeLessThan(timeValue.value.time + dt);
 		});
 	});
 });
