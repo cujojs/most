@@ -293,10 +293,10 @@ Stream.prototype.combine = function(f /*, ...streams*/) {
 
 var sample = require('./lib/combinator/sample');
 
-exports.sample = sample.sample;
+exports.sampleWith = sample.sampleWith;
 
-Stream.prototype.sample = function(events) {
-	return sample.sample(events, this);
+Stream.prototype.sampleWith = function(events) {
+	return sample.sampleWith(events, this);
 };
 
 //-----------------------------------------------------------------------
