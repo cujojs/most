@@ -12,6 +12,6 @@ function FakeDisposeSource(dispose, source) {
 	this.disposable = new Disposable(dispose);
 }
 
-FakeDisposeSource.prototype.run = function(sink) {
-	return new CompoundDisposable([this.source.run(sink), this.disposable]);
+FakeDisposeSource.prototype.run = function(sink, scheduler) {
+	return new CompoundDisposable([this.source.run(sink, scheduler), this.disposable]);
 };

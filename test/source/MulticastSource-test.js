@@ -8,6 +8,7 @@ var take = require('../../lib/combinator/slice').take;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;
 var Stream = require('../../lib/Stream');
+var scheduler = require('../../lib/Scheduler');
 var Promise = require('../../lib/Promise');
 
 var FakeDisposeSource = require('../helper/FakeDisposeSource');
@@ -21,7 +22,7 @@ describe('MulticastSource', function() {
 		var eventSpy = this.spy();
 		var s = new MulticastSource({ run: function() {} });
 
-		s.run({ event: eventSpy });
+		s.run({ event: eventSpy }, scheduler);
 		s.sink.event(sentinel);
 
 		expect(eventSpy).toHaveBeenCalledOnceWith(sentinel);
@@ -32,10 +33,10 @@ describe('MulticastSource', function() {
 		var s = new MulticastSource({ run: sourceSpy });
 
 		return Promise.all([
-			s.run({ event: function() {} }),
-			s.run({ event: function() {} }),
-			s.run({ event: function() {} }),
-			s.run({ event: function() {} })
+			s.run({ event: function() {} }, scheduler),
+			s.run({ event: function() {} }, scheduler),
+			s.run({ event: function() {} }, scheduler),
+			s.run({ event: function() {} }, scheduler)
 		]).then(function() {
 			expect(sourceSpy).toHaveBeenCalledOnce();
 		});
