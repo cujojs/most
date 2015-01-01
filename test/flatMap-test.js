@@ -2,7 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 var assertSame = require('./helper/stream-helper').assertSame;
 
-var join = require('../lib/combinator/join');
+var flatMap = require('../lib/combinator/flatMap');
 var delay = require('../lib/combinator/delay').delay;
 var concat = require('../lib/combinator/build').concat;
 var take = require('../lib/combinator/slice').take;
@@ -29,13 +29,13 @@ describe('flatMap', function() {
 		var m = streamOf('m');
 
 		return assertSame(
-			join.flatMap(function(x) { return join.flatMap(g, f(x)); }, m),
-			join.flatMap(g, join.flatMap(f, m))
+			flatMap.flatMap(function(x) { return flatMap.flatMap(g, f(x)); }, m),
+			flatMap.flatMap(g, flatMap.flatMap(f, m))
 		);
 	});
 
 	it('should preserve time order', function() {
-		var s = join.flatMap(function(x) {
+		var s = flatMap.flatMap(function(x) {
 			return delay(x, streamOf(x));
 		}, fromArray([20, 10]));
 
@@ -56,7 +56,7 @@ describe('join', function() {
 
 		return reduce(function(result, x) {
 			return result.concat(x);
-		}, [], join.join(streamsToMerge))
+		}, [], flatMap.join(streamsToMerge))
 				.then(function(result) {
 					// Include all items
 					expect(result.sort()).toEqual(a.concat(b).sort());
@@ -74,7 +74,7 @@ describe('join', function() {
 		var inner = streamOf(sentinel);
 		var outer = streamOf(inner);
 
-		var s = join.join(new Stream(new FakeDisposeSource(dispose, outer.source)));
+		var s = flatMap.join(new Stream(new FakeDisposeSource(dispose, outer.source)));
 
 		return drain(s).then(function() {
 			expect(dispose).toHaveBeenCalled();
@@ -85,7 +85,7 @@ describe('join', function() {
 		var dispose = this.spy();
 		var inner = new Stream(new FakeDisposeSource(dispose, streamOf(sentinel).source));
 
-		var s = join.join(streamOf(inner));
+		var s = flatMap.join(streamOf(inner));
 
 		return drain(s).then(function() {
 			expect(dispose).toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe('join', function() {
 	it('should dispose inner stream immediately', function() {
 		var s = streamOf(concat(streamOf(1), never()));
 
-		return drain(take(1, join.join(s))).then(function() {
+		return drain(take(1, flatMap.join(s))).then(function() {
 			expect(true).toBe(true);
 		});
 	});
@@ -111,7 +111,7 @@ describe('join', function() {
 			return new Stream(new FakeDisposeSource(spies[i], streamOf(x).source));
 		});
 
-		var s = join.join(fromArray(inners));
+		var s = flatMap.join(fromArray(inners));
 
 		return drain(s).then(function() {
 			spies.forEach(function(spy) {

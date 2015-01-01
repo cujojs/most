@@ -213,21 +213,12 @@ Stream.prototype.tap = function(f) {
 };
 
 //-----------------------------------------------------------------------
-// Joining (flatMapping)
+// FlatMapping
 
-var join = require('./lib/combinator/join');
+var flatMap = require('./lib/combinator/flatMap');
 
-exports.flatMap = exports.chain = join.flatMap;
-exports.join    = join.join;
-
-/**
- * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
- * streams to the outer. Event arrival times are preserved.
- * @returns {Stream<X>} new stream containing all events of all inner streams
- */
-Stream.prototype.join = function() {
-	return join.join(this);
-};
+exports.flatMap = exports.chain = flatMap.flatMap;
+exports.join    = flatMap.join;
 
 /**
  * Map each value in the stream to a new stream, and merge it into the
@@ -236,7 +227,16 @@ Stream.prototype.join = function() {
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
 Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
-	return join.flatMap(f, this);
+	return flatMap.flatMap(f, this);
+};
+
+/**
+ * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
+ * streams to the outer. Event arrival times are preserved.
+ * @returns {Stream<X>} new stream containing all events of all inner streams
+ */
+Stream.prototype.join = function() {
+	return flatMap.join(this);
 };
 
 var flatMapEnd = require('./lib/combinator/flatMapEnd').flatMapEnd;
@@ -252,6 +252,14 @@ exports.flatMapEnd = flatMapEnd;
  */
 Stream.prototype.flatMapEnd = function(f) {
 	return flatMapEnd(f, this);
+};
+
+var concatMap = require('./lib/combinator/concatMap').concatMap;
+
+exports.concatMap = concatMap;
+
+Stream.prototype.concatMap = function(f) {
+	return concatMap(f, this);
 };
 
 //-----------------------------------------------------------------------
