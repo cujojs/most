@@ -295,8 +295,14 @@ var sampleWith = require('./lib/combinator/sampleWith').sampleWith;
 
 exports.sampleWith = sampleWith;
 
-Stream.prototype.sampleWith = function(events) {
-	return sampleWith(events, this);
+/**
+ * When an event arrives on sampler, emit the latest event value from stream.
+ * @param {Stream} sampler stream of events at whose arrival time
+ *  signal's latest value will be propagated
+ * @returns {Stream} sampled stream of values
+ */
+Stream.prototype.sampleWith = function(sampler) {
+	return sampleWith(sampler, this);
 };
 
 //-----------------------------------------------------------------------

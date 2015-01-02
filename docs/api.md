@@ -1113,24 +1113,35 @@ var streamOfContent = streamOfPromises.await();
 streamOfContent.forEach(console.log.bind(console));
 ```
 
-## Delaying streams
+## Sampling streams
 
-### delay
+### sampleWith
 
-####`stream.delay(delayTime) -> Stream`
-####`most.delay(delayTime, stream) -> Stream`
+####`values.sampleWith(sampler)`
+####`most.sampleWith(sampler, values)`
 
-Timeshift a `stream` by `delayTime`.
+When an event arrives on sampler, emit the latest event value from values.
 
 ```
-stream:          -a-b-c-d->
-stream.delay(1): --a-b-c-d->
-stream.delay(5): ------a-b-c-d->
+values:                     -1---2-3---4-5---6-7---8->
+sampler:                    ---a---a---a---a---a---a->
+values.sampleWith(sampler): ---1---3---4---5---7---8->
 ```
 
-Delaying a stream timeshifts all the events by the same amount.  Delaying doesn't change the time *between* events.
+```
+values:                     -1----2----3----4----5--->
+sampler:                    -a-a-a-a-a-a-a-a-a-a-a-a->
+values.sampleWith(sampler): -1-1-1-2-2-3-3-3-4-4-5-5->
+```
 
-*TODO: Example*
+Sampling can "smooth" an erratic source, or can act as a dynamic throttle to speed or slow events from one stream using another.
+
+```js
+// Log mouse position whenever the user presses a key
+most.fromEvent('mousemove', document)
+	.sampleWith(most.fromEvent('keydown', document))
+	.observe(console.log.bind(console));
+```
 
 ## Rate limiting streams
 
@@ -1158,7 +1169,7 @@ searchText.debounce(500)
 	.map(function(e) {
 		return e.target.value;
 	})
-	.forEach(console.log.bind(console));
+	.observe(console.log.bind(console));
 ```
 
 See the [type-to-search example](../examples) for a more complete example of using `debounce`.
@@ -1176,3 +1187,23 @@ stream.throttle(2):  a-c-----a-c----->
 ```
 
 In contrast to debounce, throttle simply drops events that occur more often than `throttlePeriod`, whereas debounce waits for a "quiet period".
+
+
+## Delaying streams
+
+### delay
+
+####`stream.delay(delayTime) -> Stream`
+####`most.delay(delayTime, stream) -> Stream`
+
+Timeshift a `stream` by `delayTime`.
+
+```
+stream:          -a-b-c-d->
+stream.delay(1): --a-b-c-d->
+stream.delay(5): ------a-b-c-d->
+```
+
+Delaying a stream timeshifts all the events by the same amount.  Delaying doesn't change the time *between* events.
+
+*TODO: Example*
