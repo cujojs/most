@@ -89,7 +89,6 @@ function timeRx (runRx, a) {
 			onNext: noop,
 			onError: reject,
 			onCompleted: function () {
-				gc();
 				var start = Date.now();
 				var result;
 				runRx(a).subscribe({
@@ -114,7 +113,6 @@ function timeBacon (runBacon, a) {
 		b.onError(reject);
 		b.onValue(noop);
 		b.onEnd(function () {
-			gc();
 			var start = Date.now();
 			var b = runBacon(a);
 			var result;
@@ -137,7 +135,6 @@ function timeKefir(runKefir, a) {
 		//k.onError(reject);
 		k.onValue(noop);
 		k.onEnd(function() {
-			gc();
 			var start = Date.now();
 			var k = runKefir(a);
 			var result;
@@ -165,7 +162,6 @@ function kefirFromArray(array) {
 function timeMost (runMost, a) {
 	gc();
 	return runMost(a).then(function() {
-		gc();
 		var start = Date.now();
 		return runMost(a).then(function (z) {
 			elapsed('most', start, z);
@@ -176,7 +172,6 @@ function timeMost (runMost, a) {
 function timeArray (runArray, a) {
 	gc();
 	runArray(a);
-	gc();
 	var start = Date.now();
 	var z = runArray(a);
 	elapsed('Array', start, z);
@@ -185,12 +180,14 @@ function timeArray (runArray, a) {
 function timeLodash(runLodash, a) {
 	gc();
 	runLodash(a);
-	gc();
 	var start = Date.now();
 	var z = runLodash(a);
 	elapsed('lodash', start, z);
 }
 
+// Using pull() seems to give the fastest results for highland,
+// but will only work for test runs that reduce a stream to a
+// single value.
 function timeHighland(runHighland, a) {
 	gc();
 	return new Promise(function(resolve, reject) {
@@ -200,7 +197,6 @@ function timeHighland(runHighland, a) {
 				return;
 			}
 
-			gc();
 			var start = Date.now();
 			runHighland(a).pull(function(err, z) {
 				if(err) {
