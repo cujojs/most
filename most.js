@@ -289,6 +289,23 @@ Stream.prototype.combine = function(f /*, ...streams*/) {
 };
 
 //-----------------------------------------------------------------------
+// Sampling
+
+var sampleWith = require('./lib/combinator/sampleWith').sampleWith;
+
+exports.sampleWith = sampleWith;
+
+/**
+ * When an event arrives on sampler, emit the latest event value from stream.
+ * @param {Stream} sampler stream of events at whose arrival time
+ *  signal's latest value will be propagated
+ * @returns {Stream} sampled stream of values
+ */
+Stream.prototype.sampleWith = function(sampler) {
+	return sampleWith(sampler, this);
+};
+
+//-----------------------------------------------------------------------
 // Zipping
 
 var zip = require('./lib/combinator/zip');
