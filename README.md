@@ -74,6 +74,13 @@ then
 var most = require('most');
 ```
 
+## Iteroperability
+
+<a href="http://promises-aplus.github.com/promises-spec"><img width="82" height="82" alt="Promises/A+" src="http://promises-aplus.github.com/promises-spec/assets/logo-small.png"></a>
+<a href="https://github.com/fantasyland/fantasy-land"><img width="82" height="82" alt="Fantasy Land" src="https://raw.github.com/puffnfresh/fantasy-land/master/logo.png"></a>
+
+Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  They also implement [Fantasy Land](https://github.com/fantasyland/fantasy-land) `Monoid`, `Functor`, `Applicative`, and `Monad`.
+
 ## But what about
 
 ### Promises?
