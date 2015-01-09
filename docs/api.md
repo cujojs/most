@@ -28,6 +28,7 @@ most.js API
 	* [constant](#constant)
 	* [scan](#scan)
 	* [flatMap](#flatmap)
+	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
 	* [tap](#tap)
@@ -572,17 +573,55 @@ numbers.scan(function(slidingWindow, x) {
 ####`stream.flatMap(f) -> Stream`
 ####`most.flatMap(f, stream) -> Stream`
 
-Transform each event in `stream` into a stream, and then flatten it into the resulting stream. Note that `f` *must* return a stream.
+Transform each event in `stream` into a stream, and then merge it into the resulting stream. Note that `f` *must* return a stream.
 
 `function f(x) -> Stream`
 
+```
+stream:            -a----b----c|
+f(a):               1--2--3|
+f(b):                    1----2----3|
+f(c):                           1-2-3|
+stream.flatMap(f): -1--2-13---2-1-233|
+```
+
+Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
+
 ```js
-// Logs 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3
-most.from([1, 2, 3])
+// Logs: 1 2 1 1 2 1 1 2 2 2
+most.from([1, 2])
 	.flatMap(function(x) {
-		return most.repeat(x).take(5);
+		return most.periodic(x * 1000).take(5).constant(x);
 	})
-	.forEach(console.log.bind(console));
+	.observe(console.log.bind(console));
+```
+
+### concatMap
+
+####`stream.concatMap(f) -> Stream`
+####`most.concatMap(f, stream) -> Stream`
+
+Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.
+
+`function f(x) -> Stream`
+
+```
+stream:            -a----b----c|
+f(a):               1--2--3|
+f(b):                    1----2----3|
+f(c):                           1-2-3|
+stream.flatMap(f): -1--2--31----2----31-2-3|
+```
+
+Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
+
+```js
+// Logs: 1 1 1 1 1 2 2 2 2 2
+most.from([1, 2])
+	.concatMap(function(x) {
+		return most.periodic(x * 1000).take(5).constant(x);
+	})
+	.observe(console.log.bind(console));
 ```
 
 ### ap
