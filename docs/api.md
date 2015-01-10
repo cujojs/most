@@ -59,11 +59,13 @@ most.js API
 	* [join](#join)
 1. Awaiting promises
 	* [await](#await)
-1. Delaying streams
-	* [delay](#delay)
+1. Sampling streams
+	* [sampleWith](#sampleWith)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
+1. Delaying streams
+	* [delay](#delay)
 
 ## Notation
 
