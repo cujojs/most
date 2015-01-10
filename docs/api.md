@@ -60,7 +60,7 @@ most.js API
 1. Awaiting promises
 	* [await](#await)
 1. Sampling streams
-	* [sampleWith](#sampleWith)
+	* [sampleWith](#samplewith)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
