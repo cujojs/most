@@ -6,9 +6,10 @@
   "license": "MIT",
   "dependencies": {
     "baconjs": "^0.7.42",
+    "benchmark": "bestiejs/benchmark.js#master",
     "highland": "^2.3.0",
     "kefir": "^0.5.3",
-    "lodash": "^2.4.1",
+    "lodash": "lodash/lodash#master",
     "rx": "^2.3.23"
   }
 }

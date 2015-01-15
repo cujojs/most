@@ -1,14 +1,13 @@
+var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
-var Promise = require('when/lib/Promise');
 
-var runner = require('./runner');
-
-var kefirFromArray = runner.kefirFromArray;
+var runners = require('./runners');
+var kefirFromArray = runners.kefirFromArray;
 
 // Create 2 streams, each with n items, zip them by summing the
 // corresponding index pairs, then reduce the resulting stream by summing
@@ -21,53 +20,39 @@ for(var i = 0; i<n; ++i) {
 	b[i] = i;
 }
 
-runner.run({
-	most: runMost,
-	lodash: runLodash,
-	kefir: runKefir,
-	highland: runHighland,
-	rx: runRx,
-	bacon: runBacon
-}, 'zip ' + n + ' x 2', { a:a, b:b }).then(function() {
-	console.log('DONE');
-});
+var suite = Benchmark.Suite('zip 2 x ' + n + ' integers');
+var options = {
+	defer: true,
+	onError: function(e) {
+		e.currentTarget.failure = e.error;
+	}
+};
 
-function runMost(arrays) {
-	return most.from(arrays.a).zip(add, most.from(arrays.b)).reduce(add, 0);
-}
+suite
+	.add('most', function(deferred) {
+		runners.runMost(deferred, most.from(a).zip(add, most.from(b)).reduce(add, 0));
+	}, options)
+	.add('rx', function(deferred) {
+		runners.runRx(deferred, rx.Observable.fromArray(a).zip(rx.Observable.fromArray(b), add).reduce(add, 0));
+	}, options)
+	.add('kefir', function(deferred) {
+		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).reduce(add, 0));
+	}, options)
+	.add('bacon', function(deferred) {
+		runners.runBacon(deferred, bacon.zipWith(add, bacon.fromArray(a), bacon.fromArray(b)).reduce(0, add));
+	}, options)
+	.add('highland', function(deferred) {
+		runners.runHighland(deferred, highland(a).zip(highland(b)).map(addPair).reduce(0, add));
+	}, options)
+	.add('lodash', function() {
+		return lodash(a).zip(b).map(addPair).reduce(add, 0);
+	});
 
-function runLodash(arrays) {
-	var pairs = lodash.zip(arrays.a, arrays.b);
-	var added = lodash.map(pairs, addPair);
-	return lodash.reduce(added, add, 0);
-}
+runners.runSuite(suite);
 
 function addPair(pair) {
 	return pair[0] + pair[1];
 }
-
-function runHighland(arrays) {
-	return highland(arrays.a).zip(highland(arrays.b)).map(addPair).reduce(0, add);
-}
-
-function runRx(arrays) {
-	return rx.Observable.fromArray(arrays.a).zip(rx.Observable.fromArray(arrays.b), add).reduce(add, 0);
-}
-
-function runBacon(arrays) {
-	return bacon.zipWith(add, bacon.fromArray(arrays.a), bacon.fromArray(arrays.b)).reduce(0, add);
-}
-
-function runKefir(arrays) {
-	return kefirFromArray(arrays.a).zip(kefirFromArray(arrays.b), add).reduce(add, 0);
-}
-
 function add(a, b) {
 	return a + b;
-}
-
-function noop() {}
-
-function inc(x) {
-	return x+1;
 }

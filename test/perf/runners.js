@@ -1,0 +1,128 @@
+var kefir = require('kefir');
+
+exports.runSuite       = runSuite;
+
+exports.runMost        = runMost;
+exports.runRx          = runRx;
+exports.runKefir       = runKefir;
+exports.kefirFromArray = kefirFromArray;
+exports.runBacon       = runBacon;
+exports.runHighland    = runHighland;
+
+exports.logResults     = logResults;
+
+function noop() {}
+
+function logResults(e) {
+	var t = e.target;
+
+	if(t.failure) {
+		console.error(padl(10, t.name) + 'FAILED: ' + e.target.failure);
+	} else {
+		var result = padl(10, t.name)
+			+ padr(12, t.hz.toFixed(2) + ' op/s')
+			+ ' \xb1' + padr(7, t.stats.rme.toFixed(2) + '%')
+			+ padr(15, ' (' + t.stats.sample.length + ' samples)');
+
+		console.log(result);
+	}
+}
+
+function logStart() {
+	console.log(this.name);
+	console.log('-------------------------------------------------------');
+}
+
+function logComplete() {
+	console.log('-------------------------------------------------------');
+}
+
+function runSuite(suite) {
+	return suite
+		.on('start', logStart)
+		.on('cycle', logResults)
+		.on('complete', logComplete)
+		.run();
+}
+
+function runMost(deferred, mostPromise) {
+	mostPromise.then(function() {
+		deferred.resolve();
+	}, function(e) {
+		deferred.benchmark.emit({ type: 'error', error: e });
+		deferred.resolve(e);
+	});
+}
+
+function runRx(deferred, rxStream) {
+	rxStream.subscribe({
+		onNext: noop,
+		onCompleted: function() {
+			deferred.resolve();
+		},
+		onError: function(e) {
+			deferred.benchmark.emit({ type: 'error', error: e });
+			deferred.resolve(e);
+		}
+	});
+}
+
+function runKefir(deferred, kefirStream) {
+	kefirStream.onValue(noop);
+	kefirStream.onEnd(function() {
+		deferred.resolve();
+	});
+}
+
+function kefirFromArray(array) {
+	return kefir.fromBinder(function(emitter) {
+		for(var i=0; i<array.length; ++i) {
+			emitter.emit(array[i]);
+		}
+		emitter.end();
+	});
+}
+
+function runBacon(deferred, baconStream) {
+	try {
+		baconStream.onValue(noop);
+		baconStream.onEnd(function() {
+			deferred.resolve();
+		});
+		baconStream.onError(function(e) {
+			deferred.benchmark.emit({ type: 'error', error: e });
+			deferred.resolve(e);
+		});
+	} catch(e) {
+		deferred.benchmark.emit({ type: 'error', error: e });
+		deferred.resolve(e);
+	}
+}
+
+// Using pull() seems to give the fastest results for highland,
+// but will only work for test runs that reduce a stream to a
+// single value.
+function runHighland(deferred, highlandStream) {
+	highlandStream.pull(function(err, z) {
+		if(err) {
+			deferred.reject(err);
+			return;
+		}
+
+		deferred.resolve(z);
+	});
+}
+
+function padl(n, s) {
+	while(s.length < n) {
+		s += ' ';
+	}
+	return s;
+}
+
+function padr(n, s) {
+	while (s.length < n) {
+		s = ' ' + s;
+	}
+	return s;
+}
