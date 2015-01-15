@@ -17,7 +17,7 @@ for(var i = 0; i< a.length; ++i) {
 	a[i] = i;
 }
 
-var suite = Benchmark.Suite('filter -> map -> reduce ' + n + ' integers');
+var suite = Benchmark.Suite('scan -> reduce ' + n + ' integers');
 var options = {
 	defer: true,
 	onError: function(e) {
@@ -27,37 +27,47 @@ var options = {
 
 suite
 	.add('most', function(deferred) {
-		runners.runMost(deferred, most.from(a).filter(even).map(add1).reduce(sum, 0));
+		runners.runMost(deferred, most.from(a).scan(sum, 0).reduce(passthrough, 0));
 	}, options)
 	.add('rx', function(deferred) {
-		runners.runRx(deferred, rx.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0));
+		runners.runRx(deferred, rx.Observable.fromArray(a).scan(0, sum).reduce(passthrough, 0));
 	}, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).reduce(sum, 0));
+		runners.runKefir(deferred, kefirFromArray(a).scan(sum, 0).reduce(passthrough, 0));
 	}, options)
 	.add('bacon', function(deferred) {
-		runners.runBacon(deferred, bacon.fromArray(a).filter(even).map(add1).reduce(0, sum));
+		runners.runBacon(deferred, bacon.fromArray(a).scan(0, sum).reduce(0, passthrough));
 	}, options)
 	.add('highland', function(deferred) {
-		runners.runHighland(deferred, highland(a).filter(even).map(add1).reduce(0, sum));
+		runners.runHighland(deferred, highland(a).scan(0, sum).reduce(0, passthrough));
 	}, options)
 	.add('lodash', function() {
-		return lodash(a).filter(even).map(add1).reduce(sum, 0);
+		return lodashScan(sum, 0, a).reduce(passthrough, 0);
 	})
 	.add('Array', function() {
-		return a.filter(even).map(add1).reduce(sum, 0);
+		return arrayScan(sum, 0, a).reduce(passthrough, 0);
 	});
 
 runners.runSuite(suite);
 
-function add1(x) {
-	return x + 1;
+function arrayScan(f, initial, a) {
+	var result = initial;
+	return a.map(function(x) {
+		return result = f(result, x);
+	});
 }
 
-function even(x) {
-	return x % 2 === 0;
+function lodashScan(f, initial, a) {
+	var result = initial;
+	return lodash(a).map(function(x) {
+		return result = f(result, x);
+	});
 }
 
 function sum(x, y) {
 	return x + y;
+}
+
+function passthrough(z, x) {
+	return x;
 }

@@ -1,14 +1,13 @@
+var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
-var bacon = require('baconjs');
 var kefir = require('kefir');
+var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
-var Promise = require('when/lib/Promise');
 
-var runner = require('./runner');
-
-var kefirFromArray = runner.kefirFromArray;
+var runners = require('./runners');
+var kefirFromArray = runners.kefirFromArray;
 
 // flatMapping n streams, each containing m items.
 // Results in a single stream that merges in n x m items
@@ -33,58 +32,47 @@ function buildArray(base, n) {
 	return a;
 }
 
-function identity(x) {
-	return x;
-}
+var suite = Benchmark.Suite('flatMap ' + n + ' x ' + m + ' streams');
+var options = {
+	defer: true,
+	onError: function(e) {
+		e.currentTarget.failure = e.error;
+	}
+};
 
-runner.run({
-	most: runMost,
-	lodash: runLodash,
-	array: runArray,
-	kefir: runKefir,
-	highland: runHighland,
-	rx: runRx,
-	bacon: runBacon
-}, 'flatMap ' + n + ' x ' + m, a).then(function() {
-	console.log('DONE');
-});
+suite
+	.add('most', function(deferred) {
+		runners.runMost(deferred, most.from(a).flatMap(most.from).reduce(sum, 0));
+	}, options)
+	.add('rx', function(deferred) {
+		runners.runRx(deferred, rx.Observable.fromArray(a).flatMap(rx.Observable.fromArray).reduce(sum, 0));
+	}, options)
+	.add('kefir', function(deferred) {
+		runners.runKefir(deferred, kefirFromArray(a).flatMap(kefirFromArray).reduce(sum, 0));
+	}, options)
+	.add('bacon', function(deferred) {
+		runners.runBacon(deferred, bacon.fromArray(a).flatMap(bacon.fromArray).reduce(0, sum));
+	}, options)
+	.add('highland', function(deferred) {
+		runners.runHighland(deferred, highland(a).flatMap(highland).reduce(0, sum));
+	}, options)
+	.add('lodash', function() {
+		return lodashFlatMap(identity, a).reduce(sum, 0);
+	})
+	.add('Array', function() {
+		return arrayFlatMap(identity, a).reduce(sum, 0);
+	});
 
-function runArray(a) {
-	return flatMapArray(identity, a).reduce(sum, 0);
-}
+runners.runSuite(suite);
 
-function flatMapArray(f, a) {
+function arrayFlatMap(f, a) {
 	return a.reduce(function(a, x) {
 		return a.concat(f(x));
 	}, []);
 }
 
-function runLodash(a) {
-	return lodashFlatMap(identity, a).reduce(sum, 0);
-}
-
 function lodashFlatMap(f, a) {
 	return lodash(a).map(f).flatten(true);
-}
-
-function runHighland(a) {
-	return highland(a).flatMap(highland).reduce(0, sum);
-}
-
-function runMost(a) {
-	return most.from(a).flatMap(most.from).reduce(sum, 0);
-}
-
-function runRx(a) {
-	return rx.Observable.fromArray(a).flatMap(rx.Observable.fromArray).reduce(sum, 0);
-}
-
-function runBacon(a) {
-	return bacon.fromArray(a).flatMap(bacon.fromArray).reduce(0, sum);
-}
-
-function runKefir(a) {
-	return kefirFromArray(a).flatMap(kefirFromArray).reduce(sum, 0);
 }
 
 function sum(x, y) {
@@ -93,4 +81,8 @@ function sum(x, y) {
 
 function even(x) {
 	return x % 2 === 0;
+}
+
+function identity(x) {
+	return x;
 }

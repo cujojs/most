@@ -1,14 +1,13 @@
+var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
-var bacon = require('baconjs');
 var kefir = require('kefir');
+var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
-var Promise = require('when/lib/Promise');
 
-var runner = require('./runner');
-
-var kefirFromArray = runner.kefirFromArray;
+var runners = require('./runners');
+var kefirFromArray = runners.kefirFromArray;
 
 // flatMapping n streams, each containing m items.
 // Results in a single stream that merges in n x m items
@@ -33,64 +32,54 @@ function buildArray(base, n) {
 	return a;
 }
 
-function identity(x) {
-	return x;
-}
+var suite = Benchmark.Suite('concatMap ' + n + ' x ' + m + ' streams');
+var options = {
+	defer: true,
+	onError: function(e) {
+		e.currentTarget.failure = e.error;
+	}
+};
 
-runner.run({
-	most: runMost,
-	lodash: runLodash,
-	array: runArray,
-	kefir: runKefir,
-	//highland: runHighland, // Highland doesn't have concatMap
-	rx: runRx,
-	bacon: runBacon
-}, 'concatMap ' + n + ' x ' + m, a).then(function() {
-	console.log('DONE');
-});
+suite
+	.add('most', function(deferred) {
+		runners.runMost(deferred, most.from(a).concatMap(most.from).reduce(sum, 0));
+	}, options)
+	.add('rx', function(deferred) {
+		runners.runRx(deferred, rx.Observable.fromArray(a).concatMap(rx.Observable.fromArray).reduce(sum, 0));
+	}, options)
+	.add('kefir', function(deferred) {
+		runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).reduce(sum, 0));
+	}, options)
+	.add('bacon', function(deferred) {
+		runners.runBacon(deferred, bacon.fromArray(a).flatMapConcat(bacon.fromArray).reduce(0, sum));
+	}, options)
+	// Highland doesn't have concatMap
+	//.add('highland', function(deferred) {
+	//	runners.runHighland(deferred, highland(a).flatMap(highland).reduce(0, sum));
+	//}, options)
+	.add('lodash', function() {
+		return lodashConcatMap(identity, a).reduce(sum, 0);
+	})
+	.add('Array', function() {
+		return arrayConcatMap(identity, a).reduce(sum, 0);
+	});
 
-function runArray(a) {
-	return concatMapArray(identity, a).reduce(sum, 0);
-}
+runners.runSuite(suite);
 
-function concatMapArray(f, a) {
+function arrayConcatMap(f, a) {
 	return a.reduce(function(a, x) {
 		return a.concat(f(x));
 	}, []);
-}
-
-function runLodash(a) {
-	return lodashConcatMap(identity, a).reduce(sum, 0);
 }
 
 function lodashConcatMap(f, a) {
 	return lodash(a).map(f).flatten(true);
 }
 
-//function runHighland(a) {
-//	return highland(a).flatMap(highland).reduce(0, sum);
-//}
-
-function runMost(a) {
-	return most.from(a).concatMap(most.from).reduce(sum, 0);
-}
-
-function runRx(a) {
-	return rx.Observable.fromArray(a).concatMap(rx.Observable.fromArray).reduce(sum, 0);
-}
-
-function runBacon(a) {
-	return bacon.fromArray(a).flatMapConcat(bacon.fromArray).reduce(0, sum);
-}
-
-function runKefir(a) {
-	return kefirFromArray(a).flatMapConcat(kefirFromArray).reduce(sum, 0);
-}
-
 function sum(x, y) {
 	return x + y;
 }
 
-function even(x) {
-	return x % 2 === 0;
+function identity(x) {
+	return x;
 }
