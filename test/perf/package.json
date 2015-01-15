@@ -5,10 +5,10 @@
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
   "dependencies": {
-    "baconjs": "^0.7.41",
-    "highland": "^2.2.0",
-    "kefir": "^0.4.2",
+    "baconjs": "^0.7.42",
+    "highland": "^2.3.0",
+    "kefir": "^0.5.3",
     "lodash": "^2.4.1",
-    "rx": "^2.3.22"
+    "rx": "^2.3.23"
   }
 }
