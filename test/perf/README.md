@@ -73,12 +73,12 @@ lodash      27.45 op/s ±  8.98%   (50 samples)
 ```
 scan -> reduce 1000000 integers
 -------------------------------------------------------
-most        28.26 op/s ±  1.43%   (67 samples)
-rx           0.54 op/s ±  2.86%    (6 samples)
-kefir       16.53 op/s ±  1.74%   (41 samples)
+most        73.92 op/s ± 17.98%   (29 samples)
+rx           0.69 op/s ±  1.62%    (6 samples)
+kefir       16.60 op/s ±  1.16%   (40 samples)
 bacon     FAILED: RangeError: Maximum call stack size exceeded
-highland     4.51 op/s ±  4.64%   (15 samples)
-lodash      11.43 op/s ± 10.10%   (34 samples)
-Array        3.67 op/s ±  3.12%   (14 samples)
+highland     4.41 op/s ±  3.55%   (15 samples)
+lodash       6.80 op/s ± 10.92%   (21 samples)
+Array        3.90 op/s ±  3.85%   (14 samples)
 -------------------------------------------------------
 ```

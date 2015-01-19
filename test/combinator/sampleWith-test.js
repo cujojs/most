@@ -4,6 +4,7 @@ var expect = require('buster').expect;
 var sampleWith = require('../../lib/combinator/sampleWith').sampleWith;
 var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
+var map = require('../../lib/combinator/transform').map;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var observe = require('../../lib/combinator/observe').observe;
 var core = require('../../lib/source/core');
@@ -25,27 +26,35 @@ describe('sampleWith', function() {
 	it('should be empty if sampler is empty', function() {
 		var s = sampleWith(empty(), streamOf(sentinel));
 
-		return reduce(inc, 0, s)
+		return reduce(function (x) {
+			return x+1;
+		}, 0, s)
 			.then(function(x) {
 				expect(x).toBe(0);
 			});
 	});
 
 	it('should sample latest value', function() {
-		var s = sampleWith(take(4, periodic(20)), periodic(11).scan(inc, 0));
+		var i = 0;
+		var s = sampleWith(take(4, periodic(20)), map(function() {
+			return i++;
+		}, periodic(11)));
 
 		return reduce(append, [], s)
 			.then(function(a) {
-				expect(a).toEqual([0, 2, 4, 6]);
+				expect(a).toEqual([0, 1, 3, 5]);
 			});
 	});
 
 	it('should sample latest value', function() {
-		var s = sampleWith(take(7, periodic(10)), periodic(22).scan(inc, 0));
+		var i = 0;
+		var s = sampleWith(take(8, periodic(10)), map(function() {
+			return i++;
+		}, periodic(18)));
 
 		return reduce(append, [], s)
 			.then(function(a) {
-				expect(a).toEqual([0, 1, 1, 2, 2, 3, 3]);
+				expect(a).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
 			});
 	});
 
