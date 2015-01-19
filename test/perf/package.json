@@ -10,6 +10,6 @@
     "highland": "^2.3.0",
     "kefir": "^0.5.3",
     "lodash": "lodash/lodash#master",
-    "rx": "^2.3.23"
+    "rx": "^2.3.24"
   }
 }
