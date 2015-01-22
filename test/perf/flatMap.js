@@ -72,7 +72,7 @@ function arrayFlatMap(f, a) {
 }
 
 function lodashFlatMap(f, a) {
-	return lodash(a).map(f).flatten(true);
+	return lodash(a).map(f).flatten();
 }
 
 function sum(x, y) {

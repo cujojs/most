@@ -1,4 +1,4 @@
-Updated: 1-19-2015
+Updated: 1-22-2015
 
 Latest performance tests of basic most.js operations.
 
@@ -36,25 +36,25 @@ Array        5.93 op/s ±  1.93%   (19 samples)
 ```
 flatMap 1000 x 1000 streams
 -------------------------------------------------------
-most        52.09 op/s ±  2.48%   (80 samples)
-rx           0.32 op/s ±  6.52%    (5 samples)
-kefir        9.27 op/s ±  2.20%   (26 samples)
-bacon        0.85 op/s ±  3.16%    (7 samples)
-highland     0.07 op/s ±  5.67%    (5 samples)
-lodash      16.24 op/s ±  2.75%   (32 samples)
-Array        0.37 op/s ±  1.45%    (5 samples)
+most        54.38 op/s ±  1.73%   (81 samples)
+rx           0.36 op/s ±  3.52%    (5 samples)
+kefir        9.43 op/s ±  2.32%   (26 samples)
+bacon        0.86 op/s ±  2.80%    (7 samples)
+highland     0.07 op/s ±  4.74%    (5 samples)
+lodash      22.95 op/s ±  5.76%   (41 samples)
+Array        0.37 op/s ±  3.02%    (5 samples)
 -------------------------------------------------------
 ```
 
 ```
 concatMap 1000 x 1000 streams
 -------------------------------------------------------
-most        52.90 op/s ±  1.61%   (80 samples)
-rx           0.61 op/s ±  1.80%    (6 samples)
-kefir       10.49 op/s ±  1.44%   (29 samples)
-bacon        0.87 op/s ±  2.58%    (7 samples)
-lodash      17.96 op/s ±  3.88%   (45 samples)
-Array        0.37 op/s ±  1.62%    (5 samples)
+most        53.38 op/s ±  0.67%   (81 samples)
+rx           0.59 op/s ±  2.05%    (6 samples)
+kefir       10.27 op/s ±  1.62%   (28 samples)
+bacon        0.79 op/s ±  7.78%    (6 samples)
+lodash      21.83 op/s ±  4.79%   (40 samples)
+Array        0.37 op/s ±  1.91%    (5 samples)
 -------------------------------------------------------
 ```
 
