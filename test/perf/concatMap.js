@@ -73,7 +73,7 @@ function arrayConcatMap(f, a) {
 }
 
 function lodashConcatMap(f, a) {
-	return lodash(a).map(f).flatten(true);
+	return lodash(a).map(f).flatten();
 }
 
 function sum(x, y) {
