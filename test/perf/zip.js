@@ -11,7 +11,7 @@ var kefirFromArray = runners.kefirFromArray;
 
 // Create 2 streams, each with n items, zip them by summing the
 // corresponding index pairs, then reduce the resulting stream by summing
-var n = 100000;
+var n = runners.getIntArg(100000);
 var a = new Array(n);
 var b = new Array(n);
 

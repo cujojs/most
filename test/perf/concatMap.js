@@ -10,11 +10,11 @@ var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
 
 // flatMapping n streams, each containing m items.
-// Results in a single stream that merges in n x m items
-// In Array parlance: Take an Array containing n Arrays, each of length m,
-// and flatten it to an Array of length n x m.
-var n = 1000, m = 1000;
-var a = build(m, n);
+// Results in a single stream that merges in m x n items
+// In Array parlance: Take an Array containing m Arrays, each of length n,
+// and flatten it to an Array of length m x n.
+var mn = runners.getIntArg2(1000, 1000);
+var a = build(mn[0], mn[1]);
 
 function build(m, n) {
 	var a = new Array(n);
@@ -32,7 +32,7 @@ function buildArray(base, n) {
 	return a;
 }
 
-var suite = Benchmark.Suite('concatMap ' + n + ' x ' + m + ' streams');
+var suite = Benchmark.Suite('concatMap ' + mn[0] + ' x ' + mn[1] + ' streams');
 var options = {
 	defer: true,
 	onError: function(e) {

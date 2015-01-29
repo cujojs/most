@@ -11,7 +11,7 @@ var kefirFromArray = runners.kefirFromArray;
 
 // Create a stream from an Array of n integers
 // filter out odds, map remaining evens by adding 1, then reduce by summing
-var n = 1000000;
+var n = runners.getIntArg(1000000);
 var a = new Array(n);
 for(var i = 0; i< a.length; ++i) {
 	a[i] = i;
