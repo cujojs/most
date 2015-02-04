@@ -45,6 +45,8 @@ most.js API
 	* [until](#until), alias [takeUntil](#until)
 	* [since](#since), alias [skipUntil](#since)
 	* [during](#during)
+1. Looping
+	* [loop](#loop)
 1. Consuming streams
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
@@ -878,6 +880,39 @@ var timeWindow = start.constant(end);
 
 most.fromEvent('mousemove', document)
 	.during(timeWindow)
+	.observe(console.log.bind(console));
+```
+
+## Looping
+
+### loop
+
+####`stream.loop(stepper, seed) -> Stream`
+####`most.loop(stepper, seed, stream) -> Stream`
+
+Create a feedback loop that emits one value and feeds back another to be used in the next iteration.
+
+It allows you to maintain and update a "state" (aka feedback, aka `seed` for the next iteration) while emitting a different value.  In contrast, [`scan`](#scan) feeds back and emits the same value.
+
+```js
+// Average an array of values
+function average(values) {
+	return values.reduce(function(sum, x) {
+		return sum + x;
+	}, 0) / values.length;
+}
+
+// Emit the simple (ie windowed) moving average of the 10 most recent values
+stream.loop(function(values, x) {
+	values.push(x);
+	values = values.slice(-10); // Keep up to 10 most recent
+	var avg = average(values);
+
+	// Return { seed, value } pair.
+	// seed will feed back into next iteration
+	// value will be propagated
+	return { seed: values, value: avg };
+}, [])
 	.observe(console.log.bind(console));
 ```
 

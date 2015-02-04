@@ -97,6 +97,26 @@ Stream.prototype.drain = function() {
 
 //-------------------------------------------------------
 
+var loop = require('./lib/combinator/loop').loop;
+
+exports.loop = loop;
+
+/**
+ * Generalized feedback loop. Call a stepper function for each event. The stepper
+ * will be called with 2 params: the current seed and the an event value.  It must
+ * return a new { seed, value } pair. The `seed` will be fed back into the next
+ * invocation of stepper, and the `value` will be propagated as the event value.
+ * @param {function(seed:*, value:*):{seed:*, value:*}} stepper loop step function
+ * @param {*} seed initial seed value passed to first stepper call
+ * @returns {Stream} new stream whose values are the `value` field of the objects
+ * returned by the stepper
+ */
+Stream.prototype.loop = function(stepper, seed) {
+	return loop(stepper, seed, this);
+};
+
+//-------------------------------------------------------
+
 var accumulate = require('./lib/combinator/accumulate');
 
 exports.scan   = accumulate.scan;
