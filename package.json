@@ -35,6 +35,6 @@
     "jshint": "~2"
   },
   "dependencies": {
-    "when": "~3.6.4"
+    "when": "^3.7.0"
   }
 }
