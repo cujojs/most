@@ -176,6 +176,8 @@ stream.take(100)
 
 ### most.repeat
 
+**DEPRECATED:** Use [`most.periodic(period, x)`](#mostperiodic) to create a stream of periodic `x`s, or [`most.iterate(f, x)`](#mostiterate) or [`most.unfold(f, seed)`](#mostunfold) to repeat a value with finer grained control over event times.
+
 ####`most.repeat(x) -> Stream`
 
 Create a stream containing infinite occurrences of `x`.
@@ -186,14 +188,14 @@ most.repeat(x): xxxxxxx->
 
 ### most.periodic
 
-####`most.periodic(period) -> Stream`
+####`most.periodic(period, x) -> Stream`
 
 ```
-most.periodic(2): a-b-c-d-e-f->
-most.periodic(5): a----b----c->
+most.periodic(2, x): x-x-x-x-x-x->
+most.periodic(5, x): x----x----x->
 ```
 
-Create an infinite stream containing events that arrive every `period` milliseconds. The value of each event is its arrival time in milliseconds.
+Create an infinite stream containing events that arrive every `period` milliseconds, and whose value is `x`.
 
 ### most.empty
 

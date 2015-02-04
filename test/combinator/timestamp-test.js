@@ -14,7 +14,7 @@ describe('timestamp', function() {
 		var s = take(10, timestamp(periodic(1)));
 
 		return observe(function(timeValue) {
-			expect(timeValue.value).toBe(timeValue.time);
+			expect(typeof timeValue.time).toBe('number');
 		}, s);
 	});
 });
