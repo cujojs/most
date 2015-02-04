@@ -121,7 +121,7 @@ Most.js interoperates with ES6 generators and iterators.  For example, you can c
 
 ```js
 function* allTheIntegers() {
-	var i=0;
+	let i=0;
 	while(true) {
 		yield i++;
 	}
@@ -130,7 +130,5 @@ function* allTheIntegers() {
 // Log the first 100 integers
 most.from(allTheIntegers())
 	.take(100)
-	.observe(function(x) {
-		console.log(x);
-	});
+	.observe(x => console.log(x));
 ```
