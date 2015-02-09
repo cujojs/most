@@ -9,7 +9,7 @@
     "benchmark": "bestiejs/benchmark.js#master",
     "highland": "^2.3.0",
     "kefir": "^1.0.0",
-    "lodash": "^3.0.0",
-    "rx": "^2.3.24"
+    "lodash": "^3.1.0",
+    "rx": "^2.3.25"
   }
 }
