@@ -24,14 +24,14 @@ var other = { value: 'other' };
 describe('debounce', function() {
 	describe('when events always occur less frequently than debounce period', function() {
 		it('should be identity', function() {
-			var a = [0,1,2,3,4,5,6,7,8,9];
+			var a = [0,1,2,3,4];
 			var expected = a.slice(0, -1);
 
-			var s = take(10, map(function() {
+			var s = take(5, map(function() {
 				return a.shift();
-			}, periodic(10)));
+			}, periodic(20)));
 
-			var debounced = limit.debounce(1, s);
+			var debounced = limit.debounce(10, s);
 
 			return reduce(function(a, x) {
 				return a.concat(x);

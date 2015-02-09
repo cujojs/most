@@ -35,6 +35,22 @@ describe('unfold', function() {
 		});
 	});
 
+	it('should allow future events by returning a promise', function() {
+		var count = 0;
+		var expected = 3;
+
+		var s = take(expected, unfold(function (x) {
+			return Promise.resolve({ value: x, seed: x+1 });
+		}, 0));
+
+		return observe(function(x) {
+			expect(x).toBe(count);
+			count++;
+		}, s).then(function() {
+			expect(count).toBe(expected);
+		});
+	});
+
 	it('should reject on error', function() {
 		var spy = this.spy();
 		var s = unfold(function () {

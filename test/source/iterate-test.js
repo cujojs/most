@@ -4,6 +4,7 @@ var expect = require('buster').expect;
 var iterate = require('../../lib/source/iterate');
 var take = require('../../lib/combinator/slice').take;
 var observe = require('../../lib/combinator/observe').observe;
+var Promise = require('../../lib/Promise');
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -39,6 +40,18 @@ describe('iterate', function() {
 	it('should call iterator repeatedly', function() {
 		var s = take(10, iterate.iterate(function (x) {
 			return x+1;
+		}, 0));
+
+		var count = 0;
+		return observe(function(x) {
+			expect(x).toBe(count);
+			count++;
+		}, s);
+	});
+
+	it('should allow future events by returning a promise', function() {
+		var s = take(10, iterate.iterate(function (x) {
+			return Promise.resolve(x+1);
 		}, 0));
 
 		var count = 0;
