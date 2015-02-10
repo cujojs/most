@@ -319,9 +319,10 @@ Stream.prototype.combine = function(f /*, ...streams*/) {
 //-----------------------------------------------------------------------
 // Sampling
 
-var sampleWith = require('./lib/combinator/sampleWith').sampleWith;
+var sample = require('./lib/combinator/sample');
 
-exports.sampleWith = sampleWith;
+exports.sample = sample.sample;
+exports.sampleWith = sample.sampleWith;
 
 /**
  * When an event arrives on sampler, emit the latest event value from stream.
@@ -330,7 +331,17 @@ exports.sampleWith = sampleWith;
  * @returns {Stream} sampled stream of values
  */
 Stream.prototype.sampleWith = function(sampler) {
-	return sampleWith(sampler, this);
+	return sample.sampleWith(sampler, this);
+};
+
+/**
+ * When an event arrives on this stream, emit the result of calling f with the latest
+ * values of all streams being sampled
+ * @param {function(...values):*} f function to apply to each set of sampled values
+ * @returns {Stream} stream of sampled and transformed values
+ */
+Stream.prototype.sample = function(f /* ...streams */) {
+	return sample.sampleArray(f, this, base.tail(arguments));
 };
 
 //-----------------------------------------------------------------------
