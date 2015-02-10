@@ -1,13 +1,7 @@
 var makeIterable = require('../../lib/iterable').makeIterable;
+var Iteration = require('./Iteration');
 
 module.exports = ArrayIterable;
-
-function Iteration(done, value) {
-	this.done = done;
-	this.value = value;
-}
-
-var DONE = Iteration.DONE = new Iteration(true, void 0);
 
 function ArrayIterable(a) {
 	this.array = a;
@@ -31,5 +25,5 @@ ArrayIterator.prototype.next = function() {
 		return new Iteration(false, x);
 	}
 
-	return DONE;
+	return Iteration.DONE;
 };
