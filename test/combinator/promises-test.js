@@ -4,7 +4,6 @@ var expect = require('buster').expect;
 var promises = require('../../lib/combinator/promises');
 var delay = require('../../lib/combinator/delay').delay;
 var observe = require('../../lib/combinator/observe').observe;
-var drain = require('../../lib/combinator/observe').drain;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var streamOf = require('../../lib/source/core').of;
 var fromArray = require('../../lib/source/fromArray').fromArray;
@@ -36,6 +35,15 @@ describe('await', function() {
 			return a.concat(x);
 		}, [], s).then(function (a) {
 			expect(a).toEqual([1, sentinel]);
+		});
+	});
+
+	it('should propagate error if promise rejects', function() {
+		var s = promises.await(fromArray([Promise.resolve(), Promise.reject(sentinel), Promise.resolve()]));
+		var spy = this.spy();
+		return observe(spy, s).catch(function(e) {
+			expect(e).toBe(sentinel);
+			expect(spy).toHaveBeenCalledOnce();
 		});
 	});
 
