@@ -2,7 +2,8 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var lift = require('../lib/combinator/lift').lift;
-var repeat = require('../lib/source/iterate').repeat;
+var periodic = require('../lib/source/periodic').periodic;
+var take = require('../lib/combinator/slice').take;
 var observe = require('../lib/combinator/observe').observe;
 var streamOf = require('../lib/source/core').of;
 
@@ -26,13 +27,13 @@ describe('lift', function() {
 
 		var lifted = lift(f);
 
-		var a = repeat('a');
-		var b = repeat('b');
+		var a = periodic(1, 'a');
+		var b = periodic(5, 'b');
 		var c = streamOf('c');
 
 		return observe(function(x) {
 			expect(x).toBe(f('a', 'b', 'c'));
-		}, lifted(a, b, c));
+		}, take(3, lifted(a, b, c)));
 
 	});
 });
