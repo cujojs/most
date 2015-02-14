@@ -94,6 +94,18 @@ Array         5.71 op/s ±  4.65%   (18 samples)
 -------------------------------------------------------
 ```
 
+```
+distinct -> reduce 2 x 1000000 integers
+-------------------------------------------------------
+most        108.51 op/s ±  7.60%   (43 samples)
+rx            0.94 op/s ±  4.02%    (7 samples)
+kefir        14.25 op/s ±  1.38%   (35 samples)
+bacon     FAILED: RangeError: Maximum call stack size exceeded
+lodash       42.39 op/s ±  3.16%   (55 samples)
+Array         9.13 op/s ±  2.15%   (27 samples)
+-------------------------------------------------------
+```
+
 ## io.js
 
 ```
@@ -161,5 +173,17 @@ bacon     FAILED: RangeError: Maximum call stack size exceeded
 highland      4.77 op/s ±  4.02%   (16 samples)
 lodash        3.41 op/s ±  6.45%   (13 samples)
 Array         5.31 op/s ±  8.13%   (18 samples)
+-------------------------------------------------------
+```
+
+```
+distinct -> reduce 2 x 1000000 integers
+-------------------------------------------------------
+most        108.89 op/s ±  8.26%   (40 samples)
+rx            0.82 op/s ±  2.52%    (7 samples)
+kefir        13.75 op/s ±  1.54%   (34 samples)
+bacon     FAILED: RangeError: Maximum call stack size exceeded
+lodash        8.91 op/s ±  2.71%   (26 samples)
+Array         4.08 op/s ±  2.01%   (15 samples)
 -------------------------------------------------------
 ```
