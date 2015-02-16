@@ -612,11 +612,11 @@ Transform each event in `stream` into a stream, and then concatenate it onto the
 `function f(x) -> Stream`
 
 ```
-stream:            -a----b----c|
-f(a):               1--2--3|
-f(b):                    1----2----3|
-f(c):                           1-2-3|
-stream.flatMap(f): -1--2--31----2----31-2-3|
+stream:              -a----b----c|
+f(a):                 1--2--3|
+f(b):                      1----2----3|
+f(c):                             1-2-3|
+stream.concatMap(f): -1--2--31----2----31-2-3|
 ```
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
