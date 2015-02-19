@@ -15,7 +15,7 @@ var sentinel = { value: 'sentinel' };
 
 describe('combine', function() {
 	it('should yield initial only after all inputs yield', function() {
-		var s1 = periodic(1);
+		var s1 = streamOf(1);
 		var s2 = streamOf(sentinel);
 
 		var sc = combine(Array, s1, delay(2, s2));
@@ -49,7 +49,8 @@ describe('combine', function() {
 					[2,1],
 					[2,3],
 					[4,3],
-					[4,5]
+					[4,5],
+					[6,5]
 				]);
 			});
 	});

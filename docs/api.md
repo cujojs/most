@@ -635,15 +635,15 @@ most.from([1, 2])
 ####`streamOfFunctions.ap(stream) -> Stream`
 ####`most.ap(streamOfFunctions, stream) -> Stream`
 
-Apply all the functions in `streamOfFunctions` to all the values in `stream`.
+Apply the latest function in `streamOfFunctions` to the latest value in `stream`.
 
 ```
-streamOfFunctions:            f-g-h|
-stream:                       x-y-z|
-streamOfFunctions.ap(stream): f(x)-f(y)-f(z)-g(x)-g(y)-g(z)-h(x)-h(y)-h(z)|
+streamOfFunctions:            --f---------g--------h------>
+stream:                       -a-------b-------c-------d-->
+streamOfFunctions.ap(stream): --fa-----fb-gb---gc--hc--hd->
 ```
 
-This effectively creates the cross-product of `streamOfFunctions` and `stream`.  As shown in the diagram above, `stream` will be traversed multiple times--once for each event in `streamOfFunctions`.
+In effect, `ap` applies a *time-varying function* to a *time-varying value*.
 
 ### timestamp
 
