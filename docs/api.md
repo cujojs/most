@@ -55,14 +55,14 @@ most.js API
 	* [merge](#merge)
 	* [combine](#combine)
 	* [most.lift](#mostlift)
+	* [sample](#sample)
+	* [sampleWith](#samplewith)
 	* [zip](#zip)
 1. Combining higher order streams
 	* [switch](#switch)
 	* [join](#join)
 1. Awaiting promises
 	* [await](#await)
-1. Sampling streams
-	* [sampleWith](#samplewith)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
@@ -1027,7 +1027,7 @@ var yStream = fromInput(document.querySelector('input.y'));
 var resultStream = xStream.combine(add, yStream);
 
 var resultNode = document.querySelector('.result');
-result.forEach(function(z) {
+resultStream.observe(function(z) {
 	resultNode.textContent = z;
 });
 ```
@@ -1079,8 +1079,93 @@ var resultStream = liftedAppend(input1, input2);
 
 // Logs the concatenated value of input1 and input2
 // *whenever either input changes*
-resultStream.forEach(console.log.bind(console));
+resultStream.observe(console.log.bind(console));
 ```
+
+### sample
+
+####`sampler.sample(f, ...streams) -> Stream`
+####`most.sample(f, sampler, ...streams) -> Stream`
+
+Create a new stream by combining sampled values from many input streams.
+
+```
+s1:                          -1-----2-----3->
+s2:                          -1---2---3---4->
+sampler:                     -a-a-a-a-a-a-a->
+sampler.sample(add, s1, s2): -2-2-3-4-5-5-7->
+```
+
+```
+s1:                          -1----2----3->
+s2:                          -1-2-3-4-5-6->
+sampler:                     -a--a--a--a-->
+sampler.sample(add, s1, s2): -2--3--6--7-->
+```
+
+While [`combine`](#combine), produces a value whenever an event arrives on any of its inputs, `sample` produces a value only when an event arrives on the sampler.
+
+```js
+// Add the current value of two inputs
+// Updates only when the user clicks a button
+
+// Create a stream from an <input> value
+function fromInput(input) {
+	return most.fromEvent('change', input)
+		.map(function(e) { return e.target.value })
+		.map(Number);
+}
+
+// Add two numbers
+function add(x, y) {
+	return x + y;
+}
+
+// Create streams for the current value of x and y
+var xStream = fromInput(document.querySelector('input.x'));
+var yStream = fromInput(document.querySelector('input.y'));
+var click = most.fromEvent('click', document.querySelector('.button'));
+
+// Create a result stream by adding the values of x and y
+// at the time the button was clicked.
+// NOTE: add() is NOT called when x and y change, but rather
+// only when the button is clicked.
+var resultStream = click.sample(add, xStream, yStream);
+
+var resultNode = document.querySelector('.result');
+result.observe(function(z) {
+	resultNode.textContent = z;
+});
+```
+
+### sampleWith
+
+####`values.sampleWith(sampler) -> Stream`
+####`most.sampleWith(sampler, values) -> Stream`
+
+When an event arrives on sampler, emit the latest event value from values.  Effectively equivalent to `sampler.sample(identity, values);`
+
+```
+values:                     -1---2-3---4-5---6-7---8->
+sampler:                    ---a---a---a---a---a---a->
+values.sampleWith(sampler): ---1---3---4---5---7---8->
+```
+
+```
+values:                     -1----2----3----4----5--->
+sampler:                    -a-a-a-a-a-a-a-a-a-a-a-a->
+values.sampleWith(sampler): -1-1-1-2-2-3-3-3-4-4-5-5->
+```
+
+Sampling can "smooth" an erratic source, or can act as a dynamic throttle to speed or slow events from one stream using another.
+
+```js
+// Log mouse position whenever the user presses a key
+most.fromEvent('mousemove', document)
+	.sampleWith(most.fromEvent('keydown', document))
+	.observe(console.log.bind(console));
+```
+
 
 ### zip
 
@@ -1189,36 +1274,6 @@ var streamOfPromises = Stream.from(urls).map(fetchContent);
 var streamOfContent = streamOfPromises.await();
 
 streamOfContent.forEach(console.log.bind(console));
-```
-
-## Sampling streams
-
-### sampleWith
-
-####`values.sampleWith(sampler)`
-####`most.sampleWith(sampler, values)`
-
-When an event arrives on sampler, emit the latest event value from values.
-
-```
-values:                     -1---2-3---4-5---6-7---8->
-sampler:                    ---a---a---a---a---a---a->
-values.sampleWith(sampler): ---1---3---4---5---7---8->
-```
-
-```
-values:                     -1----2----3----4----5--->
-sampler:                    -a-a-a-a-a-a-a-a-a-a-a-a->
-values.sampleWith(sampler): -1-1-1-2-2-3-3-3-4-4-5-5->
-```
-
-Sampling can "smooth" an erratic source, or can act as a dynamic throttle to speed or slow events from one stream using another.
-
-```js
-// Log mouse position whenever the user presses a key
-most.fromEvent('mousemove', document)
-	.sampleWith(most.fromEvent('keydown', document))
-	.observe(console.log.bind(console));
 ```
 
 ## Rate limiting streams
