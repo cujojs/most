@@ -150,10 +150,12 @@ Stream.prototype.reduce = function(f, initial) {
 
 var unfold = require('./lib/source/unfold');
 var iterate = require('./lib/source/iterate');
+var generate = require('./lib/source/generate');
 var build = require('./lib/combinator/build');
 
 exports.unfold    = unfold.unfold;
 exports.iterate   = iterate.iterate;
+exports.generate  = generate.generate;
 exports.repeat    = iterate.repeat;
 exports.concat    = build.cycle;
 exports.concat    = build.concat;

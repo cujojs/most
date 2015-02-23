@@ -14,6 +14,7 @@ most.js API
 	* [most.never](#mostnever)
 	* [most.iterate](#mostiterate)
 	* [most.unfold](#mostunfold)
+	* [most.generate](#mostgenerate)
 	* [most.fromEvent](#mostfromevent)
 	* [most.fromEventWhere](#mostfromeventwhere)
 	* [most.create](#mostcreate)
@@ -274,6 +275,33 @@ most.unfold(function(id) {
 		return { value: content, seed: id + 1 };
 	});
 }, 1);
+```
+
+### most.generate
+
+####`most.generate(generator, ...args) -> Stream`
+
+Build a stream by running an *asynchronous generator*: a generator which yields promises.
+
+When the generator yields a promise, the promise's fulfillment value will be added to the stream.  If the promise rejects, an exception will be thrown in the generator.  You can use `try/catch` to handle the exception.
+
+```js
+function delayPromise(ms, value) {
+	return new Promise(resolve => setTimeout(() => resolve(value), delay));
+}
+
+function* countdownGet(delay, start) {
+	for(let i = start; i > 0; --i) {
+		yield delayPromise(delay, i);
+	}
+}
+
+// Logs
+// 3 (after 1 second)
+// 2 (after 1 more second)
+// 1 (after 1 more second)
+most.generate(countdown, 1000, 3)
+	.observe(x => console.log(x))
 ```
 
 ### most.fromEvent
