@@ -287,7 +287,7 @@ When the generator yields a promise, the promise's fulfillment value will be add
 
 ```js
 function delayPromise(ms, value) {
-	return new Promise(resolve => setTimeout(() => resolve(value), delay));
+	return new Promise(resolve => setTimeout(() => resolve(value), ms));
 }
 
 function* countdownGet(delay, start) {

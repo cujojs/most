@@ -117,7 +117,7 @@ most.fromPromise(Promise.resolve('hello'))
 
 Conceptually, [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) allow you to write a function that acts like an iterable sequence.  Generators support the standard ES6 [Iterator interface](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), so they can be iterated over using ES6 standard `for of` or the iterator's `next()` API.
 
-Most.js interoperates with ES6 generators and iterators.  For example, you can create an observable stream from any ES6 iterable:
+Most.js interoperates with ES6 generators and iterators.  For example, you can create an event stream from any ES6 iterable:
 
 ```js
 function* allTheIntegers() {
@@ -129,6 +129,26 @@ function* allTheIntegers() {
 
 // Log the first 100 integers
 most.from(allTheIntegers())
+	.take(100)
+	.observe(x => console.log(x));
+```
+
+You can also create an event stream from an *asynchronous generator*, a generator that yields promises:
+
+```js
+function* allTheIntegers(interval) {
+	let i=0;
+	while(true) {
+		yield delayPromise(interval, i++);
+	}
+}
+
+function delayPromise(ms, value) {
+	return new Promise(resolve => setTimeout(() => resolve(value), ms));
+}
+
+// Log the first 100 integers, at 1 second intervals
+most.generate(allTheIntegers, 1000)
 	.take(100)
 	.observe(x => console.log(x));
 ```
