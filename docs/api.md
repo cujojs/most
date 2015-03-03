@@ -321,6 +321,16 @@ Note that when the stream ends (for example, by using [take](#take), [takeUntil]
 var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 ```
 
+```js
+// We can do some event delegation by applying a filter to the stream
+// in conjunction with e.target.matches this will allow only events with 
+// .the-button class to be processed
+var clicks = most.fromEvent('click', document.querySelector('.container'));
+clicks.filter(function(e){
+    return e.target.matches('.the-button');
+}).forEach(doSomething);
+```
+
 ### most.fromEventWhere
 
 ####`most.fromEventWhere(predicate, eventType, source) -> Stream`
@@ -342,11 +352,11 @@ most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
 // Using event delegation with Element.matches
 // This allows only events with the .toggle-button class
 // It also only calls preventDefault on allowed events
-var form = document.querySelector('.container');
+var container = document.querySelector('.container');
 most.fromEventWhere(function(e) {
-		return e.matches('.toggle-button') && e.preventDefault();
-	}, 'click', container)
-	.forEach(doSomething);
+        return e.target.matches('.toggle-button') && e.preventDefault();
+    }, 'click', container)
+    .forEach(doSomething);
 ```
 
 <a name="mostcreate"/>
