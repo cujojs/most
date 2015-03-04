@@ -235,6 +235,22 @@ Stream.prototype.tap = function(f) {
 };
 
 //-----------------------------------------------------------------------
+// Transducer support
+
+var transduce = require('./lib/combinator/transduce');
+
+exports.transduce = transduce.transduce;
+
+/**
+ * Transform this stream by passing its events through a transducer.
+ * @param  {function} transducer transducer function
+ * @return {Stream} stream of events transformed by the transducer
+ */
+Stream.prototype.transduce = function(transducer) {
+	return transduce.transduce(transducer, this);
+};
+
+//-----------------------------------------------------------------------
 // FlatMapping
 
 var flatMap = require('./lib/combinator/flatMap');

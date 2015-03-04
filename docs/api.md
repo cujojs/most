@@ -37,6 +37,8 @@ most.js API
 	* [filter](#filter)
 	* [distinct](#distinct)
 	* [distinctBy](#distinctby)
+1. Transducer support
+	* [transduce](#transduce)
 1. Slicing streams
 	* [slice](#slice)
 	* [take](#take)
@@ -792,6 +794,37 @@ stream.distinctBy(equalsIgnoreCase): -a-b---c-D---e->
 The `equals` function should accept two values and return truthy if the two values are equal, or falsy if they are not equal.
 
 `function equals(a, b) -> boolean`
+
+## Transducer support
+
+### transduce
+
+####`stream.transduce(transducer) -> Stream`
+####`most.transduce(transducer, stream) -> Stream`
+
+Create a new stream by passing items through the provided transducer.
+
+[Transducers](http://simplectic.com/blog/2014/transducers-explained-1/) are composable transformations.  They may map, filter, add items to, drop items from, or otherwise transform an event stream.  The primary benefit of transducers is that they are composable and reusable across any data structures that support them (see note on performance below)
+
+Most.js supports any transducer that implements the *de facto* JavaScript transducer protocol.  For example, two popular transducers libraries are [transducers-js](https://github.com/cognitect-labs/transducers-js) and [transducers.js](https://github.com/jlongster/transducers.js).
+
+
+```js
+// Create a transducer that slices, filters, and maps
+var transducers = require('transducers-js');
+var transducer = transducers.comp(
+	transducers.take(4),
+	transducers.filter(x => x % 2 === 0),
+	transducers.map(x => x + 1)
+);
+
+// Logs 3 5
+most.from([1,2,3,4,5,6,7,8,9])
+	.transduce(transducer)
+	.observe(x => console.log(x));
+```
+
+**Note on transducer performance:** Transducers perform single-pass transformation.  For many data structures, this can provide a significant performance improvement.  However, most.js's builtin combinators currently outperform popular transducer libraries.  The primary benefit of using transducers with most.js is reusability and portability.
 
 ## Slicing streams
 
