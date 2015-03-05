@@ -28,7 +28,6 @@ describe('fromEventWhere', function() {
 		it('should unlisten on end', function() {
 			return verifyUnlistenOnEndWhere.call(this, isSentinel, new FakeEventTarget());
 		});
-
 	});
 
 	describe('given an EventEmitter', function() {
@@ -77,6 +76,21 @@ describe('fromEvent', function() {
 			return verifyUnlistenOnEnd.call(this, new FakeEventTarget());
 		});
 
+		it('should propagate event synchronously', function() {
+			var tick = 0;
+			var source = new FakeEventTarget();
+			var s = fromEvent('test', source);
+
+			setTimeout(function() {
+				tick = 1;
+				source.emit(sentinel);
+				tick = 2;
+			}, 0);
+
+			return observe(function() {
+				expect(tick).toBe(1);
+			}, take(1, s));
+		});
 	});
 
 	describe('given an EventEmitter', function() {
