@@ -28,7 +28,7 @@ most.js API
 	* [map](#map)
 	* [constant](#constant)
 	* [scan](#scan)
-	* [flatMap](#flatmap), alias [flatMap](#chain)
+	* [flatMap](#flatMap), alias [chain](#flatMap)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
