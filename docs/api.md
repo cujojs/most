@@ -325,13 +325,44 @@ var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 // We can do some event delegation by applying a filter to the stream
 // in conjunction with e.target.matches this will allow only events with 
 // .the-button class to be processed
-var clicks = most.fromEvent('click', document.querySelector('.container'));
-clicks.filter(function(e){
-    return e.target.matches('.the-button');
-}).forEach(doSomething);
+var container = document.querySelector('.container');
+most.fromEvent('click', container);
+	.filter(function(e){
+    	return e.target.matches('.the-button');
+	})
+	.forEach(doSomething);
+```
+
+```js
+// Using preventDefault
+var form = document.querySelector('form');
+most.fromEvent('submit', form)
+	.tap(function(e) {
+		e.preventDefault();
+	})
+	.map(parseForm)
+	.map(JSON.stringify)
+	.forEach(postToServer);
+```
+
+```js
+// Using event delegation with Element.matches
+// This allows only events with the .toggle-button class
+// It also only calls preventDefault on allowed events
+var container = document.querySelector('.container');
+most.fromEvent('click', container)
+	.filter(function(e) {
+		return e.target.matches('.toggle-button');
+	})
+	.tap(function(e) {
+		e.preventDefault();
+	})
+    .forEach(doSomething);
 ```
 
 ### most.fromEventWhere
+
+**DEPRECATED:** Use [`most.fromEvent`](#mostfromevent) in conjunction with [`filter`](#filter) to handle selector matching, and [`tap`](#tap) to handle `preventDefault` and/or `stopPropagation` for DOM events.
 
 ####`most.fromEventWhere(predicate, eventType, source) -> Stream`
 
