@@ -619,7 +619,7 @@ most.from(['a', 'b', 'c', 'd'])
 	.scan(function(string, letter) {
 		return string + letter;
 	}, '')
-	.forEach(console.log.bind(console);
+	.forEach(console.log.bind(console));
 ```
 
 ```js
