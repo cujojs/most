@@ -28,7 +28,7 @@ most.js API
 	* [map](#map)
 	* [constant](#constant)
 	* [scan](#scan)
-	* [flatMap](#flatmap)
+	* [flatMap](#flatmap), alias [chain](#flatmap)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
@@ -515,6 +515,8 @@ Makes an infinite stream from a finite one.  If the input `stream` is infinite, 
 ## Handling errors
 
 ### flatMapError
+
+Alias: **chain**
 
 ####`stream.flatMapError(f) -> Stream`
 ####`most.flatMapError(f, stream) -> Stream`
