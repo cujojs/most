@@ -1338,7 +1338,7 @@ function fetchContent(url) {
    // return a promise
 }
 
-var streamOfPromises = Stream.from(urls).map(fetchContent);
+var streamOfPromises = most.from(urls).map(fetchContent);
 
 var streamOfContent = streamOfPromises.await();
 
