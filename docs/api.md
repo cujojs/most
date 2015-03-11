@@ -260,7 +260,9 @@ The unfolding function accepts a seed value and must return a tuple: `{value:*, 
 
 * `tuple.value` will be emitted as an event.
 * `tuple.seed` will be passed to the next invocation of the unfolding function.
-* `tuple.done` can be used to stop unfolding.  When `tuple.done == true`, unfolding will stop.
+* `tuple.done` can be used to stop unfolding.  When `tuple.done == true`, unfolding will stop.  Additionally, when `tuple.done == true`:
+	* `tuple.value` will be used as the stream's end signal value.  It *will not* appear as a normal event in the stream.
+ 	* `tuple.seed` will be ignored
 
 Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
