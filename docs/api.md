@@ -1028,7 +1028,7 @@ Alias: **forEach**
 ####`most.observe(f, stream) -> Promise`
 ####`most.forEach(f, stream) -> Promise`
 
-Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed having resolution value of end signal value (if present), or will reject if the stream fails and the [error is not handled](#handling-errors).
+Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill with the end signal value (or null if not present) after all the events have been consumed., or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ```js
 // Log mouse movements until the user clicks, then stop.
