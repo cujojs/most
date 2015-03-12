@@ -80,6 +80,8 @@ stream1: -a-b-c-d->
 stream2: -a--b---c|
 
 stream3: -abc-def-X
+
+stream4: -a-b-c-d-|e|
 ```
 
 These are timeline diagrams that try to give a simple, representative notion of how a stream behaves over time.  Time proceeds from left to right, using letters and symbols to indicate certain things:
@@ -87,6 +89,8 @@ These are timeline diagrams that try to give a simple, representative notion of 
 * `-` - an instant in time where no event occurs
 * letters (a,b,c,d,etc) - an event at an instant in time
 * `|` - end of stream
+* `|e|` - end of stream with an end signal value attached
+  * End event value is not emited as a normal stream event (e.g. it will not be processed while observing the stream).
 * `X` - an error occurred at an instant in time
 * `>` - stream continues infinitely
 	* Typically, `>` means you can assume that a stream will continue to repeat some common pattern infinitely
@@ -100,6 +104,10 @@ A stream that emits `a` and then ends immediately.
 `stream: a-b---|`
 
 A stream that emits `a`, then `b`, and some time later ends.
+
+`stream: a-b---|c|`
+
+A stream that emits `a`, then `b`, and some time later ends with end signal value c.
 
 `stream: a-b-X`
 
@@ -412,7 +420,7 @@ Note that the publisher will not be called until there is *demand* for the strea
 The publisher function can use `add`, `end`, and `error`:
 
 * `add(x)` - Add `x` to the stream
-* `end()` - End the stream. Any later calls to `add`, `end`, or `error` will be no-ops.
+* `end([x])` - End the stream possibly attaching end signal value `x`. Any later calls to `add`, `end`, or `error` will be no-ops.
 * `error(e)` - Signal that the stream has failed and cannot produce more events.
 
 Note that if you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
@@ -1020,7 +1028,7 @@ Alias: **forEach**
 ####`most.observe(f, stream) -> Promise`
 ####`most.forEach(f, stream) -> Promise`
 
-Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
+Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed having resolution value of end signal value (if present), or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ```js
 // Log mouse movements until the user clicks, then stop.
@@ -1032,6 +1040,24 @@ most.fromEvent('mousemove', document)
 	});
 ```
 
+```js
+// consume end signal value as result Promise resolution value.
+most.unfold(function() {
+    return getPartialResults().then(function(result) {
+      return {
+        value: result.final ? result.summary : result.results,
+        done: result.final
+      };
+    });
+  }, null)
+  .forEach(function(partialResults) {
+    console.log('Partial result:', partialResults);
+  })
+  .then(function(summary) {
+    console.log('Operation summary:', summary);
+  });
+```
+
 ### drain
 
 ####`stream.drain() -> Promise`
@@ -1039,7 +1065,7 @@ most.fromEvent('mousemove', document)
 
 Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
-The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
+The returned promise will fulfill (with end signal value as resolution value) after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ## Combining streams
 
