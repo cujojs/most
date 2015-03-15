@@ -4,6 +4,7 @@ var expect = require('buster').expect;
 var timeslice = require('../lib/combinator/timeslice');
 var take = require('../lib/combinator/slice').take;
 var periodic = require('../lib/source/periodic').periodic;
+var unfold = require('../lib/source/unfold').unfold;
 var core = require('../lib/source/core');
 var delay = require('../lib/combinator/delay').delay;
 var reduce = require('../lib/combinator/accumulate').reduce;
@@ -60,7 +61,6 @@ describe('during', function() {
 				expect(count).toBe(5);
 				expect(dispose).toHaveBeenCalledOnce();
 			});
-
 	});
 });
 
@@ -116,8 +116,17 @@ describe('takeUntil', function() {
 				expect(count).toBe(3);
 				expect(dispose).toHaveBeenCalledOnce();
 			});
-
 	});
+
+	it('should use takeUntil value as end value', function() {
+		var s = periodic(10);
+		var end = delay(40, streamOf(sentinel));
+
+		return drain(timeslice.takeUntil(end, s)).then(function(x) {
+			expect(x).toBe(sentinel);
+		});
+	});
+
 });
 
 describe('skipUntil', function() {
@@ -148,4 +157,22 @@ describe('skipUntil', function() {
 
 	});
 
+	it('should preserve end value', function() {
+		var s = take(3, periodic(10, sentinel));
+		var start = delay(30, streamOf());
+
+		return drain(timeslice.skipUntil(start, s)).then(function(x) {
+			expect(x).toBe(sentinel);
+		});
+	});
+
+	it('should allow end before start signal', function() {
+		var s = take(3, periodic(10));
+		var start = delay(30, streamOf());
+		var end = delay(10, streamOf(sentinel));
+
+		return drain(timeslice.skipUntil(start, timeslice.takeUntil(end, s))).then(function(x) {
+			expect(x).toBe(sentinel);
+		});
+	});
 });
