@@ -127,7 +127,7 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 most.of(x): x|
 ```
 
-Create a stream containing only x.
+Create a stream containing only x.  End signal value of the stream is always `null`.
 
 ```js
 var stream = most.of('hello');
@@ -143,7 +143,7 @@ promise:                   ----a
 most.fromPromise(promise): ----a|
 ```
 
-Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.
+Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  End signal value of the stream is always `null`.
 
 ### most.from
 
@@ -154,6 +154,12 @@ most.from([1,2,3,4]): 1234|
 ```
 
 Create a stream containing all items from an iterable.  The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
+
+End signal value considerations:
+
+* For Arrays it is always `null`
+* For iterables it is `tuple.value` of the `tuple` returned by `next()` that has `tuple.done` set to true.
+  * For ES6 generators it will be a value returned (*not* yielded) by the generator.
 
 ```js
 // Logs 1 2 3 4
@@ -181,6 +187,22 @@ var stream = most.from(numbers());
 // Limit the stream to the first 100 numbers
 stream.take(100)
 	.forEach(console.log.bind(console));
+```
+
+```js
+function* someNumbersAndString() {
+	for(i=0 ; i<100; ++i) {
+		yield i;
+	}
+  return "end signal value";
+}
+
+// Create an infinite stream of numbers
+var stream = most.from(numbers());
+
+// Logs all the numbers and then end signal value
+stream.forEach(console.log.bind(console))
+  .then(console.log.bind(console));
 ```
 
 ### most.repeat
@@ -214,7 +236,7 @@ Create an infinite stream containing events that arrive every `period` milliseco
 most.empty(): |
 ```
 
-Create an already-ended stream containing no events.
+Create an already-ended stream containing no events.  End signal value of the stream is always `null`.
 
 ### most.never
 
@@ -293,7 +315,7 @@ most.unfold(function(id) {
 
 Build a stream by running an *asynchronous generator*: a generator which yields promises.
 
-When the generator yields a promise, the promise's fulfillment value will be added to the stream.  If the promise rejects, an exception will be thrown in the generator.  You can use `try/catch` to handle the exception.
+When the generator yields a promise, the promise's fulfillment value will be added to the stream.  If the promise rejects, an exception will be thrown in the generator.  You can use `try/catch` to handle the exception.  If the generator returns value (with `return`) it will be used as end signal value on the result stream.
 
 ```js
 function delayPromise(ms, value) {
@@ -486,7 +508,7 @@ stream
 ####`stream.startWith(x) -> Stream`
 ####`most.startWith(x, stream) -> Stream`
 
-Create a new stream containing `x` followed by all events in `stream`.
+Create a new stream containing `x` followed by all events in `stream`.  End signal value of the result stream will be the same as on input stream.
 
 ```js
 stream:              a-b-c-d->
@@ -498,12 +520,16 @@ stream.startWith(x): xa-b-c-d->
 ####`stream1.concat(stream2) -> Stream`
 ####`most.concat(stream1, stream2) -> Stream`
 
-Create a new stream containing all events in `stream1` followed by all events in `stream2`.
+Create a new stream containing all events in `stream1` followed by all events in `stream2`.  End signal value of the result stream will be the same as on `stream2` (`stream1` end signal value is lost).
 
 ```js
 stream1:                 -a-b-c|
 stream2:                 -d-e-f->
 stream1.concat(stream2): -a-b-c-d-e-f->
+
+stream1:                 -a-b-c|x|
+stream2:                 -d-e-f-|y|
+stream1.concat(stream2): -a-b-c-d-e-f-|y|
 ```
 
 Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), [flatMap](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
@@ -520,7 +546,7 @@ most.from([1,2,3]):         123|
 most.from([1,2,3]).cycle(): 123123123123->
 ```
 
-Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.
+Makes an infinite stream from a finite one.  If the input `stream` is infinite, then there will be no observable difference between `stream` and `stream.cycle()`.  End signal value from the input stream is lost.
 
 ## Handling errors
 
@@ -574,7 +600,7 @@ most.throwError(X): X
 ####`stream.map(f) -> Stream`
 ####`most.map(f, stream) -> Stream`
 
-Create a new stream by applying `f` to each event of the input stream.
+Create a new stream by applying `f` to each event of the input stream.  End signal value of the input stream is emited unmodified (i.e. `f` is *not* applied to it).
 
 ```
 stream:           -a-b-c-d->
@@ -595,7 +621,7 @@ most.from([1,2,3,4])
 ####`stream.constant(x) -> Stream`
 ####`most.constant(x, stream) -> Stream`
 
-Create a new stream by replacing each event of the input stream with `x`.
+Create a new stream by replacing each event of the input stream with `x`.  End signal value of the input stream is *not* changed to `x`.
 
 ```
 stream:             -a-b-c-d->
@@ -614,7 +640,7 @@ most.from([1,2,3,4])
 ####`stream.scan(f, initial) -> Stream`
 ####`most.scan(f, initial, stream) -> Stream`
 
-Create a new stream containing incrementally accumulated results, starting with the provided initial value.
+Create a new stream containing incrementally accumulated results, starting with the provided initial value.  End signal value will be the same as last accumulated result.
 
 `function f(accumulated, x) -> newAccumulated`
 
@@ -660,7 +686,7 @@ numbers.scan(function(slidingWindow, x) {
 ####`stream.flatMap(f) -> Stream`
 ####`most.flatMap(f, stream) -> Stream`
 
-Transform each event in `stream` into a stream, and then merge it into the resulting stream. Note that `f` *must* return a stream.
+Transform each event in `stream` into a stream, and then merge it into the resulting stream. Note that `f` *must* return a stream.  End signal value of the result stream will be an end signal value of the last of the created streams to finish emiting (not necessarily the last to be created).
 
 `function f(x) -> Stream`
 
@@ -670,6 +696,12 @@ f(a):               1--2--3|
 f(b):                    1----2----3|
 f(c):                           1-2-3|
 stream.flatMap(f): -1--2-13---2-1-233|
+
+stream:            -a----b---c|
+f(a):               1--2--3|
+f(b):                    1------2----3|B|
+f(c):                        1-2-3|C|
+stream.flatMap(f): -1--2-13--1-223---3|B|
 ```
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
@@ -688,16 +720,16 @@ most.from([1, 2])
 ####`stream.concatMap(f) -> Stream`
 ####`most.concatMap(f, stream) -> Stream`
 
-Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.
+Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.  End signal value will be the end signal value of the last stream created.
 
 `function f(x) -> Stream`
 
 ```
 stream:              -a----b----c|
 f(a):                 1--2--3|
-f(b):                      1----2----3|
-f(c):                             1-2-3|
-stream.concatMap(f): -1--2--31----2----31-2-3|
+f(b):                      1----2----3|B|
+f(c):                             1-2-3|C|
+stream.concatMap(f): -1--2--31----2----31-2-3|C|
 ```
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
@@ -726,12 +758,14 @@ streamOfFunctions.ap(stream): --fa-----fb-gb---gc--hc--hd->
 
 In effect, `ap` applies a *time-varying function* to a *time-varying value*.
 
+*TODO: Document end signal value*
+
 ### timestamp
 
 ####`stream.timestamp() -> Stream`
 ####`most.timestamp(stream) -> Stream`
 
-Materialize event timestamps, transforming `Stream<X>` into `Stream<{ time:number, value:X }>`
+Materialize event timestamps, transforming `Stream<X>` into `Stream<{ time:number, value:X }>`.  End signal value on the result stream will *not* be timestamped.
 
 ```
 // Logs
@@ -750,7 +784,7 @@ most.periodic(1000).constant('hello')
 ####`stream.tap(f) -> Stream`
 ####`most.tap(f, stream) -> Stream`
 
-Perform a side-effect for each event in `stream`.
+Perform a side-effect for each event in `stream`.  The side effect will not be performed on end signal value of the input stream.
 
 ```
 stream:        -a-b-c-d->
@@ -766,7 +800,7 @@ For each event in `stream`, `f` is called, but the value of its result is ignore
 ####`stream.filter(predicate) -> Stream`
 ####`most.filter(predicate, stream) -> Stream`
 
-Create a stream containing only events for which `predicate` returns truthy.
+Create a stream containing only events for which `predicate` returns truthy.  End signal value on the result stream will be the same as on input stream (i.e. it will *not* be a subject of filtering).
 
 ```
 stream:              -1-2-3-4->
@@ -778,7 +812,7 @@ stream.filter(even): ---2---4->
 ####`stream.distinct() -> Stream`
 ####`most.distinct(stream) -> Stream`
 
-Create a new stream with *adjacent duplicates* removed.
+Create a new stream with *adjacent duplicates* removed.  End signal value on the result stream will be the same as on input stream (i.e. it will *not* be a subject of removal of duplicates).
 
 ```
 stream:            -1-2-2-3-4-4-5->
@@ -792,7 +826,7 @@ Note that `===` is used to identify duplicate items.  To use a different compari
 ####`stream.distinctBy(equals) -> Stream`
 ####`most.distinctBy(equals, stream) -> Stream`
 
-Create a new stream with *adjacent duplicates* removed, using the provided `equals` function.
+Create a new stream with *adjacent duplicates* removed, using the provided `equals` function.  End signal value on the result stream will be the same as on input stream (i.e. it will *not* be a subject of removal of duplicates).
 
 ```
 stream:                              -a-b-B-c-D-d-e->
@@ -812,15 +846,23 @@ The `equals` function should accept two values and return truthy if the two valu
 
 Create a new stream containing only events where `start <= index < end`, where `index` is the ordinal index of an event in `stream`.
 
+End signal value considerations:
+
+* if there is enough values in the input stream to fill the slice the end signal value will be the same as the last value emited normally.
+* if there is not enough values in the input stream to fill the slice the end signal value will be the same as end signal value on the input stream.
+
 ```
 stream:             -a-b-c-d-e-f->
-stream.slice(1, 4): ---b-c-d|
+stream.slice(1, 4): ---b-c-d|d|
 
-stream:             -a-b-c|
-stream.slice(1, 4): ---b-c|
+stream:             -a-b-c|d|
+stream.slice(1, 4): ---b-c|d|
+
+stream:             -a-b-c|d|
+stream.slice(5, 9): ------|d|
 ```
 
-If stream contains fewer than `start` events, the returned stream will be empty.
+If stream contains fewer than `start` events, the returned stream will be empty, but its end signal value will be the same as on input stream.
 
 ### take
 
@@ -829,35 +871,40 @@ If stream contains fewer than `start` events, the returned stream will be empty.
 
 Create a new stream containing at most `n` events from `stream`.
 
+End signal value considerations:
+
+* if there is enough values in the input stream to take the end signal value will be the same as the last value emited normally.
+* if there is not enough values in the input stream to take the end signal value will be the same as end signal value on the input stream.
+
 ```
 stream:         -a-b-c-d-e-f->
-stream.take(3): -a-b-c|
+stream.take(3): -a-b-c|c|
 
-stream:         -a-b|
-stream.take(3): -a-b|
+stream:         -a-b|c|
+stream.take(3): -a-b|c|
 ```
 
-If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream`.
+If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream` (including end signal value).
 
 ### skip
 
 ####`stream.skip(n) -> Stream`
 ####`most.skip(n, stream) -> Stream`
 
-Create a new stream that omits the first `n` events from `stream`.
+Create a new stream that omits the first `n` events from `stream`.  End signal value of the result stream will be the same as in the input stream.
 
 ```
 stream:         -a-b-c-d-e-f->
 stream.skip(3): -------d-e-f->
 
-stream:         -a-b-c-d-e|
-stream.skip(3): -------d-e|
+stream:         -a-b-c-d-e|f|
+stream.skip(3): -------d-e|f|
 
-stream:         -a-b-c|
-stream.skip(3): ------|
+stream:         -a-b-c|d|
+stream.skip(3): ------|d|
 ```
 
-If `stream` contains fewer than `n` events, the returned stream will be empty.
+If `stream` contains fewer than `n` events, the returned stream will be empty, but the end signal value will be preserved.
 
 ### takeWhile
 
@@ -866,9 +913,17 @@ If `stream` contains fewer than `n` events, the returned stream will be empty.
 
 Create a new stream containing all events until `predicate` returns false.
 
+End signal value considerations:
+
+* if `predicate` returns false the end signal value will be the value for which `predicate` returned false.
+* if `predicate` returns truthy for all the normal events in the input stream the end signal value of the result will be the same as on the input stream (without invoking `predicate` on it).
+
 ```
-stream:                 -2-4-5-6-8->
-stream.takeWhile(even): -2-4-|
+stream:                 -2-4--5-6-8->
+stream.takeWhile(even): -2-4-|5|
+
+stream:                 -2-4-6-8-|11|
+stream.takeWhile(even): -2-4-6-8-|11|
 ```
 
 ### skipWhile
@@ -876,7 +931,7 @@ stream.takeWhile(even): -2-4-|
 ####`stream.skipWhile(predicate) -> Stream`
 ####`most.skipWhile(predicate, stream) -> Stream`
 
-Create a new stream containing all events after `predicate` returns false.
+Create a new stream containing all events after `predicate` returns false.  End signal value on the result stream will be the same as on the input stream.
 
 ```
 stream:                 -2-4-5-6-8->
@@ -892,13 +947,22 @@ Alias: **takeUntil**
 
 Create a new stream containing all events until `endSignal` emits an event.
 
+End signal value considerations:
+
+* if the `endStream` fires an event before `stream` ends the result stream's end signal value will be the same as the event value on the `endSignal` stream.
+* if the input stream ends before the `endStream` fires its first event the end signal value on the result stream will be the same as on the input stream.
+
 ```
 stream:                  -a-b-c-d-e-f->
 endSignal:               ------z->
-stream.until(endSignal): -a-b-c|
+stream.until(endSignal): -a-b-c|z|
+
+stream:                  -a-b-c-d-|e|
+endSignal:               ---------------z->
+stream.until(endSignal): -a-b-c-d-|e|
 ```
 
-If `endSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+If `endSignal` is empty or never emits an event or emits it after the input stream finishes, then the returned stream will be effectively equivalent to `stream`.
 
 ```js
 // Log mouse events until the user clicks. Note that DOM event handlers will
@@ -915,20 +979,20 @@ Alias: **skipUntil**
 ####`stream.since(startSignal) -> Stream`
 ####`most.since(startSignal, stream) -> Stream`
 
-Create a new stream containing all events until `startSignal` emits an event.
+Create a new stream containing all events after `startSignal` emits an event.  End signal value on the result stream will be the same as on the input stream.
 
 ```
 stream:                    -a-b-c-d-e-f->
 startSignal:               ------z->
-stream.since(startSignal): -a-b-c|
+stream.since(startSignal): -------d-e-f->
 ```
 
-If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+If `startSignal` is empty or never emits an event, then the returned stream will be an infinite empty stream (even if the source stream is finite).
 
 ```js
 // Start logging mouse events when the user clicks.
 most.fromEvent('mousemove', document)
-	.since(most.fromEvent('click', document)
+	.since(most.fromEvent('click', document))
 	.forEach(console.log.bind(console));
 ```
 
