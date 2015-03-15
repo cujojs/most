@@ -127,7 +127,7 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 most.of(x): x|
 ```
 
-Create a stream containing only x.  End signal value of the stream is always `null`.
+Create a stream containing only x.  End signal value of the stream is always `undefined`.
 
 ```js
 var stream = most.of('hello');
@@ -143,7 +143,7 @@ promise:                   ----a
 most.fromPromise(promise): ----a|
 ```
 
-Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  End signal value of the stream is always `null`.
+Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  End signal value of the stream is always `undefined`.
 
 ### most.from
 
@@ -157,7 +157,7 @@ Create a stream containing all items from an iterable.  The iterable can be an A
 
 End signal value considerations:
 
-* For Arrays it is always `null`
+* For Arrays it is always `undefined`
 * For iterables it is `tuple.value` of the `tuple` returned by `next()` that has `tuple.done` set to true.
   * For ES6 generators it will be a value returned (*not* yielded) by the generator.
 
@@ -236,7 +236,7 @@ Create an infinite stream containing events that arrive every `period` milliseco
 most.empty(): |
 ```
 
-Create an already-ended stream containing no events.  End signal value of the stream is always `null`.
+Create an already-ended stream containing no events.  End signal value of the stream is always `undefined`.
 
 ### most.never
 
@@ -1092,7 +1092,7 @@ Alias: **forEach**
 ####`most.observe(f, stream) -> Promise`
 ####`most.forEach(f, stream) -> Promise`
 
-Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill with the end signal value (or null if not present) after all the events have been consumed., or will reject if the stream fails and the [error is not handled](#handling-errors).
+Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill with the end signal value (or `undefined` if not present) after all the events have been consumed., or will reject if the stream fails and the [error is not handled](#handling-errors).
 
 ```js
 // Log mouse movements until the user clicks, then stop.
