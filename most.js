@@ -532,7 +532,7 @@ Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
  * @returns {Stream} new stream containing only events within the provided timespan
  */
 Stream.prototype.during = function(timeWindow) {
-	return timeslice.within(timeWindow, this);
+	return timeslice.during(timeWindow, this);
 };
 
 //-----------------------------------------------------------------------
