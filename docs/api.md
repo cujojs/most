@@ -884,7 +884,7 @@ stream:         -a-b|c|
 stream.take(3): -a-b|c|
 ```
 
-If `stream` contains fewer than `n` events, the returned stream will be effectively equivalent to `stream` (including end signal value).
+If `stream` contains fewer than `n` events, the returned stream will be equivalent to `stream`.
 
 ### skip
 
@@ -962,7 +962,7 @@ endSignal:               ---------------z->
 stream.until(endSignal): -a-b-c-d-|e|
 ```
 
-If `endSignal` is empty or never emits an event or emits it after the input stream finishes, then the returned stream will be effectively equivalent to `stream`.
+If `endSignal` is empty or never emits an event or emits it after the input stream finishes, then the returned stream will be equivalent to `stream`.
 
 ```js
 // Log mouse events until the user clicks. Note that DOM event handlers will
