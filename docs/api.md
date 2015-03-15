@@ -922,6 +922,7 @@ End signal value considerations:
 stream:                 -2-4--5-6-8->
 stream.takeWhile(even): -2-4-|5|
 
+// end signal value is re-transmitted as-is (it is not passed to the predicate)
 stream:                 -2-4-6-8-|11|
 stream.takeWhile(even): -2-4-6-8-|11|
 ```
