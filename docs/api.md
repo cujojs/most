@@ -1053,7 +1053,7 @@ most.fromEvent('mousemove', document)
 ####`stream.loop(stepper, seed) -> Stream`
 ####`most.loop(stepper, seed, stream) -> Stream`
 
-Create a feedback loop that emits one value and feeds back another to be used in the next iteration.
+Create a feedback loop that emits one value and feeds back another to be used in the next iteration.  End signal value of the result stream will be a seed returned from the last invocation of `stepper`. `stepper` is not invoked for the end signal value of the input `stream`.
 
 It allows you to maintain and update a "state" (aka feedback, aka `seed` for the next iteration) while emitting a different value.  In contrast, [`scan`](#scan) feeds back and emits the same value.
 
