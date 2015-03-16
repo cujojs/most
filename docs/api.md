@@ -980,13 +980,7 @@ Alias: **skipUntil**
 ####`stream.since(startSignal) -> Stream`
 ####`most.since(startSignal, stream) -> Stream`
 
-Create a new stream containing all events after `startSignal` emits an event.
-
-End signal value considerations:
-
-* if `startSignal` stream fires a normal event before `stream` ends then end signal value on the result stream will be the same as on the input stream.
-* if `startSignal` stream fires a normal event after `stream` ends then end signal value on the result stream will be the last normal event from the input stream.
-* if `startSignal` does not emit any normal event, then the returned stream will not emit any normal event and will end as soon as `startSignal` ends with the end signal value of `startSignal`'s.
+Create a new stream containing all events after `startSignal` emits an event.  The result stream will end at the same time as the input stream ends.  End signal value on the result stream will be the same as on input stream.
 
 ```
 stream:                    -a-b-c-d-e-f-|g|
@@ -995,11 +989,15 @@ stream.since(startSignal): -------d-e-f-|g|
 
 stream:                    -a-b-c-d-e-f-|g|
 startSignal:               -------------------z->
-stream.since(startSignal): ------------------|f|
+stream.since(startSignal): -------------|g|
 
-stream:                    -a-b-c-d-e-f->
+stream:                    -a-b-|c|
+startSignal:               ---------|S|
+stream.since(startSignal): -----|c|
+
+stream:                    -a-b-c-d-e-f-|g|
 startSignal:               -------|S|
-stream.since(startSignal): -------|S|
+stream.since(startSignal): -------------|g|
 
 stream:                    -a-b-c-d-e-f->
 startSignal:               ------------->
