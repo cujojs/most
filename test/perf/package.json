@@ -8,8 +8,8 @@
     "baconjs": "^0.7.53",
     "benchmark": "bestiejs/benchmark.js#master",
     "highland": "^2.4.0",
-    "kefir": "^1.1.0",
-    "lodash": "^3.4.0",
-    "rx": "^2.4.1"
+    "kefir": "^1.2.0",
+    "lodash": "^3.5.0",
+    "rx": "^2.4.3"
   }
 }
