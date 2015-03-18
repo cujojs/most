@@ -894,7 +894,7 @@ If `endSignal` is empty or never emits an event, then the returned stream will b
 // Log mouse events until the user clicks. Note that DOM event handlers will
 // automatically be unregistered.
 most.fromEvent('mousemove', document)
-	.until(most.fromEvent('click', document)
+	.until(most.fromEvent('click', document))
 	.forEach(console.log.bind(console));
 ```
 
