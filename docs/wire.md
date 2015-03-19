@@ -1,21 +1,21 @@
 # Table of contents
 
 1. Introduction
-1. ['stream' wire plugin](#module-most-wire)
-	1. ['stream' Factory](#wire-stream-factory)
-	1. ['stream' resolver](#wire-stream-resolver)
-1. ['stream' components creation API](#stream-components-creation-api)
+1. [`stream` wire plugin](#module-most-wire)
+	1. [`stream` Factory](#wire-stream-factory)
+	1. [`stream` resolver](#wire-stream-resolver)
+1. [`stream` components creation API](#stream-components-creation-api)
 
 # wire.js
 
 [wire.js](https://github.com/cujojs/wire/) is an Inversion of Control container that allows applications to be composed together at runtime based on a declarative configuration. A rest.js plugin is provided for wire.js that enables declarative configuration of rest.js clients, including chaning interceptors with their configuration.
 
 <a name="module-most-wire"></a>
-## 'stream' Wire Plugin
+## `stream` Wire Plugin
 
-`most/wire` ([src](../wire.js))
+You can find `most/wire` plugin sources here: ([src](../wire.js))
 
-**TIP:** In each of these examples, `{ module: 'most/wire' }` is loaded as a wire plugin as it provides the 'stream' factory to the wire.js spec.  Without this module being loaded into the spec, the facilities below will silently fail.
+**TIP:** In each of these examples, `{ module: 'most/wire' }` is loaded as a wire plugin as it provides the `stream` factory to the wire.js spec.  Without this module being loaded into the spec, the facilities below will silently fail.
 
 There are three ways to use this wire.js plugin to create stream components:
 
@@ -25,12 +25,12 @@ There are three ways to use this wire.js plugin to create stream components:
 * [`stream` resolver](#wire-stream-resolver)
 
 <a name="wire-stream-factory"></a>
-### 'stream' Factory
+### `stream` Factory
 
 The `stream` factory provides a declarative way to define a stream.
 
 <a name="wire-stream-factory-subfactory"></a>
-#### 'stream' factory using sub-factory
+#### `stream` factory using sub-factory
 
 ```js
 myPeriodicStream: {
@@ -44,7 +44,7 @@ myPeriodicStream: {
 ```
 
 <a name="wire-stream-factory-type"></a>
-#### 'stream' factory using `type` key
+#### `stream` factory using `type` key
 
 ```js
 myPeriodicStream: {
@@ -57,9 +57,9 @@ myPeriodicStream: {
 ```
 
 <a name="wire-stream-resolver"></a>
-### 'most' Resolver
+### `stream` Resolver
 
-The `most` resolver provides a way to acquire a stream using `{ $ref: "stream!stream_type" }` notation. It is especially useful to get a reference to streams that do not have configuration parameters (e.g. `{ $ref: "stream!empty"}`).
+The `stream` resolver provides a way to acquire a stream using `{ $ref: "stream!stream_type" }` notation. It is especially useful to get a reference to streams that do not have configuration parameters (e.g. `{ $ref: "stream!empty"}`).
 
 ```js
 periodicRef: { $ref: "stream!periodic", period: 300, value: "y" }
@@ -73,7 +73,7 @@ anotherComponent: {
 ```
 
 <a name="stream-components-creation-api"></a>
-## 'stream' Components Creation API
+## `stream` Components Creation API
 
 Stream components can be created using three methonds mentioned above.  However, despite the method in use the stream types and creation parameters remain the same.  Examples below consistently use one of the methods.
 
