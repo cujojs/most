@@ -9,6 +9,7 @@ It features an ultra-high performance, low overhead architecture, APIs for easil
 ## Learn more
 
 * [API docs](docs/api.md)
+* [wire.js plugin](docs/wire.md)
 * [Examples](examples)
 * [Get it](#get-it)
 
