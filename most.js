@@ -190,11 +190,12 @@ Stream.prototype.startWith = function(x) {
 // Transforming
 
 var transform = require('./lib/combinator/transform');
+var applicative = require('./lib/combinator/applicative');
 
 exports.map      = transform.map;
-exports.ap       = transform.ap;
 exports.constant = transform.constant;
 exports.tap      = transform.tap;
+exports.ap       = applicative.ap;
 
 /**
  * Transform each value in the stream by applying f to each
@@ -212,7 +213,7 @@ Stream.prototype.map = function(f) {
  * @returns {Stream} stream containing the cross product of items
  */
 Stream.prototype.ap = function(xs) {
-	return transform.ap(this, xs);
+	return applicative.ap(this, xs);
 };
 
 /**
