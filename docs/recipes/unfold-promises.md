@@ -1,6 +1,6 @@
 # Unfold Promises
 
-In this example we use `most.unfold` to help deal with promises.
+In this example we use [most.unfold](../api.md#mostunfold) to help deal with promises.
 
 We build up a stream of urls by providing `most.unfold` creator with a seed
 or an array of urls.
@@ -24,9 +24,9 @@ var urls = ['http://reqr.es/api/users?page=2',
             'http://reqr.es/api/users?page=3'];
 
 most.unfold(function (urls) {
-    return urls.length === 0 ? {
-        done: true
-    } : fetch(urls[0]).then(function(content){
+    return urls.length === 0 
+    ? { done: true } 
+    : fetch(urls[0]).then(function(content){
             return {
                 value: content,
                 seed: urls.slice(1)
