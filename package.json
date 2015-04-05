@@ -33,7 +33,7 @@
   "devDependencies": {
     "buster": "~0.7",
     "jshint": "~2",
-    "transducers-js": "~0.4"
+    "transducers-js": "^0.4.158"
   },
   "dependencies": {
     "when": "^3.7.0"
