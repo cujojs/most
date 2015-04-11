@@ -21,10 +21,10 @@ describe('filter', function() {
 	});
 });
 
-describe('distinct', function() {
+describe('skipRepeats', function() {
 
-	it('should return a stream with adjacent duplicates removed', function() {
-		var stream = filter.distinct(fromArray([1, 2, 2, 3, 4, 4]));
+	it('should return a stream with repeated events removed', function() {
+		var stream = filter.skipRepeats(fromArray([1, 2, 2, 3, 4, 4]));
 		return reduce(function(a, x) {
 				a.push(x);
 				return a;
@@ -36,14 +36,14 @@ describe('distinct', function() {
 
 });
 
-describe('distinctBy', function() {
+describe('skipRepeatsWith', function() {
 
-	it('should use provided comparator to remove adjacent duplicates', function() {
+	it('should use provided comparator to remove repeated events', function() {
 		function eq(a, b) {
 			return a.toLowerCase() === b.toLowerCase();
 		}
 
-		var stream = filter.distinctBy(eq, fromArray(['a', 'b', 'B', 'c', 'D', 'd']));
+		var stream = filter.skipRepeatsWith(eq, fromArray(['a', 'b', 'B', 'c', 'D', 'd']));
 		return reduce(function(a, x) {
 				a.push(x);
 				return a;

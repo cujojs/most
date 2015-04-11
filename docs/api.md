@@ -35,8 +35,8 @@ most.js API
 	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
-	* [distinct](#distinct)
-	* [distinctBy](#distinctby)
+	* [skipRepeats](#skipRepeats)
+	* [skipRepeatsWith](#skipRepeatsWith)
 1. Transducer support
 	* [transduce](#transduce)
 1. Slicing streams
@@ -767,30 +767,34 @@ stream:              -1-2-3-4->
 stream.filter(even): ---2---4->
 ```
 
-### distinct
+### skipRepeats
 
-####`stream.distinct() -> Stream`
-####`most.distinct(stream) -> Stream`
+**Deprecated alias:** `distinct`
 
-Create a new stream with *adjacent duplicates* removed.
+####`stream.skipRepeats() -> Stream`
+####`most.skipRepeats(stream) -> Stream`
+
+Create a new stream with *adjacent* repeated events removed.
 
 ```
 stream:            -1-2-2-3-4-4-5->
-stream.distinct(): -1-2---3-4---5->
+stream.skipRepeats(): -1-2---3-4---5->
 ```
 
 Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctby)
 
-### distinctBy
+### skipRepeatsWith
 
-####`stream.distinctBy(equals) -> Stream`
-####`most.distinctBy(equals, stream) -> Stream`
+**Deprecated alias:** `distinctBy`
 
-Create a new stream with *adjacent duplicates* removed, using the provided `equals` function.
+####`stream.skipRepeatsWith(equals) -> Stream`
+####`most.skipRepeatsWith(equals, stream) -> Stream`
+
+Create a new stream with *adjacent* repeated events removed, using the provided `equals` function.
 
 ```
 stream:                              -a-b-B-c-D-d-e->
-stream.distinctBy(equalsIgnoreCase): -a-b---c-D---e->
+stream.skipRepeatsWith(equalsIgnoreCase): -a-b---c-D---e->
 ```
 
 The `equals` function should accept two values and return truthy if the two values are equal, or falsy if they are not equal.

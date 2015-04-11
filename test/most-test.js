@@ -35,3 +35,19 @@ describe('skipUntil', function() {
 		expect(most.Stream.prototype.skipUntil).toBe(most.Stream.prototype.since);
 	});
 });
+
+describe('distinct', function() {
+	it('should be an alias for skipRepeats', function() {
+		expect(typeof most.distinct).toBe('function');
+		expect(most.distinct).toBe(most.skipRepeats);
+		expect(most.Stream.prototype.distinct).toBe(most.Stream.prototype.skipRepeats);
+	});
+});
+
+describe('distinctBy', function() {
+	it('should be an alias for skipRepeatsWith', function() {
+		expect(typeof most.distinctBy).toBe('function');
+		expect(most.distinctBy).toBe(most.skipRepeatsWith);
+		expect(most.Stream.prototype.distinctBy).toBe(most.Stream.prototype.skipRepeatsWith);
+	});
+});

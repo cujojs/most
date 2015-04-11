@@ -403,9 +403,9 @@ Stream.prototype.switch = Stream.prototype.switchLatest = function() {
 
 var filter = require('./lib/combinator/filter');
 
-exports.filter     = filter.filter;
-exports.distinct   = filter.distinct;
-exports.distinctBy = filter.distinctBy;
+exports.filter          = filter.filter;
+exports.skipRepeats     = exports.distinct   = filter.skipRepeats;
+exports.skipRepeatsWith = exports.distinctBy = filter.skipRepeatsWith;
 
 /**
  * Retain only items matching a predicate
@@ -419,22 +419,22 @@ Stream.prototype.filter = function(p) {
 };
 
 /**
- * Remove adjacent duplicates, using === to compare items
+ * Skip repeated events, using === to compare items
  * stream:           -abbcd-
  * distinct(stream): -ab-cd-
- * @returns {Stream} stream with no adjacent duplicates
+ * @returns {Stream} stream with no repeated events
  */
-Stream.prototype.distinct = function() {
-	return filter.distinct(this);
+Stream.prototype.skipRepeats = Stream.prototype.distinct = function() {
+	return filter.skipRepeats(this);
 };
 
 /**
- * Remove adjacent duplicates, using supplied equals function to compare items
- * @param {function(a:*, b:*):boolean} equals function to compare items.
- * @returns {Stream} stream with no adjacent duplicates
+ * Skip repeated events, using supplied equals function to compare items
+ * @param {function(a:*, b:*):boolean} equals function to compare items
+ * @returns {Stream} stream with no repeated events
  */
-Stream.prototype.distinctBy = function(equals) {
-	return filter.distinctBy(equals, this);
+Stream.prototype.skipRepeatsWith = Stream.prototype.distinctBy = function(equals) {
+	return filter.skipRepeatsWith(equals, this);
 };
 
 //-----------------------------------------------------------------------
