@@ -22,7 +22,7 @@ var other = { value: 'other' };
 describe('during', function() {
 	it('should contain events at or later than min and earlier than max', function() {
 		var stream = periodic(10);
-		var timespan = delay(30, streamOf(delay(41, streamOf())));
+		var timespan = delay(30, streamOf(delay(45, streamOf())));
 
 		return reduce(function(count) {
 			return count + 1;
@@ -35,13 +35,10 @@ describe('during', function() {
 	it('should dispose source stream', function() {
 		var dispose = this.spy();
 		var stream = new Stream(FakeDisposeSource.from(dispose, periodic(10)));
-		var timespan = delay(30, streamOf(delay(41, streamOf())));
+		var timespan = delay(30, streamOf(delay(45, streamOf())));
 
-		return reduce(function(count) {
-			return count + 1;
-		}, 0, timeslice.during(timespan, stream))
-			.then(function(count) {
-				expect(count).toBe(5);
+		return drain(timeslice.during(timespan, stream))
+			.then(function() {
 				expect(dispose).toHaveBeenCalledOnce();
 			});
 
@@ -67,7 +64,7 @@ describe('during', function() {
 describe('takeUntil', function() {
 	it('should only contain events earlier than signal', function() {
 		var stream = periodic(10);
-		var signal = delay(30, streamOf());
+		var signal = delay(25, streamOf());
 
 		return reduce(function(count) {
 			return count + 1;
@@ -82,11 +79,8 @@ describe('takeUntil', function() {
 		var stream = new Stream(FakeDisposeSource.from(dispose, periodic(10)));
 		var signal = delay(30, streamOf());
 
-		return reduce(function(count) {
-			return count + 1;
-		}, 0, timeslice.takeUntil(signal, stream))
-			.then(function(count) {
-				expect(count).toBe(3);
+		return drain(timeslice.takeUntil(signal, stream))
+			.then(function() {
 				expect(dispose).toHaveBeenCalledOnce();
 			});
 
@@ -107,7 +101,7 @@ describe('takeUntil', function() {
 	it('should dispose signal', function() {
 		var dispose = this.spy();
 		var stream = periodic(10);
-		var signal = new Stream(FakeDisposeSource.from(dispose, delay(30, streamOf())));
+		var signal = new Stream(FakeDisposeSource.from(dispose, delay(25, streamOf())));
 
 		return reduce(function(count) {
 			return count + 1;
@@ -145,7 +139,7 @@ describe('skipUntil', function() {
 	it('should dispose signal', function() {
 		var dispose = this.spy();
 		var stream = take(10, periodic(10));
-		var signal = new Stream(FakeDisposeSource.from(dispose, delay(30, streamOf())));
+		var signal = new Stream(FakeDisposeSource.from(dispose, delay(25, streamOf())));
 
 		return reduce(function(count) {
 			return count + 1;
