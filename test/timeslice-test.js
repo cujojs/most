@@ -48,7 +48,7 @@ describe('during', function() {
 		var dispose = this.spy();
 
 		var stream = periodic(10);
-		var timespan = delay(30, streamOf(delay(41, streamOf())));
+		var timespan = delay(30, streamOf(delay(45, streamOf())));
 		var dt = new Stream(FakeDisposeSource.from(dispose, timespan));
 
 		return reduce(function(count) {
