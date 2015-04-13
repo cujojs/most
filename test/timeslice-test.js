@@ -22,7 +22,7 @@ var other = { value: 'other' };
 describe('during', function() {
 	it('should contain events at or later than min and earlier than max', function() {
 		var stream = periodic(10);
-		var timespan = delay(30, streamOf(delay(45, streamOf())));
+		var timespan = delay(25, streamOf(delay(50, streamOf())));
 
 		return reduce(function(count) {
 			return count + 1;
@@ -126,7 +126,7 @@ describe('takeUntil', function() {
 describe('skipUntil', function() {
 	it('should only contain events at or later than signal', function() {
 		var stream = take(10, periodic(10));
-		var signal = delay(30, streamOf());
+		var signal = delay(25, streamOf());
 
 		return reduce(function(count) {
 			return count + 1;
