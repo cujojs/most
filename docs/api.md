@@ -1400,6 +1400,14 @@ stream:             abcd----abcd---->
 stream.debounce(2): -----d-------d-->
 ```
 
+```
+s1:                       abcd----abcd---->
+s2:                       ------------|
+s1.until(s2).debounce(2): -----d------d|
+```
+
+If the stream ends while there is a pending debounced event (e.g. via [`until`](#until), see example above), the pending event will be emitted just before the stream ends.
+
 Debouncing can be extremely useful when dealing with bursts of similar events, for example, debouncing keypress events before initiating a remote search query in a browser application.
 
 ```js
