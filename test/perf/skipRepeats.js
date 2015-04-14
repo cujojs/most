@@ -17,7 +17,7 @@ for(var i = 0, j = 0; i< a.length; i+=2, ++j) {
 	a[i] = a[i+1] = j;
 }
 
-var suite = Benchmark.Suite('distinct -> reduce 2 x ' + n + ' integers');
+var suite = Benchmark.Suite('skipRepeats -> reduce 2 x ' + n + ' integers');
 var options = {
 	defer: true,
 	onError: function(e) {
@@ -27,7 +27,7 @@ var options = {
 
 suite
 	.add('most', function(deferred) {
-		runners.runMost(deferred, most.from(a).distinct().reduce(sum, 0));
+		runners.runMost(deferred, most.from(a).skipRepeats().reduce(sum, 0));
 	}, options)
 	.add('rx', function(deferred) {
 		runners.runRx(deferred, rx.Observable.fromArray(a).distinctUntilChanged().reduce(sum, 0));
