@@ -8,6 +8,15 @@ var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
 
+var compose = require('./lib/compose');
+var curry = require('./lib/curry');
+var curry2 = curry.curry2;
+var curry3 = curry.curry3;
+var curryn = curry.curryn;
+
+exports.compose = compose.compose;
+exports.pipeline = compose.pipeline;
+
 /**
  * Core stream type
  * @type {Stream}
@@ -15,8 +24,8 @@ var periodic = require('./lib/source/periodic').periodic;
 exports.Stream = Stream;
 
 // Add of and empty to constructor for fantasy-land compat
-exports.of       = Stream.of    = core.of;
-exports.empty    = Stream.empty = core.empty;
+exports.of       = core.of;
+exports.empty    = core.empty;
 exports.never    = core.never;
 exports.from     = from;
 exports.periodic = periodic;
@@ -50,7 +59,7 @@ var events = require('./lib/source/fromEvent');
  *  or addListener/removeListener (node EventEmitter: http://nodejs.org/api/events.html)
  * @returns {Stream} stream of events of the specified type from the source
  */
-exports.fromEvent = events.fromEvent;
+exports.fromEvent = curry2(events.fromEvent);
 exports.fromEventWhere = events.fromEventWhere;
 
 //-----------------------------------------------------------------------
@@ -70,8 +79,7 @@ exports.lift = lift;
 
 var observe = require('./lib/combinator/observe');
 
-exports.observe = observe.observe;
-exports.forEach = observe.observe;
+exports.observe = exports.forEach = curry2(observe.observe);
 exports.drain   = observe.drain;
 
 /**
@@ -99,7 +107,7 @@ Stream.prototype.drain = function() {
 
 var loop = require('./lib/combinator/loop').loop;
 
-exports.loop = loop;
+exports.loop = curry3(loop);
 
 /**
  * Generalized feedback loop. Call a stepper function for each event. The stepper
@@ -119,8 +127,8 @@ Stream.prototype.loop = function(stepper, seed) {
 
 var accumulate = require('./lib/combinator/accumulate');
 
-exports.scan   = accumulate.scan;
-exports.reduce = accumulate.reduce;
+exports.scan   = curry3(accumulate.scan);
+exports.reduce = curry3(accumulate.reduce);
 
 /**
  * Create a stream containing successive reduce results of applying f to
@@ -153,13 +161,13 @@ var iterate = require('./lib/source/iterate');
 var generate = require('./lib/source/generate');
 var build = require('./lib/combinator/build');
 
-exports.unfold    = unfold.unfold;
-exports.iterate   = iterate.iterate;
-exports.generate  = generate.generate;
+exports.unfold    = curry2(unfold.unfold);
+exports.iterate   = curry2(iterate.iterate);
+exports.generate  = curry2(generate.generate);
 exports.repeat    = iterate.repeat;
 exports.concat    = build.cycle;
-exports.concat    = build.concat;
-exports.startWith = build.cons;
+exports.concat    = curry2(build.concat);
+exports.startWith = curry2(build.cons);
 
 /**
  * Tie this stream into a circle, thus creating an infinite stream
@@ -192,10 +200,10 @@ Stream.prototype.startWith = function(x) {
 var transform = require('./lib/combinator/transform');
 var applicative = require('./lib/combinator/applicative');
 
-exports.map      = transform.map;
+exports.map      = curry2(transform.map);
 exports.constant = transform.constant;
-exports.tap      = transform.tap;
-exports.ap       = applicative.ap;
+exports.tap      = curry2(transform.tap);
+exports.ap       = curry2(applicative.ap);
 
 /**
  * Transform each value in the stream by applying f to each
@@ -240,7 +248,7 @@ Stream.prototype.tap = function(f) {
 
 var transduce = require('./lib/combinator/transduce');
 
-exports.transduce = transduce.transduce;
+exports.transduce = curry2(transduce.transduce);
 
 /**
  * Transform this stream by passing its events through a transducer.
@@ -256,7 +264,7 @@ Stream.prototype.transduce = function(transducer) {
 
 var flatMap = require('./lib/combinator/flatMap');
 
-exports.flatMap = exports.chain = flatMap.flatMap;
+exports.flatMap = exports.chain = curry2(flatMap.flatMap);
 exports.join    = flatMap.join;
 
 /**
@@ -280,7 +288,7 @@ Stream.prototype.join = function() {
 
 var flatMapEnd = require('./lib/combinator/flatMapEnd').flatMapEnd;
 
-exports.flatMapEnd = flatMapEnd;
+exports.flatMapEnd = curry2(flatMapEnd);
 
 /**
  * Map the end event to a new stream, and begin emitting its values.
@@ -295,7 +303,7 @@ Stream.prototype.flatMapEnd = function(f) {
 
 var concatMap = require('./lib/combinator/concatMap').concatMap;
 
-exports.concatMap = concatMap;
+exports.concatMap = curry2(concatMap);
 
 Stream.prototype.concatMap = function(f) {
 	return concatMap(f, this);
@@ -306,7 +314,7 @@ Stream.prototype.concatMap = function(f) {
 
 var merge = require('./lib/combinator/merge');
 
-exports.merge = merge.merge;
+exports.merge = curryn(2, merge.merge);
 
 /**
  * Merge this stream and all the provided streams
@@ -323,7 +331,7 @@ Stream.prototype.merge = function(/*...streams*/) {
 
 var combine = require('./lib/combinator/combine');
 
-exports.combine = combine.combine;
+exports.combine = curryn(3, combine.combine);
 
 /**
  * Combine latest events from all input streams
@@ -340,8 +348,8 @@ Stream.prototype.combine = function(f /*, ...streams*/) {
 
 var sample = require('./lib/combinator/sample');
 
-exports.sample = sample.sample;
-exports.sampleWith = sample.sampleWith;
+exports.sample = curryn(3, sample.sample);
+exports.sampleWith = curry2(sample.sampleWith);
 
 /**
  * When an event arrives on sampler, emit the latest event value from stream.
@@ -359,7 +367,7 @@ Stream.prototype.sampleWith = function(sampler) {
  * @param {function(...values):*} f function to apply to each set of sampled values
  * @returns {Stream} stream of sampled and transformed values
  */
-Stream.prototype.sample = function(f /* ...streams */) {
+Stream.prototype.sample = function(f /*, ...streams */) {
 	return sample.sampleArray(f, this, base.tail(arguments));
 };
 
@@ -368,7 +376,7 @@ Stream.prototype.sample = function(f /* ...streams */) {
 
 var zip = require('./lib/combinator/zip');
 
-exports.zip = zip.zip;
+exports.zip = curryn(2, zip.zip);
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
@@ -403,9 +411,9 @@ Stream.prototype.switch = Stream.prototype.switchLatest = function() {
 
 var filter = require('./lib/combinator/filter');
 
-exports.filter          = filter.filter;
+exports.filter          = curry2(filter.filter);
 exports.skipRepeats     = exports.distinct   = filter.skipRepeats;
-exports.skipRepeatsWith = exports.distinctBy = filter.skipRepeatsWith;
+exports.skipRepeatsWith = exports.distinctBy = curry2(filter.skipRepeatsWith);
 
 /**
  * Retain only items matching a predicate
@@ -442,11 +450,11 @@ Stream.prototype.skipRepeatsWith = Stream.prototype.distinctBy = function(equals
 
 var slice = require('./lib/combinator/slice');
 
-exports.take      = slice.take;
-exports.skip      = slice.skip;
-exports.slice     = slice.slice;
-exports.takeWhile = slice.takeWhile;
-exports.skipWhile = slice.skipWhile;
+exports.take      = curry2(slice.take);
+exports.skip      = curry2(slice.skip);
+exports.slice     = curry3(slice.slice);
+exports.takeWhile = curry2(slice.takeWhile);
+exports.skipWhile = curry2(slice.skipWhile);
 
 /**
  * stream:          -abcd-
@@ -507,9 +515,9 @@ Stream.prototype.skipWhile = function(p) {
 
 var timeslice = require('./lib/combinator/timeslice');
 
-exports.until  = exports.takeUntil = timeslice.takeUntil;
-exports.since  = exports.skipUntil = timeslice.skipUntil;
-exports.during = timeslice.during; // EXPERIMENTAL
+exports.until  = exports.takeUntil = curry2(timeslice.takeUntil);
+exports.since  = exports.skipUntil = curry2(timeslice.skipUntil);
+exports.during = curry2(timeslice.during); // EXPERIMENTAL
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -557,7 +565,7 @@ Stream.prototype.during = function(timeWindow) {
 
 var delay = require('./lib/combinator/delay').delay;
 
-exports.delay = delay;
+exports.delay = curry2(delay);
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
@@ -588,8 +596,8 @@ Stream.prototype.timestamp = function() {
 
 var limit = require('./lib/combinator/limit');
 
-exports.throttle = limit.throttle;
-exports.debounce = limit.debounce;
+exports.throttle = curry2(limit.throttle);
+exports.debounce = curry2(limit.debounce);
 
 /**
  * Limit the rate of events
@@ -637,7 +645,7 @@ Stream.prototype.await = function() {
 var errors = require('./lib/combinator/errors');
 
 
-exports.flatMapError = errors.flatMapError;
+exports.flatMapError = curry2(errors.flatMapError);
 exports.throwError   = errors.throwError;
 
 /**
