@@ -2,7 +2,6 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var events = require('../../lib/source/fromEvent');
-var fromEventWhere = events.fromEventWhere;
 var fromEvent = events.fromEvent;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var observe = require('../../lib/combinator/observe').observe;
@@ -16,53 +15,6 @@ var other = { value: 'other' };
 function isSentinel(x) {
 	return x === sentinel;
 }
-
-describe('fromEventWhere', function() {
-
-	describe('given an EventTarget', function() {
-
-		it('should contain emitted items', function() {
-			return verifyContainsEmittedItemsWhere(isSentinel, new FakeEventTarget());
-		});
-
-		it('should unlisten on end', function() {
-			return verifyUnlistenOnEndWhere.call(this, isSentinel, new FakeEventTarget());
-		});
-	});
-
-	describe('given an EventEmitter', function() {
-
-		it('should contain emitted items', function() {
-			return verifyContainsEmittedItemsWhere(isSentinel, new FakeEventTarget());
-		});
-
-		it('should unlisten on end', function() {
-			return verifyUnlistenOnEndWhere.call(this, isSentinel, new FakeEventTarget());
-		});
-
-		it('should convert multiple arguments to array', function() {
-			var evented = new FakeEventEmitter();
-			var values = [[false,0,0],[true, sentinel, other]];
-
-			var s = take(1, fromEventWhere(function(array) {
-				return array[0];
-			}, 'event', evented));
-
-			setTimeout(function () {
-				values.forEach(function (array) {
-					evented.emit.apply(evented, array);
-				});
-			}, 0);
-
-			return observe(function (array) {
-				expect(array).toEqual(values[1]);
-			}, s);
-		});
-
-	});
-
-});
-
 
 describe('fromEvent', function() {
 

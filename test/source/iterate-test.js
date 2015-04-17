@@ -74,12 +74,3 @@ describe('iterate', function() {
 	});
 
 });
-
-describe('repeat', function() {
-	it('should repeat value', function() {
-		var s = take(10, iterate.repeat(sentinel));
-		return observe(function(x) {
-			expect(x).toBe(sentinel);
-		}, s);
-	});
-});

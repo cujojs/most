@@ -58,12 +58,9 @@ describe('MulticastSource', function() {
 
 	it('should call dispose if all subscribers disconnect', function() {
 		var spy = this.spy();
-		var s = new Stream(new MulticastSource(FakeDisposeSource.from(spy, repeat(sentinel))));
+		var s = new Stream(new MulticastSource(FakeDisposeSource.from(spy, streamOf(sentinel))));
 
-		var s1 = take(1, s);
-		var s2 = take(1, s);
-
-		return Promise.all([drain(s1), drain(s2)]).then(function() {
+		return Promise.all([drain(s), drain(s)]).then(function() {
 			expect(spy).toHaveBeenCalledOnce();
 		});
 	});
