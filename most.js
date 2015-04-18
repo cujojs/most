@@ -22,6 +22,28 @@ exports.from     = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------
+// ES7 Observable interface
+
+var Observable = require('./lib/Observable');
+
+/**
+ * ES7 Observable (callable with or without new).  Basically, a thin
+ * wrapper around Stream to present an ES7 compatible API.
+ * @param {function({next, return, throw}):{dispose:function}} producer
+ * @constructor
+ */
+exports.Observable = Observable.create;
+
+/**
+ * ES7 style observation
+ * @param {{next:function(x:*), return:function(x:*), throw:function(e:*)}} observer
+ * @return {{dispose:function():*}} subscription which can be disposed
+ */
+Stream.prototype['@@observer'] = Stream.prototype.observer = function(observer) {
+	return Observable.observer(observer, this);
+};
+
+//-----------------------------------------------------------------------
 // Creating
 
 var create = require('./lib/source/create');
