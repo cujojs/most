@@ -1146,6 +1146,8 @@ resultStream.observe(function(z) {
 
 ####`most.lift(f) -> function`
 
+**DEPRECATED**
+
 Lifts a function to act on streams.  Lifting returns a function that accepts streams as arguments, and returns a stream as a result.
 
 One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
