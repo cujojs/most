@@ -177,18 +177,6 @@ stream.take(100)
 	.forEach(console.log.bind(console));
 ```
 
-### most.repeat
-
-**DEPRECATED:** Use [`most.periodic(period, x)`](#mostperiodic) to create a stream of periodic `x`s, or [`most.iterate(f, x)`](#mostiterate) or [`most.unfold(f, seed)`](#mostunfold) to repeat a value with finer grained control over event times.
-
-####`most.repeat(x) -> Stream`
-
-Create a stream containing infinite occurrences of `x`.
-
-```
-most.repeat(x): xxxxxxx->
-```
-
 ### most.periodic
 
 ####`most.periodic(period, x) -> Stream`
@@ -363,37 +351,6 @@ most.fromEvent('click', container)
 	})
     .forEach(doSomething);
 ```
-
-### most.fromEventWhere
-
-**DEPRECATED:** Use [`most.fromEvent`](#mostfromevent) in conjunction with [`filter`](#filter) to handle selector matching, and [`tap`](#tap) to handle `preventDefault` and/or `stopPropagation` for DOM events.
-
-####`most.fromEventWhere(predicate, eventType, source) -> Stream`
-
-Like [most.fromEvent](#mostfromevent), create a stream containing, but apply a `predicate` function synchronously to each event.  This allows preventDefault, filtering based on CSS selectors using [element.matches](https://developer.mozilla.org/en-US/docs/Web/API/Element.matches), and any other filtering or side effects that must be performed immediately in the DOM event call stack.
-
-As with `most.fromEvent`, when the stream ends, it will automatically be disconnected from the event source.
-
-```js
-// Using preventDefault
-var form = document.querySelector('form');
-most.fromEventWhere(function(e) { e.preventDefault(); }, 'submit', form)
-	.map(parseForm)
-	.map(JSON.stringify)
-	.forEach(postToServer);
-```
-
-```js
-// Using event delegation with Element.matches
-// This allows only events with the .toggle-button class
-// It also only calls preventDefault on allowed events
-var container = document.querySelector('.container');
-most.fromEventWhere(function(e) {
-        return e.target.matches('.toggle-button') && e.preventDefault();
-    }, 'click', container)
-    .forEach(doSomething);
-```
-
 <a name="mostcreate"/>
 ### most.create
 
@@ -769,8 +726,6 @@ stream.filter(even): ---2---4->
 
 ### skipRepeats
 
-**Deprecated alias:** `distinct`
-
 ####`stream.skipRepeats() -> Stream`
 ####`most.skipRepeats(stream) -> Stream`
 
@@ -784,8 +739,6 @@ stream.skipRepeats(): -1-2---3-4---5->
 Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctby)
 
 ### skipRepeatsWith
-
-**Deprecated alias:** `distinctBy`
 
 ####`stream.skipRepeatsWith(equals) -> Stream`
 ####`most.skipRepeatsWith(equals, stream) -> Stream`

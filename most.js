@@ -51,7 +51,6 @@ var events = require('./lib/source/fromEvent');
  * @returns {Stream} stream of events of the specified type from the source
  */
 exports.fromEvent = events.fromEvent;
-exports.fromEventWhere = events.fromEventWhere;
 
 //-----------------------------------------------------------------------
 // Lifting functions
@@ -156,7 +155,6 @@ var build = require('./lib/combinator/build');
 exports.unfold    = unfold.unfold;
 exports.iterate   = iterate.iterate;
 exports.generate  = generate.generate;
-exports.repeat    = iterate.repeat;
 exports.concat    = build.cycle;
 exports.concat    = build.concat;
 exports.startWith = build.cons;
@@ -424,7 +422,7 @@ Stream.prototype.filter = function(p) {
  * distinct(stream): -ab-cd-
  * @returns {Stream} stream with no repeated events
  */
-Stream.prototype.skipRepeats = Stream.prototype.distinct = function() {
+Stream.prototype.skipRepeats = function() {
 	return filter.skipRepeats(this);
 };
 
@@ -433,7 +431,7 @@ Stream.prototype.skipRepeats = Stream.prototype.distinct = function() {
  * @param {function(a:*, b:*):boolean} equals function to compare items
  * @returns {Stream} stream with no repeated events
  */
-Stream.prototype.skipRepeatsWith = Stream.prototype.distinctBy = function(equals) {
+Stream.prototype.skipRepeatsWith = function(equals) {
 	return filter.skipRepeatsWith(equals, this);
 };
 
