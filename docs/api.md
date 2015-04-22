@@ -916,8 +916,6 @@ most.fromEvent('mousemove', document)
 
 ### during
 
-**EXPERIMENTAL**
-
 ####`stream.during(timeWindow)`
 ####`most.during(timeWindow, stream)`
 
