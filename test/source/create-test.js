@@ -3,6 +3,8 @@ var expect = require('buster').expect;
 
 var create = require('../../lib/source/create').create;
 var streamOf = require('../../lib/source/core').of;
+var until = require('../../lib/combinator/timeslice').takeUntil;
+var delay = require('../../lib/combinator/delay').delay;
 var observe = require('../../lib/combinator/observe').observe;
 var flatMapError = require('../../lib/combinator/errors').flatMapError;
 
@@ -64,6 +66,26 @@ describe('create', function() {
 			expect(count).toBe(1);
 			expect(spy).toHaveBeenCalled();
 		});
+	});
+
+	it('should prevent events after dispose', function(done) {
+		var endlessStream = create( function(add) {
+			function count(int) {
+				add(int);
+				setTimeout(count, 10, int+1);
+			}
+			count(1);
+		});
+
+		function cycle() {
+			observe(function(x) {
+				expect(x <= 2).toBeTrue();
+			}, until(streamOf().delay(20), endlessStream));
+		}
+
+		cycle('a');
+		setTimeout(cycle, 30, 'b');
+		setTimeout(done, 80);
 	});
 
 	it('should propagate error thrown synchronously from publisher', function() {
