@@ -57,8 +57,6 @@ mousemovesAfterFirstClick.join()
 
 ## Time windows
 
-**EXPERIMENTAL**
-
 A time window is a time period, anchored at a particular start time.  For example: "from 1pm to 2pm on Tuesday", or "the time between the first mouse click and the first keypress that follows."
 
 A time window can be represented as a higher-order stream.  The first event of the outer stream defines the start time, and the first event of the inner stream defines the end of the time period.

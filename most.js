@@ -538,7 +538,6 @@ Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
 };
 
 /**
- * **EXPERIMENTAL**
  * stream:                    -a-b-c-d-e-f-g->
  * timeWindow:                -----s
  * s:                               -----t
