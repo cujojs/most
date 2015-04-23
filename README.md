@@ -82,15 +82,33 @@ var most = require('most');
 
 Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  They also implement [Fantasy Land](https://github.com/fantasyland/fantasy-land) `Monoid`, `Functor`, `Applicative`, and `Monad`.
 
-## But what about
+## Reactive Programming
 
-### Promises?
+[Reactive programming](docs/concepts.md) is an important concept that provides a lot of advantages: it naturally handles asynchrony and provides a model for dealing with complex data and time flow while also lessening the need to resort to shared mutable state. It has many applications: interactive UIs and animation, client-server communication, robotics, IoT, sensor networks, etc.
 
-Promises are another elegant and powerful data structure for composing asynchronous operations.  Promises and reactive streams are clearly related in that they provide tools for managing asynchrony.  However, they each have their strengths.
+## Why most.js for Reactive Programming?
 
-Promises deal with single, asynchronous, immutable values and provide operations for transforming them, and provide asynchronous error handling and flow control.  Event streams represent sequences of asynchronous values or values that vary over time.  They provide a similar, but typically broader, set of operations.
+### High performance
 
-Most.js interoperates seamlessly with ES6 and Promises/A+ promises.  In fact, it even uses promises internally.  For example, reducing a stream returns a promise for the final result:
+A primary focus of most.js is performance.  The [perf test results](test/perf) indicate that it is achieving its goals in this area. Our hope is that by publishing those numbers, and showing what is possible, other libs will improve as well. 
+
+### Modular architecture
+
+Most.js is highly modularized. It's internal Stream/Source/Sink architecture and APIs are simple, concise, and well defined. Combinators are implemented entirely in terms of that API, and don't need to use any private details. This makes it easy to implement new combinators externally (ie in contrib repos, for example) while also guaranteeing they can still be high performance.
+
+### Simplicity
+
+Aside from making combinators less "obviously correct", complexity can also lead to performace and maintainability issues. We felt a simple implementation would lead to a more stable and performant lib overall.
+
+### Integration
+
+Most.js integrates with language features, such as promises, iterators, generators, and *asynchronous* generators.
+
+#### Promises
+
+Promises are a natural compliment to asynchronous reactive streams. The relationship between synchronous "sequence" and "value" is clear, and the asynchronous analogue needs to be clear, too. By taking the notion of a sequence and a value and lifting them into the asynchronous world, it seems clear that reducing an asynchronous sequence should produce a promise. Hence, most.js uses promises when a single value is the natural synchronous analogue.
+
+Most.js interoperates seamlessly with ES6 and Promises/A+ promises.  For example, reducing a stream returns a promise for the final result:
 
 ```js
 // After 4 seconds, logs 10
@@ -114,7 +132,7 @@ most.fromPromise(Promise.resolve('hello'))
 	});
 ```
 
-### Generators
+#### Generators
 
 Conceptually, [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*) allow you to write a function that acts like an iterable sequence.  Generators support the standard ES6 [Iterator interface](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), so they can be iterated over using ES6 standard `for of` or the iterator's `next()` API.
 
@@ -133,6 +151,8 @@ most.from(allTheIntegers())
 	.take(100)
 	.observe(x => console.log(x));
 ```
+
+#### Asynchronous Generators
 
 You can also create an event stream from an *asynchronous generator*, a generator that yields promises:
 
