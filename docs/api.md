@@ -736,7 +736,7 @@ stream:            -1-2-2-3-4-4-5->
 stream.skipRepeats(): -1-2---3-4---5->
 ```
 
-Note that `===` is used to identify duplicate items.  To use a different comparison, use [`distinctBy`](#distinctby)
+Note that `===` is used to identify duplicate items.  To use a different comparison, use [`skipRepeatsWith`](#skiprepeatswith)
 
 ### skipRepeatsWith
 
