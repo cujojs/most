@@ -35,8 +35,8 @@ most.js API
 	* [tap](#tap)
 1. Filtering streams
 	* [filter](#filter)
-	* [skipRepeats](#skipRepeats)
-	* [skipRepeatsWith](#skipRepeatsWith)
+	* [skipRepeats](#skiprepeats)
+	* [skipRepeatsWith](#skiprepeatswith)
 1. Transducer support
 	* [transduce](#transduce)
 1. Slicing streams
