@@ -1,4 +1,5 @@
 var kefir = require('kefir');
+kefir.DEPRECATION_WARNINGS = false;
 
 exports.runSuite       = runSuite;
 
@@ -92,7 +93,7 @@ function runKefir(deferred, kefirStream) {
 }
 
 function kefirFromArray(array) {
-	return kefir.fromBinder(function(emitter) {
+	return kefir.stream(function(emitter) {
 		for(var i=0; i<array.length; ++i) {
 			emitter.emit(array[i]);
 		}

@@ -7,9 +7,9 @@
   "dependencies": {
     "baconjs": "^0.7.53",
     "benchmark": "bestiejs/benchmark.js#master",
-    "highland": "^2.4.0",
-    "kefir": "^1.3.1",
-    "lodash": "^3.7.0",
+    "highland": "^2.5.0",
+    "kefir": "^2.1.0",
+    "lodash": "^3.8.0",
     "rx": "^2.5.2"
   }
 }
