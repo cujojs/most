@@ -107,7 +107,7 @@ bacon     FAILED: RangeError: Maximum call stack size exceeded
 lodash       55.32 op/s ±  2.17%   (57 samples)
 Array        12.46 op/s ±  2.22%   (35 samples)
 -------------------------------------------------------
-[```
+```
 
 ## io.js
 
