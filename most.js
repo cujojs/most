@@ -3,10 +3,10 @@
 /** @author John Hann */
 
 var Stream = require('./lib/Stream');
-var base = require('./lib/base');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
+var rest = require('lodash/array/rest');
 
 /**
  * Core stream type
@@ -313,7 +313,7 @@ exports.merge = merge.merge;
  * arbitrary order.
  */
 Stream.prototype.merge = function(/*...streams*/) {
-	return merge.mergeArray(base.cons(this, arguments));
+	return merge.merge([this,arguments]);
 };
 
 //-----------------------------------------------------------------------
@@ -330,7 +330,7 @@ exports.combine = combine.combine;
  *  event of each input stream, whenever a new event arrives on any stream.
  */
 Stream.prototype.combine = function(f /*, ...streams*/) {
-	return combine.combineArray(f, base.replace(this, 0, arguments));
+	return combine.combine(f, [this, rest(arguments)]);
 };
 
 //-----------------------------------------------------------------------
@@ -358,7 +358,7 @@ Stream.prototype.sampleWith = function(sampler) {
  * @returns {Stream} stream of sampled and transformed values
  */
 Stream.prototype.sample = function(f /* ...streams */) {
-	return sample.sampleArray(f, this, base.tail(arguments));
+	return sample.sampleArray(f, this, rest(arguments));
 };
 
 //-----------------------------------------------------------------------
@@ -376,7 +376,7 @@ exports.zip = zip.zip;
  * @returns {Stream} new stream containing pairs
  */
 Stream.prototype.zip = function(f /*, ...streams*/) {
-	return zip.zipArray(f, base.replace(this, 0, arguments));
+	return zip.zip(f, [this, rest(arguments)]);
 };
 
 //-----------------------------------------------------------------------
