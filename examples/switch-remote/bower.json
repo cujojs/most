@@ -1,0 +1,24 @@
+{
+  "name": "most-circles",
+  "version": "0.7.0",
+  "homepage": "https://github.com/cujojs/most",
+  "authors": [
+    "Brian Cavalier <brian@hovercraftstudios.com>"
+  ],
+  "main": "main.js",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "most": "~0.14",
+    "rave": "~0.4"
+  }
+}
