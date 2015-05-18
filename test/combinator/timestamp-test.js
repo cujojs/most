@@ -4,17 +4,25 @@ var expect = require('buster').expect;
 var timestamp = require('../../lib/combinator/timestamp').timestamp;
 var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
-var observe = require('../../lib/combinator/observe').observe;
 var streamOf = require('../../lib/source/core').of;
+
+var TestScheduler = require('../helper/TestScheduler');
 
 var sentinel = { value: 'sentinel' };
 
 describe('timestamp', function() {
 	it('should emit time-value pairs', function() {
-		var s = take(10, timestamp(periodic(1)));
+		var n = 10;
+		var s = take(n, periodic(1, sentinel));
 
-		return observe(function(timeValue) {
-			expect(typeof timeValue.time).toBe('number');
+		var scheduler = new TestScheduler();
+		scheduler.tick(n);
+
+		return scheduler.collect(s).then(function(events) {
+			events.forEach(function(timeValue, i) {
+				expect(timeValue.value).toBe(sentinel);
+				expect(timeValue.time).toBe(i);
+			});
 		}, s);
 	});
 });

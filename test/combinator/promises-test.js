@@ -2,7 +2,6 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var promises = require('../../lib/combinator/promises');
-var delay = require('../../lib/combinator/delay').delay;
 var observe = require('../../lib/combinator/observe').observe;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var streamOf = require('../../lib/source/core').of;

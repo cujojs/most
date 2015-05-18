@@ -8,33 +8,7 @@ var fromArray = require('../../lib/source/fromArray').fromArray;
 var streamOf = require('../../lib/source/core').of;
 var all = require('../../lib/Promise').all;
 
-function testMerge(merge) {
-	var a = [1, 2, 3];
-	var b = [4, 5, 6];
-	var sa = fromArray(a);
-	var sb = fromArray(b);
-
-	return reduce(function (result, x) {
-		return result.concat(x);
-	}, [], merge(delay(0, sa), delay(0, sb)))
-		.then(function (result) {
-			// Include all items
-			expect(result.slice().sort()).toEqual(a.concat(b).sort());
-
-			// Relative order of items in each stream must be preserved
-			expect(result.indexOf(1) < result.indexOf(2)).toBeTrue();
-			expect(result.indexOf(2) < result.indexOf(3)).toBeTrue();
-
-			expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
-			expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
-		});
-}
-
-function toArray(s) {
-	return reduce(function(result, x) {
-		return result.concat(x);
-	}, [], s);
-}
+var TestScheduler = require('../helper/TestScheduler');
 
 describe('merge', function() {
 	it('should include items from all inputs', function() {
@@ -65,3 +39,36 @@ describe('mergeArray', function() {
 		});
 	});
 });
+
+function testMerge(merge) {
+	var a = [1, 2, 3];
+	var b = [4, 5, 6];
+	var sa = fromArray(a);
+	var sb = fromArray(b);
+
+	var scheduler = new TestScheduler();
+	scheduler.tick(2);
+
+	return scheduler.collect(merge(delay(2, sa), delay(1, sb)))
+		.then(function (events) {
+			var result = events.map(function(event) {
+				return event.value;
+			});
+			// Include all items
+			expect(result.slice().sort()).toEqual(a.concat(b).sort());
+
+			// Relative order of items in each stream must be preserved
+			expect(result.indexOf(1) < result.indexOf(2)).toBeTrue();
+			expect(result.indexOf(2) < result.indexOf(3)).toBeTrue();
+
+			expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
+			expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
+		});
+}
+
+function toArray(s) {
+	return reduce(function(result, x) {
+		return result.concat(x);
+	}, [], s);
+}
+

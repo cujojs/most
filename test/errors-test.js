@@ -4,10 +4,7 @@ var expect = require('buster').expect;
 var error = require('../lib/combinator/errors');
 var observe = require('../lib/combinator/observe').observe;
 var streamOf = require('../lib/source/core').of;
-//var Stream = require('../lib/Stream');
-//var promise = require('../lib/promises');
 
-//var reject = promise.Promise.reject;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 

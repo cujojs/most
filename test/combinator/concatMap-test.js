@@ -12,6 +12,7 @@ var core = require('../../lib/source/core');
 var fromArray = require('../../lib/source/fromArray').fromArray;
 var Stream = require('../../lib/Stream');
 
+var TestScheduler = require('../helper/TestScheduler');
 var FakeDisposeSource = require('../helper/FakeDisposeSource');
 
 var streamOf = core.of;
@@ -41,13 +42,20 @@ describe('concatMap', function() {
 	it('should concatenate', function() {
 		var s = concatMap.concatMap(function(x) {
 			return delay(x, streamOf(x));
-		}, fromArray([20, 10]));
+		}, fromArray([2, 1]));
 
-		return reduce(function(a, x) {
-			return a.concat(x);
-		}, [], s)
-			.then(function(a) {
-				expect(a).toEqual([20, 10]);
+		var scheduler = new TestScheduler();
+		scheduler.tick(3);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events.length).toBe(2);
+
+				expect(events[0].time).toBe(2);
+				expect(events[0].value).toBe(2);
+
+				expect(events[1].time).toBe(3);
+				expect(events[1].value).toBe(1);
 			});
 	});
 
