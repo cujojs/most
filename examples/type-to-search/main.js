@@ -27,7 +27,7 @@ module.exports = function run() {
 		.filter(function(text) {
 			return text.length > 1;
 		})
-		.distinct();
+		.skipRepeats();
 
 	// Get results from wikipedia API and render
 	// Ignore empty results, extract the actual list of results
