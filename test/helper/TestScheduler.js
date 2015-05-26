@@ -44,19 +44,16 @@ TestScheduler.prototype.tick = function(dt) {
 TestScheduler.prototype._setNow = function(t) {
 	this._targetTime = Math.max(this._time, Math.max(this._targetTime, t));
 
-	if(this._targetTime === this._time || this._running) {
+	if(this._running) {
 		return;
 	}
 
 	this._running = true;
-	var self = this;
-	setTimeout(function() {
-		self._advanceClock();
-	}, 0);
+	return this._advanceClock();
 };
 
 TestScheduler.prototype._advanceClock = function() {
-	if(this._time === this._targetTime) {
+	if(this._time > this._targetTime) {
 		this._running = false;
 		return;
 	}
@@ -81,10 +78,6 @@ function AdvanceClockTask(scheduler) {
 AdvanceClockTask.prototype.run = function() {
 	if(this.scheduler._tasks.length === 0) {
 		this.scheduler._time = this.scheduler._targetTime;
-		return;
-	}
-
-	if(this.scheduler.time === this.scheduler._targetTime) {
 		return;
 	}
 
