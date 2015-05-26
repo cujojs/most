@@ -4,7 +4,6 @@ var assertSame = require('./helper/stream-helper').assertSame;
 
 var transform = require('../lib/combinator/transform');
 var observe = require('../lib/combinator/observe').observe;
-var delay = require('../lib/combinator/delay').delay;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var streamOf = require('../lib/source/core').of;
 

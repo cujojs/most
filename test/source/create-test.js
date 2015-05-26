@@ -8,6 +8,9 @@ var delay = require('../../lib/combinator/delay').delay;
 var observe = require('../../lib/combinator/observe').observe;
 var flatMapError = require('../../lib/combinator/errors').flatMapError;
 
+var runSource = require('../../lib/runSource');
+var TestScheduler = require('../helper/TestScheduler');
+
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
@@ -68,24 +71,24 @@ describe('create', function() {
 		});
 	});
 
-	it('should prevent events after dispose', function(done) {
-		var endlessStream = create( function(add) {
-			function count(int) {
-				add(int);
-				setTimeout(count, 10, int+1);
-			}
-			count(1);
+	it('should prevent events after dispose', function() {
+		var scheduler = new TestScheduler();
+
+		var endlessStream = create(function(add) {
+			add(1);
+			scheduler.delay(2, {
+				run: function() { add(2); }
+			});
 		});
 
-		function cycle() {
-			observe(function(x) {
-				expect(x <= 2).toBeTrue();
-			}, until(streamOf().delay(20), endlessStream));
-		}
+		var s = until(delay(1, streamOf()), endlessStream);
 
-		cycle('a');
-		setTimeout(cycle, 30, 'b');
-		setTimeout(done, 80);
+		scheduler.tick(2);
+
+		return scheduler.collect(s).then(function(events) {
+			expect(events.length).toBe(1);
+			expect(events[0].value).toBe(1);
+		});
 	});
 
 	it('should propagate error thrown synchronously from publisher', function() {

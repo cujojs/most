@@ -14,6 +14,7 @@ var Stream = require('../lib/Stream');
 var streamOf = core.of;
 var empty = core.empty;
 
+var TestScheduler = require('./helper/TestScheduler');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var sentinel = { value: 'sentinel' };
@@ -67,11 +68,16 @@ describe('build', function() {
 			var s1 = delay(1, fromArray([1,2]));
 			var s2 = fromArray([3,4]);
 
-			return reduce(function(a, x) {
-				return a.concat(x);
-			}, [], build.concat(s1, s2)).then(function(a) {
-				expect(a).toEqual([1,2,3,4]);
-			});
+			var scheduler = new TestScheduler();
+			scheduler.tick(1);
+
+			return scheduler.collect(build.concat(s1, s2))
+				.then(function(events) {
+					var values = events.map(function(event) {
+						return event.value;
+					});
+					expect(values).toEqual([1,2,3,4]);
+				});
 		});
 
 		it('should satisfy left identity', function() {

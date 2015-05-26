@@ -8,32 +8,40 @@ var delay = require('../lib/combinator/delay').delay;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var fromArray = require('../lib/source/fromArray').fromArray;
 
+var TestScheduler = require('./helper/TestScheduler');
+
 describe('zip', function() {
 	it('should invoke f for each tuple', function() {
-		var spy = this.spy();
 		var a = [1,2,3];
 		var b = [4,5,6];
-		var s = zip(spy, delay(0, fromArray(a)), delay(0, fromArray(b)));
+		var s = zip(Array, delay(1, fromArray(a)), delay(0, fromArray(b)));
 
-		return reduce(function(i) {
-				expect(spy).toHaveBeenCalledWith(a[i], b[i]);
-				return i + 1;
-			}, 0, s);
+		var scheduler = new TestScheduler();
+		scheduler.tick(1);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 1, value: [1,4] },
+					{ time: 1, value: [2,5] },
+					{ time: 1, value: [3,6] }
+				]);
+			});
 	});
 
 	it('should end when shortest stream ends', function() {
-		var spy = function(a, b) {
-			return a+b;
-		};
+		var s = fromArray([1,2,3,4]);
 
-		var a = take(2, iterate(inc, 1));
-		var b = take(3, iterate(inc, 4));
+		var a = take(2, s);
+		var b = take(3, s);
 
-		var s = zip(spy, a, b);
+		var scheduler = new TestScheduler();
+		scheduler.tick(2);
 
-		return reduce(inc, 0, s).then(function(count) {
-			expect(count).toBe(2);
-		});
+		return scheduler.collect(zip(Array, a, b))
+			.then(function(events) {
+				expect(events.length).toBe(2);
+			});
 	});
 });
 

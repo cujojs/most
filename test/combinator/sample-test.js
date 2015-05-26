@@ -11,6 +11,8 @@ var reduce = require('../../lib/combinator/accumulate').reduce;
 var observe = require('../../lib/combinator/observe').observe;
 var core = require('../../lib/source/core');
 
+var TestScheduler = require('../helper/TestScheduler');
+
 var empty = core.empty;
 var streamOf = core.of;
 
@@ -38,19 +40,22 @@ describe('sample', function() {
 	});
 
 	it('should sample latest value', function() {
-		var s1 = scan(inc, 0, periodic(20));
-		var s2 = scan(inc, 0, periodic(10));
+		var s1 = scan(inc, 0, periodic(2));
+		var s2 = scan(inc, 0, periodic(1));
 
-		var s = sample.sample(Array, periodic(10), s1, s2);
+		var s = sample.sample(Array, periodic(1), s1, s2);
 
-		return reduce(append, [], take(5, s))
-			.then(function(a) {
-				expect(a).toEqual([
-					[1, 1],
-					[1, 2],
-					[2, 3],
-					[2, 4],
-					[3, 5]
+		var scheduler = new TestScheduler();
+		scheduler.tick(5);
+
+		return scheduler.collect(take(5, s))
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 0, value: [1, 1] },
+					{ time: 1, value: [1, 2] },
+					{ time: 2, value: [2, 3] },
+					{ time: 3, value: [2, 4] },
+					{ time: 4, value: [3, 5] }
 				]);
 			});
 	});
@@ -77,35 +82,64 @@ describe('sampleWith', function() {
 	});
 
 	it('should sample latest value', function() {
+		var n = 5;
 		var i = 0;
-		var s = sampleWith(take(4, periodic(20)), map(function() {
+		var s = sampleWith(take(n, periodic(2)), map(function() {
 			return i++;
-		}, periodic(11)));
+		}, periodic(1)));
 
-		return reduce(append, [], s)
-			.then(function(a) {
-				expect(a).toEqual([0, 1, 3, 5]);
+		var scheduler = new TestScheduler();
+		scheduler.tick(n*21);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 0, value: 0 },
+					{ time: 2, value: 1 },
+					{ time: 4, value: 3 },
+					{ time: 6, value: 5 },
+					{ time: 8, value: 7 }
+				]);
 			});
 	});
 
 	it('should sample latest value', function() {
+		var n = 6;
 		var i = 0;
-		var s = sampleWith(take(8, periodic(10)), map(function() {
+		var s = sampleWith(take(n, periodic(1)), map(function() {
 			return i++;
-		}, periodic(18)));
+		}, periodic(2)));
 
-		return reduce(append, [], s)
-			.then(function(a) {
-				expect(a).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+		var scheduler = new TestScheduler();
+		scheduler.tick(n);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 0, value: 0 },
+					{ time: 1, value: 0 },
+					{ time: 2, value: 1 },
+					{ time: 3, value: 1 },
+					{ time: 4, value: 2 },
+					{ time: 5, value: 2 }
+				]);
 			});
 	});
 
 	it('should repeat last value after source ends', function() {
-		var s = sample.sampleWith(take(3, periodic(1)), streamOf(sentinel));
+		var n = 3;
+		var s = sample.sampleWith(take(n, periodic(1)), streamOf(sentinel));
 
-		return reduce(append, [], s)
-			.then(function(a) {
-				expect(a).toEqual([sentinel, sentinel, sentinel]);
+		var scheduler = new TestScheduler();
+		scheduler.tick(n);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 0, value: sentinel },
+					{ time: 1, value: sentinel },
+					{ time: 2, value: sentinel }
+				]);
 			});
 	});
 });

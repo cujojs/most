@@ -12,6 +12,7 @@ var core = require('../lib/source/core');
 var fromArray = require('../lib/source/fromArray').fromArray;
 var Stream = require('../lib/Stream');
 
+var TestScheduler = require('./helper/TestScheduler');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var streamOf = core.of;
@@ -37,13 +38,20 @@ describe('flatMap', function() {
 	it('should preserve time order', function() {
 		var s = flatMap.flatMap(function(x) {
 			return delay(x, streamOf(x));
-		}, fromArray([20, 10]));
+		}, fromArray([2, 1]));
 
-		return reduce(function(a, x) {
-			return a.concat(x);
-		}, [], s)
-			.then(function(a) {
-				expect(a).toEqual([10, 20]);
+		var scheduler = new TestScheduler();
+		scheduler.tick(2);
+
+		return scheduler.collect(s)
+			.then(function(events) {
+				expect(events.length).toBe(2);
+
+				expect(events[0].time).toBe(1);
+				expect(events[0].value).toBe(1);
+
+				expect(events[1].time).toBe(2);
+				expect(events[1].value).toBe(2);
 			});
 	});
 });
@@ -52,21 +60,25 @@ describe('join', function() {
 	it('should merge items from all inner streams', function() {
 		var a = [1,2,3];
 		var b = [4,5,6];
-		var streamsToMerge = fromArray([delay(0, fromArray(a)), delay(0, fromArray(b))]);
+		var streamsToMerge = fromArray([delay(1, fromArray(a)), fromArray(b)]);
 
-		return reduce(function(result, x) {
-			return result.concat(x);
-		}, [], flatMap.join(streamsToMerge))
-				.then(function(result) {
-					// Include all items
-					expect(result.sort()).toEqual(a.concat(b).sort());
+		var scheduler = new TestScheduler();
+		scheduler.tick(1);
 
-					// Relative order of items in each stream must be preserved
-					expect(result.indexOf(1) < result.indexOf(2)).toBeTrue();
-					expect(result.indexOf(2) < result.indexOf(3)).toBeTrue();
-					expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
-					expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
+		return scheduler.collect(flatMap.join(streamsToMerge))
+			.then(function(events) {
+				var result = events.map(function(event) {
+					return event.value;
 				});
+				// Include all items
+				expect(result.sort()).toEqual(a.concat(b).sort());
+
+				// Relative order of items in each stream must be preserved
+				expect(result.indexOf(1) < result.indexOf(2)).toBeTrue();
+				expect(result.indexOf(2) < result.indexOf(3)).toBeTrue();
+				expect(result.indexOf(4) < result.indexOf(5)).toBeTrue();
+				expect(result.indexOf(5) < result.indexOf(6)).toBeTrue();
+			});
 	});
 
 	it('should dispose outer stream', function() {
