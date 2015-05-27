@@ -5,11 +5,11 @@
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
   "dependencies": {
-    "baconjs": "^0.7.53",
+    "baconjs": "^0.7.60",
     "benchmark": "bestiejs/benchmark.js#master",
-    "highland": "^2.5.0",
-    "kefir": "^2.1.0",
-    "lodash": "^3.8.0",
+    "highland": "^2.5.1",
+    "kefir": "^2.5.0",
+    "lodash": "^3.9.3",
     "rx": "^2.5.2"
   }
 }
