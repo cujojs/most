@@ -902,10 +902,10 @@ Create a new stream containing all events until `startSignal` emits an event.
 ```
 stream:                    -a-b-c-d-e-f->
 startSignal:               ------z->
-stream.since(startSignal): -a-b-c|
+stream.since(startSignal): -------d-e-f->
 ```
 
-If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
+If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to [`never()`](#mostnever).
 
 ```js
 // Start logging mouse events when the user clicks.
