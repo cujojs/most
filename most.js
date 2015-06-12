@@ -633,7 +633,6 @@ Stream.prototype.await = function() {
 
 var errors = require('./lib/combinator/errors');
 
-
 exports.flatMapError = errors.flatMapError;
 exports.throwError   = errors.throwError;
 
@@ -651,16 +650,15 @@ Stream.prototype.flatMapError = function(f) {
 };
 
 //-----------------------------------------------------------------------
-// Changing behavior
+// Multicasting
 
 var multicast = require('./lib/combinator/multicast').multicast;
-
 
 exports.multicast = multicast;
 
 /**
  * Transform the stream into multicast stream.  That means that many subscribers
- * to the stream will not cause multiple invokations of the internal machinery.
+ * to the stream will not cause multiple invocations of the internal machinery.
  * @returns {Stream} new stream which will multicast events to all observers.
  */
 Stream.prototype.multicast = function() {
