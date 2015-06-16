@@ -17,16 +17,16 @@ describe('multicast', function() {
 		var observer1Spy = this.spy();
 		var observer2Spy = this.spy();
 
-    var s = streamOf(sentinel);
-    var mapped = map(mapperSpy, s);
-    
-    var o1 = observe(observer1Spy, mapped);
-    var o2 = observe(observer2Spy, mapped);
+		var s = streamOf(sentinel);
+		var mapped = map(mapperSpy, s);
 
-		return all([o1,o2]).then(function(a) {
-      expect(mapperSpy).toHaveBeenCalledTwice();
-      expect(observer1Spy).toHaveBeenCalledOnce();
-      expect(observer2Spy).toHaveBeenCalledOnce();
+		var o1 = observe(observer1Spy, mapped);
+		var o2 = observe(observer2Spy, mapped);
+
+		return all([o1, o2]).then(function (a) {
+			expect(mapperSpy).toHaveBeenCalledTwice();
+			expect(observer1Spy).toHaveBeenCalledOnce();
+			expect(observer2Spy).toHaveBeenCalledOnce();
 		});
 	});
 
@@ -35,17 +35,17 @@ describe('multicast', function() {
 		var observer1Spy = this.spy();
 		var observer2Spy = this.spy();
 
-    var s = streamOf(sentinel);
-    var mapped = map(mapperSpy, s);
-    var multicasted = multicast(mapped);
-    
-    var o1 = observe(observer1Spy, multicasted);
-    var o2 = observe(observer2Spy, multicasted);
+		var s = streamOf(sentinel);
+		var mapped = map(mapperSpy, s);
+		var multicasted = multicast(mapped);
 
-		return all([o1,o2]).then(function(a) {
-      expect(mapperSpy).toHaveBeenCalledOnce();
-      expect(observer1Spy).toHaveBeenCalledOnce();
-      expect(observer2Spy).toHaveBeenCalledOnce();
+		var o1 = observe(observer1Spy, multicasted);
+		var o2 = observe(observer2Spy, multicasted);
+
+		return all([o1, o2]).then(function (a) {
+			expect(mapperSpy).toHaveBeenCalledOnce();
+			expect(observer1Spy).toHaveBeenCalledOnce();
+			expect(observer2Spy).toHaveBeenCalledOnce();
 		});
 	});
 });
