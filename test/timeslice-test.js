@@ -11,6 +11,8 @@ var reduce = require('../lib/combinator/accumulate').reduce;
 var drain = require('../lib/combinator/observe').drain;
 var Stream = require('../lib/Stream');
 var merge = require('../lib/combinator/merge').merge;
+var map = require('../lib/combinator/transform').map;
+var timestamp = require('../lib/combinator/timestamp').timestamp;
 
 var streamOf = core.of;
 var never = core.never;
@@ -22,20 +24,31 @@ var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
 describe('during', function() {
-	it('should contain events at or later than min and earlier than max', function() {
-		var stream = periodic(1);
-		var timespan = delay(1, streamOf(delay(5, streamOf())));
+	it('=>should contain events at or later than min and earlier than max', function() {
+		var i = 0;
+		var stream = map(function() {return i++;}, periodic(10));
+		var timespan = delay(10, streamOf(delay(50, streamOf())));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(6);
-
-		return scheduler.collect(timeslice.during(timespan, stream))
-			.then(function(events) {
-				var len = events.length;
-                expect(len).toBe(5);
-				expect(events[0].time).toBe(1);
-				expect(events[len-1].time).toBe(5);
+		return reduce(function(a, x) {return a.concat(x);}, [], timeslice.during(timespan, stream))
+			.then(function(a) {
+				console.log(a);
+				expect(a.length).toBe(5);
 			});
+
+		//var stream = periodic(1);
+		//var timespan = delay(1, streamOf(delay(5, streamOf())));
+
+		//var scheduler = new TestScheduler();
+		//scheduler.tick(6);
+        //
+		//return scheduler.collect(stream)//timeslice.during(timespan, stream))
+		//	.then(function(events) {
+		//		console.log(events);
+		//		var len = events.length;
+         //       expect(len).toBe(5);
+		//		expect(events[0].time).toBe(1);
+		//		expect(events[len-1].time).toBe(5);
+		//	});
 	});
 
 	it('should dispose source stream', function() {

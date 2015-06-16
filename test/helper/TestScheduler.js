@@ -38,37 +38,34 @@ TestScheduler.prototype.tick = function(dt) {
 		return;
 	}
 
-	return this._setNow(dt + this._time);
-};
-
-TestScheduler.prototype._setNow = function(t) {
-	this._targetTime = Math.max(this._time, Math.max(this._targetTime, t));
-
 	if(this._running) {
 		return;
 	}
+
+	return this._scheduleNextRun(dt + this._time);
+};
+
+TestScheduler.prototype._unschedule = function() {};
+
+TestScheduler.prototype._scheduleNextRun = function(now) {
+	if(this._targetTime < now) {
+		this._targetTime = now;
+	}
+
+	//if(this._running) {
+	//	return;
+	//}
 
 	this._running = true;
 	return this._advanceClock();
 };
 
 TestScheduler.prototype._advanceClock = function() {
-	if(this._time > this._targetTime) {
-		this._running = false;
-		return;
+	console.log(this._time, this._targetTime);
+	if(this._time < this._targetTime) {
+		return defer(new AdvanceClockTask(this));
 	}
-
-	return defer(new AdvanceClockTask(this));
-};
-
-TestScheduler.prototype._unschedule = function() {};
-
-TestScheduler.prototype._scheduleNextRun = function(now) {
-	if(this._tasks.length === 0 || now < this._tasks[0].time) {
-		return;
-	}
-
-	this._setNow(now);
+	this._running = false;
 };
 
 function AdvanceClockTask(scheduler) {
@@ -76,13 +73,11 @@ function AdvanceClockTask(scheduler) {
 }
 
 AdvanceClockTask.prototype.run = function() {
-	if(this.scheduler._tasks.length === 0) {
-		this.scheduler._time = this.scheduler._targetTime;
-		return;
-	}
+    //this.scheduler._time++;
+    this.scheduler._runReadyTasks(this.scheduler._time);
 
-	this.scheduler._time = this.scheduler._tasks[0].time;
-	this.scheduler._runReadyTasks(this.scheduler._time);
+	this.scheduler._time++;
+
 	return this.scheduler._advanceClock();
 };
 
