@@ -11,7 +11,7 @@ module.exports = function run() {
 	var h = parseInt(s.height, 10)/2;
 
 	// Number of mouse tails (circles) to create
-	var nTails = 50;
+	var nTails = 100;
 
 	// Stream mouse movements and turn them into translate3d style rules
 	var mousemoves = most.fromEvent('mousemove', document).map(toTranslate3d);
