@@ -2,7 +2,13 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var most = require('../most');
-var sentinel = { value: 'sentinel' };
+
+describe('just', function() {
+	it('should be an alias for of', function() {
+		expect(typeof most.just).toBe('function');
+		expect(most.just).toBe(most.of);
+	});
+});
 
 describe('chain', function() {
 	it('should be an alias for flatMap', function() {

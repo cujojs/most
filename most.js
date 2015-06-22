@@ -16,6 +16,7 @@ exports.Stream = Stream;
 
 // Add of and empty to constructor for fantasy-land compat
 exports.of       = Stream.of    = core.of;
+exports.just     = core.of; // easier ES6 import alias
 exports.empty    = Stream.empty = core.empty;
 exports.never    = core.never;
 exports.from     = from;
