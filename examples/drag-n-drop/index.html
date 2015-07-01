@@ -2,11 +2,19 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>Drag'n'Drop Demo for Most.js</title>
     <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+        }
         body {
           font-size: 1em;
-          font-family: 'Helvetica Nueue', Helvetica, sans-serif;
+          font-family: 'Helvetica Neue', Helvetica, sans-serif;
+        }
+        .dragging-area {
+            width: 100%;
+            height: 100%;
         }
         .box {
           -webkit-transition: box-shadow 100ms ease;
@@ -41,6 +49,8 @@
     <script src="bower_components/rave/rave.js"></script>
 </head>
 <body>
-    <div class="box draggable"><span class="rest">Drag</span><span class="drag">Drop</span> me, baby!</div>
+    <div class="dragging-area">
+        <div class="box draggable"><span class="rest">Drag</span><span class="drag">Drop</span> me, baby!</div>
+    </div>
 </body>
 </html>
