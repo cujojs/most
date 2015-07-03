@@ -15,7 +15,6 @@ module.exports = function() {
 	var area = document.querySelector('.dragging-area');
 	// The thing we want to make draggable
 	var draggable = document.querySelector('.draggable');
-	var dragOffset = {};
 
 	// A higher-order stream (stream whose items are themselves streams)
 	// A mousedown DOM event generates a stream event which is
@@ -26,12 +25,14 @@ module.exports = function() {
 			e.preventDefault();
 
 			// Memorize click position within the box
-			dragOffset.dx = e.clientX - draggable.offsetLeft;
-			dragOffset.dy = e.clientY - draggable.offsetTop;
+			var dragOffset = {
+				dx: e.clientX - draggable.offsetLeft,
+				dy: e.clientY - draggable.offsetTop
+			};
 
 			return most.fromEvent('mousemove', area)
 				.map(function(e) {
-					return eventToDragInfo(DRAG, draggable, e);
+					return eventToDragInfo(DRAG, draggable, e, dragOffset);
 				})
 				.startWith(eventToDragInfo(GRAB, draggable, e));
 		});
@@ -52,30 +53,28 @@ module.exports = function() {
 	// dropped behavior.
 	most.merge(drag, drop)
 		.switch()
-		.reduce(handleDrag, dragOffset);
+		.observe(handleDrag);
 };
 
-function eventToDragInfo(action, target, e) {
-	return { action: action, target: target, x: e.clientX, y: e.clientY };
+// dragOffset is undefined and unused for actions other than DRAG.
+function eventToDragInfo(action, target, e, dragOffset) {
+	return { action: action, target: target, x: e.clientX, y: e.clientY, offset: dragOffset };
 }
 
-function handleDrag(offset, dd) {
-	var el = dd.target;
-	console.log(dd);
+function handleDrag(dragInfo) {
+	var el = dragInfo.target;
 
-	if (dd.action === GRAB) {
+	if (dragInfo.action === GRAB) {
 		el.classList.add('dragging');
-		return offset;
+		return;
 	}
 
-	if (dd.action === DROP) {
+	if (dragInfo.action === DROP) {
 		el.classList.remove('dragging');
-		return offset;
+		return;
 	}
 
-	var els = dd.target.style;
-	els.left = (dd.x - offset.dx) + 'px';
-	els.top = (dd.y - offset.dy) + 'px';
-
-	return offset;
+	var els = dragInfo.target.style;
+	els.left = (dragInfo.x - dragInfo.offset.dx) + 'px';
+	els.top = (dragInfo.y - dragInfo.offset.dy) + 'px';
 }
