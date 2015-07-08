@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "main": "most.js",
+  "main": "dist/most.js",
   "version": "0.14.0",
   "homepage": "https://github.com/cujojs/most",
   "authors": [
@@ -31,11 +31,12 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
+	"/*.js",
     "node_modules",
     "bower_components",
     "examples",
     "test",
-    "tests",
+    "lib",
     "package.json"
   ],
   "dependencies": {
