@@ -5,7 +5,7 @@ most.js API
 	* [Notation](#notation)
 	* [Concepts](./concepts.md)
 1. Creating streams
-	* [most.of](#mostof)
+	* [most.of](#mostof), alias [most.just](#mostof)
 	* [most.fromPromise](#mostfrompromise)
 	* [most.from](#mostfrom)
 	* [most.repeat](#mostrepeat)
@@ -71,6 +71,8 @@ most.js API
 	* [throttle](#throttle)
 1. Delaying streams
 	* [delay](#delay)
+1. Sharing stream
+	* [multicast](#multicast)
 
 ## Notation
 
@@ -115,7 +117,10 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 
 ### most.of
 
+ES6 import-friendly alias: `most.just`
+
 ####`most.of(x) -> Stream`
+####`most.just(x) -> Stream`
 
 ```
 most.of(x): x|
@@ -126,6 +131,13 @@ Create a stream containing only x.
 ```js
 var stream = most.of('hello');
 stream.forEach(console.log.bind(console)); // logs hello
+```
+
+```js
+// Use `just` for easy ES6 import
+import { just } from 'most';
+let stream = most.just('hello');
+stream.observe(x => console.log(x));
 ```
 
 ### most.fromPromise
@@ -1392,7 +1404,6 @@ stream.throttle(2):  a-c-----a-c----->
 
 In contrast to debounce, throttle simply drops events that occur more often than `throttlePeriod`, whereas debounce waits for a "quiet period".
 
-
 ## Delaying streams
 
 ### delay
@@ -1410,4 +1421,18 @@ stream.delay(5): ------a-b-c-d->
 
 Delaying a stream timeshifts all the events by the same amount.  Delaying doesn't change the time *between* events.
 
-*TODO: Example*
+## Sharing streams
+
+### multicast
+
+####`stream.multicast() -> Stream`
+####`most.multicast(stream) -> Stream`
+
+Returns a stream equivalent to the original, but which can be shared more efficiently among multiple consumers.
+
+```
+stream:             -a-b-c-d->
+stream.multicast(): -a-b-c-d->
+```
+
+Using `multicast` allows you to build up a stream of maps, filters, and other transformations, and then share it efficiently with multiple observers.
