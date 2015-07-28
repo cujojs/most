@@ -136,7 +136,7 @@ stream.forEach(console.log.bind(console)); // logs hello
 ```js
 // Use `just` for easy ES6 import
 import { just } from 'most';
-let stream = most.just('hello');
+let stream = just('hello');
 stream.observe(x => console.log(x));
 ```
 
