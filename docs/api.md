@@ -136,7 +136,7 @@ stream.forEach(console.log.bind(console)); // logs hello
 ```js
 // Use `just` for easy ES6 import
 import { just } from 'most';
-let stream = most.just('hello');
+let stream = just('hello');
 stream.observe(x => console.log(x));
 ```
 
@@ -867,8 +867,8 @@ stream.takeWhile(even): -2-4-|
 
 ### skipWhile
 
-####`stream.takeWhile(predicate) -> Stream`
-####`most.takeWhile(predicate, stream) -> Stream`
+####`stream.skipWhile(predicate) -> Stream`
+####`most.skipWhile(predicate, stream) -> Stream`
 
 Create a new stream containing all events after `predicate` returns false.
 
