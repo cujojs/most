@@ -67,12 +67,24 @@ To [run the example above](examples/add-inputs) and [others](examples) using [Ra
 
 ## Get it
 
-`npm install --save most` or `bower install --save most`
+As a module:
 
-then
+```
+npm install --save most` or `bower install --save most
+```
 
 ```js
 var most = require('most');
+```
+
+As `window.most`:
+
+```
+bower install --save most`
+```
+
+```html
+<script src="most/dist/most.js"></script>
 ```
 
 ## Iteroperability
