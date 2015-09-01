@@ -2,6 +2,7 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var streamOf = require('../../lib/source/core').of;
+var fromArray = require('../../lib/source/fromArray').fromArray;
 var map = require('../../lib/combinator/transform').map;
 var observe = require('../../lib/combinator/observe').observe;
 var multicast = require('../../lib/combinator/multicast').multicast;
@@ -47,5 +48,24 @@ describe('multicast', function() {
 			expect(observer1Spy).toHaveBeenCalledOnce();
 			expect(observer2Spy).toHaveBeenCalledOnce();
 		});
+	});
+
+	it('when multicasted and reduced twice, source streams are only evaluated once', function() {
+		var sourceSpy = this.spy();
+		var sumSpy = this.spy(function(sum, val) { return sum + val; });
+		var prodSpy = this.spy(function(prod, val) { return prod * val; });
+
+		var s = fromArray([1, 2, 3]).tap(sourceSpy);
+		var multicasted = multicast(s);
+
+		return multicasted.reduce(sumSpy, 0)
+			.then(function (sum) {
+				return multicasted.reduce(prodSpy, 1);
+			})
+			.then(function (prod) {
+				expect(sourceSpy).toHaveBeenCalledThrice();
+				expect(sumSpy).toHaveBeenCalledThrice();
+				expect(prodSpy).toHaveBeenCalledThrice();
+			});
 	});
 });
