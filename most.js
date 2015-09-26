@@ -23,6 +23,20 @@ exports.from     = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------
+// https://github.com/zenparsing/es-observable
+
+var observable = require('./lib/observable');
+
+
+Stream.prototype.subscribe = function(subscriber) {
+	return observable.subscribe(subscriber, this);
+};
+
+Stream.prototype[observable.symbol] = function() {
+	return this;
+};
+
+//-----------------------------------------------------------------------
 // Creating
 
 var create = require('./lib/source/create');
