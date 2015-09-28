@@ -36,6 +36,10 @@ Stream.prototype[observable.symbol] = function() {
 	return this;
 };
 
+var fromObservable = require('./lib/source/fromObservable');
+
+exports.fromObservable = fromObservable;
+
 //-----------------------------------------------------------------------
 // Creating
 
