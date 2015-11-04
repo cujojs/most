@@ -45,7 +45,7 @@ describe('scan', function() {
 		});
 
 		var s = scan(function(a, x) {
-			expect(x).notToBe(expectedEndValue);
+			expect(x).not.toBe(expectedEndValue);
 			return x;
 		}, 0, stream);
 
