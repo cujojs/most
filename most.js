@@ -653,3 +653,25 @@ exports.multicast = multicast;
 Stream.prototype.multicast = function() {
 	return multicast(this);
 };
+
+//-----------------------------------------------------------------------
+// Hold
+
+var hold = require('./lib/combinator/hold').hold;
+
+exports.hold = hold;
+
+/**
+ * Deliver the most recently seen event to each new observer the instant
+ * it begins observing.  A held stream is always multicast.
+ * Given a stream:
+ * stream:    -a---b---c---d->
+ * observers which begin observing at different times will see:
+ * observer1: -a---b---c---d->
+ * observer2:    a-b---c---d->
+ * observer3:           c--d->
+ * @return {Stream} new held stream
+ */
+Stream.prototype.hold = function() {
+	return hold(this);
+};
