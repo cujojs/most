@@ -3,8 +3,6 @@ var expect = require('buster').expect;
 
 var MulticastSource = require('../../lib/source/MulticastSource');
 var streamOf = require('../../lib/source/core').of;
-var repeat = require('../../lib/source/iterate').repeat;
-var take = require('../../lib/combinator/slice').take;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;
 var Stream = require('../../lib/Stream');
@@ -23,7 +21,7 @@ describe('MulticastSource', function() {
 		var s = new MulticastSource({ run: function() {} });
 
 		s.run({ event: eventSpy }, scheduler);
-		s.sink.event(sentinel);
+		s.event(sentinel);
 
 		expect(eventSpy).toHaveBeenCalledOnceWith(sentinel);
 	});
