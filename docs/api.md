@@ -1103,58 +1103,6 @@ resultStream.observe(function(z) {
 });
 ```
 
-### most.lift
-
-####`most.lift(f) -> function`
-
-**DEPRECATED**
-
-Lifts a function to act on streams.  Lifting returns a function that accepts streams as arguments, and returns a stream as a result.
-
-One way to think of lifting is that it takes a function that operates on "normal" values, like two strings, and creates a function that operates on "time-varying" values--on the "current value" of two `<input>` elements, for example.
-
-Lifting should be done at "initialization time": you should lift a function once and then use it many times.
-
-```js
-// return the concatenation of 2 strings
-function append(s1, s2) {
-	return s1 + s2;
-}
-
-var s1 = 'foo';
-var s2 = 'bar';
-
-// result is a string
-var result = append(s1, s2);
-
-// Logs 'foobar'
-console.log(result);
-
-// Lift the append function to operate on values that change over time
-var liftedAppend = most.lift(append);
-
-// A stream representing the "current value" of <input name="s1">
-var input1 = most.fromEvent('change', document.querySelector('[name="s1"]'))
-	.map(function(e) {
-		return e.target.value;
-	});
-
-// A stream representing the "current value" of <input name="s2">
-var input2 = most.fromEvent('change', document.querySelector('[name="s2"]'))
-	.map(function(e) {
-		return e.target.value;
-	});
-
-// resultStream is a stream of strings
-// Whenever either input changes, resultStream will emit a new event
-// It's like a live-updating value
-var resultStream = liftedAppend(input1, input2);
-
-// Logs the concatenated value of input1 and input2
-// *whenever either input changes*
-resultStream.observe(console.log.bind(console));
-```
-
 ### sample
 
 ####`sampler.sample(f, ...streams) -> Stream`
