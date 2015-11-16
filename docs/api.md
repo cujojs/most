@@ -1071,7 +1071,9 @@ stream2:                       --3---4-5--6->
 stream1.combine(add, stream2): --3-4-5-67-8->
 ```
 
-Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.  A combined stream ends with any one of its input streams ends.
+Combining creates a new stream by applying a function to the most recent event from each stream whenever a new event arrives on any one stream.  Combining must wait for at least one event to arrive on all input streams before it can produce any events.
+
+A combined stream has the same proportion as the max of the proportions of its input streams. To put it imperative terms: combine ends after all its inputs have ended.
 
 ```js
 // Add the current value of two inputs
