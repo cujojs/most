@@ -7,6 +7,7 @@ var observe = require('../../lib/combinator/observe').observe;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
+
 describe('from', function() {
 
 	it('should support array-like items', function() {
@@ -15,7 +16,7 @@ describe('from', function() {
 			return observe(function(x) {
 				result.push(x);
 			}, from(arguments)).then(function() {
-				expect(result).toEqual(result);
+				expect(result).toEqual([1,2,3]);
 			});
 		}
 		return observeArguments(1,2,3);
