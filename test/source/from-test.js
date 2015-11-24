@@ -4,10 +4,6 @@ var expect = require('buster').expect;
 var from = require('../../lib/source/from').from;
 var observe = require('../../lib/combinator/observe').observe;
 
-var sentinel = { value: 'sentinel' };
-var other = { value: 'other' };
-
-
 describe('from', function() {
 
 	it('should support array-like items', function() {
