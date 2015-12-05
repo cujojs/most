@@ -1,6 +1,7 @@
 var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
+var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
@@ -32,11 +33,14 @@ suite
 	.add('most', function(deferred) {
 		runners.runMost(deferred, most.from(a).zip(add, most.from(b)).reduce(add, 0));
 	}, options)
-	.add('rx', function(deferred) {
+	.add('rx 4', function(deferred) {
 		runners.runRx(deferred, rx.Observable.fromArray(a).zip(rx.Observable.fromArray(b), add).reduce(add, 0));
 	}, options)
+  .add('rx 5', function(deferred) {
+    runners.runRx5(deferred, rxjs.Observable.fromArray(a).zip(rxjs.Observable.fromArray(b), add).reduce(add, 0));
+  }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).reduce(add, 0));
+		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).scan(add, 0));
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.zipWith(add, bacon.fromArray(a), bacon.fromArray(b)).reduce(0, add));
