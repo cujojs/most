@@ -87,16 +87,16 @@ function runRx(deferred, rxStream) {
 }
 
 function runRx5(deferred, rxStream) {
-  rxStream.subscribe({
-    next: noop,
-    complete: function() {
-      deferred.resolve();
-    },
-    error: function(e) {
-      deferred.benchmark.emit({ type: 'error', error: e });
-      deferred.resolve(e);
-    }
-  });
+	rxStream.subscribe({
+		next: noop,
+		complete: function() {
+			deferred.resolve();
+		},
+		error: function(e) {
+			deferred.benchmark.emit({ type: 'error', error: e });
+			deferred.resolve(e);
+		}
+	});
 }
 
 function runKefir(deferred, kefirStream) {
