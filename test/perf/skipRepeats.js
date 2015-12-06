@@ -37,7 +37,7 @@ suite
     runners.runRx5(deferred, rxjs.Observable.fromArray(a).distinctUntilChanged().reduce(sum, 0));
   }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).skipDuplicates().scan(sum, 0));
+		runners.runKefir(deferred, kefirFromArray(a).skipDuplicates().scan(sum, 0).last());
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.fromArray(a).skipDuplicates().reduce(0, sum));

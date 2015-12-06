@@ -40,7 +40,7 @@ suite
     runners.runRx5(deferred, rxjs.Observable.fromArray(a).zip(rxjs.Observable.fromArray(b), add).reduce(add, 0));
   }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).scan(add, 0));
+		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).scan(add, 0).last());
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.zipWith(add, bacon.fromArray(a), bacon.fromArray(b)).reduce(0, add));

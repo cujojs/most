@@ -54,7 +54,7 @@ suite
         function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
   }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).flatMap(kefirFromArray).scan(sum, 0));
+		runners.runKefir(deferred, kefirFromArray(a).flatMap(kefirFromArray).scan(sum, 0).last());
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.fromArray(a).flatMap(bacon.fromArray).reduce(0, sum));

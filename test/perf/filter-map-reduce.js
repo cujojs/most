@@ -38,7 +38,7 @@ suite
       rxjs.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0));
   }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).scan(sum, 0));
+		runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).scan(sum, 0).last());
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.fromArray(a).filter(even).map(add1).reduce(0, sum));

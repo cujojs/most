@@ -52,7 +52,7 @@ suite
     runners.runRx5(deffered, rxjs.Observable.fromArray(a).concatMap(function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
   }, options)
 	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).scan(sum, 0));
+		runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).scan(sum, 0).last());
 	}, options)
 	.add('bacon', function(deferred) {
 		runners.runBacon(deferred, bacon.fromArray(a).flatMapConcat(bacon.fromArray).reduce(0, sum));
