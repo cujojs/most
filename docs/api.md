@@ -27,7 +27,7 @@ most.js API
 	* [constant](#constant)
 	* [scan](#scan)
 	* [flatMap](#flatmap), alias [chain](#flatmap)
-	* [flatMapEnd](#flatmapEnd)
+	* [flatMapEnd](#flatmapend)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
@@ -649,26 +649,28 @@ most.from([1, 2])
 ####`stream.flatMapEnd(f) -> Stream`
 ####`most.flatMapEnd(f, stream) -> Stream`
 
-Map the end event to a new stream, and begin emitting its values.  Note that `f` *must* return a stream.
+Replace the end signal with a new stream returned by f. Note that f *must* return a stream.
 
 `function f(x) -> Stream`
 
 ```
-stream:            -a-b-c-d-e-f->
-stream.take(4):         -a-b-c-d|
-f(end): 				-1-2-3-4-5->
-stream.flatMapEnd(f): -a-b-c-d-1-2-3-4-5>
+stream:               -a-b-c-d-e-f->
+stream.take(4):       -a-b-c-d|
+f(end): 		              -1-2-3-4-5->
+stream.flatMapEnd(f): -a-b-c-d-1-2-3-4-5->
 ```
 
 
 ```js
 most.periodic(1000, 'x')
-  .take(4)
-  .flatMapEnd(function(x){
-    return most.just('hello captain!')
-  })
-  .observe(console.log.bind(console));
-  // Logs: x 4 times... ends and then logs 'hello captain!'
+    .take(4)
+    .flatMapEnd(function() {
+        return most.iterate(function(x) {
+            return x + 1;
+        }, 1).take(5)
+    })
+    .observe(console.log.bind(console));
+  // Logs: x 4 times... ends and then logs 1, 2, 3, 4, 5
 ```
 
 ### concatMap
