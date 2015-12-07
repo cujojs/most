@@ -48,9 +48,9 @@ suite
 	.add('rx 4', function(deferred) {
 		runners.runRx(deferred, rx.Observable.fromArray(a).concatMap(rx.Observable.fromArray).reduce(sum, 0));
 	}, options)
-  .add('rx 5', function(deffered) {
-    runners.runRx5(deffered, rxjs.Observable.fromArray(a).concatMap(function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
-  }, options)
+	.add('rx 5', function(deffered) {
+		runners.runRx5(deffered, rxjs.Observable.fromArray(a).concatMap(function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
+	}, options)
 	.add('kefir', function(deferred) {
 		runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).scan(sum, 0).last());
 	}, options)
