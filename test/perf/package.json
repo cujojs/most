@@ -4,12 +4,22 @@
   "description": "Perf tests for most.js",
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
+  "scripts": {
+    "concatMap": "node ./concatMap.js",
+    "filter-map-reduce": "node ./filter-map-reduce",
+    "flatMap": "node ./flatMap.js",
+    "scan": "node ./scan.js",
+    "skipRepeats": "node ./skipRepeats.js",
+    "zip": "node ./zip.js",
+    "start": "npm run concatMap && npm run filter-map-reduce && npm run flatMap && npm run scan && npm run skipRepeats && npm run zip"
+  },
   "dependencies": {
-    "baconjs": "^0.7.70",
-    "benchmark": "bestiejs/benchmark.js#master",
+    "@reactivex/rxjs": "^5.0.0-alpha.12",
+    "baconjs": "^0.7.82",
+    "benchmark": "github:bestiejs/benchmark.js#master",
     "highland": "^2.5.1",
-    "kefir": "^2.8.0",
-    "lodash": "^3.10.0",
-    "rx": "^3.1.0"
+    "kefir": "^3.1.0",
+    "lodash": "^3.10.1",
+    "rx": "^4.0.7"
   }
 }
