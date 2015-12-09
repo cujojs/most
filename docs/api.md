@@ -1272,6 +1272,18 @@ stream.await(): ---1--2--3->
 
 Note that event order is preserved, regardless of promise fulfillment order.  The fulfilled event values will arrive at the later of the original event time and the promise fulfillment time.
 
+To create a stream that merges promises in fulfillment order, use
+`stream.flatMap(most.fromPromise)`.  Note the difference:
+
+```
+promise p:                        --1
+promise q:                        --------2
+promise r:                        ------3
+stream:                           -p-q-r----->
+stream.flatMap(most.fromPromise): --1---3-2-->
+stream.await():                   --1-----23->
+```
+
 If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  For example:
 
 ```
@@ -1281,9 +1293,6 @@ promise r:      -3
 stream:         -p---q---r->
 stream.await(): ---1--X
 ```
-
-Functionally, `stream.await()` and `stream.flatMap(most.fromPromise)` are equivalent, but `await` is much more efficient.
-
 
 ```js
 var urls = [url1, url2, url3, ...];
