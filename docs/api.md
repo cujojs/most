@@ -1270,7 +1270,7 @@ stream:         -p---q---r->
 stream.await(): ---1--2--3->
 ```
 
-Note that event order is preserved, regardless of promise fulfillment order.  The fulfilled event values will arrive at the later of the original event time and the promise fulfillment time.
+Event *times* may be delayed.  However, event *order* is always preserved, regardless of promise fulfillment order.
 
 To create a stream that merges promises in fulfillment order, use
 `stream.flatMap(most.fromPromise)`.  Note the difference:
