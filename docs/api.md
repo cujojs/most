@@ -27,6 +27,7 @@ most.js API
 	* [constant](#constant)
 	* [scan](#scan)
 	* [flatMap](#flatmap), alias [chain](#flatmap)
+	* [flatMapEnd](#flatmapend)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
@@ -55,7 +56,6 @@ most.js API
 1. Combining streams
 	* [merge](#merge)
 	* [combine](#combine)
-	* [most.lift](#mostlift)
 	* [sample](#sample)
 	* [sampleWith](#samplewith)
 	* [zip](#zip)
@@ -642,6 +642,35 @@ most.from([1, 2])
 		return most.periodic(x * 1000).take(5).constant(x);
 	})
 	.observe(console.log.bind(console));
+```
+
+### flatMapEnd
+
+####`stream.flatMapEnd(f) -> Stream`
+####`most.flatMapEnd(f, stream) -> Stream`
+
+Replace the end signal with a new stream returned by f. Note that f *must* return a stream.
+
+`function f(x) -> Stream`
+
+```
+stream:               -a-b-c-d-e-f->
+stream.take(4):       -a-b-c-d|end
+f(end): 		               1-2-3-4-5->
+stream.flatMapEnd(f): -a-b-c-d-1-2-3-4-5->
+```
+
+
+```js
+most.periodic(1000, 'x')
+    .take(4)
+    .flatMapEnd(function() {
+        return most.iterate(function(x) {
+            return x + 1;
+        }, 1).take(5)
+    })
+    .observe(console.log.bind(console));
+  // Logs: x 4 times... ends and then logs 1, 2, 3, 4, 5
 ```
 
 ### concatMap
