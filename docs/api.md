@@ -655,8 +655,8 @@ Replace the end signal with a new stream returned by f. Note that f *must* retur
 
 ```
 stream:               -a-b-c-d-e-f->
-stream.take(4):       -a-b-c-d|
-f(end): 		              -1-2-3-4-5->
+stream.take(4):       -a-b-c-d|end
+f(end): 		               1-2-3-4-5->
 stream.flatMapEnd(f): -a-b-c-d-1-2-3-4-5->
 ```
 
