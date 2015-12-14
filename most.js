@@ -144,7 +144,7 @@ var build = require('./lib/combinator/build');
 exports.unfold    = unfold.unfold;
 exports.iterate   = iterate.iterate;
 exports.generate  = generate.generate;
-exports.concat    = build.cycle;
+exports.cycle     = build.cycle;
 exports.concat    = build.concat;
 exports.startWith = build.cons;
 
