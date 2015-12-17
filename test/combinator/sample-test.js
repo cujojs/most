@@ -40,22 +40,22 @@ describe('sample', function() {
 	});
 
 	it('should sample latest value', function() {
-		var s1 = scan(inc, 0, periodic(2));
+		var s1 = scan(inc, 0, periodic(3));
 		var s2 = scan(inc, 0, periodic(1));
 
-		var s = sample.sample(Array, periodic(1), s1, s2);
+		var s = sample.sample(Array, periodic(3), s1, s2);
 
 		var scheduler = new TestScheduler();
-		scheduler.tick(5);
+		scheduler.tick(15);
 
 		return scheduler.collect(take(5, s))
 			.then(function(events) {
 				expect(events).toEqual([
-					{ time: 0, value: [1, 1] },
-					{ time: 1, value: [1, 2] },
-					{ time: 2, value: [2, 3] },
-					{ time: 3, value: [2, 4] },
-					{ time: 4, value: [3, 5] }
+					{ time: 0, value: [0, 0] },
+					{ time: 3, value: [1, 3] },
+					{ time: 6, value: [2, 6] },
+					{ time: 9, value: [3, 9] },
+					{ time: 12, value: [4, 12] }
 				]);
 			});
 	});
