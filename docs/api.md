@@ -62,6 +62,7 @@ most.js API
 1. Combining higher order streams
 	* [switch](#switch)
 	* [join](#join)
+	* [mergeConcurrently](#mergeConcurrently)
 1. Awaiting promises
 	* [await](#await)
 1. Rate limiting streams
@@ -1252,6 +1253,27 @@ stream.join(): ---a---b--4c-5-d6->
 ```
 
 *TODO: Example*
+
+### mergeConcurrently
+
+####`stream.mergeConcurrently(concurrency) -> Stream`
+####`most.mergeConcurrently(concurrency, stream) -> Stream`
+
+Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that merges inner streams as they arrive *up to the specified concurrency*.  Once `concurrency` number of streams are being merged, newly arriving streams will be merged after an existing one ends.
+
+```
+s:                           --a--b--c--d--e-->
+t:                           --x------y|
+u:                           -1--2--3--4--5--6>
+stream:                      -s--t--u--------->
+stream.mergeConcurrently(2): --a------y4d-5e-6>
+```
+
+Note that `u` is only merged *after* `t` ends, due to the concurrency level of `2`.
+
+Note also that `stream.mergeConcurrently(Infinity)` is equivalent to [`stream.join()`](#join).
+
+To control concurrency, `mergeConcurrently` must maintain an internal queue of newly arrived streams.  If new streams arrive faster than the concurrency level allows them to be merged, the internal queue will grow infinitely.
 
 ## Awaiting promises
 
