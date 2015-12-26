@@ -289,6 +289,26 @@ Stream.prototype.concatMap = function(f) {
 };
 
 //-----------------------------------------------------------------------
+// Concurrent merging
+
+var mergeConcurrently = require('./lib/combinator/mergeConcurrently');
+
+exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
+
+/**
+ * Flatten a Stream<Stream<X>> to Stream<X> by merging inner
+ * streams to the outer, limiting the number of inner streams that may
+ * be active concurrently.
+ * @param {number} concurrency at most this many inner streams will be
+ *  allowed to be active concurrently.
+ * @return {Stream<X>} new stream containing all events of all inner
+ *  streams, with limited concurrency.
+ */
+Stream.prototype.mergeConcurrently = function(concurrency) {
+	return mergeConcurrently.mergeConcurrently(concurrency, this);
+};
+
+//-----------------------------------------------------------------------
 // Merging
 
 var merge = require('./lib/combinator/merge');
