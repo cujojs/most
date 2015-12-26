@@ -305,7 +305,7 @@ exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
  *  streams, with limited concurrency.
  */
 Stream.prototype.mergeConcurrently = function(concurrency) {
-	return mergeConcurrently.mergeConcurrently(concurrency);
+	return mergeConcurrently.mergeConcurrently(concurrency, this);
 };
 
 //-----------------------------------------------------------------------
