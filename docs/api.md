@@ -20,14 +20,14 @@ most.js API
 	* [concat](#concat)
 	* [cycle](#cycle)
 1. Handling errors
-	* [flatMapError](#flatmaperror)
+	* [recoverWith](#recoverwith), alias [flatMapError](#recoverwith)
 	* [throwError](#mostthrowerror)
 1. Transforming streams
 	* [map](#map)
 	* [constant](#constant)
 	* [scan](#scan)
-	* [flatMap](#flatmap), alias [chain](#flatmap)
-	* [flatMapEnd](#flatmapend)
+	* [chain](#chain), alias [flatMap](#chain)
+	* [continueWith](#continuewith), alias [flatMapEnd](#flatmapend)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
@@ -148,7 +148,7 @@ promise:                   ----a
 most.fromPromise(promise): ----a|
 ```
 
-Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [flatMapError](#flatmaperror) for error recovery.
+Create a stream containing the outcome of a promise.  If the promise fulfills, the stream will contain the promise's value.  If the promise rejects, the stream will be in an error state with the promise's rejection reason as its error.  See [recoverWith](#recoverwith) for error recovery.
 
 ### most.from
 
@@ -486,19 +486,19 @@ Makes an infinite stream from a finite one.  If the input `stream` is infinite, 
 
 ## Handling errors
 
-### flatMapError
+### recoverWith
 
-Alias: **chain**
+Alias: **flatMapError**
 
-####`stream.flatMapError(f) -> Stream`
-####`most.flatMapError(f, stream) -> Stream`
+####`stream.recoverWith(f) -> Stream`
+####`most.recoverWith(f, stream) -> Stream`
 
 Recover from a stream failure by calling a function to create a new stream.
 
 ```
 stream:                 -a-b-c-X
 f(X):                   -d-e-f->
-stream.flatMapError(f): -a-b-c-d-e-f->
+stream.recoverWith(f): -a-b-c-d-e-f->
 ```
 
 When a stream fails with an error, the error will be passed to `f`.  `f` must return a new stream to replace the error.
@@ -511,7 +511,7 @@ var stream = most.fromPromise(rest('http://myapi.com/things'));
 // Try to process data from the real API, but fall back
 // to some default data if that fails.
 stream.map(JSON.parse)
-	.flatMapError(function(e) {
+	.recoverWith(function(e) {
 		// console.error(e);
 		return most.of(defaultData);
 	})
@@ -617,10 +617,12 @@ numbers.scan(function(slidingWindow, x) {
 }, [])
 	.forEach(console.log.bind(console));
 ```
-### flatMap
+### chain
 
-####`stream.flatMap(f) -> Stream`
-####`most.flatMap(f, stream) -> Stream`
+Alias: **flatMap**
+
+####`stream.chain(f) -> Stream`
+####`most.chain(f, stream) -> Stream`
 
 Transform each event in `stream` into a stream, and then merge it into the resulting stream. Note that `f` *must* return a stream.
 
@@ -631,24 +633,24 @@ stream:            -a----b----c|
 f(a):               1--2--3|
 f(b):                    1----2----3|
 f(c):                           1-2-3|
-stream.flatMap(f): -1--2-13---2-1-233|
+stream.chain(f):   -1--2-13---2-1-233|
 ```
 
-Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
+Note the difference between [`concatMap`](#concatmap) and [`chain`](#chain): `concatMap` concatenates, while `chain` merges.
 
 ```js
 // Logs: 1 2 1 1 2 1 1 2 2 2
 most.from([1, 2])
-	.flatMap(function(x) {
+	.chain(function(x) {
 		return most.periodic(x * 1000).take(5).constant(x);
 	})
 	.observe(console.log.bind(console));
 ```
 
-### flatMapEnd
+### continueWith
 
-####`stream.flatMapEnd(f) -> Stream`
-####`most.flatMapEnd(f, stream) -> Stream`
+####`stream.continueWith(f) -> Stream`
+####`most.continueWith(f, stream) -> Stream`
 
 Replace the end signal with a new stream returned by f. Note that f *must* return a stream.
 
@@ -658,14 +660,14 @@ Replace the end signal with a new stream returned by f. Note that f *must* retur
 stream:               -a-b-c-d-e-f->
 stream.take(4):       -a-b-c-d|end
 f(end): 		               1-2-3-4-5->
-stream.flatMapEnd(f): -a-b-c-d-1-2-3-4-5->
+stream.continueWith(f): -a-b-c-d-1-2-3-4-5->
 ```
 
 
 ```js
 most.periodic(1000, 'x')
     .take(4)
-    .flatMapEnd(function() {
+    .continueWith(function() {
         return most.iterate(function(x) {
             return x + 1;
         }, 1).take(5)
@@ -1324,18 +1326,18 @@ stream.await(): ---1--2--3->
 Event *times* may be delayed.  However, event *order* is always preserved, regardless of promise fulfillment order.
 
 To create a stream that merges promises in fulfillment order, use
-`stream.flatMap(most.fromPromise)`.  Note the difference:
+`stream.chain(most.fromPromise)`.  Note the difference:
 
 ```
 promise p:                        --1
 promise q:                        --------2
 promise r:                        ------3
 stream:                           -p-q-r----->
-stream.flatMap(most.fromPromise): --1---3-2-->
+stream.chain(most.fromPromise):   --1---3-2-->
 stream.await():                   --1-----23->
 ```
 
-If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [flatMapError](#flatmaperror) for error recovery.  For example:
+If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [recoverWith](#recoverwith) for error recovery.  For example:
 
 ```
 promise p:      ---1
