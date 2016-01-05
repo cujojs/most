@@ -41,3 +41,19 @@ describe('skipUntil', function() {
 		expect(most.Stream.prototype.skipUntil).toBe(most.Stream.prototype.since);
 	});
 });
+
+describe('flatMapEnd', function() {
+	it('should be an alias for continueWith', function() {
+		expect(typeof most.flatMapEnd).toBe('function');
+		expect(most.flatMapEnd).toBe(most.continueWith);
+		expect(most.Stream.prototype.flatMapEnd).toBe(most.Stream.prototype.continueWith);
+	});
+
+	describe('flatMapError', function() {
+		it('should be an alias for recoverWith', function () {
+			expect(typeof most.flatMapError).toBe('function');
+			expect(most.flatMapError).toBe(most.recoverWith);
+			expect(most.Stream.prototype.flatMapError).toBe(most.Stream.prototype.recoverWith);
+		});
+	});
+});
