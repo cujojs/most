@@ -110,21 +110,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.fromEvent = events.fromEvent;
 
 	//-----------------------------------------------------------------------
-	// Lifting functions
-
-	var lift = __webpack_require__(29).lift;
-
-	/**
-	 * Lift a function that accepts values and returns a value, and return a function
-	 * that accepts streams and returns a stream.
-	 * @type {function(f:function(...args):*):function(...streams):Stream<*>}
-	 */
-	exports.lift = lift;
-
-	//-----------------------------------------------------------------------
 	// Observing
 
-	var observe = __webpack_require__(39);
+	var observe = __webpack_require__(29);
 
 	exports.observe = observe.observe;
 	exports.forEach = observe.observe;
@@ -153,7 +141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//-------------------------------------------------------
 
-	var loop = __webpack_require__(45).loop;
+	var loop = __webpack_require__(35).loop;
 
 	exports.loop = loop;
 
@@ -173,7 +161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//-------------------------------------------------------
 
-	var accumulate = __webpack_require__(46);
+	var accumulate = __webpack_require__(37);
 
 	exports.scan   = accumulate.scan;
 	exports.reduce = accumulate.reduce;
@@ -204,15 +192,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Building and extending
 
-	var unfold = __webpack_require__(47);
-	var iterate = __webpack_require__(48);
-	var generate = __webpack_require__(49);
-	var build = __webpack_require__(50);
+	var unfold = __webpack_require__(42);
+	var iterate = __webpack_require__(43);
+	var generate = __webpack_require__(44);
+	var build = __webpack_require__(38);
 
 	exports.unfold    = unfold.unfold;
 	exports.iterate   = iterate.iterate;
 	exports.generate  = generate.generate;
-	exports.concat    = build.cycle;
+	exports.cycle     = build.cycle;
 	exports.concat    = build.concat;
 	exports.startWith = build.cons;
 
@@ -244,8 +232,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Transforming
 
-	var transform = __webpack_require__(33);
-	var applicative = __webpack_require__(55);
+	var transform = __webpack_require__(45);
+	var applicative = __webpack_require__(49);
 
 	exports.map      = transform.map;
 	exports.constant = transform.constant;
@@ -293,7 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Transducer support
 
-	var transduce = __webpack_require__(56);
+	var transduce = __webpack_require__(53);
 
 	exports.transduce = transduce.transduce;
 
@@ -309,7 +297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// FlatMapping
 
-	var flatMap = __webpack_require__(57);
+	var flatMap = __webpack_require__(54);
 
 	exports.flatMap = exports.chain = flatMap.flatMap;
 	exports.join    = flatMap.join;
@@ -333,7 +321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return flatMap.join(this);
 	};
 
-	var flatMapEnd = __webpack_require__(58).flatMapEnd;
+	var flatMapEnd = __webpack_require__(39).flatMapEnd;
 
 	exports.flatMapEnd = flatMapEnd;
 
@@ -348,7 +336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return flatMapEnd(f, this);
 	};
 
-	var concatMap = __webpack_require__(51).concatMap;
+	var concatMap = __webpack_require__(57).concatMap;
 
 	exports.concatMap = concatMap;
 
@@ -357,9 +345,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	//-----------------------------------------------------------------------
+	// Concurrent merging
+
+	var mergeConcurrently = __webpack_require__(55);
+
+	exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
+
+	/**
+	 * Flatten a Stream<Stream<X>> to Stream<X> by merging inner
+	 * streams to the outer, limiting the number of inner streams that may
+	 * be active concurrently.
+	 * @param {number} concurrency at most this many inner streams will be
+	 *  allowed to be active concurrently.
+	 * @return {Stream<X>} new stream containing all events of all inner
+	 *  streams, with limited concurrency.
+	 */
+	Stream.prototype.mergeConcurrently = function(concurrency) {
+		return mergeConcurrently.mergeConcurrently(concurrency, this);
+	};
+
+	//-----------------------------------------------------------------------
 	// Merging
 
-	var merge = __webpack_require__(59);
+	var merge = __webpack_require__(58);
 
 	exports.merge = merge.merge;
 
@@ -376,7 +384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Combining
 
-	var combine = __webpack_require__(30);
+	var combine = __webpack_require__(50);
 
 	exports.combine = combine.combine;
 
@@ -393,7 +401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Sampling
 
-	var sample = __webpack_require__(60);
+	var sample = __webpack_require__(59);
 
 	exports.sample = sample.sample;
 	exports.sampleWith = sample.sampleWith;
@@ -421,7 +429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Zipping
 
-	var zip = __webpack_require__(61);
+	var zip = __webpack_require__(60);
 
 	exports.zip = zip.zip;
 
@@ -439,7 +447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Switching
 
-	var switchLatest = __webpack_require__(63).switch;
+	var switchLatest = __webpack_require__(62).switch;
 
 	exports.switch       = switchLatest;
 	exports.switchLatest = switchLatest;
@@ -456,7 +464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Filtering
 
-	var filter = __webpack_require__(66);
+	var filter = __webpack_require__(65);
 
 	exports.filter          = filter.filter;
 	exports.skipRepeats     = exports.distinct   = filter.skipRepeats;
@@ -495,7 +503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Slicing
 
-	var slice = __webpack_require__(65);
+	var slice = __webpack_require__(64);
 
 	exports.take      = slice.take;
 	exports.skip      = slice.skip;
@@ -560,7 +568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Time slicing
 
-	var timeslice = __webpack_require__(64);
+	var timeslice = __webpack_require__(63);
 
 	exports.until  = exports.takeUntil = timeslice.takeUntil;
 	exports.since  = exports.skipUntil = timeslice.skipUntil;
@@ -609,7 +617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Delaying
 
-	var delay = __webpack_require__(67).delay;
+	var delay = __webpack_require__(66).delay;
 
 	exports.delay = delay;
 
@@ -624,7 +632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Getting event timestamp
 
-	var timestamp = __webpack_require__(68).timestamp;
+	var timestamp = __webpack_require__(67).timestamp;
 
 	exports.timestamp = timestamp;
 
@@ -640,7 +648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Rate limiting
 
-	var limit = __webpack_require__(69);
+	var limit = __webpack_require__(68);
 
 	exports.throttle = limit.throttle;
 	exports.debounce = limit.debounce;
@@ -671,7 +679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Awaiting Promises
 
-	var promises = __webpack_require__(70);
+	var promises = __webpack_require__(69);
 
 	exports.fromPromise = promises.fromPromise;
 	exports.await       = promises.await;
@@ -688,7 +696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Error handling
 
-	var errors = __webpack_require__(71);
+	var errors = __webpack_require__(70);
 
 	exports.flatMapError = errors.flatMapError;
 	exports.throwError   = errors.throwError;
@@ -709,7 +717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Multicasting
 
-	var multicast = __webpack_require__(72).multicast;
+	var multicast = __webpack_require__(71).multicast;
 
 	exports.multicast = multicast;
 
@@ -761,6 +769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.remove = remove;
 	exports.removeAll = removeAll;
 	exports.findIndex = findIndex;
+	exports.isArrayLike = isArrayLike;
 
 	function noop() {}
 
@@ -895,6 +904,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		return -1;
 	}
 
+	function isArrayLike(x){
+	   return x != null && typeof x.length === 'number' && typeof x !== 'function';
+	}
 
 /***/ },
 /* 3 */
@@ -1129,11 +1141,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var fromArray = __webpack_require__(10).fromArray;
 	var isIterable = __webpack_require__(11).isIterable;
 	var fromIterable = __webpack_require__(12).fromIterable;
+	var isArrayLike = __webpack_require__(2).isArrayLike;
 
 	exports.from = from;
 
 	function from(a) {
-		if(Array.isArray(a)) {
+		if(Array.isArray(a) || isArrayLike(a)) {
 			return fromArray(a);
 		}
 
@@ -1340,21 +1353,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function MulticastSource(source) {
 		this.source = source;
-		this.sink = new MulticastSink();
+		this.sinks = [];
 		this._disposable = void 0;
 	}
 
 	MulticastSource.prototype.run = function(sink, scheduler) {
-		var n = this.sink.add(sink);
+		var n = this.add(sink);
 		if(n === 1) {
-			this._disposable = this.source.run(this.sink, scheduler);
+			this._disposable = this.source.run(this, scheduler);
 		}
 
 		return new MulticastDisposable(this, sink);
 	};
 
 	MulticastSource.prototype._dispose = function() {
-		return resolve(this._disposable).then(dispose);
+		var disposable = this._disposable;
+		this._disposable = void 0;
+		return resolve(disposable).then(dispose);
 	};
 
 	function dispose(disposable) {
@@ -1371,25 +1386,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	MulticastDisposable.prototype.dispose = function() {
 		var s = this.source;
-		var remaining = s.sink.remove(this.sink);
+		var remaining = s.remove(this.sink);
 		return remaining === 0 && s._dispose();
 	};
 
-	function MulticastSink() {
-		this.sinks = [];
-	}
-
-	MulticastSink.prototype.add = function(sink) {
+	MulticastSource.prototype.add = function(sink) {
 		this.sinks = base.append(sink, this.sinks);
 		return this.sinks.length;
 	};
 
-	MulticastSink.prototype.remove = function(sink) {
+	MulticastSource.prototype.remove = function(sink) {
 		this.sinks = base.remove(base.findIndex(sink, this.sinks), this.sinks);
 		return this.sinks.length;
 	};
 
-	MulticastSink.prototype.event = function(t, x) {
+	MulticastSource.prototype.event = function(t, x) {
 		var s = this.sinks;
 		if(s.length === 1) {
 			s[0].event(t, x);
@@ -1400,7 +1411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	};
 
-	MulticastSink.prototype.end = function(t, x) {
+	MulticastSource.prototype.end = function(t, x) {
 		var s = this.sinks;
 		if(s.length === 1) {
 			s[0].end(t, x);
@@ -1411,7 +1422,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	};
 
-	MulticastSink.prototype.error = function(t, e) {
+	MulticastSource.prototype.error = function(t, e) {
 		var s = this.sinks;
 		if(s.length === 1) {
 			s[0].error(t, e);
@@ -1421,6 +1432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			s[i].error(t, e);
 		}
 	};
+
 
 /***/ },
 /* 15 */
@@ -2850,11 +2862,14 @@ return /******/ (function(modules) { // webpackBootstrap
 		this.sink = sink;
 		this.scheduler = scheduler;
 		this.active = true;
+		this._unsubscribe = this._init(subscribe);
+	}
 
+	Subscription.prototype._init = function(subscribe) {
 		var s = this;
 
 		try {
-			this._unsubscribe = subscribe(add, end, error);
+			return subscribe(add, end, error);
 		} catch(e) {
 			error(e);
 		}
@@ -2868,7 +2883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		function error(e) {
 			s._error(e);
 		}
-	}
+	};
 
 	Subscription.prototype._add = function(x) {
 		if(!this.active) {
@@ -2893,7 +2908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Subscription.prototype.dispose = function() {
 		this.active = false;
 		if(typeof this._unsubscribe === 'function') {
-			return this._unsubscribe();
+			return this._unsubscribe.call(void 0);
 		}
 	};
 
@@ -2912,6 +2927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			sink.error(t, e);
 		}
 	}
+
 
 /***/ },
 /* 26 */
@@ -3148,485 +3164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var combine = __webpack_require__(30).combineArray;
-
-	var paramsRx = /\(([^)]*)/;
-	var liftedSuffix = '_most$Stream$lifted';
-
-	exports.lift = lift;
-
-	/**
-	 * @deprecated
-	 * Lift a function to operate on streams.  For example:
-	 * lift(function(x:number, y:number):number) -> function(xs:Stream, ys:Stream):Stream
-	 * @param {function} f function to be lifted
-	 * @returns {function} function with the same arity as f that accepts
-	 *  streams as arguments and returns a stream
-	 */
-	function lift (f) {
-		/*jshint evil:true*/
-		var m = paramsRx.exec(f.toString());
-		var body = 'return function ' + f.name + liftedSuffix + ' (' + m[1] + ') {\n' +
-				'  return combine(f, arguments);\n' +
-				'};';
-
-		return (new Function('combine', 'f', body)(combine, f));
-	}
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Stream = __webpack_require__(1);
-	var transform = __webpack_require__(33);
-	var core = __webpack_require__(3);
-	var Pipe = __webpack_require__(32);
-	var IndexSink = __webpack_require__(31);
-	var CompoundDisposable = __webpack_require__(37);
-	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(38);
-
-	var hasValue = IndexSink.hasValue;
-	var getValue = IndexSink.getValue;
-
-	var map = base.map;
-	var tail = base.tail;
-
-	exports.combineArray = combineArray;
-	exports.combine = combine;
-
-	/**
-	 * Combine latest events from all input streams
-	 * @param {function(...events):*} f function to combine most recent events
-	 * @returns {Stream} stream containing the result of applying f to the most recent
-	 *  event of each input stream, whenever a new event arrives on any stream.
-	 */
-	function combine(f /*, ...streams */) {
-		return new Stream(new Combine(f, map(getSource, tail(arguments))));
-	}
-
-	/**
-	 * Combine latest events from all input streams
-	 * @param {function(...events):*} f function to combine most recent events
-	 * @param {[Stream]} streams most recent events
-	 * @returns {Stream} stream containing the result of applying f to the most recent
-	 *  event of each input stream, whenever a new event arrives on any stream.
-	 */
-	function combineArray(f, streams) {
-		return streams.length === 0 ? core.empty()
-			 : streams.length === 1 ? transform.map(f, streams[0])
-			 : new Stream(new Combine(f, map(getSource, streams)));
-	}
-
-	function getSource(stream) {
-		return stream.source;
-	}
-
-	function Combine(f, sources) {
-		this.f = f;
-		this.sources = sources;
-	}
-
-	Combine.prototype.run = function(sink, scheduler) {
-		var l = this.sources.length;
-		var disposables = new Array(l);
-		var sinks = new Array(l);
-
-		var combineSink = new CombineSink(this.f, sinks, sink);
-
-		for(var indexSink, i=0; i<l; ++i) {
-			indexSink = sinks[i] = new IndexSink(i, combineSink);
-			disposables[i] = this.sources[i].run(indexSink, scheduler);
-		}
-
-		return new CompoundDisposable(disposables);
-	};
-
-	function CombineSink(f, sinks, sink) {
-		this.f = f;
-		this.sinks = sinks;
-		this.sink = sink;
-		this.ready = false;
-		this.activeCount = sinks.length;
-	}
-
-	CombineSink.prototype.event = function(t /*, indexSink */) {
-		if(!this.ready) {
-			this.ready = this.sinks.every(hasValue);
-		}
-
-		if(this.ready) {
-			// TODO: Maybe cache values in their own array once this.ready
-			this.sink.event(t, invoke(this.f, map(getValue, this.sinks)));
-		}
-	};
-
-	CombineSink.prototype.end = function(t, indexedValue) {
-		if(--this.activeCount === 0) {
-			this.sink.end(t, indexedValue.value);
-		}
-	};
-
-	CombineSink.prototype.error = Pipe.prototype.error;
-
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Sink = __webpack_require__(32);
-
-	module.exports = IndexSink;
-
-	IndexSink.hasValue = hasValue;
-	IndexSink.getValue = getValue;
-
-	function hasValue(indexSink) {
-		return indexSink.hasValue;
-	}
-
-	function getValue(indexSink) {
-		return indexSink.value;
-	}
-
-	function IndexSink(i, sink) {
-		this.index = i;
-		this.sink = sink;
-		this.active = true;
-		this.hasValue = false;
-		this.value = void 0;
-	}
-
-	IndexSink.prototype.event = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-		this.value = x;
-		this.hasValue = true;
-		this.sink.event(t, this);
-	};
-
-	IndexSink.prototype.end = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-		this.active = false;
-		this.sink.end(t, { index: this.index, value: x });
-	};
-
-	IndexSink.prototype.error = Sink.prototype.error;
-
-
-/***/ },
-/* 32 */
-/***/ function(module, exports) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	module.exports = Pipe;
-
-	/**
-	 * A sink mixin that simply forwards event, end, and error to
-	 * another sink.
-	 * @param sink
-	 * @constructor
-	 */
-	function Pipe(sink) {
-		this.sink = sink;
-	}
-
-	Pipe.prototype.event = function(t, x) {
-		return this.sink.event(t, x);
-	};
-
-	Pipe.prototype.end = function(t, x) {
-		return this.sink.end(t, x);
-	};
-
-	Pipe.prototype.error = function(t, e) {
-		return this.sink.error(t, e);
-	};
-
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Stream = __webpack_require__(1);
-	var Map = __webpack_require__(34);
-
-	exports.map = map;
-	exports.constant = constant;
-	exports.tap = tap;
-
-	/**
-	 * Transform each value in the stream by applying f to each
-	 * @param {function(*):*} f mapping function
-	 * @param {Stream} stream stream to map
-	 * @returns {Stream} stream containing items transformed by f
-	 */
-	function map(f, stream) {
-		return new Stream(Map.create(f, stream.source));
-	}
-
-	/**
-	 * Replace each value in the stream with x
-	 * @param {*} x
-	 * @param {Stream} stream
-	 * @returns {Stream} stream containing items replaced with x
-	 */
-	function constant(x, stream) {
-		return map(function() {
-			return x;
-		}, stream);
-	}
-
-	/**
-	 * Perform a side effect for each item in the stream
-	 * @param {function(x:*):*} f side effect to execute for each item. The
-	 *  return value will be discarded.
-	 * @param {Stream} stream stream to tap
-	 * @returns {Stream} new stream containing the same items as this stream
-	 */
-	function tap(f, stream) {
-		return map(function(x) {
-			f(x);
-			return x;
-		}, stream);
-	}
-
-
-/***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Pipe = __webpack_require__(32);
-	var Filter = __webpack_require__(35);
-	var FilterMap = __webpack_require__(36);
-	var base = __webpack_require__(2);
-
-	module.exports = Map;
-
-	function Map(f, source) {
-		this.f = f;
-		this.source = source;
-	}
-
-	/**
-	 * Create a mapped source, fusing adjacent map.map, filter.map,
-	 * and filter.map.map if possible
-	 * @param {function(*):*} f mapping function
-	 * @param {{run:function}} source source to map
-	 * @returns {Map|FilterMap} mapped source, possibly fused
-	 */
-	Map.create = function createMap(f, source) {
-		if(source instanceof Map) {
-			return new Map(base.compose(f, source.f), source.source);
-		}
-
-		if(source instanceof Filter) {
-			return new FilterMap(source.p, f, source.source);
-		}
-
-		if(source instanceof FilterMap) {
-			return new FilterMap(source.p, base.compose(f, source.f), source.source);
-		}
-
-		return new Map(f, source);
-	};
-
-	Map.prototype.run = function(sink, scheduler) {
-		return this.source.run(new MapSink(this.f, sink), scheduler);
-	};
-
-	function MapSink(f, sink) {
-		this.f = f;
-		this.sink = sink;
-	}
-
-	MapSink.prototype.end   = Pipe.prototype.end;
-	MapSink.prototype.error = Pipe.prototype.error;
-
-	MapSink.prototype.event = function(t, x) {
-		var f = this.f;
-		this.sink.event(t, f(x));
-	};
-
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Pipe = __webpack_require__(32);
-
-	module.exports = Filter;
-
-	function Filter(p, source) {
-		this.p = p;
-		this.source = source;
-	}
-
-	/**
-	 * Create a filtered source, fusing adjacent filter.filter if possible
-	 * @param {function(x:*):boolean} p filtering predicate
-	 * @param {{run:function}} source source to filter
-	 * @returns {Filter} filtered source
-	 */
-	Filter.create = function createFilter(p, source) {
-		if (source instanceof Filter) {
-			return new Filter(and(source.p, p), source.source);
-		}
-
-		return new Filter(p, source);
-	};
-
-	Filter.prototype.run = function(sink, scheduler) {
-		return this.source.run(new FilterSink(this.p, sink), scheduler);
-	};
-
-	function FilterSink(p, sink) {
-		this.p = p;
-		this.sink = sink;
-	}
-
-	FilterSink.prototype.end   = Pipe.prototype.end;
-	FilterSink.prototype.error = Pipe.prototype.error;
-
-	FilterSink.prototype.event = function(t, x) {
-		var p = this.p;
-		p(x) && this.sink.event(t, x);
-	};
-
-	function and(p, q) {
-		return function(x) {
-			return p(x) && q(x);
-		};
-	}
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Pipe = __webpack_require__(32);
-
-	module.exports = FilterMap;
-
-	function FilterMap(p, f, source) {
-		this.p = p;
-		this.f = f;
-		this.source = source;
-	}
-
-	FilterMap.prototype.run = function(sink, scheduler) {
-		return this.source.run(new FilterMapSink(this.p, this.f, sink), scheduler);
-	};
-
-	function FilterMapSink(p, f, sink) {
-		this.p = p;
-		this.f = f;
-		this.sink = sink;
-	}
-
-	FilterMapSink.prototype.event = function(t, x) {
-		var f = this.f;
-		var p = this.p;
-		p(x) && this.sink.event(t, f(x));
-	};
-
-	FilterMapSink.prototype.end = Pipe.prototype.end;
-	FilterMapSink.prototype.error = Pipe.prototype.error;
-
-
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var all = __webpack_require__(15).all;
-	var map = __webpack_require__(2).map;
-
-	module.exports = CompoundDisposable;
-
-	function CompoundDisposable(disposables) {
-		this.disposed = false;
-		this.disposables = disposables;
-	}
-
-	CompoundDisposable.prototype.dispose = function() {
-		if(this.disposed) {
-			return;
-		}
-		this.disposed = true;
-		return all(map(dispose, this.disposables));
-	};
-
-	function dispose(disposable) {
-		return disposable.dispose();
-	}
-
-/***/ },
-/* 38 */
-/***/ function(module, exports) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	module.exports = invoke;
-
-	function invoke(f, args) {
-		/*jshint maxcomplexity:7*/
-		switch(args.length) {
-			case 0: return f();
-			case 1: return f(args[0]);
-			case 2: return f(args[0], args[1]);
-			case 3: return f(args[0], args[1], args[2]);
-			case 4: return f(args[0], args[1], args[2], args[3]);
-			case 5: return f(args[0], args[1], args[2], args[3], args[4]);
-			default:
-				return f.apply(void 0, args);
-		}
-	}
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var runSource = __webpack_require__(40);
+	var runSource = __webpack_require__(30);
 	var noop = __webpack_require__(2).noop;
 
 	exports.observe = observe;
@@ -3655,7 +3193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -3663,9 +3201,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Promise = __webpack_require__(15);
-	var Observer = __webpack_require__(41);
-	var SettableDisposable = __webpack_require__(42);
-	var defaultScheduler = __webpack_require__(43);
+	var Observer = __webpack_require__(31);
+	var SettableDisposable = __webpack_require__(32);
+	var defaultScheduler = __webpack_require__(33);
 
 	exports.withDefaultScheduler = withDefaultScheduler;
 	exports.withScheduler = withScheduler;
@@ -3685,7 +3223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -3737,7 +3275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -3788,7 +3326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -3796,7 +3334,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	/*global setTimeout, clearTimeout*/
-	var Scheduler = __webpack_require__(44);
+	var Scheduler = __webpack_require__(34);
 	var defer = __webpack_require__(27);
 
 	// Default timer functions
@@ -3853,7 +3391,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ },
-/* 44 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4068,7 +3606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4076,7 +3614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Pipe = __webpack_require__(32);
+	var Pipe = __webpack_require__(36);
 
 	exports.loop = loop;
 
@@ -4125,7 +3663,40 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 46 */
+/* 36 */
+/***/ function(module, exports) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	module.exports = Pipe;
+
+	/**
+	 * A sink mixin that simply forwards event, end, and error to
+	 * another sink.
+	 * @param sink
+	 * @constructor
+	 */
+	function Pipe(sink) {
+		this.sink = sink;
+	}
+
+	Pipe.prototype.event = function(t, x) {
+		return this.sink.event(t, x);
+	};
+
+	Pipe.prototype.end = function(t, x) {
+		return this.sink.end(t, x);
+	};
+
+	Pipe.prototype.error = function(t, e) {
+		return this.sink.error(t, e);
+	};
+
+
+/***/ },
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4133,8 +3704,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Pipe = __webpack_require__(32);
-	var runSource = __webpack_require__(40);
+	var Pipe = __webpack_require__(36);
+	var runSource = __webpack_require__(30);
+	var cons = __webpack_require__(38).cons;
 	var noop = __webpack_require__(2).noop;
 
 	exports.scan = scan;
@@ -4149,32 +3721,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Stream} new stream containing successive reduce results
 	 */
 	function scan(f, initial, stream) {
-		return new Stream(new Scan(f, initial, stream.source));
+		return cons(initial, new Stream(new Accumulate(ScanSink, f, initial, stream.source)));
 	}
-
-	function Scan(f, z, source) {
-		this.f = f;
-		this.value = z;
-		this.source = source;
-	}
-
-	Scan.prototype.run = function(sink, scheduler) {
-		return this.source.run(new ScanSink(this.f, this.value, sink), scheduler);
-	};
 
 	function ScanSink(f, z, sink) {
 		this.f = f;
 		this.value = z;
 		this.sink = sink;
-		this.init = true;
 	}
 
 	ScanSink.prototype.event = function(t, x) {
-		if(this.init) {
-			this.init = false;
-			this.sink.event(t, this.value);
-		}
-
 		var f = this.f;
 		this.value = f(this.value, x);
 		this.sink.event(t, this.value);
@@ -4193,17 +3749,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Promise} promise for the file result of the reduce
 	 */
 	function reduce(f, initial, stream) {
-		return runSource.withDefaultScheduler(noop, new Accumulate(f, initial, stream.source));
+		return runSource.withDefaultScheduler(noop, new Accumulate(AccumulateSink, f, initial, stream.source));
 	}
 
-	function Accumulate(f, z, source) {
+	function Accumulate(SinkType, f, z, source) {
+		this.SinkType = SinkType;
 		this.f = f;
 		this.value = z;
 		this.source = source;
 	}
 
 	Accumulate.prototype.run = function(sink, scheduler) {
-		return this.source.run(new AccumulateSink(this.f, this.value, sink), scheduler);
+		return this.source.run(new this.SinkType(this.f, this.value, sink), scheduler);
 	};
 
 	function AccumulateSink(f, z, sink) {
@@ -4226,7 +3783,218 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 47 */
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var streamOf = __webpack_require__(3).of;
+	var flatMapEnd = __webpack_require__(39).flatMapEnd;
+	var Sink = __webpack_require__(36);
+	var Promise = __webpack_require__(15);
+
+	exports.concat = concat;
+	exports.cycle = cycle;
+	exports.cons = cons;
+
+	/**
+	 * @param {*} x value to prepend
+	 * @param {Stream} stream
+	 * @returns {Stream} new stream with x prepended
+	 */
+	function cons(x, stream) {
+		return concat(streamOf(x), stream);
+	}
+
+	/**
+	 * @param {Stream} left
+	 * @param {Stream} right
+	 * @returns {Stream} new stream containing all events in left followed by all
+	 *  events in right.  This *timeshifts* right to the end of left.
+	 */
+	function concat(left, right) {
+		return flatMapEnd(returnRight, left);
+
+		function returnRight() {
+			return right;
+		}
+	}
+
+	/**
+	 * Tie stream into a circle, thus creating an infinite stream
+	 * @param {Stream} stream
+	 * @returns {Stream} new infinite stream
+	 */
+	function cycle(stream) {
+		return new Stream(new Cycle(stream.source));
+	}
+
+	function Cycle(source) {
+		this.source = source;
+	}
+
+	Cycle.prototype.run = function(sink, scheduler) {
+		return new CycleSink(this.source, sink, scheduler);
+	};
+
+	function CycleSink(source, sink, scheduler) {
+		this.active = true;
+		this.sink = sink;
+		this.scheduler = scheduler;
+		this.source = source;
+		this.disposable = source.run(this, scheduler);
+	}
+
+	CycleSink.prototype.error = Sink.prototype.error;
+
+	CycleSink.prototype.event = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+		this.sink.event(t, x);
+	};
+
+	CycleSink.prototype.end = function(t) {
+		if(!this.active) {
+			return;
+		}
+
+		var self = this;
+		Promise.resolve(this.disposable.dispose()).catch(function(e) {
+			self.error(t, e);
+		});
+		this.disposable = this.source.run(this, this.scheduler);
+	};
+
+	CycleSink.prototype.dispose = function() {
+		this.active = false;
+		return this.disposable.dispose();
+	};
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var Sink = __webpack_require__(36);
+	var AwaitingDisposable = __webpack_require__(40);
+	var CompoundDisposable = __webpack_require__(41);
+
+	exports.flatMapEnd = flatMapEnd;
+
+	function flatMapEnd(f, stream) {
+		return new Stream(new FlatMapEnd(f, stream.source));
+	}
+
+	function FlatMapEnd(f, source) {
+		this.f = f;
+		this.source = source;
+	}
+
+	FlatMapEnd.prototype.run = function(sink, scheduler) {
+		return new FlatMapEndSink(this.f, this.source, sink, scheduler);
+	};
+
+	function FlatMapEndSink(f, source, sink, scheduler) {
+		this.f = f;
+		this.sink = sink;
+		this.scheduler = scheduler;
+		this.active = true;
+		this.disposable = new AwaitingDisposable(source.run(this, scheduler));
+	}
+
+	FlatMapEndSink.prototype.error = Sink.prototype.error;
+
+	FlatMapEndSink.prototype.event = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+		this.sink.event(t, x);
+	};
+
+	FlatMapEndSink.prototype.end = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+
+		this.dispose();
+
+		var f = this.f;
+		var stream = f(x);
+		var disposable = stream.source.run(this.sink, this.scheduler);
+		this.disposable = new CompoundDisposable([this.disposable, disposable]);
+	};
+
+	FlatMapEndSink.prototype.dispose = function() {
+		this.active = false;
+		return this.disposable.dispose();
+	};
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	module.exports = AwaitingDisposable;
+
+	function AwaitingDisposable(disposable) {
+		this.disposed = false;
+		this.disposable = disposable;
+		this.value = void 0;
+	}
+
+	AwaitingDisposable.prototype.dispose = function() {
+		if(!this.disposed) {
+			this.disposed = true;
+			this.value = this.disposable.dispose();
+		}
+		return this.value;
+	};
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var all = __webpack_require__(15).all;
+	var map = __webpack_require__(2).map;
+
+	module.exports = CompoundDisposable;
+
+	function CompoundDisposable(disposables) {
+		this.disposed = false;
+		this.disposables = disposables;
+	}
+
+	CompoundDisposable.prototype.dispose = function() {
+		if(this.disposed) {
+			return;
+		}
+		this.disposed = true;
+		return all(map(dispose, this.disposables));
+	};
+
+	function dispose(disposable) {
+		return disposable.dispose();
+	}
+
+/***/ },
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4305,7 +4073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 48 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4380,7 +4148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 49 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -4456,7 +4224,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 50 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4464,351 +4232,212 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var streamOf = __webpack_require__(3).of;
-	var fromArray = __webpack_require__(10).fromArray;
-	var concatMap = __webpack_require__(51).concatMap;
-	var Sink = __webpack_require__(32);
-	var Promise = __webpack_require__(15);
-	var identity = __webpack_require__(2).identity;
+	var Map = __webpack_require__(46);
 
-	exports.concat = concat;
-	exports.cycle = cycle;
-	exports.cons = cons;
+	exports.map = map;
+	exports.constant = constant;
+	exports.tap = tap;
 
 	/**
-	 * @param {*} x value to prepend
+	 * Transform each value in the stream by applying f to each
+	 * @param {function(*):*} f mapping function
+	 * @param {Stream} stream stream to map
+	 * @returns {Stream} stream containing items transformed by f
+	 */
+	function map(f, stream) {
+		return new Stream(Map.create(f, stream.source));
+	}
+
+	/**
+	 * Replace each value in the stream with x
+	 * @param {*} x
 	 * @param {Stream} stream
-	 * @returns {Stream} new stream with x prepended
+	 * @returns {Stream} stream containing items replaced with x
 	 */
-	function cons(x, stream) {
-		return concat(streamOf(x), stream);
+	function constant(x, stream) {
+		return map(function() {
+			return x;
+		}, stream);
 	}
 
 	/**
-	 * @param {Stream} left
-	 * @param {Stream} right
-	 * @returns {Stream} new stream containing all events in left followed by all
-	 *  events in right.  This *timeshifts* right to the end of left.
+	 * Perform a side effect for each item in the stream
+	 * @param {function(x:*):*} f side effect to execute for each item. The
+	 *  return value will be discarded.
+	 * @param {Stream} stream stream to tap
+	 * @returns {Stream} new stream containing the same items as this stream
 	 */
-	function concat(left, right) {
-		return concatMap(identity, fromArray([left, right]));
+	function tap(f, stream) {
+		return map(function(x) {
+			f(x);
+			return x;
+		}, stream);
 	}
 
-	/**
-	 * Tie stream into a circle, thus creating an infinite stream
-	 * @param {Stream} stream
-	 * @returns {Stream} new infinite stream
-	 */
-	function cycle(stream) {
-		return new Stream(new Cycle(stream.source));
-	}
 
-	function Cycle(source) {
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Pipe = __webpack_require__(36);
+	var Filter = __webpack_require__(47);
+	var FilterMap = __webpack_require__(48);
+	var base = __webpack_require__(2);
+
+	module.exports = Map;
+
+	function Map(f, source) {
+		this.f = f;
 		this.source = source;
 	}
 
-	Cycle.prototype.run = function(sink, scheduler) {
-		return new CycleSink(this.source, sink, scheduler);
-	};
-
-	function CycleSink(source, sink, scheduler) {
-		this.active = true;
-		this.sink = sink;
-		this.scheduler = scheduler;
-		this.source = source;
-		this.disposable = source.run(this, scheduler);
-	}
-
-	CycleSink.prototype.error = Sink.prototype.error;
-
-	CycleSink.prototype.event = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-		this.sink.event(t, x);
-	};
-
-	CycleSink.prototype.end = function(t) {
-		if(!this.active) {
-			return;
-		}
-
-		var self = this;
-		Promise.resolve(this.disposable.dispose()).catch(function(e) {
-			self.error(t, e);
-		});
-		this.disposable = this.source.run(this, this.scheduler);
-	};
-
-	CycleSink.prototype.dispose = function() {
-		this.active = false;
-		return this.disposable.dispose();
-	};
-
-/***/ },
-/* 51 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
-	var map = __webpack_require__(33).map;
-
-	exports.concatMap = concatMap;
-
 	/**
-	 * Map each value in stream to a new stream, and concatenate them all
-	 * stream:              -a---b---cX
-	 * f(a):                 1-1-1-1X
-	 * f(b):                        -2-2-2-2X
-	 * f(c):                                -3-3-3-3X
-	 * stream.concatMap(f): -1-1-1-1-2-2-2-2-3-3-3-3X
-	 * @param {function(x:*):Stream} f function to map each value to a stream
-	 * @param {Stream} stream
-	 * @returns {Stream} new stream containing all events from each stream returned by f
+	 * Create a mapped source, fusing adjacent map.map, filter.map,
+	 * and filter.map.map if possible
+	 * @param {function(*):*} f mapping function
+	 * @param {{run:function}} source source to map
+	 * @returns {Map|FilterMap} mapped source, possibly fused
 	 */
-	function concatMap(f, stream) {
-		return mergeConcurrently(1, map(f, stream));
+	Map.create = function createMap(f, source) {
+		if(source instanceof Map) {
+			return new Map(base.compose(f, source.f), source.source);
+		}
+
+		if(source instanceof Filter) {
+			return new FilterMap(source.p, f, source.source);
+		}
+
+		if(source instanceof FilterMap) {
+			return new FilterMap(source.p, base.compose(f, source.f), source.source);
+		}
+
+		return new Map(f, source);
+	};
+
+	Map.prototype.run = function(sink, scheduler) {
+		return this.source.run(new MapSink(this.f, sink), scheduler);
+	};
+
+	function MapSink(f, sink) {
+		this.f = f;
+		this.sink = sink;
 	}
+
+	MapSink.prototype.end   = Pipe.prototype.end;
+	MapSink.prototype.error = Pipe.prototype.error;
+
+	MapSink.prototype.event = function(t, x) {
+		var f = this.f;
+		this.sink.event(t, f(x));
+	};
 
 
 /***/ },
-/* 52 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var Stream = __webpack_require__(1);
-	var AwaitingDisposable = __webpack_require__(53);
-	var LinkedList = __webpack_require__(54);
-	var Promise = __webpack_require__(15);
+	var Pipe = __webpack_require__(36);
 
-	exports.mergeConcurrently = mergeConcurrently;
+	module.exports = Filter;
 
-	function mergeConcurrently(concurrency, stream) {
-		return new Stream(new MergeConcurrently(concurrency, stream.source));
-	}
-
-	function MergeConcurrently(concurrency, source) {
-		this.concurrency = concurrency;
+	function Filter(p, source) {
+		this.p = p;
 		this.source = source;
 	}
 
-	MergeConcurrently.prototype.run = function(sink, scheduler) {
-		return new Outer(this.concurrency, this.source, sink, scheduler);
+	/**
+	 * Create a filtered source, fusing adjacent filter.filter if possible
+	 * @param {function(x:*):boolean} p filtering predicate
+	 * @param {{run:function}} source source to filter
+	 * @returns {Filter} filtered source
+	 */
+	Filter.create = function createFilter(p, source) {
+		if (source instanceof Filter) {
+			return new Filter(and(source.p, p), source.source);
+		}
+
+		return new Filter(p, source);
 	};
 
-	function Outer(concurrency, source, sink, scheduler) {
-		this.concurrency = concurrency;
+	Filter.prototype.run = function(sink, scheduler) {
+		return this.source.run(new FilterSink(this.p, sink), scheduler);
+	};
+
+	function FilterSink(p, sink) {
+		this.p = p;
 		this.sink = sink;
-		this.scheduler = scheduler;
-		this.pending = [];
-		this.current = new LinkedList();
-		this.disposable = new AwaitingDisposable(source.run(this, scheduler));
-		this.active = true;
 	}
 
-	Outer.prototype.event = function(t, x) {
-		this._addInner(t, x);
+	FilterSink.prototype.end   = Pipe.prototype.end;
+	FilterSink.prototype.error = Pipe.prototype.error;
+
+	FilterSink.prototype.event = function(t, x) {
+		var p = this.p;
+		p(x) && this.sink.event(t, x);
 	};
 
-	Outer.prototype._addInner = function(t, stream) {
-		if(this.current.length < this.concurrency) {
-			this._startInner(t, stream);
-		} else {
-			this.pending.push(stream);
-		}
-	};
-
-	Outer.prototype._startInner = function(t, stream) {
-		var innerSink = new Inner(t, this, this.sink);
-		this.current.add(innerSink);
-		innerSink.disposable = stream.source.run(innerSink, this.scheduler);
-	};
-
-	Outer.prototype.end = function(t, x) {
-		this.active = false;
-		this.disposable.dispose();
-		this._checkEnd(t, x);
-	};
-
-	Outer.prototype.error = function(t, e) {
-		this.active = false;
-		this.sink.error(t, e);
-	};
-
-	Outer.prototype.dispose = function() {
-		this.active = false;
-		this.pending.length = 0;
-		return Promise.all([this.disposable.dispose(), this.current.dispose()]);
-	};
-
-	Outer.prototype._endInner = function(t, x, inner) {
-		this.current.remove(inner);
-		var self = this;
-		Promise.resolve(inner.dispose()).catch(function(e) {
-			self.error(t, e);
-		});
-
-		if(this.pending.length === 0) {
-			this._checkEnd(t, x);
-		} else {
-			this._startInner(t, this.pending.shift());
-		}
-	};
-
-	Outer.prototype._checkEnd = function(t, x) {
-		if(!this.active && this.current.isEmpty()) {
-			this.sink.end(t, x);
-		}
-	};
-
-	function Inner(time, outer, sink) {
-		this.prev = this.next = null;
-		this.time = time;
-		this.outer = outer;
-		this.sink = sink;
-		this.disposable = void 0;
+	function and(p, q) {
+		return function(x) {
+			return p(x) && q(x);
+		};
 	}
-
-	Inner.prototype.event = function(t, x) {
-		this.sink.event(Math.max(t, this.time), x);
-	};
-
-	Inner.prototype.end = function(t, x) {
-		this.outer._endInner(Math.max(t, this.time), x, this);
-	};
-
-	Inner.prototype.error = function(t, e) {
-		this.outer.error(Math.max(t, this.time), e);
-	};
-
-	Inner.prototype.dispose = function() {
-		return this.disposable.dispose();
-	};
 
 
 /***/ },
-/* 53 */
-/***/ function(module, exports) {
-
-	/** @license MIT License (c) copyright 2010-2015 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	module.exports = AwaitingDisposable;
-
-	function AwaitingDisposable(disposable) {
-		this.disposed = false;
-		this.disposable = disposable;
-		this.value = void 0;
-	}
-
-	AwaitingDisposable.prototype.dispose = function() {
-		if(!this.disposed) {
-			this.disposed = true;
-			this.value = this.disposable.dispose();
-		}
-		return this.value;
-	};
-
-
-/***/ },
-/* 54 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var Promise = __webpack_require__(15);
+	var Pipe = __webpack_require__(36);
 
-	module.exports = LinkedList;
+	module.exports = FilterMap;
 
-	/**
-	 * Doubly linked list
-	 * @constructor
-	 */
-	function LinkedList() {
-		this.head = null;
-		this.length = 0;
+	function FilterMap(p, f, source) {
+		this.p = p;
+		this.f = f;
+		this.source = source;
 	}
 
-	/**
-	 * Add a node to the end of the list
-	 * @param {{prev:Object|null, next:Object|null, dispose:function}} x node to add
-	 */
-	LinkedList.prototype.add = function(x) {
-		if(this.head !== null) {
-			this.head.prev = x;
-			x.next = this.head;
-		}
-		this.head = x;
-		++this.length;
+	FilterMap.prototype.run = function(sink, scheduler) {
+		return this.source.run(new FilterMapSink(this.p, this.f, sink), scheduler);
 	};
 
-	/**
-	 * Remove the provided node from the list
-	 * @param {{prev:Object|null, next:Object|null, dispose:function}} x node to remove
-	 */
-	LinkedList.prototype.remove = function(x) {
-		--this.length;
-		if(x === this.head) {
-			this.head = this.head.next;
-		}
-		if(x.next !== null) {
-			x.next.prev = x.prev;
-			x.next = null;
-		}
-		if(x.prev !== null) {
-			x.prev.next = x.next;
-			x.prev = null;
-		}
+	function FilterMapSink(p, f, sink) {
+		this.p = p;
+		this.f = f;
+		this.sink = sink;
+	}
+
+	FilterMapSink.prototype.event = function(t, x) {
+		var f = this.f;
+		var p = this.p;
+		p(x) && this.sink.event(t, f(x));
 	};
 
-	/**
-	 * @returns {boolean} true iff there are no nodes in the list
-	 */
-	LinkedList.prototype.isEmpty = function() {
-		return this.length === 0;
-	};
+	FilterMapSink.prototype.end = Pipe.prototype.end;
+	FilterMapSink.prototype.error = Pipe.prototype.error;
 
-	/**
-	 * Dispose all nodes
-	 * @returns {Promise} promise that fulfills when all nodes have been disposed,
-	 *  or rejects if an error occurs while disposing
-	 */
-	LinkedList.prototype.dispose = function() {
-		if(this.isEmpty()) {
-			return Promise.resolve();
-		}
-
-		var promises = [];
-		var x = this.head;
-		this.head = null;
-		this.length = 0;
-
-		while(x !== null) {
-			promises.push(x.dispose());
-			x = x.next;
-		}
-
-		return Promise.all(promises);
-	};
 
 /***/ },
-/* 55 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var combine = __webpack_require__(30).combine;
+	var combine = __webpack_require__(50).combine;
 
 	exports.ap  = ap;
 
@@ -4832,7 +4461,178 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var transform = __webpack_require__(45);
+	var core = __webpack_require__(3);
+	var Pipe = __webpack_require__(36);
+	var IndexSink = __webpack_require__(51);
+	var CompoundDisposable = __webpack_require__(41);
+	var base = __webpack_require__(2);
+	var invoke = __webpack_require__(52);
+
+	var hasValue = IndexSink.hasValue;
+
+	var map = base.map;
+	var tail = base.tail;
+
+	exports.combineArray = combineArray;
+	exports.combine = combine;
+
+	/**
+	 * Combine latest events from all input streams
+	 * @param {function(...events):*} f function to combine most recent events
+	 * @returns {Stream} stream containing the result of applying f to the most recent
+	 *  event of each input stream, whenever a new event arrives on any stream.
+	 */
+	function combine(f /*, ...streams */) {
+		return new Stream(new Combine(f, map(getSource, tail(arguments))));
+	}
+
+	/**
+	 * Combine latest events from all input streams
+	 * @param {function(...events):*} f function to combine most recent events
+	 * @param {[Stream]} streams most recent events
+	 * @returns {Stream} stream containing the result of applying f to the most recent
+	 *  event of each input stream, whenever a new event arrives on any stream.
+	 */
+	function combineArray(f, streams) {
+		return streams.length === 0 ? core.empty()
+			 : streams.length === 1 ? transform.map(f, streams[0])
+			 : new Stream(new Combine(f, map(getSource, streams)));
+	}
+
+	function getSource(stream) {
+		return stream.source;
+	}
+
+	function Combine(f, sources) {
+		this.f = f;
+		this.sources = sources;
+	}
+
+	Combine.prototype.run = function(sink, scheduler) {
+		var l = this.sources.length;
+		var disposables = new Array(l);
+		var sinks = new Array(l);
+
+		var combineSink = new CombineSink(this.f, sinks, sink);
+
+		for(var indexSink, i=0; i<l; ++i) {
+			indexSink = sinks[i] = new IndexSink(i, combineSink);
+			disposables[i] = this.sources[i].run(indexSink, scheduler);
+		}
+
+		return new CompoundDisposable(disposables);
+	};
+
+	function CombineSink(f, sinks, sink) {
+		this.f = f;
+		this.sinks = sinks;
+		this.values = new Array(sinks.length);
+		this.sink = sink;
+		this.ready = false;
+		this.activeCount = sinks.length;
+	}
+
+	CombineSink.prototype.event = function(t, indexedValue) {
+		if(!this.ready) {
+			this.ready = this.sinks.every(hasValue);
+		}
+
+		this.values[indexedValue.index] = indexedValue.value;
+		if(this.ready) {
+			this.sink.event(t, invoke(this.f, this.values));
+		}
+	};
+
+	CombineSink.prototype.end = function(t, indexedValue) {
+		if(--this.activeCount === 0) {
+			this.sink.end(t, indexedValue.value);
+		}
+	};
+
+	CombineSink.prototype.error = Pipe.prototype.error;
+
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Sink = __webpack_require__(36);
+
+	module.exports = IndexSink;
+
+	IndexSink.hasValue = hasValue;
+
+	function hasValue(indexSink) {
+		return indexSink.hasValue;
+	}
+
+	function IndexSink(i, sink) {
+		this.index = i;
+		this.sink = sink;
+		this.active = true;
+		this.hasValue = false;
+		this.value = void 0;
+	}
+
+	IndexSink.prototype.event = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+		this.value = x;
+		this.hasValue = true;
+		this.sink.event(t, this);
+	};
+
+	IndexSink.prototype.end = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+		this.active = false;
+		this.sink.end(t, { index: this.index, value: x });
+	};
+
+	IndexSink.prototype.error = Sink.prototype.error;
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	module.exports = invoke;
+
+	function invoke(f, args) {
+		/*jshint maxcomplexity:7*/
+		switch(args.length) {
+			case 0: return f();
+			case 1: return f(args[0]);
+			case 2: return f(args[0], args[1]);
+			case 3: return f(args[0], args[1], args[2]);
+			case 4: return f(args[0], args[1], args[2], args[3]);
+			case 5: return f(args[0], args[1], args[2], args[3], args[4]);
+			default:
+				return f.apply(void 0, args);
+		}
+	}
+
+/***/ },
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -4961,15 +4761,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 57 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
-	var map = __webpack_require__(33).map;
+	var mergeConcurrently = __webpack_require__(55).mergeConcurrently;
+	var map = __webpack_require__(45).map;
 
 	exports.flatMap = flatMap;
 	exports.join = join;
@@ -4997,7 +4797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 58 */
+/* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5005,62 +4805,229 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
-	var AwaitingDisposable = __webpack_require__(53);
-	var CompoundDisposable = __webpack_require__(37);
+	var AwaitingDisposable = __webpack_require__(40);
+	var LinkedList = __webpack_require__(56);
+	var Promise = __webpack_require__(15);
 
-	exports.flatMapEnd = flatMapEnd;
+	exports.mergeConcurrently = mergeConcurrently;
 
-	function flatMapEnd(f, stream) {
-		return new Stream(new FlatMapEnd(f, stream.source));
+	function mergeConcurrently(concurrency, stream) {
+		return new Stream(new MergeConcurrently(concurrency, stream.source));
 	}
 
-	function FlatMapEnd(f, source) {
-		this.f = f;
+	function MergeConcurrently(concurrency, source) {
+		this.concurrency = concurrency;
 		this.source = source;
 	}
 
-	FlatMapEnd.prototype.run = function(sink, scheduler) {
-		return new FlatMapEndSink(this.f, this.source, sink, scheduler);
+	MergeConcurrently.prototype.run = function(sink, scheduler) {
+		return new Outer(this.concurrency, this.source, sink, scheduler);
 	};
 
-	function FlatMapEndSink(f, source, sink, scheduler) {
-		this.f = f;
+	function Outer(concurrency, source, sink, scheduler) {
+		this.concurrency = concurrency;
 		this.sink = sink;
 		this.scheduler = scheduler;
-		this.active = true;
+		this.pending = [];
+		this.current = new LinkedList();
 		this.disposable = new AwaitingDisposable(source.run(this, scheduler));
+		this.active = true;
 	}
 
-	FlatMapEndSink.prototype.error = Sink.prototype.error;
-
-	FlatMapEndSink.prototype.event = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-		this.sink.event(t, x);
+	Outer.prototype.event = function(t, x) {
+		this._addInner(t, x);
 	};
 
-	FlatMapEndSink.prototype.end = function(t, x) {
-		if(!this.active) {
-			return;
+	Outer.prototype._addInner = function(t, stream) {
+		if(this.current.length < this.concurrency) {
+			this._startInner(t, stream);
+		} else {
+			this.pending.push(stream);
 		}
-
-		this.dispose();
-
-		var f = this.f;
-		var stream = f(x);
-		var disposable = stream.source.run(this.sink, this.scheduler);
-		this.disposable = new CompoundDisposable([this.disposable, disposable]);
 	};
 
-	FlatMapEndSink.prototype.dispose = function() {
+	Outer.prototype._startInner = function(t, stream) {
+		var innerSink = new Inner(t, this, this.sink);
+		this.current.add(innerSink);
+		innerSink.disposable = stream.source.run(innerSink, this.scheduler);
+	};
+
+	Outer.prototype.end = function(t, x) {
 		this.active = false;
+		this.disposable.dispose();
+		this._checkEnd(t, x);
+	};
+
+	Outer.prototype.error = function(t, e) {
+		this.active = false;
+		this.sink.error(t, e);
+	};
+
+	Outer.prototype.dispose = function() {
+		this.active = false;
+		this.pending.length = 0;
+		return Promise.all([this.disposable.dispose(), this.current.dispose()]);
+	};
+
+	Outer.prototype._endInner = function(t, x, inner) {
+		this.current.remove(inner);
+		var self = this;
+		Promise.resolve(inner.dispose()).catch(function(e) {
+			self.error(t, e);
+		});
+
+		if(this.pending.length === 0) {
+			this._checkEnd(t, x);
+		} else {
+			this._startInner(t, this.pending.shift());
+		}
+	};
+
+	Outer.prototype._checkEnd = function(t, x) {
+		if(!this.active && this.current.isEmpty()) {
+			this.sink.end(t, x);
+		}
+	};
+
+	function Inner(time, outer, sink) {
+		this.prev = this.next = null;
+		this.time = time;
+		this.outer = outer;
+		this.sink = sink;
+		this.disposable = void 0;
+	}
+
+	Inner.prototype.event = function(t, x) {
+		this.sink.event(Math.max(t, this.time), x);
+	};
+
+	Inner.prototype.end = function(t, x) {
+		this.outer._endInner(Math.max(t, this.time), x, this);
+	};
+
+	Inner.prototype.error = function(t, e) {
+		this.outer.error(Math.max(t, this.time), e);
+	};
+
+	Inner.prototype.dispose = function() {
 		return this.disposable.dispose();
 	};
 
+
 /***/ },
-/* 59 */
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Promise = __webpack_require__(15);
+
+	module.exports = LinkedList;
+
+	/**
+	 * Doubly linked list
+	 * @constructor
+	 */
+	function LinkedList() {
+		this.head = null;
+		this.length = 0;
+	}
+
+	/**
+	 * Add a node to the end of the list
+	 * @param {{prev:Object|null, next:Object|null, dispose:function}} x node to add
+	 */
+	LinkedList.prototype.add = function(x) {
+		if(this.head !== null) {
+			this.head.prev = x;
+			x.next = this.head;
+		}
+		this.head = x;
+		++this.length;
+	};
+
+	/**
+	 * Remove the provided node from the list
+	 * @param {{prev:Object|null, next:Object|null, dispose:function}} x node to remove
+	 */
+	LinkedList.prototype.remove = function(x) {
+		--this.length;
+		if(x === this.head) {
+			this.head = this.head.next;
+		}
+		if(x.next !== null) {
+			x.next.prev = x.prev;
+			x.next = null;
+		}
+		if(x.prev !== null) {
+			x.prev.next = x.next;
+			x.prev = null;
+		}
+	};
+
+	/**
+	 * @returns {boolean} true iff there are no nodes in the list
+	 */
+	LinkedList.prototype.isEmpty = function() {
+		return this.length === 0;
+	};
+
+	/**
+	 * Dispose all nodes
+	 * @returns {Promise} promise that fulfills when all nodes have been disposed,
+	 *  or rejects if an error occurs while disposing
+	 */
+	LinkedList.prototype.dispose = function() {
+		if(this.isEmpty()) {
+			return Promise.resolve();
+		}
+
+		var promises = [];
+		var x = this.head;
+		this.head = null;
+		this.length = 0;
+
+		while(x !== null) {
+			promises.push(x.dispose());
+			x = x.next;
+		}
+
+		return Promise.all(promises);
+	};
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2015 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var mergeConcurrently = __webpack_require__(55).mergeConcurrently;
+	var map = __webpack_require__(45).map;
+
+	exports.concatMap = concatMap;
+
+	/**
+	 * Map each value in stream to a new stream, and concatenate them all
+	 * stream:              -a---b---cX
+	 * f(a):                 1-1-1-1X
+	 * f(b):                        -2-2-2-2X
+	 * f(c):                                -3-3-3-3X
+	 * stream.concatMap(f): -1-1-1-1-2-2-2-2-3-3-3-3X
+	 * @param {function(x:*):Stream} f function to map each value to a stream
+	 * @param {Stream} stream
+	 * @returns {Stream} new stream containing all events from each stream returned by f
+	 */
+	function concatMap(f, stream) {
+		return mergeConcurrently(1, map(f, stream));
+	}
+
+
+/***/ },
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5069,7 +5036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var empty = __webpack_require__(1).empty;
 	var fromArray = __webpack_require__(10).fromArray;
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
+	var mergeConcurrently = __webpack_require__(55).mergeConcurrently;
 	var copy = __webpack_require__(2).copy;
 
 	exports.merge = merge;
@@ -5099,7 +5066,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5107,10 +5074,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Pipe = __webpack_require__(32);
-	var CompoundDisposable = __webpack_require__(37);
+	var Pipe = __webpack_require__(36);
+	var CompoundDisposable = __webpack_require__(41);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(38);
+	var invoke = __webpack_require__(52);
 
 	exports.sample = sample;
 	exports.sampleWith = sampleWith;
@@ -5216,7 +5183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5224,14 +5191,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var transform = __webpack_require__(33);
+	var transform = __webpack_require__(45);
 	var core = __webpack_require__(3);
-	var Sink = __webpack_require__(32);
-	var IndexSink = __webpack_require__(31);
-	var CompoundDisposable = __webpack_require__(37);
+	var Sink = __webpack_require__(36);
+	var IndexSink = __webpack_require__(51);
+	var CompoundDisposable = __webpack_require__(41);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(38);
-	var Queue = __webpack_require__(62);
+	var invoke = __webpack_require__(52);
+	var Queue = __webpack_require__(61);
 
 	var map = base.map;
 	var tail = base.tail;
@@ -5355,7 +5322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 61 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5426,7 +5393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5435,9 +5402,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var MulticastSource = __webpack_require__(14);
-	var until = __webpack_require__(64).takeUntil;
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
-	var map = __webpack_require__(33).map;
+	var until = __webpack_require__(63).takeUntil;
+	var mergeConcurrently = __webpack_require__(55).mergeConcurrently;
+	var map = __webpack_require__(45).map;
 
 	exports.switch = switchLatest;
 
@@ -5459,7 +5426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5467,11 +5434,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Pipe = __webpack_require__(32);
-	var CompoundDisposable = __webpack_require__(37);
+	var Pipe = __webpack_require__(36);
+	var CompoundDisposable = __webpack_require__(41);
 	var never = __webpack_require__(3).never;
-	var join = __webpack_require__(57).join;
-	var take = __webpack_require__(65).take;
+	var join = __webpack_require__(54).join;
+	var take = __webpack_require__(64).take;
 	var noop = __webpack_require__(2).noop;
 
 	exports.during    = during;
@@ -5587,7 +5554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5595,9 +5562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
+	var Sink = __webpack_require__(36);
 	var core = __webpack_require__(3);
-	var AwaitingDisposable = __webpack_require__(53);
+	var AwaitingDisposable = __webpack_require__(40);
 
 	exports.take = take;
 	exports.skip = skip;
@@ -5755,7 +5722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5763,8 +5730,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
-	var Filter = __webpack_require__(35);
+	var Sink = __webpack_require__(36);
+	var Filter = __webpack_require__(47);
 
 	exports.filter = filter;
 	exports.skipRepeats = skipRepeats;
@@ -5835,7 +5802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5843,8 +5810,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
-	var CompoundDisposable = __webpack_require__(37);
+	var Sink = __webpack_require__(36);
+	var CompoundDisposable = __webpack_require__(41);
 	var PropagateTask = __webpack_require__(5);
 
 	exports.delay = delay;
@@ -5894,7 +5861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 68 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5902,7 +5869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
+	var Sink = __webpack_require__(36);
 
 	exports.timestamp = timestamp;
 
@@ -5931,7 +5898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 69 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -5939,8 +5906,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(32);
-	var CompoundDisposable = __webpack_require__(37);
+	var Sink = __webpack_require__(36);
+	var CompoundDisposable = __webpack_require__(41);
 	var PropagateTask = __webpack_require__(5);
 
 	exports.throttle = throttle;
@@ -5978,9 +5945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 	};
 
-	ThrottleSink.prototype.end   = function(t, e) {
-		return Sink.prototype.end.call(this, t, e);
-	};
+	ThrottleSink.prototype.end   = Sink.prototype.end;
 
 	ThrottleSink.prototype.error = Sink.prototype.error;
 
@@ -6049,7 +6014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -6178,7 +6143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 71 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
@@ -6266,7 +6231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 72 */
+/* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2015 original author or authors */
