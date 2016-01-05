@@ -12,10 +12,6 @@ var FakeEventEmitter = require('../helper/FakeEventEmitter');
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-function isSentinel(x) {
-	return x === sentinel;
-}
-
 describe('fromEvent', function() {
 
 	describe('given an EventTarget', function() {
@@ -98,38 +94,11 @@ function verifyContainsEmittedItems (evented) {
 	});
 }
 
-function verifyContainsEmittedItemsWhere(predicate, evented) {
-	var values = [sentinel, other, sentinel];
-
-	var stream = take(values.length-1, fromEventWhere(isSentinel, 'event', evented));
-
-	return testEvents(function (x) {
-		expect(x).toBe(sentinel);
-	}, values, evented, stream).then(function(count) {
-		expect(count).toBe(values.length-1);
-	});
-}
-
 function verifyUnlistenOnEnd (evented) {
 	var spy = spyOnRemove(this, evented);
 	var values = [sentinel, sentinel, sentinel];
 
 	var stream = take(1, fromEvent('event', evented));
-
-	return testEvents(function(x) {
-		expect(x).toBe(sentinel);
-	}, values, evented, stream).then(function (count) {
-		expect(count).toBe(1);
-	}).then(function() {
-		expect(spy).toHaveBeenCalled();
-	});
-}
-
-function verifyUnlistenOnEndWhere(predicate, evented) {
-	var spy = spyOnRemove(this, evented);
-	var values = [other, sentinel, sentinel];
-
-	var stream = take(1, fromEventWhere(isSentinel, 'event', evented));
 
 	return testEvents(function(x) {
 		expect(x).toBe(sentinel);
