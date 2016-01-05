@@ -937,7 +937,7 @@ Alias: **skipUntil**
 ####`stream.since(startSignal) -> Stream`
 ####`most.since(startSignal, stream) -> Stream`
 
-Create a new stream containing all events until `startSignal` emits an event.
+Create a new stream containing all events after `startSignal` emits its first event.
 
 ```
 stream:                    -a-b-c-d-e-f->
