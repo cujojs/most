@@ -323,6 +323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var flatMapEnd = __webpack_require__(39).flatMapEnd;
 
+	exports.continueWith = flatMapEnd;
 	exports.flatMapEnd = flatMapEnd;
 
 	/**
@@ -332,7 +333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Stream} new stream that emits all events from the original stream,
 	 * followed by all events from the stream returned by f.
 	 */
-	Stream.prototype.flatMapEnd = function(f) {
+	Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function(f) {
 		return flatMapEnd(f, this);
 	};
 
@@ -698,6 +699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var errors = __webpack_require__(68);
 
+	exports.recoverWith  = errors.flatMapError;
 	exports.flatMapError = errors.flatMapError;
 	exports.throwError   = errors.throwError;
 
@@ -710,7 +712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {function(error:*):Stream} f function which returns a new stream
 	 * @returns {Stream} new stream which will recover from an error by calling f
 	 */
-	Stream.prototype.flatMapError = function(f) {
+	Stream.prototype.recoverWith = Stream.prototype.flatMapError = function(f) {
 		return errors.flatMapError(f, this);
 	};
 
