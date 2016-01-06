@@ -14,11 +14,11 @@
     "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run zip && npm run scan && npm run skipRepeats"
   },
   "dependencies": {
-    "@reactivex/rxjs": "^5.0.0-alpha.12",
+    "@reactivex/rxjs": "^5.0.0-beta.0",
     "baconjs": "^0.7.82",
     "benchmark": "github:bestiejs/benchmark.js#master",
     "highland": "^2.5.1",
-    "kefir": "^3.1.0",
+    "kefir": "^3.2.0",
     "lodash": "^3.10.1",
     "rx": "^4.0.7"
   }
