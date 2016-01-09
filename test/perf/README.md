@@ -1,4 +1,4 @@
-Updated: 12-21-2015
+Updated: 1-5-2016
 
 Latest performance tests of basic most.js operations.
 
