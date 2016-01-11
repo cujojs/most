@@ -6,13 +6,12 @@ var concatMap = require('../../lib/combinator/concatMap');
 var delay = require('../../lib/combinator/delay').delay;
 var concat = require('../../lib/combinator/build').concat;
 var take = require('../../lib/combinator/slice').take;
-var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;
 var core = require('../../lib/source/core');
 var fromArray = require('../../lib/source/fromArray').fromArray;
 var Stream = require('../../lib/Stream');
 
-var TestScheduler = require('../helper/TestScheduler');
+var te = require('../helper/testEnvironment');
 var FakeDisposeSource = require('../helper/FakeDisposeSource');
 
 var streamOf = core.of;
@@ -40,35 +39,19 @@ describe('concatMap', function() {
 	});
 
 	it('should concatenate', function() {
-		var s = concatMap.concatMap(function(x) {
-			return delay(x, streamOf(x));
-		}, fromArray([2, 1]));
+		var s1 = [{ time: 2, value: 2 }, { time: 3, value: 3 }];
+		var s2 = [{ time: 1, value: 1 }];
+		var s3 = [{ time: 0, value: 0 }];
+		var s = concatMap.concatMap(te.atTimes, fromArray([s1, s2, s3]));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(3);
-
-		return scheduler.collect(s)
+		return te.collectEvents(s, te.ticks(5))
 			.then(function(events) {
-				expect(events.length).toBe(2);
-
-				expect(events[0].time).toBe(2);
-				expect(events[0].value).toBe(2);
-
-				expect(events[1].time).toBe(3);
-				expect(events[1].value).toBe(1);
-			});
-	});
-
-	it('should concatenate all inner streams', function() {
-		var a = [1,2,3];
-		var b = [4,5,6];
-		var streamsToMerge = fromArray([delay(10, fromArray(a)), delay(0, fromArray(b))]);
-
-		return reduce(function(result, x) {
-			return result.concat(x);
-		}, [], concatMap.concatMap(identity, streamsToMerge))
-			.then(function(result) {
-				expect(result).toEqual(a.concat(b));
+				expect(events).toEqual([
+					{ time: 2, value: 2 },
+					{ time: 3, value: 3 },
+					{ time: 4, value: 1 },
+					{ time: 4, value: 0 }
+				]);
 			});
 	});
 

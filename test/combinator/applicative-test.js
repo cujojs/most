@@ -1,5 +1,4 @@
 require('buster').spec.expose();
-var expect = require('buster').expect;
 var assertSame = require('../helper/stream-helper').assertSame;
 
 var applicative = require('../../lib/combinator/applicative');

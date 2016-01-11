@@ -2,19 +2,16 @@ require('buster').spec.expose();
 var expect = require('buster').expect;
 
 var fromArray = require('../../lib/source/fromArray').fromArray;
-var observe = require('../../lib/combinator/observe').observe;
-
-var sentinel = { value: 'sentinel' };
-var other = { value: 'other' };
+var reduce = require('../../lib/combinator/accumulate').reduce;
 
 describe('from', function() {
 
 	it('should contain array items', function() {
 		var input = [1,2,3];
-		var result = [];
-		return observe(function(x) {
-			result.push(x);
-		}, fromArray(input)).then(function() {
+		return reduce(function(a, x) {
+			a.push(x);
+			return a;
+		}, [], fromArray(input)).then(function(result) {
 			expect(result).toEqual(input);
 		});
 	});

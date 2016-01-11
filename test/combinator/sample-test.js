@@ -6,25 +6,16 @@ var sampleWith = require('../../lib/combinator/sample').sampleWith;
 var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
 var map = require('../../lib/combinator/transform').map;
-var scan = require('../../lib/combinator/accumulate').scan;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var observe = require('../../lib/combinator/observe').observe;
 var core = require('../../lib/source/core');
 
-var TestScheduler = require('../helper/TestScheduler');
+var te = require('../helper/testEnvironment');
 
 var empty = core.empty;
 var streamOf = core.of;
 
 var sentinel = { value: 'sentinel' };
-
-function inc(x) {
-	return x+1;
-}
-
-function append(a, x) {
-	return a.concat([x]);
-}
 
 describe('sample', function() {
 	it('should be empty if sampler is empty', function() {
@@ -40,21 +31,19 @@ describe('sample', function() {
 	});
 
 	it('should sample latest value', function() {
-		var s1 = scan(inc, 0, periodic(3));
-		var s2 = scan(inc, 0, periodic(1));
+		var s1 = te.makeEvents(3, 10);
+		var s2 = te.makeEvents(1, 30);
 
-		var s = sample.sample(Array, periodic(3), s1, s2);
+		var s3 = te.makeEvents(3, 10);
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(15);
-
-		return scheduler.collect(take(5, s))
+		var s = sample.sample(Array, s3, s1, s2);
+		return te.collectEvents(take(5, s), te.ticks(15))
 			.then(function(events) {
 				expect(events).toEqual([
-					{ time: 0, value: [0, 0] },
-					{ time: 3, value: [1, 3] },
-					{ time: 6, value: [2, 6] },
-					{ time: 9, value: [3, 9] },
+					{ time: 0,  value: [0, 0] },
+					{ time: 3,  value: [1, 3] },
+					{ time: 6,  value: [2, 6] },
+					{ time: 9,  value: [3, 9] },
 					{ time: 12, value: [4, 12] }
 				]);
 			});
@@ -88,10 +77,7 @@ describe('sampleWith', function() {
 			return i++;
 		}, periodic(1)));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(n*21);
-
-		return scheduler.collect(s)
+		return te.collectEvents(s, te.ticks(n*21))
 			.then(function(events) {
 				expect(events).toEqual([
 					{ time: 0, value: 0 },
@@ -110,10 +96,7 @@ describe('sampleWith', function() {
 			return i++;
 		}, periodic(2)));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(n);
-
-		return scheduler.collect(s)
+		return te.collectEvents(s, te.ticks(n))
 			.then(function(events) {
 				expect(events).toEqual([
 					{ time: 0, value: 0 },
@@ -130,10 +113,7 @@ describe('sampleWith', function() {
 		var n = 3;
 		var s = sample.sampleWith(take(n, periodic(1)), streamOf(sentinel));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(n);
-
-		return scheduler.collect(s)
+		return te.collectEvents(s, te.ticks(n))
 			.then(function(events) {
 				expect(events).toEqual([
 					{ time: 0, value: sentinel },

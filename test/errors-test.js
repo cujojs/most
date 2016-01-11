@@ -8,10 +8,6 @@ var streamOf = require('../lib/source/core').of;
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
 
-function thrower(e) {
-	throw e;
-}
-
 describe('throwError', function() {
 
 	it('should create a Stream containing only an error', function() {
@@ -27,11 +23,11 @@ describe('throwError', function() {
 
 });
 
-describe('flatMapError', function() {
+describe('recoverWith', function() {
 
 	it('when an error is thrown should continue with returned stream', function() {
 
-		var s = error.flatMapError(function () {
+		var s = error.recoverWith(function () {
 			return streamOf(sentinel);
 		}, error.throwError(other));
 
@@ -43,7 +39,7 @@ describe('flatMapError', function() {
 
 	it('should only flat map first error if recovered stream also errors', function() {
 
-		var s = error.flatMapError(function () {
+		var s = error.recoverWith(function () {
 			return error.throwError(sentinel);
 		}, error.throwError(other));
 

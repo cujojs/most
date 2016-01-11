@@ -3,7 +3,6 @@ var expect = require('buster').expect;
 
 var slice = require('../lib/combinator/slice');
 var fromArray = require('../lib/source/fromArray').fromArray;
-var iterate = require('../lib/combinator/build').iterate;
 var reduce = require('../lib/combinator/accumulate').reduce;
 
 describe('slice', function() {
