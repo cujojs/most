@@ -4,7 +4,7 @@ var expect = require('buster').expect;
 var delay = require('../lib/combinator/delay').delay;
 var streamOf = require('../lib/source/core').of;
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 

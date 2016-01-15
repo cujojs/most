@@ -7,7 +7,7 @@ var zip = require('../lib/combinator/zip').zip;
 var delay = require('../lib/combinator/delay').delay;
 var fromArray = require('../lib/source/fromArray').fromArray;
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 
 describe('zip', function() {
 	it('should invoke f for each tuple', function() {

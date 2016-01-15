@@ -11,7 +11,7 @@ var core = require('../lib/source/core');
 var fromArray = require('../lib/source/fromArray').fromArray;
 var Stream = require('../lib/Stream');
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var streamOf = core.of;

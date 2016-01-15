@@ -10,7 +10,7 @@ var periodic = require('../lib/source/periodic').periodic;
 var streamOf = require('../lib/source/core').of;
 var Stream = require('../lib/Stream');
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 

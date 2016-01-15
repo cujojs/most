@@ -8,7 +8,7 @@ var delay = require('../../lib/combinator/delay').delay;
 var observe = require('../../lib/combinator/observe').observe;
 var flatMapError = require('../../lib/combinator/errors').flatMapError;
 
-var te = require('../helper/testEnvironment');
+var te = require('../helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };

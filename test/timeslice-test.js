@@ -13,7 +13,7 @@ var merge = require('../lib/combinator/merge').merge;
 var streamOf = core.of;
 var never = core.never;
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var sentinel = { value: 'sentinel' };

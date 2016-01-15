@@ -14,7 +14,7 @@ var Stream = require('../lib/Stream');
 var streamOf = core.of;
 var empty = core.empty;
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var sentinel = { value: 'sentinel' };

@@ -10,7 +10,7 @@ var reduce = require('../../lib/combinator/accumulate').reduce;
 var observe = require('../../lib/combinator/observe').observe;
 var core = require('../../lib/source/core');
 
-var te = require('../helper/testEnvironment');
+var te = require('../helper/testEnv');
 
 var empty = core.empty;
 var streamOf = core.of;

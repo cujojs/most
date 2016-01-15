@@ -6,7 +6,7 @@ var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
 var just = require('../../lib/source/core').of;
 var fromArray = require('../../lib/source/fromArray').fromArray;
-var te = require('../helper/testEnvironment');
+var te = require('../helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 

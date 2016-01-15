@@ -8,7 +8,7 @@ var fromArray = require('../../lib/source/fromArray').fromArray;
 var streamOf = require('../../lib/source/core').of;
 var all = require('../../lib/Promise').all;
 
-var te = require('../helper/testEnvironment');
+var te = require('../helper/testEnv');
 
 describe('merge', function() {
 	it('should include items from all inputs', function() {

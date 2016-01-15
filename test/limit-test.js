@@ -19,7 +19,7 @@ var streamOf = core.of;
 
 var map = transform.map;
 
-var te = require('./helper/testEnvironment');
+var te = require('./helper/testEnv');
 var assertSame = require('./helper/stream-helper').assertSame;
 
 var sentinel = { value: 'sentinel' };

@@ -5,7 +5,7 @@ var timestamp = require('../../lib/combinator/timestamp').timestamp;
 var periodic = require('../../lib/source/periodic').periodic;
 var take = require('../../lib/combinator/slice').take;
 
-var te = require('../helper/testEnvironment');
+var te = require('../helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 
