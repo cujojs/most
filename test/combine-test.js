@@ -6,12 +6,11 @@ var map = require('../lib/combinator/transform').map;
 var take = require('../lib/combinator/slice').take;
 var delay = require('../lib/combinator/delay').delay;
 var observe = require('../lib/combinator/observe').observe;
-var reduce = require('../lib/combinator/accumulate').reduce;
 var periodic = require('../lib/source/periodic').periodic;
 var streamOf = require('../lib/source/core').of;
 var Stream = require('../lib/Stream');
 
-var TestScheduler = require('./helper/TestScheduler');
+var te = require('./helper/testEnv');
 
 var sentinel = { value: 'sentinel' };
 
@@ -22,10 +21,7 @@ describe('combine', function() {
 
 		var sc = combine(Array, s1, delay(1, s2));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(1);
-
-		return scheduler.collect(sc).then(function(events) {
+		return te.collectEvents(sc, te.ticks(2)).then(function(events) {
 			expect(events.length).toBe(1);
 			expect(events[0].value).toEqual([1, sentinel]);
 		});
@@ -44,17 +40,16 @@ describe('combine', function() {
 
 		var sc = combine(Array, take(a1.length, s1), take(a2.length, s2));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(a1.length+a2.length);
-
-		return scheduler.collect(sc)
+		return te.collectEvents(sc, te.ticks(a1.length+a2.length))
 			.then(function(events) {
-				var result = events.map(function(event) {
-					return event.value;
-				});
-
-				expect(result).toEqual([
-					[0,'a'],[1,'a'],[1,'b'], [2,'b'],[2,'c'],[3,'c'],[3,'d']
+				expect(events).toEqual([
+					{ time: 1, value: [ 0, 'a' ] },
+					{ time: 2, value: [ 1, 'a' ] },
+					{ time: 3, value: [ 1, 'b' ] },
+					{ time: 4, value: [ 2, 'b' ] },
+					{ time: 5, value: [ 2, 'c' ] },
+					{ time: 6, value: [ 3, 'c' ] },
+					{ time: 7, value: [ 3, 'd' ] }
 				]);
 			});
 	});

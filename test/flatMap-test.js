@@ -6,13 +6,12 @@ var flatMap = require('../lib/combinator/flatMap');
 var delay = require('../lib/combinator/delay').delay;
 var concat = require('../lib/combinator/build').concat;
 var take = require('../lib/combinator/slice').take;
-var reduce = require('../lib/combinator/accumulate').reduce;
 var drain = require('../lib/combinator/observe').drain;
 var core = require('../lib/source/core');
 var fromArray = require('../lib/source/fromArray').fromArray;
 var Stream = require('../lib/Stream');
 
-var TestScheduler = require('./helper/TestScheduler');
+var te = require('./helper/testEnv');
 var FakeDisposeSource = require('./helper/FakeDisposeSource');
 
 var streamOf = core.of;
@@ -40,10 +39,7 @@ describe('flatMap', function() {
 			return delay(x, streamOf(x));
 		}, fromArray([2, 1]));
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(2);
-
-		return scheduler.collect(s)
+		return te.collectEvents(s, te.ticks(3))
 			.then(function(events) {
 				expect(events.length).toBe(2);
 
@@ -62,10 +58,9 @@ describe('join', function() {
 		var b = [4,5,6];
 		var streamsToMerge = fromArray([delay(1, fromArray(a)), fromArray(b)]);
 
-		var scheduler = new TestScheduler();
-		scheduler.tick(1);
+		var s = flatMap.join(streamsToMerge);
 
-		return scheduler.collect(flatMap.join(streamsToMerge))
+		return te.collectEvents(s, te.ticks(2))
 			.then(function(events) {
 				var result = events.map(function(event) {
 					return event.value;

@@ -10,7 +10,6 @@ var Promise = require('../../lib/Promise');
 
 var sentinel = { value: 'sentinel' };
 
-
 describe('await', function() {
 
 	it('should await promises', function() {

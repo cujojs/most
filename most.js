@@ -265,10 +265,10 @@ Stream.prototype.join = function() {
 	return flatMap.join(this);
 };
 
-var flatMapEnd = require('./lib/combinator/flatMapEnd').flatMapEnd;
+var continueWith = require('./lib/combinator/continueWith').continueWith;
 
-exports.continueWith = flatMapEnd;
-exports.flatMapEnd = flatMapEnd;
+exports.continueWith = continueWith;
+exports.flatMapEnd = continueWith;
 
 /**
  * Map the end event to a new stream, and begin emitting its values.
@@ -278,7 +278,7 @@ exports.flatMapEnd = flatMapEnd;
  * followed by all events from the stream returned by f.
  */
 Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function(f) {
-	return flatMapEnd(f, this);
+	return continueWith(f, this);
 };
 
 var concatMap = require('./lib/combinator/concatMap').concatMap;

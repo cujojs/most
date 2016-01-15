@@ -4,12 +4,9 @@ var assertSame = require('./helper/stream-helper').assertSame;
 
 var transform = require('../lib/combinator/transform');
 var observe = require('../lib/combinator/observe').observe;
-var reduce = require('../lib/combinator/accumulate').reduce;
 var streamOf = require('../lib/source/core').of;
 
 var map = transform.map;
-var ap = transform.ap;
-var flatMap = transform.flatMap;
 var tap = transform.tap;
 var constant = transform.constant;
 

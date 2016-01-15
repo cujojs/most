@@ -5,7 +5,6 @@ var switchLatest = require('../lib/combinator/switch').switch;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var observe = require('../lib/combinator/observe').observe;
 var take = require('../lib/combinator/slice').take;
-var repeat = require('../lib/combinator/build').repeat;
 var transform = require('../lib/combinator/transform');
 var periodic = require('../lib/source/periodic').periodic;
 var fromArray = require('../lib/source/fromArray').fromArray;

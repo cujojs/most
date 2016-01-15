@@ -8,7 +8,7 @@ var fromArray = require('../../lib/source/fromArray').fromArray;
 var streamOf = require('../../lib/source/core').of;
 var all = require('../../lib/Promise').all;
 
-var TestScheduler = require('../helper/TestScheduler');
+var te = require('../helper/testEnv');
 
 describe('merge', function() {
 	it('should include items from all inputs', function() {
@@ -46,10 +46,8 @@ function testMerge(merge) {
 	var sa = fromArray(a);
 	var sb = fromArray(b);
 
-	var scheduler = new TestScheduler();
-	scheduler.tick(2);
-
-	return scheduler.collect(merge(delay(2, sa), delay(1, sb)))
+	var s = merge(delay(2, sa), delay(1, sb));
+    return te.collectEvents(s, te.ticks(2))
 		.then(function (events) {
 			var result = events.map(function(event) {
 				return event.value;
