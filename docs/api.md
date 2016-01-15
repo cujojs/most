@@ -307,7 +307,7 @@ most.generate(countdown, 1000, 3)
 
 ### most.fromEvent
 
-####`most.fromEvent(eventType, source) -> Stream`
+####`most.fromEvent(eventType, source [, useCapture=false]) -> Stream`
 
 ```
 source:                            -a--b-c---d->
@@ -315,6 +315,8 @@ most.fromEvent(eventType, source): -a--b-c---d->
 ```
 
 Create a stream containing events from the provided [EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), such as a DOM element, or [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter).  This provides a simple way to coerce existing event sources into streams.
+
+When passing an EventTarget, you can provide `useCapture` as the 3rd parameter, and it will be passed through to `addEventListener` and `removeEventListener`.  When not provided, `useCapture` defaults to `false`.
 
 When the stream ends (for example, by using [take](#take), [takeUntil](#until), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
 

@@ -70,6 +70,10 @@ describe('fromEvent', function() {
 
 });
 
+function randomBoolean() {
+	return Math.random() >= 0.5;
+}
+
 function testEvents(verify, values, source, stream) {
 	setTimeout(function () {
 		values.forEach(function (x) {
@@ -85,7 +89,7 @@ function testEvents(verify, values, source, stream) {
 
 function verifyContainsEmittedItems (evented) {
 	var values = [sentinel, sentinel, sentinel];
-	var stream = take(values.length, fromEvent('event', evented));
+	var stream = take(values.length, fromEvent('event', evented, randomBoolean()));
 
 	return testEvents(function (x) {
 		expect(x).toBe(sentinel);
@@ -98,7 +102,7 @@ function verifyUnlistenOnEnd (evented) {
 	var spy = spyOnRemove(this, evented);
 	var values = [sentinel, sentinel, sentinel];
 
-	var stream = take(1, fromEvent('event', evented));
+	var stream = take(1, fromEvent('event', evented, randomBoolean()));
 
 	return testEvents(function(x) {
 		expect(x).toBe(sentinel);
