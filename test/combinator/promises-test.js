@@ -14,7 +14,7 @@ var sentinel = { value: 'sentinel' };
 describe('await', function() {
 
 	it('should await promises', function() {
-		var s = promises.await(streamOf(Promise.resolve(sentinel)));
+		var s = promises.awaitPromises(streamOf(Promise.resolve(sentinel)));
 
 		return observe(function(x) {
 			expect(x).toBe(sentinel);
@@ -28,7 +28,7 @@ describe('await', function() {
 		var fast = Promise.resolve(sentinel);
 
 		// delayed promise followed by already fulfilled promise
-		var s = promises.await(fromArray([slow, fast]));
+		var s = promises.awaitPromises(fromArray([slow, fast]));
 
 		return reduce(function (a, x) {
 			return a.concat(x);
@@ -38,7 +38,7 @@ describe('await', function() {
 	});
 
 	it('should propagate error if promise rejects', function() {
-		var s = promises.await(fromArray([Promise.resolve(), Promise.reject(sentinel), Promise.resolve()]));
+		var s = promises.awaitPromises(fromArray([Promise.resolve(), Promise.reject(sentinel), Promise.resolve()]));
 		var spy = this.spy();
 		return observe(spy, s).catch(function(e) {
 			expect(e).toBe(sentinel);
