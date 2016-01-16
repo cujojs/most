@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "Monadic streams",
   "main": "most.js",
   "files": [
@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "jshint . && buster-test",
-    "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c 'warnings=false' -m -o dist/most.min.js"
+    "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c 'warnings=false' -m -o dist/most.min.js",
+    "preversion": "npm run build"
   },
   "repository": {
     "type": "git",
