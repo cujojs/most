@@ -19,7 +19,7 @@ exports.of       = Stream.of    = core.of;
 exports.just     = core.of; // easier ES6 import alias
 exports.empty    = Stream.empty = core.empty;
 exports.never    = core.never;
-exports.from     = from;
+exports.from     = Stream.from = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------
@@ -674,4 +674,45 @@ exports.multicast = multicast;
  */
 Stream.prototype.multicast = function() {
 	return multicast(this);
+};
+
+//-----------------------------------------------------------------------
+// ES7 Observable
+
+var observable = require('./lib/observable');
+
+var Observable = observable.Observable;
+exports.Observable = Observable;
+
+Observable.from = from;
+Observable.of = core.of;
+
+Object.defineProperty(Observable, observable.speciesSymbol, {
+	get: function() {
+		return Observable;
+	}
+});
+
+Object.defineProperty(Stream, observable.speciesSymbol, {
+	get: function() {
+		return Observable;
+	}
+});
+
+Object.defineProperty(Observable.prototype, 'subscribe', {
+	value: function(observer) {
+		return observable.subscribe(observer, this);
+	},
+	enumerable: false, writable: true, configurable: true
+});
+
+Object.defineProperty(Stream.prototype, 'subscribe', {
+	value: function(observer) {
+		return observable.subscribe(observer, this);
+	},
+	enumerable: false, writable: true, configurable: true
+});
+
+Stream.prototype[observable.symbol] = function() {
+	return this;
 };
