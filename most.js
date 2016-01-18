@@ -716,3 +716,10 @@ Object.defineProperty(Stream.prototype, 'subscribe', {
 Stream.prototype[observable.symbol] = function() {
 	return this;
 };
+
+Object.defineProperty(Observable.prototype, 'forEach', {
+	value: function(f) {
+		return observe.observe(f, this);
+	},
+	enumerable: false, writable: true, configurable: true
+});
