@@ -3,6 +3,7 @@
   "version": "0.17.1",
   "description": "Monadic streams",
   "main": "most.js",
+  "typings": "./type-definitions/most.d.ts",
   "files": [
     "most.js",
     "lib/**/*.js"
