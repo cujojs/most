@@ -71,7 +71,7 @@ To [run the example above](examples/add-inputs) and [others](examples) using [Ra
 
 ### Requirements
    
-   Most requires ES6 `Promise`.  In environments that don't have ES6 `Promise`, use a polyfill such as [creed](https://github.com/briancavalier/creed), [when](https://github.com/cujojs/when/blob/master/docs/es6-promise-shim.md), [bluebird], etc.
+   Most requires ES6 `Promise`.  In environments that don't have ES6 `Promise`, use a polyfill such as [creed](https://github.com/briancavalier/creed), [when](https://github.com/cujojs/when/blob/master/docs/es6-promise-shim.md), [bluebird](http://bluebirdjs.com/docs/getting-started.html), etc.
 
 ### Install
 
