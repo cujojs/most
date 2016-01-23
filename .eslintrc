@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "complexity": [1, 5],
+    "no-shadow": 0,
+    "no-underscore-dangle": 0,
+    "no-use-before-define": 0,
+    "quotes": [2, "single"],
+    "strict": 0
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}

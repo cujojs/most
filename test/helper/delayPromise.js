@@ -1,5 +1,3 @@
-var Promise = require('../../lib/Promise');
-
 module.exports = delayPromise;
 
 function delayPromise(ms, x) {

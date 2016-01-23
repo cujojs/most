@@ -6,7 +6,6 @@ var observe = require('../../lib/combinator/observe').observe;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var streamOf = require('../../lib/source/core').of;
 var fromArray = require('../../lib/source/fromArray').fromArray;
-var Promise = require('../../lib/Promise');
 
 var sentinel = { value: 'sentinel' };
 

@@ -1,7 +1,6 @@
 var expect = require('buster').expect;
 
 var reduce = require('../../lib/combinator/accumulate').reduce;
-var Promise = require('../../lib/Promise');
 
 exports.assertSame = assertSame;
 

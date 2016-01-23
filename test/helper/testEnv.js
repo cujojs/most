@@ -3,7 +3,6 @@
 /** @author John Hann */
 
 var Stream = require('../../lib/Stream');
-var Promise = require('../../lib/Promise');
 var PropagateTask = require('../../lib/scheduler/PropagateTask');
 var Scheduler = require('../../lib/scheduler/Scheduler');
 var VirtualTimer = require('./VirtualTimer');

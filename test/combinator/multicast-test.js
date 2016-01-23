@@ -5,7 +5,6 @@ var streamOf = require('../../lib/source/core').of;
 var map = require('../../lib/combinator/transform').map;
 var observe = require('../../lib/combinator/observe').observe;
 var multicast = require('../../lib/combinator/multicast').multicast;
-var all = require('../../lib/Promise').all;
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };
@@ -23,7 +22,7 @@ describe('multicast', function() {
 		var o1 = observe(observer1Spy, mapped);
 		var o2 = observe(observer2Spy, mapped);
 
-		return all([o1, o2]).then(function (a) {
+		return Promise.all([o1, o2]).then(function (a) {
 			expect(mapperSpy).toHaveBeenCalledTwice();
 			expect(observer1Spy).toHaveBeenCalledOnce();
 			expect(observer2Spy).toHaveBeenCalledOnce();
@@ -42,7 +41,7 @@ describe('multicast', function() {
 		var o1 = observe(observer1Spy, multicasted);
 		var o2 = observe(observer2Spy, multicasted);
 
-		return all([o1, o2]).then(function (a) {
+		return Promise.all([o1, o2]).then(function (a) {
 			expect(mapperSpy).toHaveBeenCalledOnce();
 			expect(observer1Spy).toHaveBeenCalledOnce();
 			expect(observer2Spy).toHaveBeenCalledOnce();

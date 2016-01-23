@@ -7,7 +7,6 @@ var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;
 var Stream = require('../../lib/Stream');
 var scheduler = require('../../lib/scheduler/defaultScheduler');
-var Promise = require('../../lib/Promise');
 
 var FakeDisposeSource = require('../helper/FakeDisposeSource');
 

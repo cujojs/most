@@ -6,7 +6,6 @@ var delay = require('../../lib/combinator/delay').delay;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var fromArray = require('../../lib/source/fromArray').fromArray;
 var streamOf = require('../../lib/source/core').of;
-var all = require('../../lib/Promise').all;
 
 var te = require('../helper/testEnv');
 
@@ -23,7 +22,7 @@ describe('merge', function() {
 		var p1 = toArray(merge.merge(merge.merge(s1, s2), s3));
 		var p2 = toArray(merge.merge(s1, merge.merge(s2, s3)));
 
-		return all([p1,p2]).then(function(a) {
+		return Promise.all([p1,p2]).then(function(a) {
 			var p1 = a[0].sort();
 			var p2 = a[1].sort();
 

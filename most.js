@@ -517,7 +517,7 @@ var timeslice = require('./lib/combinator/timeslice');
 
 exports.until  = exports.takeUntil = timeslice.takeUntil;
 exports.since  = exports.skipUntil = timeslice.skipUntil;
-exports.during = timeslice.during; // EXPERIMENTAL
+exports.during = timeslice.during;
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
