@@ -1,5 +1,3 @@
-Updated: 1-5-2016
-
 Latest performance tests of basic most.js operations.
 
 * [Setup](#setup)
@@ -72,6 +70,21 @@ kefir        12.36 op/s ±  1.10%   (32 samples)
 bacon         0.82 op/s ±  3.54%    (7 samples)
 lodash       18.47 op/s ±  2.40%   (34 samples)
 Array         0.41 op/s ±  2.45%    (6 samples)
+-------------------------------------------------------
+
+> most-perf@0.10.0 merge /Users/brian/Projects/cujojs/most/test/perf
+> node ./merge.js
+
+merge 100000 x 10 streams
+-------------------------------------------------------
+most        170.02 op/s ±  1.06%   (76 samples)
+rx 4          1.28 op/s ±  2.66%    (8 samples)
+rx 5          7.65 op/s ±  1.21%   (22 samples)
+kefir        14.51 op/s ±  1.54%   (37 samples)
+bacon         0.88 op/s ±  3.22%    (7 samples)
+highland      0.18 op/s ±  2.32%    (5 samples)
+lodash       17.98 op/s ±  1.97%   (34 samples)
+Array        14.32 op/s ±  2.34%   (39 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 zip /Users/brian/Projects/cujojs/most/test/perf
