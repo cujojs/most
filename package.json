@@ -8,7 +8,7 @@
     "lib/**/*.js"
   ],
   "scripts": {
-    "test": "jshint . && buster-test",
+    "test": "eslint . && buster-test",
     "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c 'warnings=false' -m -o dist/most.min.js",
     "preversion": "npm run build"
   },
@@ -38,12 +38,9 @@
   "license": "MIT",
   "devDependencies": {
     "buster": "~0.7",
-    "jshint": "~2",
-    "transducers-js": "^0.4.158",
+    "eslint": "^1.10.3",
+    "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
     "webpack": "^1.10.1"
-  },
-  "dependencies": {
-    "when": "^3.7.0"
   }
 }

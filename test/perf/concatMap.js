@@ -1,11 +1,10 @@
 var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
-var rxjs = require('@reactivex/rxjs')
+var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
-var highland = require('highland');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
