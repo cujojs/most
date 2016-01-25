@@ -1092,6 +1092,21 @@ Merging multiple streams creates a new stream containing all events from the inp
 
 In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
 
+### mergeArray
+
+####`most.mergeArray(arrayOfStreams) -> Stream`
+
+Array form of [merge](#merge).  Create a new Stream containing all events from all streams in `arrayOfStreams`.
+
+```
+s1:                             -a--b----c--->
+s2:                             --w---x-y--z->
+s3:                             ---1---2----3>
+most.mergeArray([s1, s2, s3]):  -aw1b-x2yc-z3>
+```
+
+See [merge](#merge) for more details.
+
 ### combine
 
 ####`stream1.combine(f, stream2) -> Stream`
@@ -1138,6 +1153,21 @@ resultStream.observe(function(z) {
 	resultNode.textContent = z;
 });
 ```
+
+### combineArray
+
+####`most.combineArray(f, arrayOfStreams) -> Stream`
+
+Array form of [combine](#combine). Create a new stream that emits the set of latest event values from all input streams whenever a new event arrives on any input stream.
+
+```
+s1:                                    -0--1----2->
+s2:                                    --3---4-5-->
+s3:                                    ---2---1--->
+most.combineArray(add3, [s1, s2, s3]): ---56-7678->
+```
+
+See [combine](#combine) for more details.
 
 ### sample
 
