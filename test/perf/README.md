@@ -77,14 +77,14 @@ Array         0.41 op/s ±  2.45%    (6 samples)
 
 merge 100000 x 10 streams
 -------------------------------------------------------
-most        170.02 op/s ±  1.06%   (76 samples)
-rx 4          1.28 op/s ±  2.66%    (8 samples)
-rx 5          7.65 op/s ±  1.21%   (22 samples)
-kefir        14.51 op/s ±  1.54%   (37 samples)
-bacon         0.88 op/s ±  3.22%    (7 samples)
-highland      0.18 op/s ±  2.32%    (5 samples)
-lodash       17.98 op/s ±  1.97%   (34 samples)
-Array        14.32 op/s ±  2.34%   (39 samples)
+most        319.76 op/s ±  1.58%   (78 samples)
+rx 4          1.24 op/s ±  1.42%    (8 samples)
+rx 5          7.84 op/s ±  1.01%   (23 samples)
+kefir        14.66 op/s ±  1.28%   (37 samples)
+bacon         0.90 op/s ±  2.31%    (7 samples)
+highland      0.18 op/s ±  2.61%    (5 samples)
+lodash       18.07 op/s ±  1.47%   (34 samples)
+Array        14.05 op/s ±  2.24%   (39 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 zip /Users/brian/Projects/cujojs/most/test/perf
