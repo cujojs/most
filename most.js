@@ -315,6 +315,7 @@ Stream.prototype.mergeConcurrently = function(concurrency) {
 var merge = require('./lib/combinator/merge');
 
 exports.merge = merge.merge;
+exports.mergeArray = merge.mergeArray;
 
 /**
  * Merge this stream and all the provided streams
@@ -332,6 +333,7 @@ Stream.prototype.merge = function(/*...streams*/) {
 var combine = require('./lib/combinator/combine');
 
 exports.combine = combine.combine;
+exports.combineArray = combine.combineArray;
 
 /**
  * Combine latest events from all input streams
