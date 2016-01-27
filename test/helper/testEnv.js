@@ -77,7 +77,7 @@ AtTimes.prototype.run = function(sink, scheduler) {
 
 	var end = scheduler.delay(s.time, PropagateTask.end(void 0, sink));
 
-	return dispose.newDisposable(cancelAll, s.tasks.concat(end));
+	return dispose.create(cancelAll, s.tasks.concat(end));
 };
 
 function appendEvent(sink, scheduler, s, event) {
