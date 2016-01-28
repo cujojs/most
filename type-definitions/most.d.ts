@@ -1,7 +1,21 @@
 declare type SeedValue<S, V> = { seed: S, value: V };
 declare type TimeValue<V>    = { time: number, value: V };
 
-declare interface Promise<A> {}
+declare interface Thenable<A> {
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Thenable<U>;
+    catch<U>(onAejected?: (error: any) => U | Thenable<U>): Thenable<U>;
+}
+
+declare interface Promise<A> {
+	constructor(callback: (resolve : (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
+
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
+
+	catch<U>(onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
+}
+
 declare interface Generator<A, B, C> {}
 declare interface Iterable<A> {}
 
@@ -72,7 +86,11 @@ export interface Stream<A> {
   multicast<A>(): Stream<A>;
 }
 
-export function create<A>(f: (add: Function, end: Function, error: Function) => void): Stream<A>;
+declare interface DisposeFn {
+  (): void|Promise<any>;
+}
+
+export function create<A>(f: (add: (a:A) => any, end: (x:any) => any, error: (e:Error) => any) => void|DisposeFn): Stream<A>;
 export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
 export function from<A>(as: Iterable<A>): Stream<A>;
@@ -131,7 +149,7 @@ export function timestamp<A>(s: Stream<A>): Stream<TimeValue<A>>;
 export function delay<A>(dt: number, s: Stream<A>): Stream<A>;
 
 export function fromPromise<A>(p: Promise<A>): Stream<A>;
-export function awaitPromises<A>(s: Stream<Promise<A>>): Stream<A>;
+export function await<A>(s: Stream<Promise<A>>): Stream<A>;
 
 export function sample<A>(f: (...as: any[]) => A, sampler: Stream<any>, ...ss: Array<Stream<any>>): Stream<A>;
 export function sampleWith<A>(sampler: Stream<any>, s: Stream<A>): Stream<A>;
