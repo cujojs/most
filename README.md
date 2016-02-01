@@ -78,7 +78,7 @@ To [run the example above](examples/add-inputs) and [others](examples) using [Ra
 As a module:
 
 ```
-npm install --save most` or `bower install --save most
+npm install --save most
 ```
 
 ```js
