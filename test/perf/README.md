@@ -28,19 +28,20 @@ most-perf@0.10.0 /Users/brian/Projects/cujojs/most/test/perf
 v5.5.0
 
 > npm start
+
 > most-perf@0.10.0 filter-map-reduce /Users/brian/Projects/cujojs/most/test/perf
 > node ./filter-map-reduce
 
 filter -> map -> reduce 1000000 integers
 -------------------------------------------------------
-most        331.52 op/s ±  0.74%   (80 samples)
-rx 4          1.39 op/s ±  1.05%    (8 samples)
-rx 5          4.79 op/s ±  1.40%   (16 samples)
-kefir        12.64 op/s ±  0.81%   (33 samples)
-bacon         1.01 op/s ±  1.61%    (7 samples)
-highland      7.55 op/s ±  3.73%   (22 samples)
-lodash       54.80 op/s ±  2.84%   (57 samples)
-Array         6.76 op/s ±  2.80%   (21 samples)
+most        513.41 op/s ±  1.15%   (79 samples)
+rx 4          1.26 op/s ±  0.99%    (8 samples)
+rx 5          4.47 op/s ±  1.18%   (15 samples)
+kefir        12.19 op/s ±  1.10%   (32 samples)
+bacon         1.02 op/s ±  1.45%    (7 samples)
+highland      7.24 op/s ±  4.37%   (21 samples)
+lodash       52.96 op/s ±  3.05%   (55 samples)
+Array         6.18 op/s ±  2.91%   (20 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 flatMap /Users/brian/Projects/cujojs/most/test/perf
@@ -48,14 +49,14 @@ Array         6.76 op/s ±  2.80%   (21 samples)
 
 flatMap 1000 x 1000 streams
 -------------------------------------------------------
-most        173.70 op/s ±  1.06%   (77 samples)
-rx 4          0.76 op/s ±  1.85%    (6 samples)
-rx 5          7.24 op/s ±  1.17%   (22 samples)
-kefir        10.47 op/s ±  0.85%   (28 samples)
-bacon         0.86 op/s ±  3.57%    (7 samples)
-highland      0.17 op/s ±  6.44%    (5 samples)
-lodash       19.12 op/s ±  2.18%   (35 samples)
-Array         0.43 op/s ±  0.91%    (6 samples)
+most        174.33 op/s ±  1.21%   (78 samples)
+rx 4          0.70 op/s ±  2.75%    (6 samples)
+rx 5          7.10 op/s ±  1.35%   (21 samples)
+kefir        11.47 op/s ±  1.51%   (31 samples)
+bacon         0.82 op/s ±  2.24%    (7 samples)
+highland      0.17 op/s ±  4.69%    (5 samples)
+lodash       17.82 op/s ±  2.10%   (33 samples)
+Array         0.41 op/s ±  1.26%    (6 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 concatMap /Users/brian/Projects/cujojs/most/test/perf
@@ -63,13 +64,13 @@ Array         0.43 op/s ±  0.91%    (6 samples)
 
 concatMap 1000 x 1000 streams
 -------------------------------------------------------
-most        120.45 op/s ±  0.70%   (77 samples)
-rx 4          1.25 op/s ±  0.66%    (8 samples)
-rx 5          7.74 op/s ±  0.90%   (23 samples)
-kefir        12.32 op/s ±  0.91%   (32 samples)
-bacon         0.90 op/s ±  2.77%    (7 samples)
-lodash       19.03 op/s ±  2.66%   (35 samples)
-Array         0.44 op/s ±  2.18%    (6 samples)
+most        120.22 op/s ±  1.56%   (78 samples)
+rx 4          1.11 op/s ±  1.73%    (7 samples)
+rx 5          7.27 op/s ±  1.34%   (22 samples)
+kefir        12.11 op/s ±  1.61%   (32 samples)
+bacon         0.88 op/s ±  3.28%    (7 samples)
+lodash       17.53 op/s ±  3.06%   (41 samples)
+Array         0.42 op/s ±  2.43%    (6 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 merge /Users/brian/Projects/cujojs/most/test/perf
@@ -77,14 +78,14 @@ Array         0.44 op/s ±  2.18%    (6 samples)
 
 merge 100000 x 10 streams
 -------------------------------------------------------
-most        303.24 op/s ±  0.56%   (78 samples)
-rx 4          1.24 op/s ±  1.34%    (8 samples)
-rx 5          7.70 op/s ±  1.23%   (22 samples)
-kefir        14.97 op/s ±  1.10%   (37 samples)
-bacon         0.79 op/s ±  3.15%    (6 samples)
-highland      0.17 op/s ±  3.99%    (5 samples)
-lodash       18.90 op/s ±  1.72%   (35 samples)
-Array        14.90 op/s ±  1.78%   (41 samples)
+most        338.51 op/s ±  1.00%   (80 samples)
+rx 4          1.24 op/s ±  2.29%    (8 samples)
+rx 5          7.42 op/s ±  1.07%   (22 samples)
+kefir        14.16 op/s ±  1.37%   (36 samples)
+bacon         0.90 op/s ±  2.40%    (7 samples)
+highland      0.18 op/s ±  2.60%    (5 samples)
+lodash       17.67 op/s ±  2.62%   (35 samples)
+Array        14.16 op/s ±  2.01%   (39 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 zip /Users/brian/Projects/cujojs/most/test/perf
@@ -92,13 +93,13 @@ Array        14.90 op/s ±  1.78%   (41 samples)
 
 zip 2 x 100000 integers
 -------------------------------------------------------
-most        117.85 op/s ±  1.30%   (76 samples)
-rx 4          4.08 op/s ±  1.92%   (14 samples)
-rx 5         21.59 op/s ±  2.76%   (29 samples)
-kefir        18.33 op/s ±  0.63%   (44 samples)
-bacon         1.10 op/s ±  4.96%    (7 samples)
-highland      0.55 op/s ±  3.42%    (6 samples)
-lodash       40.62 op/s ±  6.42%   (53 samples)
+most        115.59 op/s ±  1.71%   (74 samples)
+rx 4          3.95 op/s ±  2.05%   (14 samples)
+rx 5         20.25 op/s ±  2.89%   (28 samples)
+kefir        18.10 op/s ±  1.69%   (44 samples)
+bacon         1.04 op/s ±  5.34%    (7 samples)
+highland      0.54 op/s ±  3.71%    (6 samples)
+lodash       36.82 op/s ± 10.06%   (49 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 scan /Users/brian/Projects/cujojs/most/test/perf
@@ -106,14 +107,14 @@ lodash       40.62 op/s ±  6.42%   (53 samples)
 
 scan -> reduce 1000000 integers
 -------------------------------------------------------
-most        361.24 op/s ±  0.66%   (79 samples)
-rx 4          1.23 op/s ±  1.60%    (8 samples)
-rx 5          4.41 op/s ±  1.12%   (15 samples)
-kefir        19.86 op/s ±  0.96%   (27 samples)
-bacon         0.81 op/s ±  2.65%    (7 samples)
-highland      5.68 op/s ±  6.18%   (18 samples)
-lodash       10.22 op/s ±  5.99%   (31 samples)
-Array         5.70 op/s ±  5.82%   (19 samples)
+most        362.37 op/s ±  0.97%   (80 samples)
+rx 4          1.16 op/s ±  0.72%    (7 samples)
+rx 5          4.46 op/s ±  1.49%   (15 samples)
+kefir        19.38 op/s ±  1.08%   (27 samples)
+bacon         0.81 op/s ±  1.36%    (7 samples)
+highland      5.83 op/s ±  3.96%   (18 samples)
+lodash        9.54 op/s ±  9.10%   (29 samples)
+Array         5.60 op/s ±  5.75%   (18 samples)
 -------------------------------------------------------
 
 > most-perf@0.10.0 skipRepeats /Users/brian/Projects/cujojs/most/test/perf
@@ -121,12 +122,12 @@ Array         5.70 op/s ±  5.82%   (19 samples)
 
 skipRepeats -> reduce 2 x 1000000 integers
 -------------------------------------------------------
-most        307.19 op/s ±  0.55%   (79 samples)
-rx 4          1.64 op/s ±  0.77%    (9 samples)
-rx 5          6.27 op/s ±  1.06%   (19 samples)
-kefir        15.57 op/s ±  0.75%   (38 samples)
-bacon         1.15 op/s ±  1.38%    (7 samples)
-lodash       62.61 op/s ±  3.36%   (65 samples)
-Array         8.12 op/s ±  4.06%   (25 samples)
+most        362.55 op/s ±  0.80%   (80 samples)
+rx 4          1.34 op/s ±  1.35%    (8 samples)
+rx 5          5.87 op/s ±  0.97%   (19 samples)
+kefir        15.09 op/s ±  0.86%   (38 samples)
+bacon         1.11 op/s ±  3.24%    (7 samples)
+lodash       59.36 op/s ±  3.40%   (62 samples)
+Array         8.37 op/s ±  3.15%   (25 samples)
 -------------------------------------------------------
 ```
