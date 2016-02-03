@@ -55,9 +55,9 @@ most.js API
 	* [drain](#drain)
 1. Combining streams
 	* [merge](#merge)
-	* [mergeArray](#mergeArray)
+	* [mergeArray](#mergearray)
 	* [combine](#combine)
-	* [combineArray](#combineArray)
+	* [combineArray](#combinearray)
 	* [sample](#sample)
 	* [sampleWith](#samplewith)
 	* [zip](#zip)
