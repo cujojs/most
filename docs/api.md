@@ -64,7 +64,7 @@ most.js API
 1. Combining higher order streams
 	* [switch](#switch)
 	* [join](#join)
-	* [mergeConcurrently](#mergeConcurrently)
+	* [mergeConcurrently](#mergeconcurrently)
 1. Awaiting promises
 	* [await](#await)
 1. Rate limiting streams
