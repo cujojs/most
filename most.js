@@ -149,6 +149,7 @@ exports.concat    = build.concat;
 exports.startWith = build.cons;
 
 /**
+ * @deprecated
  * Tie this stream into a circle, thus creating an infinite stream
  * @returns {Stream} new infinite stream
  */

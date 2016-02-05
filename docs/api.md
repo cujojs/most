@@ -478,6 +478,8 @@ Note that this effectively *timeshifts* events from `stream2` past the end time 
 
 ### cycle
 
+**Deprecated**
+
 ####`stream.cycle() -> Stream`
 ####`most.cycle(stream) -> Stream`
 
