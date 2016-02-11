@@ -19,9 +19,9 @@ the last.
 
 ```js
 var most = require('most');
-var urls = ['http://reqr.es/api/users?page=2', 
-            'http://reqr.es/api/users?delay=3', 
-            'http://reqr.es/api/users?page=3'];
+var urls = ['http://reqres.in/api/users?page=2', 
+            'http://reqres.in/api/users?delay=3', 
+            'http://reqres.in/api/users?page=3'];
 
 most.unfold(function (urls) {
     return urls.length === 0 
