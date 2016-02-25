@@ -2289,7 +2289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Scheduler.prototype.schedule = function(delay, period, task) {
 		var now = this.now();
-	    var st = new ScheduledTask(now + Math.max(0, delay), period, task, this);
+		var st = new ScheduledTask(now + Math.max(0, delay), period, task, this);
 
 		insertByTime(st, this._tasks);
 		this._scheduleNextRun(now);
@@ -2302,8 +2302,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		if(i >= 0 && i < this._tasks.length) {
 			var at = base.findIndex(task, this._tasks[i].events);
-	        this._tasks[i].events.splice(at, 1);
-			this._reschedule();
+			if(at >= 0) {
+				this._tasks[i].events.splice(at, 1);
+				this._reschedule();
+			}
 		}
 	};
 
