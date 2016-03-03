@@ -295,7 +295,7 @@ function delayPromise(ms, value) {
 	return new Promise(resolve => setTimeout(() => resolve(value), ms));
 }
 
-function* countdownGet(delay, start) {
+function* countdown(delay, start) {
 	for(let i = start; i > 0; --i) {
 		yield delayPromise(delay, i);
 	}
