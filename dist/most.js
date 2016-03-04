@@ -1015,12 +1015,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function ValueProducer(emit, x, sink, scheduler) {
-		this.task = new PropagateTask(emit, x, sink);
-		scheduler.asap(this.task);
+		this.task = scheduler.asap(new PropagateTask(emit, x, sink));
 	}
 
 	ValueProducer.prototype.dispose = function() {
-		return this.task.dispose();
+		return this.task.cancel();
 	};
 
 
@@ -2310,9 +2309,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	Scheduler.prototype.cancelAll = function(f) {
-		this._tasks = base.removeAll(f, this._tasks);
+		for(var i=0; i<this._tasks.length; ++i) {
+			removeAllFrom(f, this._tasks[i]);
+		}
 		this._reschedule();
 	};
+
+	function removeAllFrom(f, timeslot) {
+		timeslot.events = base.removeAll(f, timeslot.events);
+	}
 
 	Scheduler.prototype._reschedule = function() {
 		if(this._tasks.length === 0) {
@@ -3739,7 +3744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Outer.prototype.end = function(t, x) {
 		this.active = false;
-		this.disposable.dispose();
+		dispose.tryDispose(t, this.disposable, this.sink);
 		this._checkEnd(t, x);
 	};
 
