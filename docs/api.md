@@ -373,7 +373,7 @@ most.fromEvent('click', container)
 
 ####`most.create(publisher) -> Stream`
 
-Create a push-stream for imperatively pushing events, primarily for adapting existing event sources.
+Create a push-stream for imperatively pushing events, primarily for situations where existing, declarative sources, like [`fromEvent`](#mostfromevent), [`unfold`](#mostunfold), [`iterate`](#mostiterate), etc. can't be used.
 
 ```
 function publisher(add:function(x:*), end:function(x:*), error:function(e:Error))
@@ -391,7 +391,10 @@ The publisher function can use `add`, `end`, and `error`:
 * `end()` - End the stream. Any later calls to `add`, `end`, or `error` will be no-ops.
 * `error(e)` - Signal that the stream has failed and cannot produce more events.
 
-Note that if you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
+**Important**
+
+* Pulling the `add`, `end`, and/or `error` functions out of the publisher closure is *not supported*.
+* If you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
 
 #### dispose
 
