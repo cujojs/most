@@ -393,8 +393,23 @@ The publisher function can use `add`, `end`, and `error`:
 
 **Important**
 
-* Pulling the `add`, `end`, and/or `error` functions out of the publisher closure is *not supported*.
 * If you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
+
+* Pulling the `add`, `end`, and/or `error` functions out of the publisher closure is *not supported*.
+
+```js
+// Unsupported:
+let emitEvent, emitEnd, emitError
+
+const stream = most.create((add, end, error) => {
+  emitEvent = add
+  emitEnd = end
+  emitError = error
+})
+
+emitEvent(123)
+emitEnd()
+```
 
 #### dispose
 
