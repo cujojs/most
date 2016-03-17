@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.18.3",
+  "version": "0.18.4",
   "description": "Monadic streams",
   "main": "most.js",
   "files": [
