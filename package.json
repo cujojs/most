@@ -42,5 +42,8 @@
     "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
     "webpack": "^1.10.1"
+  },
+  "dependencies": {
+    "@most/multicast": "^1.0.3"
   }
 }
