@@ -666,7 +666,7 @@ Stream.prototype.recoverWith = Stream.prototype.flatMapError = function(f) {
 //-----------------------------------------------------------------------
 // Multicasting
 
-var multicast = require('@most/multicast');
+var multicast = require('@most/multicast').default;
 
 exports.multicast = multicast;
 

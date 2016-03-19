@@ -57,3 +57,10 @@ describe('flatMapEnd', function() {
 		});
 	});
 });
+
+describe('multicast', function() {
+	it('should be a function', function() {
+		expect(typeof most.multicast).toBe('function');
+		expect(typeof most.Stream.prototype.multicast).toBe('function');
+	});
+});
