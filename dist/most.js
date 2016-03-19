@@ -722,7 +722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Multicasting
 
-	var multicast = __webpack_require__(16);
+	var multicast = __webpack_require__(16).default;
 
 	exports.multicast = multicast;
 
