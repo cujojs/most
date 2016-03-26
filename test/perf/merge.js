@@ -10,7 +10,7 @@ var highland = require('highland');
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
 
-// flatMapping n streams, each containing m items.
+// Merging n streams, each containing m items.
 // Results in a single stream that merges in n x m items
 // In Array parlance: Take an Array containing n Arrays, each of length m,
 // and flatten it to an Array of length n x m.
