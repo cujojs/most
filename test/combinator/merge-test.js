@@ -68,4 +68,3 @@ function toArray(s) {
 		return result.concat(x);
 	}, [], s);
 }
-
