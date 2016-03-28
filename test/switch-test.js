@@ -60,7 +60,7 @@ describe('switch', function() {
 			var i = 0;
 			var s = map(function() {
 				return constant(++i, periodic(10));
-			}, periodic(25));
+			}, periodic(27));
 
 			return sequenceEqual([1,1,1,2,2,2,3,3,3,4], take(10, switchLatest(s)));
 		});
