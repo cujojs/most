@@ -282,7 +282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Transducer support
 
-	var transduce = __webpack_require__(50);
+	var transduce = __webpack_require__(49);
 
 	exports.transduce = transduce.transduce;
 
@@ -298,7 +298,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// FlatMapping
 
-	var flatMap = __webpack_require__(51);
+	var flatMap = __webpack_require__(50);
 
 	exports.flatMap = exports.chain = flatMap.flatMap;
 	exports.join    = flatMap.join;
@@ -338,7 +338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return continueWith(f, this);
 	};
 
-	var concatMap = __webpack_require__(54).concatMap;
+	var concatMap = __webpack_require__(53).concatMap;
 
 	exports.concatMap = concatMap;
 
@@ -349,7 +349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Concurrent merging
 
-	var mergeConcurrently = __webpack_require__(52);
+	var mergeConcurrently = __webpack_require__(51);
 
 	exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
 
@@ -369,7 +369,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Merging
 
-	var merge = __webpack_require__(48);
+	var merge = __webpack_require__(54);
 
 	exports.merge = merge.merge;
 	exports.mergeArray = merge.mergeArray;
@@ -3624,14 +3624,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var core = __webpack_require__(3);
 	var Pipe = __webpack_require__(34);
 	var IndexSink = __webpack_require__(47);
-	var mergeSources = __webpack_require__(48).mergeSources;
 	var dispose = __webpack_require__(7);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(49);
+	var invoke = __webpack_require__(48);
 
 	var hasValue = IndexSink.hasValue;
 
-	//var map = base.map;
+	var map = base.map;
 	var tail = base.tail;
 
 	exports.combineArray = combineArray;
@@ -3658,8 +3657,36 @@ return /******/ (function(modules) { // webpackBootstrap
 		var l = streams.length;
 		return l === 0 ? core.empty()
 			 : l === 1 ? transform.map(f, streams[0])
-			 : new Stream(mergeSources(CombineSink, f, streams));
+			 : new Stream(combineSources(f, streams));
 	}
+
+	function combineSources(f, streams) {
+		return new Combine(f, map(getSource, streams))
+	}
+
+	function getSource(stream) {
+		return stream.source;
+	}
+
+	function Combine(f, sources) {
+		this.f = f;
+		this.sources = sources;
+	}
+
+	Combine.prototype.run = function(sink, scheduler) {
+		var l = this.sources.length;
+		var disposables = new Array(l);
+		var sinks = new Array(l);
+
+		var mergeSink = new CombineSink(disposables, sinks, sink, this.f);
+
+		for(var indexSink, i=0; i<l; ++i) {
+			indexSink = sinks[i] = new IndexSink(i, mergeSink);
+			disposables[i] = this.sources[i].run(indexSink, scheduler);
+		}
+
+		return dispose.all(disposables);
+	};
 
 	function CombineSink(disposables, sinks, sink, f) {
 		this.sink = sink;
@@ -3740,99 +3767,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 48 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Stream = __webpack_require__(1);
-	var Pipe = __webpack_require__(34);
-	var IndexSink = __webpack_require__(47);
-	var empty = __webpack_require__(3).empty;
-	var dispose = __webpack_require__(7);
-	var base = __webpack_require__(2);
-
-	var copy = base.copy;
-	var map = base.map;
-
-	exports.merge = merge;
-	exports.mergeArray = mergeArray;
-	exports.mergeSources = mergeSources;
-
-	/**
-	 * @returns {Stream} stream containing events from all streams in the argument
-	 * list in time order.  If two events are simultaneous they will be merged in
-	 * arbitrary order.
-	 */
-	function merge(/*...streams*/) {
-		return mergeArray(copy(arguments));
-	}
-
-	/**
-	 * @param {Array} streams array of stream to merge
-	 * @returns {Stream} stream containing events from all input observables
-	 * in time order.  If two events are simultaneous they will be merged in
-	 * arbitrary order.
-	 */
-	function mergeArray(streams) {
-	    var l = streams.length;
-	    return l === 0 ? empty()
-			 : l === 1 ? streams[0]
-			 : new Stream(mergeSources(MergeSink, void 0, streams));
-	}
-
-	function mergeSources(Sink, arg, streams) {
-		return new Merge(Sink, arg, map(getSource, streams))
-	}
-
-	function getSource(stream) {
-		return stream.source;
-	}
-
-	function Merge(Sink, arg, sources) {
-		this.Sink = Sink;
-		this.arg = arg;
-		this.sources = sources;
-	}
-
-	Merge.prototype.run = function(sink, scheduler) {
-		var l = this.sources.length;
-		var disposables = new Array(l);
-		var sinks = new Array(l);
-
-		var mergeSink = new this.Sink(disposables, sinks, sink, this.arg);
-
-		for(var indexSink, i=0; i<l; ++i) {
-			indexSink = sinks[i] = new IndexSink(i, mergeSink);
-			disposables[i] = this.sources[i].run(indexSink, scheduler);
-		}
-
-		return dispose.all(disposables);
-	};
-
-	function MergeSink(disposables, sinks, sink) {
-		this.sink = sink;
-		this.disposables = disposables;
-		this.activeCount = sinks.length;
-	}
-
-	MergeSink.prototype.error = Pipe.prototype.error;
-
-	MergeSink.prototype.event = function(t, indexValue) {
-		this.sink.event(t, indexValue.value);
-	};
-
-	MergeSink.prototype.end = function(t, indexedValue) {
-		dispose.tryDispose(t, this.disposables[indexedValue.index], this.sink);
-		if(--this.activeCount === 0) {
-			this.sink.end(t, indexedValue.value);
-		}
-	};
-
-
-/***/ },
-/* 49 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3857,7 +3791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3986,14 +3920,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
+	var mergeConcurrently = __webpack_require__(51).mergeConcurrently;
 	var map = __webpack_require__(41).map;
 
 	exports.flatMap = flatMap;
@@ -4022,7 +3956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4031,7 +3965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var dispose = __webpack_require__(7);
-	var LinkedList = __webpack_require__(53);
+	var LinkedList = __webpack_require__(52);
 
 	exports.mergeConcurrently = mergeConcurrently;
 
@@ -4136,7 +4070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 52 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4218,14 +4152,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
+	var mergeConcurrently = __webpack_require__(51).mergeConcurrently;
 	var map = __webpack_require__(41).map;
 
 	exports.concatMap = concatMap;
@@ -4247,6 +4181,108 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var Pipe = __webpack_require__(34);
+	var IndexSink = __webpack_require__(47);
+	var empty = __webpack_require__(3).empty;
+	var dispose = __webpack_require__(7);
+	var base = __webpack_require__(2);
+
+	var copy = base.copy;
+	var reduce = base.reduce;
+
+	exports.merge = merge;
+	exports.mergeArray = mergeArray;
+
+	/**
+	 * @returns {Stream} stream containing events from all streams in the argument
+	 * list in time order.  If two events are simultaneous they will be merged in
+	 * arbitrary order.
+	 */
+	function merge(/*...streams*/) {
+		return mergeArray(copy(arguments));
+	}
+
+	/**
+	 * @param {Array} streams array of stream to merge
+	 * @returns {Stream} stream containing events from all input observables
+	 * in time order.  If two events are simultaneous they will be merged in
+	 * arbitrary order.
+	 */
+	function mergeArray(streams) {
+	    var l = streams.length;
+	    return l === 0 ? empty()
+			 : l === 1 ? streams[0]
+			 : new Stream(mergeSources(streams));
+	}
+
+	/**
+	 * This implements fusion/flattening for merge.  It will
+	 * fuse adjacent merge operations.  For example:
+	 * - a.merge(b).merge(c) effectively becomes merge(a, b, c)
+	 * - merge(a, merge(b, c)) effectively becomes merge(a, b, c)
+	 * It does this by concatenating the sources arrays of
+	 * any nested Merge sources, in effect "flattening" nested
+	 * merge operations into a single merge.
+	 */
+	function mergeSources(streams) {
+		return new Merge(reduce(appendSources, [], streams))
+	}
+
+	function appendSources(sources, stream) {
+		var source = stream.source;
+		return source instanceof Merge
+			? sources.concat(source.sources)
+			: sources.concat(source)
+	}
+
+	function Merge(sources) {
+		this.sources = sources;
+	}
+
+	Merge.prototype.run = function(sink, scheduler) {
+		var l = this.sources.length;
+		var disposables = new Array(l);
+		var sinks = new Array(l);
+
+		var mergeSink = new MergeSink(disposables, sinks, sink);
+
+		for(var indexSink, i=0; i<l; ++i) {
+			indexSink = sinks[i] = new IndexSink(i, mergeSink);
+			disposables[i] = this.sources[i].run(indexSink, scheduler);
+		}
+
+		return dispose.all(disposables);
+	};
+
+	function MergeSink(disposables, sinks, sink) {
+		this.sink = sink;
+		this.disposables = disposables;
+		this.activeCount = sinks.length;
+	}
+
+	MergeSink.prototype.error = Pipe.prototype.error;
+
+	MergeSink.prototype.event = function(t, indexValue) {
+		this.sink.event(t, indexValue.value);
+	};
+
+	MergeSink.prototype.end = function(t, indexedValue) {
+		dispose.tryDispose(t, this.disposables[indexedValue.index], this.sink);
+		if(--this.activeCount === 0) {
+			this.sink.end(t, indexedValue.value);
+		}
+	};
+
+
+/***/ },
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -4258,7 +4294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Pipe = __webpack_require__(34);
 	var dispose = __webpack_require__(7);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(49);
+	var invoke = __webpack_require__(48);
 
 	exports.sample = sample;
 	exports.sampleWith = sampleWith;
@@ -4378,7 +4414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var IndexSink = __webpack_require__(47);
 	var dispose = __webpack_require__(7);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(49);
+	var invoke = __webpack_require__(48);
 	var Queue = __webpack_require__(57);
 
 	var map = base.map;
@@ -4584,7 +4620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Stream = __webpack_require__(1);
 	var MulticastSource = __webpack_require__(16).MulticastSource;
 	var until = __webpack_require__(59).takeUntil;
-	var mergeConcurrently = __webpack_require__(52).mergeConcurrently;
+	var mergeConcurrently = __webpack_require__(51).mergeConcurrently;
 	var map = __webpack_require__(41).map;
 
 	exports.switch = switchLatest;
@@ -4617,7 +4653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Stream = __webpack_require__(1);
 	var Pipe = __webpack_require__(34);
 	var dispose = __webpack_require__(7);
-	var join = __webpack_require__(51).join;
+	var join = __webpack_require__(50).join;
 	var noop = __webpack_require__(2).noop;
 
 	exports.during    = during;
