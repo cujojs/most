@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "eslint . && buster-test",
-    "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c 'warnings=false' -m -o dist/most.min.js",
+    "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
     "preversion": "npm run build"
   },
   "repository": {
