@@ -639,7 +639,7 @@ var numbers = most.iterate(function(x) {
 // [2,3,4]
 // ... etc ...
 numbers.scan(function(slidingWindow, x) {
-	return slidingWindow.concat(x).slice(-10);
+	return slidingWindow.concat(x).slice(-3);
 }, [])
 	.forEach(console.log.bind(console));
 ```
