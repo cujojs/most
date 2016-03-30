@@ -88,6 +88,37 @@ lodash       17.67 op/s ±  2.62%   (35 samples)
 Array        14.16 op/s ±  2.01%   (39 samples)
 -------------------------------------------------------
 
+> most-perf@0.10.0 merge-nested /Users/brian/Projects/cujojs/most/test/perf
+> node ./merge-nested.js
+merge nested streams w/depth 2, 5, 10, 100 (10000 items in each stream)
+-------------------------------------------------------
+most (depth 2)     9234.43 op/s ±  1.26%   (81 samples)
+most (depth 5)     4948.00 op/s ±  0.88%   (84 samples)
+most (depth 10)    2758.31 op/s ±  0.84%   (82 samples)
+most (depth 100)    235.47 op/s ±  0.95%   (81 samples)
+most (depth 1000)    21.14 op/s ±  1.26%   (52 samples)
+most (depth 10000)    1.05 op/s ±  1.51%   (10 samples)
+rx 4 (depth 2)       40.35 op/s ±  1.23%   (35 samples)
+rx 4 (depth 5)       14.83 op/s ±  0.91%   (37 samples)
+rx 4 (depth 10)       6.20 op/s ±  0.78%   (19 samples)
+rx 4 (depth 100)      0.14 op/s ±  1.73%    (5 samples)
+rx 5 (depth 2)      894.07 op/s ±  1.52%   (42 samples)
+rx 5 (depth 5)      350.03 op/s ±  1.51%   (43 samples)
+rx 5 (depth 10)     142.71 op/s ±  1.65%   (43 samples)
+rx 5 (depth 100)      2.30 op/s ±  0.91%   (10 samples)
+kefir (depth 2)     354.40 op/s ±  2.14%   (45 samples)
+kefir (depth 5)     120.46 op/s ±  1.81%   (42 samples)
+kefir (depth 10)     46.48 op/s ±  0.96%   (39 samples)
+kefir (depth 100)     0.63 op/s ±  5.42%    (6 samples)
+bacon (depth 2)      24.48 op/s ±  6.20%   (33 samples)
+bacon (depth 5)      10.63 op/s ±  1.80%   (29 samples)
+bacon (depth 10)      4.51 op/s ±  1.56%   (15 samples)
+bacon (depth 100)     0.09 op/s ±  5.30%    (5 samples)
+highland (depth 2)    2.64 op/s ±  4.23%   (11 samples)
+highland (depth 5)    2.79 op/s ±  3.46%   (11 samples)
+highland (depth 10)    0.24 op/s ±  2.58%    (5 samples)
+-------------------------------------------------------
+
 > most-perf@0.10.0 zip /Users/brian/Projects/cujojs/most/test/perf
 > node ./zip.js
 

@@ -9,6 +9,7 @@
     "filter-map-reduce": "node ./filter-map-reduce",
     "flatMap": "node ./flatMap.js",
     "merge": "node ./merge.js",
+    "merge-nested": "node ./merge-nested.js",
     "scan": "node ./scan.js",
     "skipRepeats": "node ./skipRepeats.js",
     "zip": "node ./zip.js",
