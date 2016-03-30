@@ -25,7 +25,7 @@ most-perf@0.10.0 /Users/brian/Projects/cujojs/most/test/perf
 
 ```
 > node --version
-v5.5.0
+v5.9.0
 
 > npm start
 
