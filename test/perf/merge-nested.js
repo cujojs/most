@@ -68,14 +68,14 @@ suite
 		var s = merge(100, most.from);
 		runners.runMost(deferred, s.reduce(sum, 0));
 	}, options)
-	.add('most (depth 1000)', function(deferred) {
-		var s = merge(1000, most.from);
-		runners.runMost(deferred, s.reduce(sum, 0));
-	}, options)
-	.add('most (depth 10000)', function(deferred) {
-		var s = merge(10000, most.from);
-		runners.runMost(deferred, s.reduce(sum, 0));
-	}, options)
+	// .add('most (depth 1000)', function(deferred) {
+	// 	var s = merge(1000, most.from);
+	// 	runners.runMost(deferred, s.reduce(sum, 0));
+	// }, options)
+	// .add('most (depth 10000)', function(deferred) {
+	// 	var s = merge(10000, most.from);
+	// 	runners.runMost(deferred, s.reduce(sum, 0));
+	// }, options)
 	.add('rx 4 (depth 2)', function(deferred) {
 		var s = merge(2, rx.Observable.fromArray);
 		runners.runRx(deferred, s.reduce(sum, 0));
