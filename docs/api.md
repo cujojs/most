@@ -324,6 +324,8 @@ When passing an EventTarget, you can provide `useCapture` as the 3rd parameter, 
 
 When the stream ends (for example, by using [take](#take), [takeUntil](#until), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
 
+When source event has more than one argument, all the arguments will be agregated into array in resulting Stream.
+
 Note on EventEmitter: EventEmitters and EventTargets, such as DOM nodes, behave differently in that EventEmitter allows events to be delivered in the same tick as a listener is added.  When using EventEmitter, `most.fromEvent`, will *ensure asynchronous event delivery*, thereby preventing hazards of "maybe sync, maybe async" (aka zalgo) event delivery.
 
 ```js
