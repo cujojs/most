@@ -8,12 +8,12 @@ declare interface Thenable<A> {
 }
 
 declare interface Promise<A> {
-	constructor(callback: (resolve : (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
+  constructor(callback: (resolve: (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
 
   then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
   then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
 
-	catch<U>(onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  catch<U>(onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
 }
 
 declare interface Generator<A, B, C> {}
@@ -44,7 +44,10 @@ export interface Stream<A> {
   concatMap<B>(f: (a: A) => Stream<B>): Stream<B>;
   mergeConcurrently<B>(concurrency: number): Stream<B>;
   merge(...ss: Array<Stream<A>>): Stream<A>;
+  mergeArray(streams: Array<Stream<A>>): Stream<A>;
   combine<B>(f: (a: A, ...args: Array<any>) => B, ...ss: Array<Stream<any>>): Stream<B>;
+  combineArray<B>(f: (...args: Array<any>) => B, streams: Array<Stream<any>>): Stream<B>;
+
 
   scan<B>(f: (b: B, a: A) => B, b: B): Stream<B>;
   loop<S, B>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S): Stream<B>;
@@ -90,11 +93,14 @@ declare interface DisposeFn {
   (): void|Promise<any>;
 }
 
-export function create<A>(f: (add: (a:A) => any, end: (x:any) => any, error: (e:Error) => any) => void|DisposeFn): Stream<A>;
+export function create<A>(f: (add: (a: A) => any, end: (x: any) => any, error: (e: Error) => any) => void|DisposeFn): Stream<A>;
 export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
+export function empty(): Stream<any>;
+export function never(): Stream<any>;
 export function from<A>(as: Iterable<A>): Stream<A>;
 export function periodic<A>(period: number, a?: A): Stream<A>;
+export function fromEvent(event: string, target: any, useCapture?: boolean): Stream<Event>;
 
 export function unfold<A, B, S>(f: (seed: S) => SeedValue<S, B|Promise<B>>, seed: S): Stream<B>;
 export function iterate<A>(f: (a: A) => A|Promise<A>, a: A): Stream<A>;
@@ -118,7 +124,9 @@ export function continueWith<A>(f: (a: any) => Stream<A>, s: Stream<A>): Stream<
 export function concatMap<A, B>(f: (a: A) => Stream<B>, s: Stream<A>): Stream<B>;
 export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>): Stream<A>;
 export function merge<A>(...ss: Array<Stream<A>>): Stream<A>;
+export function mergeArray<A>(streams: Array<Stream<A>>): Stream<A>;
 export function combine<A>(f: (...args: Array<any>) => A, ...ss: Array<Stream<any>>): Stream<A>;
+export function combineArray<A>(f: (...args: Array<any>) => A, streams: Array<Stream<any>>): Stream<A>;
 
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
 export function loop<A, B, S>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S, s: Stream<A>): Stream<B>;
