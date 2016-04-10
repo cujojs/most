@@ -328,7 +328,7 @@ When the stream ends (for example, by using [take](#take), [takeUntil](#until), 
 
 **Notes on EventEmitter**
 
-1. When source event has more than one argument, all the arguments will be aggregated into array in resulting Stream. 
+1. When source event has more than one argument, all the arguments will be aggregated into array in resulting Stream.
 2. EventEmitters and EventTargets, such as DOM nodes, behave differently in that EventEmitter allows events to be delivered in the same tick as a listener is added.  When using EventEmitter, `most.fromEvent`, will *ensure asynchronous event delivery*, thereby preventing hazards of "maybe sync, maybe async" (aka zalgo) event delivery.
 
 ```js
@@ -337,7 +337,7 @@ var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 
 ```js
 // We can do some event delegation by applying a filter to the stream
-// in conjunction with e.target.matches this will allow only events with 
+// in conjunction with e.target.matches this will allow only events with
 // .the-button class to be processed
 var container = document.querySelector('.container');
 most.fromEvent('click', container);
@@ -714,6 +714,8 @@ most.periodic(1000, 'x')
 
 Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.
 
+The mapping function `f` is applied *lazily*.  That is, `f` is called only once it is time to concatenate a new stream.
+
 `function f(x) -> Stream`
 
 ```
@@ -722,6 +724,7 @@ f(a):                 1--2--3|
 f(b):                      1----2----3|
 f(c):                             1-2-3|
 stream.concatMap(f): -1--2--31----2----31-2-3|
+f called lazily:      ^      ^          ^
 ```
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
