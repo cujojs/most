@@ -55,6 +55,23 @@ describe('concatMap', function() {
 			});
 	});
 
+	it('should map lazily', function() {
+		var s1 = te.atTimes([{ time: 0, value: 0 }, { time: 1, value: 1 }]);
+
+		var env = te.ticks(4);
+		var s = concatMap.concatMap(function(x) {
+			return te.atTimes([{ time: 2, value: env.scheduler.now() }]);
+		}, s1)
+
+		return te.collectEvents(s, env)
+			.then(function(events) {
+				expect(events).toEqual([
+					{ time: 2, value: 0 },
+					{ time: 4, value: 2 }
+				]);
+			});
+	})
+
 	it('should dispose outer stream', function() {
 		var dispose = this.spy();
 		var inner = streamOf(sentinel);
