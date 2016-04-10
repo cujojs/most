@@ -51,7 +51,7 @@ suite
 		runners.runRx(deferred, rx.Observable.merge.apply(void 0, streams).reduce(sum, 0));
 	}, options)
 	.add('rx 5', function(deferred) {
-		var streams = a.map(function(x) {return rxjs.Observable.fromArray(x)});
+		var streams = a.map(function(x) {return rxjs.Observable.from(x)});
 		runners.runRx5(deferred,
 			rxjs.Observable.merge.apply(rxjs.Observable, streams).reduce(sum, 0))
 	}, options)

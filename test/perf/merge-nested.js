@@ -93,19 +93,19 @@ suite
 		runners.runRx(deferred, s.reduce(sum, 0));
 	}, options)
 	.add('rx 5 (depth 2)', function(deferred) {
-		var s = merge(2, function(x) {return rxjs.Observable.fromArray(x)});
+		var s = merge(2, function(x) {return rxjs.Observable.from(x)});
 		runners.runRx5(deferred, s.reduce(sum, 0));
 	}, options)
 	.add('rx 5 (depth 5)', function(deferred) {
-		var s = merge(5, function(x) {return rxjs.Observable.fromArray(x)});
+		var s = merge(5, function(x) {return rxjs.Observable.from(x)});
 		runners.runRx5(deferred, s.reduce(sum, 0));
 	}, options)
 	.add('rx 5 (depth 10)', function(deferred) {
-		var s = merge(10, function(x) {return rxjs.Observable.fromArray(x)});
+		var s = merge(10, function(x) {return rxjs.Observable.from(x)});
 		runners.runRx5(deferred, s.reduce(sum, 0));
 	}, options)
 	.add('rx 5 (depth 100)', function(deferred) {
-		var s = merge(100, function(x) {return rxjs.Observable.fromArray(x)});
+		var s = merge(100, function(x) {return rxjs.Observable.from(x)});
 		runners.runRx5(deferred, s.reduce(sum, 0));
 	}, options)
 	.add('kefir (depth 2)', function(deferred) {
