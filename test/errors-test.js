@@ -37,7 +37,7 @@ describe('recoverWith', function() {
 
 	});
 
-	it('should recover from errors before recoverError', function() {
+	it('should recover from errors before recoverWith', function() {
 		var s = map(function() {
 			throw new Error();
 		}, just(other));
@@ -49,9 +49,8 @@ describe('recoverWith', function() {
 		}, s));
 	});
 
-	it('should not recover from errors after recoverError', function() {
-		var s = error.recoverWith(function() {
-			console.log('here');
+	it('should not recover from errors after recoverWith', function() {
+		var s = error.recoverWith(function(e) {
 			throw other;
 		}, just(123));
 
