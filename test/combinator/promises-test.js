@@ -63,4 +63,14 @@ describe('fromPromise', function() {
 			});
 	});
 
+	it('should be recoverable if promise rejects', function() {
+		var s = promises.fromPromise(Promise.reject())
+			.recoverWith(function() {
+				return promises.fromPromise(Promise.resolve(sentinel));
+			});
+
+		return observe(function(x) {
+			expect(x).toBe(sentinel)
+		}, s);
+	})
 });
