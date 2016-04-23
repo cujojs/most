@@ -9,7 +9,7 @@ describe('slice', function() {
 	it('should fuse adjacent take, skip, slice', function() {
 		var s = slice.skip(2, slice.slice(1, 10, slice.take(5, fromArray([1]))));
 		expect(s.source.skip).toBe(3);
-		expect(s.source.take).toBe(5);
+		expect(s.source.take).toBe(2);
 		expect(s.source.constructor).not.toBe(s.source.source.constructor);
 	});
 
