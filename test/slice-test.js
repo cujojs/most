@@ -6,15 +6,29 @@ var fromArray = require('../lib/source/fromArray').fromArray;
 var reduce = require('../lib/combinator/accumulate').reduce;
 
 describe('slice', function() {
-	it('should skip first n elements', function () {
-		var a = [1, 1, 1, 1, 1, 1, 1];
+	describe('should narrow', function() {
+		it('when second slice is smaller', function() {
+			var s = slice.slice(1, 5, slice.slice(1, 10, fromArray([1])));
+			expect(s.source.skip).toBe(2);
+			expect(s.source.take).toBe(5);
+		});
+
+		it('when second slice is larger', function() {
+			var s = slice.slice(1, 10, slice.slice(1, 5, fromArray([1])));
+			expect(s.source.skip).toBe(2);
+			expect(s.source.take).toBe(3);
+		});
+	});
+
+	it('should retain only sliced range', function () {
+		var a = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 		var s = slice.slice(2, a.length-2, fromArray(a));
 
-		return reduce(function (count) {
-			return count + 1;
-		}, 0, s)
-			.then(function (count) {
-				expect(count).toBe(a.length - 4);
+		return reduce(function (a, x) {
+			return a.concat(x);
+		}, [], s)
+			.then(function (result) {
+				expect(result).toEqual(a.slice(2, a.length-2))
 			});
 	});
 });
