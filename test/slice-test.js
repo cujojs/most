@@ -6,6 +6,13 @@ var fromArray = require('../lib/source/fromArray').fromArray;
 var reduce = require('../lib/combinator/accumulate').reduce;
 
 describe('slice', function() {
+	it('should fuse adjacent take, skip, slice', function() {
+		var s = slice.skip(2, slice.slice(1, 10, slice.take(5, fromArray([1]))));
+		expect(s.source.skip).toBe(3);
+		expect(s.source.take).toBe(5);
+		expect(s.source.constructor).not.toBe(s.source.source.constructor);
+	});
+
 	it('should skip first n elements', function () {
 		var a = [1, 1, 1, 1, 1, 1, 1];
 		var s = slice.slice(2, a.length-2, fromArray(a));
