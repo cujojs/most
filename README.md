@@ -1,3 +1,11 @@
+```
+________________________________
+___   |/  /_  __ \_  ___/__  __/
+__  /|_/ /_  / / /____ \__  /   
+_  /  / / / /_/ /____/ /_  /    
+/_/  /_/  \____/______/ /_/
+```
+
 [![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
 
 # Monadic streams for reactive programming
