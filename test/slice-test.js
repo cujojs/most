@@ -9,14 +9,14 @@ describe('slice', function() {
 	describe('should narrow', function() {
 		it('when second slice is smaller', function() {
 			var s = slice.slice(1, 5, slice.slice(1, 10, fromArray([1])));
-			expect(s.source.skip).toBe(2);
-			expect(s.source.take).toBe(5);
+			expect(s.source.min).toBe(2);
+			expect(s.source.max).toBe(4);
 		});
 
 		it('when second slice is larger', function() {
 			var s = slice.slice(1, 10, slice.slice(1, 5, fromArray([1])));
-			expect(s.source.skip).toBe(2);
-			expect(s.source.take).toBe(3);
+			expect(s.source.min).toBe(2);
+			expect(s.source.max).toBe(5);
 		});
 	});
 
