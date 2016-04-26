@@ -3,7 +3,7 @@
 /** @author John Hann */
 
 var Stream = require('./lib/Stream');
-var base = require('./lib/base');
+var base = require('@most/prelude');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
