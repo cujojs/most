@@ -10,10 +10,12 @@
     "flatMap": "node ./flatMap.js",
     "merge": "node ./merge.js",
     "merge-nested": "node ./merge-nested.js",
+    "sample": "node ./sample.js",
     "scan": "node ./scan.js",
+    "slice": "node ./slice.js",
     "skipRepeats": "node ./skipRepeats.js",
     "zip": "node ./zip.js",
-    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run zip && npm run scan && npm run skipRepeats"
+    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run zip && npm run sample && npm run scan && npm run slice && npm run skipRepeats"
   },
   "dependencies": {
     "@reactivex/rxjs": "5.0.0-beta.4",
