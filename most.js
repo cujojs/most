@@ -7,7 +7,7 @@ var base = require('@most/prelude');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
-
+var $$observable = require('symbol-observable');
 /**
  * Core stream type
  * @type {Stream}
@@ -677,4 +677,44 @@ exports.multicast = multicast;
  */
 Stream.prototype.multicast = function() {
 	return multicast(this);
+};
+
+Stream.prototype[$$observable] = function () {
+	var self = this;
+	return {
+		subscribe: function (observer) {
+			var isDisposed = false;
+			var kill;
+			var unsubscribe = function () {
+				isDisposed = true;
+				if (kill) {
+					kill();
+				}
+			};
+
+			var promise = self
+				// HACK: Brian, I'm not really sure what to do to get
+				// the cancellation semantic here. How is this?
+				.takeUntil(create.create(function (add, end, error) {
+					if (isDisposed) {
+						add();
+					} else {
+						kill = add;
+					}
+				}))
+				.observe(function (value) {
+					observer.next && observer.next(value);
+				});
+
+			promise.then(function (completionValue) {
+				observer.complete && observer.complete(completionValue);
+			}, function (err) {
+				observer.error && observer.error(err);
+			});
+
+			return {
+				unsubscribe: unsubscribe
+			};
+		}
+	};
 };
