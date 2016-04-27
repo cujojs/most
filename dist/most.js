@@ -4691,6 +4691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Sink = __webpack_require__(33);
 	var core = __webpack_require__(3);
 	var dispose = __webpack_require__(7);
+	var Map = __webpack_require__(41);
 
 	exports.take = take;
 	exports.skip = skip;
@@ -4729,28 +4730,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function sliceSource(start, end, source) {
-		if(source instanceof Slice) {
-			var s = start + source.skip;
-			var e = Math.min(s + end, source.skip + source.take);
-			return new Slice(s, e, source.source);
-		}
-		return new Slice(start, end, source);
+		return source instanceof Map ? commuteMapSlice(start, end, source)
+			: source instanceof Slice ? fuseSlice(start, end, source)
+			: new Slice(start, end, source);
+	}
+
+	function commuteMapSlice(start, end, source) {
+		return Map.create(source.f, sliceSource(start, end, source.source))
+	}
+
+	function fuseSlice(start, end, source) {
+		start += source.min;
+		end = Math.min(end + source.min, source.max);
+		return new Slice(start, end, source.source);
 	}
 
 	function Slice(min, max, source) {
-		this.skip = min;
-		this.take = max - min;
 		this.source = source;
+		this.min = min;
+		this.max = max;
 	}
 
 	Slice.prototype.run = function(sink, scheduler) {
-		return new SliceSink(this.skip, this.take, this.source, sink, scheduler);
+		return new SliceSink(this.min, this.max - this.min, this.source, sink, scheduler);
 	};
 
 	function SliceSink(skip, take, source, sink, scheduler) {
+		this.sink = sink;
 		this.skip = skip;
 		this.take = take;
-		this.sink = sink;
 		this.disposable = dispose.once(source.run(this, scheduler));
 	}
 
