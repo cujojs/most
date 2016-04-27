@@ -6,6 +6,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var lazy = require('lazy.js');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -65,6 +66,9 @@ suite
 	.add('lodash', function() {
 		return lodashFlatMap(identity, a).reduce(sum, 0);
 	})
+	.add('lazy', function() {
+		return lazyFlatMap(identity, a).reduce(sum, 0);
+	})
 	.add('Array', function() {
 		return arrayFlatMap(identity, a).reduce(sum, 0);
 	});
@@ -79,6 +83,10 @@ function arrayFlatMap(f, a) {
 
 function lodashFlatMap(f, a) {
 	return lodash(a).map(f).flatten();
+}
+
+function lazyFlatMap(f, a) {
+	return lazy(a).map(f).flatten();
 }
 
 function sum(x, y) {
