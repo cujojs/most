@@ -8,9 +8,10 @@
     "lib/**/*.js"
   ],
   "scripts": {
-    "test": "eslint . && buster-test",
+    "test": "eslint . && buster-test && npm run doctest",
     "build": "webpack --output-library most --output-library-target umd ./most.js --output-filename dist/most.js && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
-    "preversion": "npm run build"
+    "preversion": "npm run build",
+    "doctest": "markdown-doctest"
   },
   "repository": {
     "type": "git",
@@ -39,9 +40,13 @@
   "devDependencies": {
     "buster": "~0.7",
     "eslint": "^1.10.3",
+    "jsdom": "^8.4.0",
+    "markdown-doctest": "^0.3.3",
+    "rest": "^1.3.2",
     "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
-    "webpack": "^1.12.14"
+    "webpack": "^1.12.14",
+    "when": "^3.7.7"
   },
   "dependencies": {
     "@most/multicast": "^1.0.3",

@@ -4,6 +4,7 @@
 
 Consider the following statement:
 
+<!-- skip-example -->
 ```js
 var x = a + b;
 ```
