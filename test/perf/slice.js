@@ -31,7 +31,7 @@ var t = n * 0.5;
 
 suite
 	.add('most', function(deferred) {
-		runners.runMost(deferred, most.from(a).skip(s).take(t).map(add1).reduce(sum, 0));
+		runners.runMost(deferred, most.from(a).skip(s).take(t).reduce(sum, 0));
 	}, options)
 	.add('rx 4', function(deferred) {
 		runners.runRx(deferred, rx.Observable.fromArray(a).skip(s).take(t).reduce(sum, 0));
