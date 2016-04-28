@@ -1,5 +1,4 @@
 var most = require(__dirname);
-var jsdom = require('jsdom');
 var path = require('path');
 var fs = require('fs');
 
@@ -13,20 +12,6 @@ if (fs.existsSync(path.join(__dirname, '/node_modules/babel'))) {
 // needed for regeneratorRuntime
 require(path.join(__dirname, babelPath, 'polyfill'));
 
-var html = [
-  '<head></head>',
-  '<body>',
-    '<form></form>',
-    '<div class="the-button"></div>',
-    '<div class="button"></div>',
-    '<div class="container"></div>',
-    '<input class="x">',
-    '<input class="y">',
-    '<input name="search-text">',
-    '<div class="result">',
-  '</body>'
-].join('\n');
-
 function noop () {};
 
 module.exports = {
@@ -36,8 +21,21 @@ module.exports = {
 
   globals: {
     most: most,
+
     regeneratorRuntime: regeneratorRuntime,
-    document: jsdom.jsdom(html),
+
+    document: {
+      addEventListener: noop,
+      removeEventListener: noop,
+
+      querySelector: function () {
+        return {
+          addEventListener: noop,
+          removeEventListener: noop
+        }
+      }
+    },
+
     exports: {},
 
     doSomething: noop,
