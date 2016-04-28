@@ -40,7 +40,7 @@
   "devDependencies": {
     "buster": "~0.7",
     "eslint": "^1.10.3",
-    "markdown-doctest": "^0.3.3",
+    "markdown-doctest": "^0.3.4",
     "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
     "webpack": "^1.12.14"
