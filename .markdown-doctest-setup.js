@@ -1,7 +1,17 @@
-var most = require('.');
+var most = require(__dirname);
 var jsdom = require('jsdom');
+var path = require('path');
+var fs = require('fs');
 
-require(__dirname + "/node_modules/markdown-doctest/node_modules/babel/polyfill");
+// because npm 3 flattens modules
+if (fs.existsSync(path.join(__dirname, '/node_modules/babel'))) {
+  var babelPath = '/node_modules/babel';
+} else {
+  var babelPath = '/node_modules/markdown-doctest/node_modules/babel';
+}
+
+// needed for regeneratorRuntime
+require(path.join(__dirname, babelPath, 'polyfill'));
 
 var html = [
   '<head></head>',
