@@ -28,6 +28,7 @@ most.fromEvent('click', container)
     });
 ```
 
+<!-- skip-example -->
 ```js
 var $ = require('jquery');
 var container = $(".parent");

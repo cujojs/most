@@ -237,6 +237,7 @@ most.iterate(function(x) {
 
 The iterating function may return a promise.  This allows `most.iterate` to be used to build asynchronous streams of future values.  For example:
 
+<!-- skip-example -->
 ```js
 var when = require('when');
 // An infinite stream of all integers >= 0, each delayed by 1 more
@@ -269,6 +270,7 @@ The unfolding function accepts a seed value and must return a tuple: `{value:*, 
 
 Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
+<!-- skip-example -->
 ```js
 var rest = require('rest');
 var urlPrefix = 'product/';
@@ -340,7 +342,7 @@ var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 // in conjunction with e.target.matches this will allow only events with
 // .the-button class to be processed
 var container = document.querySelector('.container');
-most.fromEvent('click', container);
+most.fromEvent('click', container)
 	.filter(function(e){
     	return e.target.matches('.the-button');
 	})
@@ -402,6 +404,7 @@ The publisher function can use `add`, `end`, and `error`:
 
 * Pulling the `add`, `end`, and/or `error` functions out of the publisher closure is *not supported*.
 
+<!-- skip-example -->
 ```js
 // Unsupported:
 let emitEvent, emitEnd, emitError
@@ -479,6 +482,7 @@ stream
 
 Create a new stream containing `x` followed by all events in `stream`.
 
+<!-- skip-example -->
 ```js
 stream:              a-b-c-d->
 stream.startWith(x): xa-b-c-d->
@@ -491,6 +495,7 @@ stream.startWith(x): xa-b-c-d->
 
 Create a new stream containing all events in `stream1` followed by all events in `stream2`.
 
+<!-- skip-example -->
 ```js
 stream1:                 -a-b-c|
 stream2:                 -d-e-f->
@@ -534,6 +539,7 @@ stream.recoverWith(f): -a-b-c-d-e-f->
 
 When a stream fails with an error, the error will be passed to `f`.  `f` must return a new stream to replace the error.
 
+<!-- skip-example -->
 ```js
 var rest = require('rest');
 
@@ -555,6 +561,7 @@ stream.map(JSON.parse)
 
 Create a stream in the error state.  This can be useful for functions that need to return a stream, but need to signal an error.
 
+<!-- skip-example -->
 ```js
 most.throwError(X): X
 ```
@@ -627,6 +634,7 @@ most.from(['a', 'b', 'c', 'd'])
 	.forEach(console.log.bind(console));
 ```
 
+<!-- skip-example -->
 ```js
 // Maintain a sliding window of (up to) 3 values in an array
 
@@ -669,6 +677,7 @@ stream.chain(f):   -1--2-13---2-1-233|
 
 Note the difference between [`concatMap`](#concatmap) and [`chain`](#chain): `concatMap` concatenates, while `chain` merges.
 
+<!-- skip-example -->
 ```js
 // Logs: 1 2 1 1 2 1 1 2 2 2
 most.from([1, 2])
@@ -695,6 +704,7 @@ stream.continueWith(f): -a-b-c-d-1-2-3-4-5->
 ```
 
 
+<!-- skip-example -->
 ```js
 most.periodic(1000, 'x')
     .take(4)
@@ -729,6 +739,7 @@ f called lazily:      ^      ^          ^
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
 
+<!-- skip-example -->
 ```js
 // Logs: 1 1 1 1 1 2 2 2 2 2
 most.from([1, 2])
@@ -986,7 +997,7 @@ If `startSignal` is empty or never emits an event, then the returned stream will
 ```js
 // Start logging mouse events when the user clicks.
 most.fromEvent('mousemove', document)
-	.since(most.fromEvent('click', document)
+	.since(most.fromEvent('click', document))
 	.forEach(console.log.bind(console));
 ```
 
@@ -1252,7 +1263,7 @@ var click = most.fromEvent('click', document.querySelector('.button'));
 var resultStream = click.sample(add, xStream, yStream);
 
 var resultNode = document.querySelector('.result');
-result.observe(function(z) {
+resultStream.observe(function(z) {
 	resultNode.textContent = z;
 });
 ```
@@ -1411,6 +1422,7 @@ stream:         -p---q---r->
 stream.await(): ---1--X
 ```
 
+<!-- skip-example -->
 ```js
 var urls = [url1, url2, url3, ...];
 
