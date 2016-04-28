@@ -2,24 +2,55 @@ declare type SeedValue<S, V> = { seed: S, value: V };
 declare type TimeValue<V>    = { time: number, value: V };
 
 declare interface Thenable<A> {
-    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Thenable<U>;
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => U | Thenable<U>): Thenable<U>;
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => void): Thenable<U>;
     catch<U>(onAejected?: (error: any) => U | Thenable<U>): Thenable<U>;
 }
 
 declare interface Promise<A> {
   constructor(callback: (resolve: (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
 
-  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
-  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => void): Promise<U>;
 
-  catch<U>(onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  catch<U>(onBejected?: (error: any) => U | Thenable<U>): Promise<U>;
 }
 
 declare interface Generator<A, B, C> {}
 declare interface Iterable<A> {}
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
+
+declare interface PolymorphicFunction {
+  <A1, A2, B>(v1: A1, v2: A2): B;
+  <A1, A2, A3, B>(v1: A1, v2: A2, v3: A3): B;
+  <A1, A2, A3, A4, B>(v1: A1, v2: A2, v3: A3, v4: A4): B;
+  <A1, A2, A3, A4, A5, B>(v1: A1, v2: A2, v3: A3, v4: A4, v5: A5): B;
+  <A1, A2, A3, A4, A5, A6, B>(v1: A1, v2: A2, v3: A3, v4: A4, v5: A5, v6: A6): B;
+  <B>(...values: Array<any>): B;
+}
+
+declare interface PolymorphicSignature {
+  <A1, A2, B>(
+    project: (a1: A1, a2: A2) => B,
+    stream2: Stream<A2>): Stream<B>;
+  <A1, A2, A3, B>(
+    project: (a1: A1, a2: A2, a3: A3) => B,
+    stream2: Stream<A2>,
+    stream3: Stream<A3>): Stream<B>;
+  <A1, A2, A3, A4, B>(
+    project: (a1: A1, a2: A2, a3: A3, a4: A4) => B,
+    stream2: Stream<A2>,
+    stream3: Stream<A3>,
+    stream4: Stream<A4>): Stream<B>;
+  <A1, A2, A3, A4, A5, B>(
+    project: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => B,
+    stream2: Stream<A2>,
+    stream3: Stream<A3>,
+    stream4: Stream<A4>,
+    stream5: Stream<A5>): Stream<B>;
+  <B>(project: (...args: Array<any>) => B, ...streams: Array<Stream<any>>): Stream<B>;
+}
 
 export interface Stream<A> {
   reduce<B>(f: (b: B, a: A) => B, b: B): Promise<B>;
@@ -45,7 +76,7 @@ export interface Stream<A> {
   mergeConcurrently<B>(concurrency: number): Stream<B>;
   merge(...ss: Array<Stream<A>>): Stream<A>;
   mergeArray(streams: Array<Stream<A>>): Stream<A>;
-  combine<B>(f: (a: A, ...args: Array<any>) => B, ...ss: Array<Stream<any>>): Stream<B>;
+  combine: PolymorphicSignature;
   combineArray<B>(f: (...args: Array<any>) => B, streams: Array<Stream<any>>): Stream<B>;
 
 
@@ -57,8 +88,8 @@ export interface Stream<A> {
   startWith(a: A): Stream<A>;
 
   filter(p: (a: A) => boolean): Stream<A>;
-  skipRepeats(): Stream<A>;
-  skipRepeatsWith(eq: (a1: A, a2: A) => boolean): Stream<A>;
+  skipBepeats(): Stream<A>;
+  skipBepeatsWith(eq: (a1: A, a2: A) => boolean): Stream<A>;
 
   take(n: number): Stream<A>;
   skip(n: number): Stream<A>;
@@ -82,8 +113,8 @@ export interface Stream<A> {
 
   sample<B>(f: (...as: any[]) => B, ...ss: Array<Stream<any>>): Stream<B>;
   sampleWith<A>(sampler: Stream<any>): Stream<A>;
-
-  zip<A>(f: (a: A, ...as: any[]) => A, ...ss: Array<Stream<any>>): Stream<A>;
+  
+  zip: PolymorphicSignature;
 
   recoverWith<B>(p: (a: B) => A): Stream<A>;
   multicast<A>(): Stream<A>;
@@ -123,9 +154,10 @@ export function switchLatest<A>(s: Stream<Stream<A>>): Stream<A>;
 export function continueWith<A>(f: (a: any) => Stream<A>, s: Stream<A>): Stream<A>;
 export function concatMap<A, B>(f: (a: A) => Stream<B>, s: Stream<A>): Stream<B>;
 export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>): Stream<A>;
+
 export function merge<A>(...ss: Array<Stream<A>>): Stream<A>;
 export function mergeArray<A>(streams: Array<Stream<A>>): Stream<A>;
-export function combine<A>(f: (...args: Array<any>) => A, ...ss: Array<Stream<any>>): Stream<A>;
+export function combine<A>(f: PolymorphicFunction, ...ss: Array<Stream<any>>): Stream<A>;
 export function combineArray<A>(f: (...args: Array<any>) => A, streams: Array<Stream<any>>): Stream<A>;
 
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
@@ -136,8 +168,8 @@ export function concat<A>(s1: Stream<A>, s2: Stream<A>): Stream<A>;
 export function startWith<A>(a: A, s: Stream<A>): Stream<A>;
 
 export function filter<A>(p: (a: A) => boolean, s: Stream<A>): Stream<A>;
-export function skipRepeats<A>(s: Stream<A>): Stream<A>;
-export function skipRepeatsWith<A>(eq: (a1: A, a2: A) => boolean, s: Stream<A>): Stream<A>;
+export function skipBepeats<A>(s: Stream<A>): Stream<A>;
+export function skipBepeatsWith<A>(eq: (a1: A, a2: A) => boolean, s: Stream<A>): Stream<A>;
 
 export function take<A>(n: number, s: Stream<A>): Stream<A>;
 export function skip<A>(n: number, s: Stream<A>): Stream<A>;
@@ -162,7 +194,8 @@ export function await<A>(s: Stream<Promise<A>>): Stream<A>;
 export function sample<A>(f: (...as: any[]) => A, sampler: Stream<any>, ...ss: Array<Stream<any>>): Stream<A>;
 export function sampleWith<A>(sampler: Stream<any>, s: Stream<A>): Stream<A>;
 
-export function zip<A>(f: (...as: any[]) => A, ...ss: Array<Stream<any>>): Stream<A>;
+// polymorphic
+export function zip<A>(f: PolymorphicFunction): Stream<A>;
 
 export function recoverWith<A, B>(p: (a: B) => A, s: Stream<A>): Stream<A>;
 export function throwError(e: Error): Stream<any>;
