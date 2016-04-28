@@ -2,18 +2,18 @@ declare type SeedValue<S, V> = { seed: S, value: V };
 declare type TimeValue<V>    = { time: number, value: V };
 
 declare interface Thenable<A> {
-    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => U | Thenable<U>): Thenable<U>;
-    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => void): Thenable<U>;
-    catch<U>(onAejected?: (error: any) => U | Thenable<U>): Thenable<U>;
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
+    then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Thenable<U>;
+    catch<U>(onRejected?: (error: any) => U | Thenable<U>): Thenable<U>;
 }
 
 declare interface Promise<A> {
   constructor(callback: (resolve: (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
 
-  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => U | Thenable<U>): Promise<U>;
-  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onBejected?: (error: any) => void): Promise<U>;
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
 
-  catch<U>(onBejected?: (error: any) => U | Thenable<U>): Promise<U>;
+  catch<U>(onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
 }
 
 declare interface Generator<A, B, C> {}
