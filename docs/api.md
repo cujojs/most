@@ -227,7 +227,6 @@ Create a stream that contains no events and never ends.
 
 Build an infinite stream by computing successive items iteratively.  Conceptually, the stream will contain: `[initial, f(initial), f(f(initial)), ...]`
 
-<!-- skip-example -->
 ```js
 // An infinite stream of all integers >= 0, ie
 // 0, 1, 2, 3, 4, 5, ...
@@ -238,7 +237,6 @@ most.iterate(function(x) {
 
 The iterating function may return a promise.  This allows `most.iterate` to be used to build asynchronous streams of future values.  For example:
 
-<!-- skip-example -->
 ```js
 var when = require('when');
 // An infinite stream of all integers >= 0, each delayed by 1 more
@@ -539,6 +537,7 @@ stream.recoverWith(f): -a-b-c-d-e-f->
 
 When a stream fails with an error, the error will be passed to `f`.  `f` must return a new stream to replace the error.
 
+<!-- skip-example -->
 ```js
 var rest = require('rest');
 
@@ -633,6 +632,7 @@ most.from(['a', 'b', 'c', 'd'])
 	.forEach(console.log.bind(console));
 ```
 
+<!-- skip-example -->
 ```js
 // Maintain a sliding window of (up to) 3 values in an array
 
@@ -675,6 +675,7 @@ stream.chain(f):   -1--2-13---2-1-233|
 
 Note the difference between [`concatMap`](#concatmap) and [`chain`](#chain): `concatMap` concatenates, while `chain` merges.
 
+<!-- skip-example -->
 ```js
 // Logs: 1 2 1 1 2 1 1 2 2 2
 most.from([1, 2])
@@ -701,6 +702,7 @@ stream.continueWith(f): -a-b-c-d-1-2-3-4-5->
 ```
 
 
+<!-- skip-example -->
 ```js
 most.periodic(1000, 'x')
     .take(4)
@@ -735,6 +737,7 @@ f called lazily:      ^      ^          ^
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
 
+<!-- skip-example -->
 ```js
 // Logs: 1 1 1 1 1 2 2 2 2 2
 most.from([1, 2])
