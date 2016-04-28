@@ -1,9 +1,7 @@
 var most = require('.');
-var when = require('when');
-var rest = require('rest');
 var jsdom = require('jsdom');
 
-var foo = require(__dirname + "/node_modules/markdown-doctest/node_modules/babel/polyfill");
+require(__dirname + "/node_modules/markdown-doctest/node_modules/babel/polyfill");
 
 var html = [
   '<head></head>',
@@ -23,9 +21,7 @@ function noop () {};
 
 module.exports = {
   require: {
-    'most': most,
-    'when': when,
-    'rest': rest
+    most: most
   },
 
   globals: {

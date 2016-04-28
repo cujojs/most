@@ -237,6 +237,7 @@ most.iterate(function(x) {
 
 The iterating function may return a promise.  This allows `most.iterate` to be used to build asynchronous streams of future values.  For example:
 
+<!-- skip-example -->
 ```js
 var when = require('when');
 // An infinite stream of all integers >= 0, each delayed by 1 more
@@ -269,6 +270,7 @@ The unfolding function accepts a seed value and must return a tuple: `{value:*, 
 
 Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
+<!-- skip-example -->
 ```js
 var rest = require('rest');
 var urlPrefix = 'product/';
