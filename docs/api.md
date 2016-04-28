@@ -55,14 +55,16 @@ most.js API
 	* [drain](#drain)
 1. Combining streams
 	* [merge](#merge)
+	* [mergeArray](#mergearray)
 	* [combine](#combine)
+	* [combineArray](#combinearray)
 	* [sample](#sample)
 	* [sampleWith](#samplewith)
 	* [zip](#zip)
 1. Combining higher order streams
 	* [switch](#switch)
 	* [join](#join)
-	* [mergeConcurrently](#mergeConcurrently)
+	* [mergeConcurrently](#mergeconcurrently)
 1. Awaiting promises
 	* [await](#await)
 1. Rate limiting streams
@@ -261,7 +263,9 @@ The unfolding function accepts a seed value and must return a tuple: `{value:*, 
 
 * `tuple.value` will be emitted as an event.
 * `tuple.seed` will be passed to the next invocation of the unfolding function.
-* `tuple.done` can be used to stop unfolding.  When `tuple.done == true`, unfolding will stop.
+* `tuple.done` can be used to stop unfolding.  When `tuple.done == true`, unfolding will stop.  Additionally, when `tuple.done == true`:
+	* `tuple.value` will be used as the stream's end signal value.  It *will not* appear as a normal event in the stream.
+ 	* `tuple.seed` will be ignored
 
 Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
@@ -291,7 +295,7 @@ function delayPromise(ms, value) {
 	return new Promise(resolve => setTimeout(() => resolve(value), ms));
 }
 
-function* countdownGet(delay, start) {
+function* countdown(delay, start) {
 	for(let i = start; i > 0; --i) {
 		yield delayPromise(delay, i);
 	}
@@ -320,7 +324,12 @@ When passing an EventTarget, you can provide `useCapture` as the 3rd parameter, 
 
 When the stream ends (for example, by using [take](#take), [takeUntil](#until), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
 
-Note on EventEmitter: EventEmitters and EventTargets, such as DOM nodes, behave differently in that EventEmitter allows events to be delivered in the same tick as a listener is added.  When using EventEmitter, `most.fromEvent`, will *ensure asynchronous event delivery*, thereby preventing hazards of "maybe sync, maybe async" (aka zalgo) event delivery.
+
+
+**Notes on EventEmitter**
+
+1. When source event has more than one argument, all the arguments will be aggregated into array in resulting Stream.
+2. EventEmitters and EventTargets, such as DOM nodes, behave differently in that EventEmitter allows events to be delivered in the same tick as a listener is added.  When using EventEmitter, `most.fromEvent`, will *ensure asynchronous event delivery*, thereby preventing hazards of "maybe sync, maybe async" (aka zalgo) event delivery.
 
 ```js
 var clicks = most.fromEvent('click', document.querySelector('.the-button'));
@@ -328,7 +337,7 @@ var clicks = most.fromEvent('click', document.querySelector('.the-button'));
 
 ```js
 // We can do some event delegation by applying a filter to the stream
-// in conjunction with e.target.matches this will allow only events with 
+// in conjunction with e.target.matches this will allow only events with
 // .the-button class to be processed
 var container = document.querySelector('.container');
 most.fromEvent('click', container);
@@ -369,7 +378,7 @@ most.fromEvent('click', container)
 
 ####`most.create(publisher) -> Stream`
 
-Create a push-stream for imperatively pushing events, primarily for adapting existing event sources.
+Create a push-stream for imperatively pushing events, primarily for situations where existing, declarative sources, like [`fromEvent`](#mostfromevent), [`unfold`](#mostunfold), [`iterate`](#mostiterate), etc. can't be used.
 
 ```
 function publisher(add:function(x:*), end:function(x:*), error:function(e:Error))
@@ -387,7 +396,25 @@ The publisher function can use `add`, `end`, and `error`:
 * `end()` - End the stream. Any later calls to `add`, `end`, or `error` will be no-ops.
 * `error(e)` - Signal that the stream has failed and cannot produce more events.
 
-Note that if you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
+**Important**
+
+* If you never call `end` or `error`, the stream will never end, and consumers will wait forever for additional events.
+
+* Pulling the `add`, `end`, and/or `error` functions out of the publisher closure is *not supported*.
+
+```js
+// Unsupported:
+let emitEvent, emitEnd, emitError
+
+const stream = most.create((add, end, error) => {
+  emitEvent = add
+  emitEnd = end
+  emitError = error
+})
+
+emitEvent(123)
+emitEnd()
+```
 
 #### dispose
 
@@ -473,6 +500,8 @@ stream1.concat(stream2): -a-b-c-d-e-f->
 Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), [flatMap](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
 
 ### cycle
+
+**Deprecated**
 
 ####`stream.cycle() -> Stream`
 ####`most.cycle(stream) -> Stream`
@@ -615,7 +644,7 @@ var numbers = most.iterate(function(x) {
 // [2,3,4]
 // ... etc ...
 numbers.scan(function(slidingWindow, x) {
-	return slidingWindow.concat(x).slice(-10);
+	return slidingWindow.concat(x).slice(-3);
 }, [])
 	.forEach(console.log.bind(console));
 ```
@@ -685,6 +714,8 @@ most.periodic(1000, 'x')
 
 Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.
 
+The mapping function `f` is applied *lazily*.  That is, `f` is called only once it is time to concatenate a new stream.
+
 `function f(x) -> Stream`
 
 ```
@@ -693,6 +724,7 @@ f(a):                 1--2--3|
 f(b):                      1----2----3|
 f(c):                             1-2-3|
 stream.concatMap(f): -1--2--31----2----31-2-3|
+f called lazily:      ^      ^          ^
 ```
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
@@ -1092,6 +1124,21 @@ Merging multiple streams creates a new stream containing all events from the inp
 
 In contrast to `concat`, `merge` preserves the arrival times of events. That is, it creates a new stream where events from `stream1` and `stream2` can interleave.
 
+### mergeArray
+
+####`most.mergeArray(arrayOfStreams) -> Stream`
+
+Array form of [merge](#merge).  Create a new Stream containing all events from all streams in `arrayOfStreams`.
+
+```
+s1:                             -a--b----c--->
+s2:                             --w---x-y--z->
+s3:                             ---1---2----3>
+most.mergeArray([s1, s2, s3]):  -aw1b-x2yc-z3>
+```
+
+See [merge](#merge) for more details.
+
 ### combine
 
 ####`stream1.combine(f, stream2) -> Stream`
@@ -1138,6 +1185,21 @@ resultStream.observe(function(z) {
 	resultNode.textContent = z;
 });
 ```
+
+### combineArray
+
+####`most.combineArray(f, arrayOfStreams) -> Stream`
+
+Array form of [combine](#combine). Create a new stream that emits the set of latest event values from all input streams whenever a new event arrives on any input stream.
+
+```
+s1:                                    -0--1----2->
+s2:                                    --3---4-5-->
+s3:                                    ---2---1--->
+most.combineArray(add3, [s1, s2, s3]): ---56-7678->
+```
+
+See [combine](#combine) for more details.
 
 ### sample
 

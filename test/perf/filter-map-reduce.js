@@ -35,7 +35,7 @@ suite
 	}, options)
 	.add('rx 5', function(deferred) {
 		runners.runRx5(deferred,
-			rxjs.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0));
+			rxjs.Observable.from(a).filter(even).map(add1).reduce(sum, 0));
 	}, options)
 	.add('kefir', function(deferred) {
 		runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).scan(sum, 0).last());

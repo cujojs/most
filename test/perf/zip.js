@@ -37,7 +37,7 @@ suite
 		runners.runRx(deferred, rx.Observable.fromArray(a).zip(rx.Observable.fromArray(b), add).reduce(add, 0));
 	}, options)
 	.add('rx 5', function(deferred) {
-		runners.runRx5(deferred, rxjs.Observable.fromArray(a).zip(rxjs.Observable.fromArray(b), add).reduce(add, 0));
+		runners.runRx5(deferred, rxjs.Observable.from(a).zip(rxjs.Observable.from(b), add).reduce(add, 0));
 	}, options)
 	.add('kefir', function(deferred) {
 		runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).scan(add, 0).last());

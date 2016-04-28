@@ -38,7 +38,7 @@ function logResults(e) {
 	if(t.failure) {
 		console.error(padl(10, t.name) + 'FAILED: ' + e.target.failure);
 	} else {
-		var result = padl(10, t.name)
+		var result = padl(18, t.name)
 			+ padr(13, t.hz.toFixed(2) + ' op/s')
 			+ ' \xb1' + padr(7, t.stats.rme.toFixed(2) + '%')
 			+ padr(15, ' (' + t.stats.sample.length + ' samples)');

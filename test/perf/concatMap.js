@@ -1,11 +1,10 @@
 var Benchmark = require('benchmark');
 var most = require('../../most');
 var rx = require('rx');
-var rxjs = require('@reactivex/rxjs')
+var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
-var highland = require('highland');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -49,7 +48,7 @@ suite
 		runners.runRx(deferred, rx.Observable.fromArray(a).concatMap(rx.Observable.fromArray).reduce(sum, 0));
 	}, options)
 	.add('rx 5', function(deffered) {
-		runners.runRx5(deffered, rxjs.Observable.fromArray(a).concatMap(function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
+		runners.runRx5(deffered, rxjs.Observable.from(a).concatMap(function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
 	}, options)
 	.add('kefir', function(deferred) {
 		runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).scan(sum, 0).last());

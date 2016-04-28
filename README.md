@@ -1,7 +1,14 @@
-[![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
+```
+________________________________
+___   |/  /_  __ \_  ___/__  __/
+__  /|_/ /_  / / /____ \__  /   
+_  /  / / / /_/ /____/ /_  /    
+/_/  /_/  \____/______/ /_/
+```
 
 # Monadic streams for reactive programming
 
+[![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
 [![Join the chat at https://gitter.im/cujojs/most](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cujojs/most?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Most.js is a toolkit for reactive programming.  It helps you compose asynchronous operations on streams of values and events, e.g. WebSocket messages, DOM events, etc, and on time-varying values, e.g. the "current value" of an &lt;input&gt;, without many of the hazards of side effects and mutable shared state.
@@ -69,10 +76,16 @@ To [run the example above](examples/add-inputs) and [others](examples) using [Ra
 
 ## Get it
 
+### Requirements
+
+Most requires ES6 `Promise`.  You can use your favorite polyfill, such as [creed](https://github.com/briancavalier/creed), [when](https://github.com/cujojs/when/blob/master/docs/es6-promise-shim.md), [bluebird](http://bluebirdjs.com/docs/getting-started.html), [es6-promise](https://github.com/jakearchibald/es6-promise), etc.  Using a polyfill can be especially beneficial on platforms that don't yet have good unhandled rejection reporting capabilities.
+
+### Install
+
 As a module:
 
 ```
-npm install --save most` or `bower install --save most
+npm install --save most
 ```
 
 ```js
@@ -104,7 +117,7 @@ Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  T
 
 ### High performance
 
-A primary focus of most.js is performance.  The [perf test results](test/perf) indicate that it is achieving its goals in this area. Our hope is that by publishing those numbers, and showing what is possible, other libs will improve as well. 
+A primary focus of most.js is performance.  The [perf test results](test/perf) indicate that it is achieving its goals in this area. Our hope is that by publishing those numbers, and showing what is possible, other libs will improve as well.
 
 ### Modular architecture
 

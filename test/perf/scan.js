@@ -34,7 +34,7 @@ suite
 		runners.runRx(deferred, rx.Observable.fromArray(a).scan(sum, 0).reduce(passthrough, 0));
 	}, options)
   .add('rx 5', function(deferred) {
-		runners.runRx5(deferred, rxjs.Observable.fromArray(a).scan(sum, 0).reduce(passthrough, 0));
+		runners.runRx5(deferred, rxjs.Observable.from(a).scan(sum, 0).reduce(passthrough, 0));
 	}, options)
 	.add('kefir', function(deferred) {
 		runners.runKefir(deferred, kefirFromArray(a).scan(sum, 0).scan(passthrough, 0).last());

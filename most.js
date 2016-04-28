@@ -1,9 +1,9 @@
-/** @license MIT License (c) copyright 2010-2015 original author or authors */
+/** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
 
 var Stream = require('./lib/Stream');
-var base = require('./lib/base');
+var base = require('@most/prelude');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
@@ -149,6 +149,7 @@ exports.concat    = build.concat;
 exports.startWith = build.cons;
 
 /**
+ * @deprecated
  * Tie this stream into a circle, thus creating an infinite stream
  * @returns {Stream} new infinite stream
  */
@@ -315,6 +316,7 @@ Stream.prototype.mergeConcurrently = function(concurrency) {
 var merge = require('./lib/combinator/merge');
 
 exports.merge = merge.merge;
+exports.mergeArray = merge.mergeArray;
 
 /**
  * Merge this stream and all the provided streams
@@ -332,6 +334,7 @@ Stream.prototype.merge = function(/*...streams*/) {
 var combine = require('./lib/combinator/combine');
 
 exports.combine = combine.combine;
+exports.combineArray = combine.combineArray;
 
 /**
  * Combine latest events from all input streams
@@ -517,7 +520,7 @@ var timeslice = require('./lib/combinator/timeslice');
 
 exports.until  = exports.takeUntil = timeslice.takeUntil;
 exports.since  = exports.skipUntil = timeslice.skipUntil;
-exports.during = timeslice.during; // EXPERIMENTAL
+exports.during = timeslice.during;
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -663,7 +666,7 @@ Stream.prototype.recoverWith = Stream.prototype.flatMapError = function(f) {
 //-----------------------------------------------------------------------
 // Multicasting
 
-var multicast = require('./lib/combinator/multicast').multicast;
+var multicast = require('@most/multicast').default;
 
 exports.multicast = multicast;
 

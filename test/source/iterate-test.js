@@ -4,7 +4,6 @@ var expect = require('buster').expect;
 var iterate = require('../../lib/source/iterate');
 var take = require('../../lib/combinator/slice').take;
 var observe = require('../../lib/combinator/observe').observe;
-var Promise = require('../../lib/Promise');
 
 var sentinel = { value: 'sentinel' };
 var other = { value: 'other' };

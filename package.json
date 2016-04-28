@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.17.1",
+  "version": "0.19.0",
   "description": "Monadic streams",
   "typings": "type-definitions/most.d.ts",
   "main": "most.js",
@@ -9,8 +9,8 @@
     "lib/**/*.js"
   ],
   "scripts": {
-    "test": "jshint . && buster-test",
-    "build": "webpack --output-library most --output-library-target umd ./most.js --output-file dist/most.js && uglifyjs dist/most.js -c 'warnings=false' -m -o dist/most.min.js",
+    "test": "eslint . && buster-test",
+    "build": "webpack --output-library most --output-library-target umd ./most.js --output-filename dist/most.js && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
     "preversion": "npm run build"
   },
   "repository": {
@@ -39,12 +39,13 @@
   "license": "MIT",
   "devDependencies": {
     "buster": "~0.7",
-    "jshint": "~2",
-    "transducers-js": "^0.4.158",
+    "eslint": "^1.10.3",
+    "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
-    "webpack": "^1.10.1"
+    "webpack": "^1.12.14"
   },
   "dependencies": {
-    "when": "^3.7.0"
+    "@most/multicast": "^1.0.3",
+    "@most/prelude": "^1.1.0"
   }
 }

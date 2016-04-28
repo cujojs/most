@@ -1,15 +1,14 @@
 var dispose = require('../../lib/disposable/dispose');
-var newDisposable = dispose.newDisposable;
 
 module.exports = FakeDisposeSource;
 
-FakeDisposeSource.from = function(dispose, stream) {
-	return new FakeDisposeSource(dispose, stream.source);
+FakeDisposeSource.from = function(disposer, stream) {
+	return new FakeDisposeSource(disposer, stream.source);
 };
 
-function FakeDisposeSource(dispose, source) {
+function FakeDisposeSource(disposer, source) {
 	this.source = source;
-	this.disposable = newDisposable(dispose);
+	this.disposable = dispose.create(disposer);
 }
 
 FakeDisposeSource.prototype.run = function(sink, scheduler) {

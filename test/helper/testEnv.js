@@ -3,7 +3,6 @@
 /** @author John Hann */
 
 var Stream = require('../../lib/Stream');
-var Promise = require('../../lib/Promise');
 var PropagateTask = require('../../lib/scheduler/PropagateTask');
 var Scheduler = require('../../lib/scheduler/Scheduler');
 var VirtualTimer = require('./VirtualTimer');
@@ -78,7 +77,7 @@ AtTimes.prototype.run = function(sink, scheduler) {
 
 	var end = scheduler.delay(s.time, PropagateTask.end(void 0, sink));
 
-	return dispose.newDisposable(cancelAll, s.tasks.concat(end));
+	return dispose.create(cancelAll, s.tasks.concat(end));
 };
 
 function appendEvent(sink, scheduler, s, event) {
