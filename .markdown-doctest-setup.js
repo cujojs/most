@@ -16,7 +16,8 @@ function noop () {};
 
 module.exports = {
   require: {
-    most: most
+    most: most,
+   'transducers-js': require('transducers-js')
   },
 
   globals: {

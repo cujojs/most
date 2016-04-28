@@ -855,7 +855,6 @@ Create a new stream by passing items through the provided transducer.
 Most.js supports any transducer that implements the *de facto* JavaScript transducer protocol.  For example, two popular transducers libraries are [transducers-js](https://github.com/cognitect-labs/transducers-js) and [transducers.js](https://github.com/jlongster/transducers.js).
 
 
-<!-- skip-example -->
 ```js
 // Create a transducer that slices, filters, and maps
 var transducers = require('transducers-js');
