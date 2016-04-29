@@ -8,6 +8,7 @@ var delay = require('../lib/combinator/delay').delay;
 var join = require('../lib/combinator/flatMap').join;
 var zip = require('../lib/combinator/zip').zip;
 var transform = require('../lib/combinator/transform');
+var iterate = require('../lib/source/iterate').iterate;
 var merge = require('../lib/combinator/merge').merge;
 var take = require('../lib/combinator/slice').take;
 var observe = require('../lib/combinator/observe').observe;
@@ -103,23 +104,21 @@ describe('debounce', function() {
 
 describe('throttle', function() {
 	it('should exclude items that are too frequent', function() {
-
-		var n = 10;
-		var i = 0;
-		var s = take(n, map(function() {
-			return i++;
-		}, periodic(1)));
-
+		var s = te.atTimes([
+			{ time: 0, value: 0 },
+			{ time: 1, value: 1 },
+			{ time: 2, value: 2 },
+			{ time: 3, value: 3 },
+			{ time: 4, value: 4 }
+		]);
 		var throttled = limit.throttle(2, s);
 
-		return te.collectEvents(throttled, te.ticks(n))
+		return te.collectEvents(throttled, te.ticks(5))
 			.then(function(events) {
 				expect(events).toEqual([
 					{ time: 0, value: 0 },
 					{ time: 2, value: 2 },
-					{ time: 4, value: 4 },
-					{ time: 6, value: 6 },
-					{ time: 8, value: 8 }
+					{ time: 4, value: 4 }
 				]);
 			});
 	});
