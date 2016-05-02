@@ -23,6 +23,24 @@ exports.from     = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------
+// Fluent adapter
+
+var thru = require('./lib/combinator/thru');
+
+exports.thru = thru;
+
+/**
+ * Adapt a functional stream transform to fluent style.
+ * It applies f to the this stream object
+ * @param  {function(s: Stream): Stream} f function that
+ * receives the stream itself and must return a new stream
+ * @return {Stream}
+ */
+Stream.prototype.thru = function(f) {
+	return thru(f, this);
+}
+
+//-----------------------------------------------------------------------
 // Creating
 
 var create = require('./lib/source/create');
