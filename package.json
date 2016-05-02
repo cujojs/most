@@ -46,7 +46,7 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
-    "@most/multicast": "^1.0.3",
+    "@most/multicast": "^1.1.1",
     "@most/prelude": "^1.1.0"
   }
 }
