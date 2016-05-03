@@ -1081,26 +1081,26 @@ Functional APIs allow for the highest degree of modularity via external packages
 If you prefer using fluent APIs, `thru` allows using those functional APIs in a fluent style.  For example:
 
 ```js
-import hold from `@most/hold`
-import { click } from `@most/dom-event`
+import hold from '@most/hold'
+import { periodic } from 'most'
 
-click(someElement)
-  .tap(ev => ev.preventDefault())
-  .map(ev => ev.target.value)
+periodic(10, 1)
+	.take(5)
+	.scan((total, increment) => total + increment, 0)
   .thru(hold)
-  .observer(x => console.log(x))
+  .observe(x => console.log(x))
 ```
 
 rather than mixing functional and fluent:
 
 ```js
-import hold from `@most/hold`
-import { click } from `@most/dom-event`
+import hold from '@most/hold'
+import { periodic } from 'most'
 
-hold(click(someElement)
-  .tap(ev => ev.preventDefault())
-  .map(ev => ev.target.value))
-  .observer(x => console.log(x))
+hold(periodic(10, 1)
+	.take(5)
+	.scan((total, increment) => total + increment, 0))
+  .observe(x => console.log(x))
 ```
 
 ## Consuming streams

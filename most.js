@@ -25,7 +25,7 @@ exports.periodic = periodic;
 //-----------------------------------------------------------------------
 // Fluent adapter
 
-var thru = require('./lib/combinator/thru');
+var thru = require('./lib/combinator/thru').thru;
 
 exports.thru = thru;
 
