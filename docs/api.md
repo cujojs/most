@@ -1085,7 +1085,7 @@ import hold from `@most/hold`
 import { click } from `@most/dom-event`
 
 click(someElement)
-  .tap(ev => ev.preventDefault)
+  .tap(ev => ev.preventDefault())
   .map(ev => ev.target.value)
   .thru(hold)
   .observer(x => console.log(x))
@@ -1098,7 +1098,7 @@ import hold from `@most/hold`
 import { click } from `@most/dom-event`
 
 hold(click(someElement)
-  .tap(ev => ev.preventDefault)
+  .tap(ev => ev.preventDefault())
   .map(ev => ev.target.value))
   .observer(x => console.log(x))
 ```
