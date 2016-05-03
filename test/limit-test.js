@@ -103,6 +103,15 @@ describe('debounce', function() {
 });
 
 describe('throttle', function() {
+	describe('fusion', function() {
+		it('should use max', function() {
+			var s1 = limit.throttle(2, limit.throttle(1, te.atTimes([])));
+			var s2 = limit.throttle(1, limit.throttle(2, te.atTimes([])));
+			expect(s1.source.period).toBe(s2.source.period);
+			expect(s1.source.period).toBe(2);
+		});
+	});
+
 	it('should exclude items that are too frequent', function() {
 		var s = te.atTimes([
 			{ time: 0, value: 0 },
