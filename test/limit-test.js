@@ -8,11 +8,13 @@ var delay = require('../lib/combinator/delay').delay;
 var join = require('../lib/combinator/flatMap').join;
 var zip = require('../lib/combinator/zip').zip;
 var transform = require('../lib/combinator/transform');
+var iterate = require('../lib/source/iterate').iterate;
 var merge = require('../lib/combinator/merge').merge;
 var take = require('../lib/combinator/slice').take;
 var observe = require('../lib/combinator/observe').observe;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
+var Map = require('../lib/fusion/Map');
 
 var empty = core.empty;
 var streamOf = core.of;
@@ -102,24 +104,42 @@ describe('debounce', function() {
 });
 
 describe('throttle', function() {
+	describe('fusion', function() {
+		it('should use max', function() {
+			var s1 = limit.throttle(2, limit.throttle(1, te.atTimes([])));
+			var s2 = limit.throttle(1, limit.throttle(2, te.atTimes([])));
+			expect(s1.source.period).toBe(s2.source.period);
+			expect(s1.source.period).toBe(2);
+		});
+
+		it('should commute map', function() {
+			function id(x) {
+				return x;
+			}
+			var s = limit.throttle(1, map(id, fromArray([1, 2, 3, 4])));
+
+			expect(s.source instanceof Map).toBe(true);
+			expect(s.source.f).toBe(id);
+			expect(s.source.source.period).toBe(1);
+		});
+	});
+
 	it('should exclude items that are too frequent', function() {
-
-		var n = 10;
-		var i = 0;
-		var s = take(n, map(function() {
-			return i++;
-		}, periodic(1)));
-
+		var s = te.atTimes([
+			{ time: 0, value: 0 },
+			{ time: 1, value: 1 },
+			{ time: 2, value: 2 },
+			{ time: 3, value: 3 },
+			{ time: 4, value: 4 }
+		]);
 		var throttled = limit.throttle(2, s);
 
-		return te.collectEvents(throttled, te.ticks(n))
+		return te.collectEvents(throttled, te.ticks(5))
 			.then(function(events) {
 				expect(events).toEqual([
 					{ time: 0, value: 0 },
 					{ time: 2, value: 2 },
-					{ time: 4, value: 4 },
-					{ time: 6, value: 6 },
-					{ time: 8, value: 8 }
+					{ time: 4, value: 4 }
 				]);
 			});
 	});
