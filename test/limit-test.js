@@ -14,6 +14,7 @@ var take = require('../lib/combinator/slice').take;
 var observe = require('../lib/combinator/observe').observe;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
+var Map = require('../lib/fusion/Map');
 
 var empty = core.empty;
 var streamOf = core.of;
@@ -109,6 +110,17 @@ describe('throttle', function() {
 			var s2 = limit.throttle(1, limit.throttle(2, te.atTimes([])));
 			expect(s1.source.period).toBe(s2.source.period);
 			expect(s1.source.period).toBe(2);
+		});
+
+		it('should commute map', function() {
+			function id(x) {
+				return x;
+			}
+			var s = limit.throttle(1, map(id, fromArray([1, 2, 3, 4])));
+
+			expect(s.source instanceof Map).toBe(true);
+			expect(s.source.f).toBe(id);
+			expect(s.source.source.period).toBe(1);
 		});
 	});
 
