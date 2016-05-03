@@ -192,10 +192,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Building and extending
 
-	var unfold = __webpack_require__(37);
-	var iterate = __webpack_require__(38);
-	var generate = __webpack_require__(39);
-	var build = __webpack_require__(35);
+	var unfold = __webpack_require__(35);
+	var iterate = __webpack_require__(36);
+	var generate = __webpack_require__(37);
+	var build = __webpack_require__(38);
 
 	exports.unfold    = unfold.unfold;
 	exports.iterate   = iterate.iterate;
@@ -322,7 +322,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return flatMap.join(this);
 	};
 
-	var continueWith = __webpack_require__(36).continueWith;
+	var continueWith = __webpack_require__(39).continueWith;
 
 	exports.continueWith = continueWith;
 	exports.flatMapEnd = continueWith;
@@ -2450,6 +2450,8 @@ return /******/ (function(modules) { // webpackBootstrap
 		return this.task.dispose();
 	};
 
+	ScheduledTask.prototype.dispose = ScheduledTask.prototype.cancel;
+
 	function runTask(task) {
 		try {
 			return task.run();
@@ -2817,7 +2819,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Stream = __webpack_require__(1);
 	var Pipe = __webpack_require__(33);
 	var runSource = __webpack_require__(25);
-	var cons = __webpack_require__(35).cons;
+	var dispose = __webpack_require__(7);
+	var PropagateTask = __webpack_require__(5);
 
 	exports.scan = scan;
 	exports.reduce = reduce;
@@ -2831,8 +2834,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Stream} new stream containing successive reduce results
 	 */
 	function scan(f, initial, stream) {
-		return cons(initial, new Stream(new Accumulate(ScanSink, f, initial, stream.source)));
+		return new Stream(new Scan(f, initial, stream.source));
 	}
+
+	function Scan(f, z, source) {
+		this.source = source;
+		this.f = f;
+		this.value = z;
+	}
+
+	Scan.prototype.run = function(sink, scheduler) {
+		var d1 = scheduler.asap(PropagateTask.event(this.value, sink));
+		var d2 = this.source.run(new ScanSink(this.f, this.value, sink), scheduler);
+		return dispose.all([d1, d2]);
+	};
 
 	function ScanSink(f, z, sink) {
 		this.f = f;
@@ -2859,35 +2874,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Promise} promise for the file result of the reduce
 	 */
 	function reduce(f, initial, stream) {
-		return runSource.withDefaultScheduler(noop, new Accumulate(AccumulateSink, f, initial, stream.source));
+		return runSource.withDefaultScheduler(noop, new Reduce(f, initial, stream.source));
 	}
 
-	function Accumulate(SinkType, f, z, source) {
-		this.SinkType = SinkType;
+	function Reduce(f, z, source) {
+		this.source = source;
 		this.f = f;
 		this.value = z;
-		this.source = source;
 	}
 
-	Accumulate.prototype.run = function(sink, scheduler) {
-		return this.source.run(new this.SinkType(this.f, this.value, sink), scheduler);
+	Reduce.prototype.run = function(sink, scheduler) {
+		return this.source.run(new ReduceSink(this.f, this.value, sink), scheduler);
 	};
 
-	function AccumulateSink(f, z, sink) {
+	function ReduceSink(f, z, sink) {
 		this.f = f;
 		this.value = z;
 		this.sink = sink;
 	}
 
-	AccumulateSink.prototype.event = function(t, x) {
+	ReduceSink.prototype.event = function(t, x) {
 		var f = this.f;
 		this.value = f(this.value, x);
 		this.sink.event(t, this.value);
 	};
 
-	AccumulateSink.prototype.error = Pipe.prototype.error;
+	ReduceSink.prototype.error = Pipe.prototype.error;
 
-	AccumulateSink.prototype.end = function(t) {
+	ReduceSink.prototype.end = function(t) {
 		this.sink.end(t, this.value);
 	};
 
@@ -2896,128 +2910,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var streamOf = __webpack_require__(3).of;
-	var continueWith = __webpack_require__(36).continueWith;
-
-	exports.concat = concat;
-	exports.cycle = cycle;
-	exports.cons = cons;
-
-	/**
-	 * @param {*} x value to prepend
-	 * @param {Stream} stream
-	 * @returns {Stream} new stream with x prepended
-	 */
-	function cons(x, stream) {
-		return concat(streamOf(x), stream);
-	}
-
-	/**
-	 * @param {Stream} left
-	 * @param {Stream} right
-	 * @returns {Stream} new stream containing all events in left followed by all
-	 *  events in right.  This *timeshifts* right to the end of left.
-	 */
-	function concat(left, right) {
-		return continueWith(function() {
-			return right;
-		}, left);
-	}
-
-	/**
-	 * @deprecated
-	 * Tie stream into a circle, creating an infinite stream
-	 * @param {Stream} stream
-	 * @returns {Stream} new infinite stream
-	 */
-	function cycle(stream) {
-		return continueWith(function cycleNext() {
-			return cycle(stream);
-		}, stream);
-	}
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Stream = __webpack_require__(1);
-	var Sink = __webpack_require__(33);
-	var dispose = __webpack_require__(7);
-	var isPromise = __webpack_require__(10).isPromise;
-
-	exports.continueWith = continueWith;
-
-	function continueWith(f, stream) {
-		return new Stream(new ContinueWith(f, stream.source));
-	}
-
-	function ContinueWith(f, source) {
-		this.f = f;
-		this.source = source;
-	}
-
-	ContinueWith.prototype.run = function(sink, scheduler) {
-		return new ContinueWithSink(this.f, this.source, sink, scheduler);
-	};
-
-	function ContinueWithSink(f, source, sink, scheduler) {
-		this.f = f;
-		this.sink = sink;
-		this.scheduler = scheduler;
-		this.active = true;
-		this.disposable = dispose.once(source.run(this, scheduler));
-	}
-
-	ContinueWithSink.prototype.error = Sink.prototype.error;
-
-	ContinueWithSink.prototype.event = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-		this.sink.event(t, x);
-	};
-
-	ContinueWithSink.prototype.end = function(t, x) {
-		if(!this.active) {
-			return;
-		}
-
-		var result = dispose.tryDispose(t, this.disposable, this.sink);
-		this.disposable = isPromise(result)
-			? dispose.promised(this._thenContinue(result, x))
-			: this._continue(this.f, x);
-	};
-
-	ContinueWithSink.prototype._thenContinue = function(p, x) {
-		var self = this;
-		return p.then(function () {
-			return self._continue(self.f, x);
-		});
-	};
-
-	ContinueWithSink.prototype._continue = function(f, x) {
-		return f(x).source.run(this.sink, this.scheduler);
-	};
-
-	ContinueWithSink.prototype.dispose = function() {
-		this.active = false;
-		return this.disposable.dispose();
-	};
-
-
-/***/ },
-/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3096,7 +2988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3170,7 +3062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -3242,6 +3134,128 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Generate.prototype.dispose = function() {
 		this.active = false;
+	};
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var streamOf = __webpack_require__(3).of;
+	var continueWith = __webpack_require__(39).continueWith;
+
+	exports.concat = concat;
+	exports.cycle = cycle;
+	exports.cons = cons;
+
+	/**
+	 * @param {*} x value to prepend
+	 * @param {Stream} stream
+	 * @returns {Stream} new stream with x prepended
+	 */
+	function cons(x, stream) {
+		return concat(streamOf(x), stream);
+	}
+
+	/**
+	 * @param {Stream} left
+	 * @param {Stream} right
+	 * @returns {Stream} new stream containing all events in left followed by all
+	 *  events in right.  This *timeshifts* right to the end of left.
+	 */
+	function concat(left, right) {
+		return continueWith(function() {
+			return right;
+		}, left);
+	}
+
+	/**
+	 * @deprecated
+	 * Tie stream into a circle, creating an infinite stream
+	 * @param {Stream} stream
+	 * @returns {Stream} new infinite stream
+	 */
+	function cycle(stream) {
+		return continueWith(function cycleNext() {
+			return cycle(stream);
+		}, stream);
+	}
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var Sink = __webpack_require__(33);
+	var dispose = __webpack_require__(7);
+	var isPromise = __webpack_require__(10).isPromise;
+
+	exports.continueWith = continueWith;
+
+	function continueWith(f, stream) {
+		return new Stream(new ContinueWith(f, stream.source));
+	}
+
+	function ContinueWith(f, source) {
+		this.f = f;
+		this.source = source;
+	}
+
+	ContinueWith.prototype.run = function(sink, scheduler) {
+		return new ContinueWithSink(this.f, this.source, sink, scheduler);
+	};
+
+	function ContinueWithSink(f, source, sink, scheduler) {
+		this.f = f;
+		this.sink = sink;
+		this.scheduler = scheduler;
+		this.active = true;
+		this.disposable = dispose.once(source.run(this, scheduler));
+	}
+
+	ContinueWithSink.prototype.error = Sink.prototype.error;
+
+	ContinueWithSink.prototype.event = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+		this.sink.event(t, x);
+	};
+
+	ContinueWithSink.prototype.end = function(t, x) {
+		if(!this.active) {
+			return;
+		}
+
+		var result = dispose.tryDispose(t, this.disposable, this.sink);
+		this.disposable = isPromise(result)
+			? dispose.promised(this._thenContinue(result, x))
+			: this._continue(this.f, x);
+	};
+
+	ContinueWithSink.prototype._thenContinue = function(p, x) {
+		var self = this;
+		return p.then(function () {
+			return self._continue(self.f, x);
+		});
+	};
+
+	ContinueWithSink.prototype._continue = function(f, x) {
+		return f(x).source.run(this.sink, this.scheduler);
+	};
+
+	ContinueWithSink.prototype.dispose = function() {
+		this.active = false;
+		return this.disposable.dispose();
 	};
 
 
