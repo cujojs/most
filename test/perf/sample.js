@@ -121,12 +121,13 @@ const m1 = most.of(1);
 suite
 	.add('most', function(deferred) {
 		// runners.runMost(deferred, sample(sum, most.from(a), m1).reduce(sum, 0));
+		// runners.runMost(deferred, most.from(a).sample(combineSamples, ...as.map(most.of)).reduce(sum, 0));
 		runners.runMost(deferred, sampleArray(combineSamples, most.from(a), as.map(most.of)).reduce(sum, 0));
 	}, options)
 	.add('rx 5', function(deferred) {
 		runners.runRx5(deferred,
 			// rxjs.Observable.from(a).withLatestFrom(rxjs.Observable.of(1), sum).reduce(sum, 0));
-			rxjs.Observable.fromArray(a).withLatestFrom(...rxjss, combineSamples).reduce(sum, 0));
+			rxjs.Observable.from(a).withLatestFrom(...rxjss, combineSamples).reduce(sum, 0));
 	}, options)
 	// .add('kefir', function(deferred) {
 	// 	runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).scan(sum, 0).last());
@@ -151,6 +152,7 @@ function add1(x) {
 }
 
 const combineSamples = (x, a) => x+a.length;
+// const combineSamples = (x, a) => x+a;
 
 function even(x) {
 	return x % 2 === 0;
