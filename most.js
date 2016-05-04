@@ -27,8 +27,6 @@ exports.periodic = periodic;
 
 var thru = require('./lib/combinator/thru').thru;
 
-exports.thru = thru;
-
 /**
  * Adapt a functional stream transform to fluent style.
  * It applies f to the this stream object
