@@ -1087,8 +1087,8 @@ import { periodic } from 'most'
 periodic(10, 1)
 	.take(5)
 	.scan((total, increment) => total + increment, 0)
-  .thru(hold)
-  .observe(x => console.log(x))
+	.thru(hold)
+	.observe(x => console.log(x))
 ```
 
 rather than mixing functional and fluent:
@@ -1100,7 +1100,7 @@ import { periodic } from 'most'
 hold(periodic(10, 1)
 	.take(5)
 	.scan((total, increment) => total + increment, 0))
-  .observe(x => console.log(x))
+	.observe(x => console.log(x))
 ```
 
 ## Consuming streams
