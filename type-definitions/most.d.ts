@@ -113,7 +113,7 @@ export interface Stream<A> {
 
   sample<B>(f: (...as: any[]) => B, ...ss: Array<Stream<any>>): Stream<B>;
   sampleWith<A>(sampler: Stream<any>): Stream<A>;
-  
+
   zip: PolymorphicSignature;
 
   recoverWith<B>(p: (a: B) => A): Stream<A>;
@@ -168,8 +168,8 @@ export function concat<A>(s1: Stream<A>, s2: Stream<A>): Stream<A>;
 export function startWith<A>(a: A, s: Stream<A>): Stream<A>;
 
 export function filter<A>(p: (a: A) => boolean, s: Stream<A>): Stream<A>;
-export function skipBepeats<A>(s: Stream<A>): Stream<A>;
-export function skipBepeatsWith<A>(eq: (a1: A, a2: A) => boolean, s: Stream<A>): Stream<A>;
+export function skipRepeats<A>(s: Stream<A>): Stream<A>;
+export function skipRepeatsWith<A>(eq: (a1: A, a2: A) => boolean, s: Stream<A>): Stream<A>;
 
 export function take<A>(n: number, s: Stream<A>): Stream<A>;
 export function skip<A>(n: number, s: Stream<A>): Stream<A>;
