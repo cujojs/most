@@ -49,6 +49,8 @@ most.js API
 	* [during](#during)
 1. Looping
 	* [loop](#loop)
+1. Adapting fluent APIs
+	* [thru](#thru)
 1. Consuming streams
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
@@ -325,8 +327,6 @@ Create a stream containing events from the provided [EventTarget](https://develo
 When passing an EventTarget, you can provide `useCapture` as the 3rd parameter, and it will be passed through to `addEventListener` and `removeEventListener`.  When not provided, `useCapture` defaults to `false`.
 
 When the stream ends (for example, by using [take](#take), [takeUntil](#until), etc.), it will automatically be disconnected from the event source.  For example, in the case of DOM events, the underlying DOM event listener will be removed automatically.
-
-
 
 **Notes on EventEmitter**
 
@@ -1064,6 +1064,43 @@ stream.loop(function(values, x) {
 	return { seed: values, value: avg };
 }, [])
 	.observe(console.log.bind(console));
+```
+
+## Adapting fluent APIs
+
+### thru
+
+####`stream.thru(transform) -> Stream`
+
+`transform(stream: Stream) -> Stream`
+
+Use a functional API in fluent style.
+
+Functional APIs allow for the highest degree of modularity via external packages, such as [`@most/hold`](https://github.com/mostjs/hold), *without the risks of modifying prototypes*.
+
+If you prefer using fluent APIs, `thru` allows using those functional APIs in a fluent style.  For example:
+
+```js
+import hold from '@most/hold'
+import { periodic } from 'most'
+
+periodic(10, 1)
+	.take(5)
+	.scan((total, increment) => total + increment, 0)
+	.thru(hold)
+	.observe(x => console.log(x))
+```
+
+rather than mixing functional and fluent:
+
+```js
+import hold from '@most/hold'
+import { periodic } from 'most'
+
+hold(periodic(10, 1)
+	.take(5)
+	.scan((total, increment) => total + increment, 0))
+	.observe(x => console.log(x))
 ```
 
 ## Consuming streams
