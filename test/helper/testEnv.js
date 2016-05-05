@@ -95,5 +95,5 @@ function cancelAll(tasks) {
 }
 
 function cancelOne(task) {
-	return task.cancel();
+	return task.dispose();
 }
