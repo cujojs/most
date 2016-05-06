@@ -256,6 +256,17 @@ Stream.prototype.transduce = function(transducer) {
 };
 
 //-----------------------------------------------------------------------
+// Extend (not quite Comonad ... yet)
+
+var extend = require('./lib/combinator/extend').extend;
+
+exports.extend = extend;
+
+Stream.prototype.extend = function(f) {
+	return extend(f, this);
+}
+
+//-----------------------------------------------------------------------
 // FlatMapping
 
 var flatMap = require('./lib/combinator/flatMap');
