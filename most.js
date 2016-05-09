@@ -7,6 +7,7 @@ var base = require('@most/prelude');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
+var symbolObservable = require('symbol-observable');
 
 /**
  * Core stream type
@@ -21,6 +22,19 @@ exports.empty    = Stream.empty = core.empty;
 exports.never    = core.never;
 exports.from     = from;
 exports.periodic = periodic;
+
+//-----------------------------------------------------------------------
+// ES7 Observable interop
+
+var subscribe = require('./lib/observable/subscribe').subscribe;
+
+Stream.prototype.subscribe = function(subscriber) {
+	subscribe(subscriber, this);
+};
+
+Stream.prototype[symbolObservable] = function() {
+	return this;
+}
 
 //-----------------------------------------------------------------------
 // Fluent adapter
