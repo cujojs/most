@@ -41,7 +41,7 @@
     "@most/hold": "^1.2.0",
     "buster": "^0.8.0",
     "eslint": "^1.10.3",
-    "markdown-doctest": "^0.3.4",
+    "markdown-doctest": "^0.4.0",
     "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
     "webpack": "^1.12.14"
