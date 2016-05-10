@@ -39,7 +39,7 @@
   "license": "MIT",
   "devDependencies": {
     "@most/hold": "^1.2.0",
-    "buster": "~0.7",
+    "buster": "^0.8.0",
     "eslint": "^1.10.3",
     "markdown-doctest": "^0.3.4",
     "transducers-js": "^0.4.174",
