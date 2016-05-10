@@ -29,7 +29,7 @@ exports.periodic = periodic;
 var subscribe = require('./lib/observable/subscribe').subscribe;
 
 Stream.prototype.subscribe = function(subscriber) {
-	subscribe(subscriber, this);
+	return subscribe(subscriber, this);
 };
 
 Stream.prototype[symbolObservable] = function() {
