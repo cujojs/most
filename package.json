@@ -8,7 +8,8 @@
     "lib/**/*.js"
   ],
   "scripts": {
-    "test": "eslint . && buster-test && npm run doctest",
+    "unit-test": "buster-test",
+    "test": "eslint . && npm run unit-test && npm run doctest",
     "build": "webpack --output-library most --output-library-target umd ./most.js --output-filename dist/most.js && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
     "preversion": "npm run build",
     "doctest": "markdown-doctest"
