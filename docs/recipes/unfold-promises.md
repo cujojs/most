@@ -17,21 +17,23 @@ If we were to run the code below we would observe the 1st url gets processed
 instantly while the 2nd waits for about 3 seconds before continuing to resolve
 the last.
 
-```js
-var most = require('most');
-var urls = ['http://reqres.in/api/users?page=2', 
-            'http://reqres.in/api/users?delay=3', 
-            'http://reqres.in/api/users?page=3'];
+```es6
+import { unfold } from 'most'
 
-most.unfold(function (urls) {
-    return urls.length === 0 
-    ? { done: true } 
-    : fetch(urls[0]).then(function(content){
-            return {
-                value: content,
-                seed: urls.slice(1)
-        };
-    })
-}, urls)
-.observe(console.log.bind(console));
+const fetch = url => {
+	// ... fetch url content and return a promise
+	return Promise.resolve('...')
+}
+
+const urls = ['http://reqres.in/api/users?page=2',
+            'http://reqres.in/api/users?delay=3',
+            'http://reqres.in/api/users?page=3']
+
+unfold(urls =>
+    urls.length === 0
+    ? { done: true }
+    : fetch(urls[0]).then(content => {
+        return { value: content, seed: urls.slice(1) }
+			}, urls))
+.observe(x => console.log(x));
 ```

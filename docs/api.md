@@ -239,21 +239,21 @@ most.iterate(function(x) {
 
 The iterating function may return a promise.  This allows `most.iterate` to be used to build asynchronous streams of future values.  For example:
 
-<!-- skip-example -->
-```js
-var when = require('when');
-// An infinite stream of all integers >= 0, each delayed by 1 more
-// millisecond than the previous.
+```es6
+// An infinite stream of all integers >= 0, each delayed
+// by 1 more millisecond than the previous.
 // IOW, a stream that decelerates as it produces values:
 // 0 (immediately)
 // 1 (1 millisecond after 0)
 // 2 (2 millisecond after 1)
 // 3 (3 millisecond after 2)
 // ... etc
-most.iterate(function(x) {
-	var y = x + 1;
-	return when(y).delay(y);
-}, 0);
+// Take only the first 10
+most.iterate(x => delay(x + 1)).take(10);
+
+// Simple promise delay helper
+const delay = y =>
+	new Promise(resolve => setTimeout(resolve, y, y), 0);
 ```
 
 ### most.unfold
@@ -272,18 +272,20 @@ The unfolding function accepts a seed value and must return a tuple: `{value:*, 
 
 Note that if the unfolding function never returns a tuple with `tuple.done == true`, the stream will be infinite.
 
-<!-- skip-example -->
-```js
-var rest = require('rest');
-var urlPrefix = 'product/';
+```es6
+const urlPrefix = 'product/'
+
+const fetch = url => {
+	// ... fetch content and return a promise
+	return Promise.resolve('...')
+}
 
 // Unfold an infinite stream of products, producing a stream of:
 // [rest('product/1'), rest('product/2'), rest('product/3'), ...]
-most.unfold(function(id) {
-	return rest(urlPrefix + id).then(function(content) {
-		return { value: content, seed: id + 1 };
-	});
-}, 1);
+most.unfold(id =>
+	fetch(urlPrefix + id).then(content => {
+		return { value: content, seed: id + 1 }
+	}), 1)
 ```
 
 ### most.generate
@@ -333,47 +335,39 @@ When the stream ends (for example, by using [take](#take), [takeUntil](#until), 
 1. When source event has more than one argument, all the arguments will be aggregated into array in resulting Stream.
 2. EventEmitters and EventTargets, such as DOM nodes, behave differently in that EventEmitter allows events to be delivered in the same tick as a listener is added.  When using EventEmitter, `most.fromEvent`, will *ensure asynchronous event delivery*, thereby preventing hazards of "maybe sync, maybe async" (aka zalgo) event delivery.
 
-```js
-var clicks = most.fromEvent('click', document.querySelector('.the-button'));
+```es6
+const clicks = most.fromEvent('click', document.querySelector('.the-button'));
 ```
 
-```js
+```es6
 // We can do some event delegation by applying a filter to the stream
 // in conjunction with e.target.matches this will allow only events with
 // .the-button class to be processed
 var container = document.querySelector('.container');
 most.fromEvent('click', container)
-	.filter(function(e){
-    	return e.target.matches('.the-button');
-	})
-	.forEach(doSomething);
+	.filter(e => e.target.matches('.the-button'))
+	.forEach(event => { /* do something with event */ })
 ```
 
-```js
+```es6
 // Using preventDefault
-var form = document.querySelector('form');
+const form = document.querySelector('form');
 most.fromEvent('submit', form)
-	.tap(function(e) {
-		e.preventDefault();
-	})
+	.tap(e => e.preventDefault())
 	.map(parseForm)
 	.map(JSON.stringify)
-	.forEach(postToServer);
+	.forEach(event => { /* do something with JSON data */ })
 ```
 
-```js
+```es6
 // Using event delegation with Element.matches
 // This allows only events with the .toggle-button class
 // It also only calls preventDefault on allowed events
-var container = document.querySelector('.container');
+const container = document.querySelector('.container');
 most.fromEvent('click', container)
-	.filter(function(e) {
-		return e.target.matches('.toggle-button');
-	})
-	.tap(function(e) {
-		e.preventDefault();
-	})
-    .forEach(doSomething);
+	.filter(e => e.target.matches('.toggle-button'))
+	.tap(e => e.preventDefault())
+	.forEach(event => { /* do something with event */ })
 ```
 <a name="mostcreate"/>
 ### most.create
@@ -482,8 +476,7 @@ stream
 
 Create a new stream containing `x` followed by all events in `stream`.
 
-<!-- skip-example -->
-```js
+```
 stream:              a-b-c-d->
 stream.startWith(x): xa-b-c-d->
 ```
@@ -495,8 +488,7 @@ stream.startWith(x): xa-b-c-d->
 
 Create a new stream containing all events in `stream1` followed by all events in `stream2`.
 
-<!-- skip-example -->
-```js
+```
 stream1:                 -a-b-c|
 stream2:                 -d-e-f->
 stream1.concat(stream2): -a-b-c-d-e-f->
@@ -539,19 +531,18 @@ stream.recoverWith(f): -a-b-c-d-e-f->
 
 When a stream fails with an error, the error will be passed to `f`.  `f` must return a new stream to replace the error.
 
-<!-- skip-example -->
-```js
-var rest = require('rest');
+```es6
+const fetch = url => {
+	// ... fetch content and return a promise
+	return Promise.resolve('...')
+}
 
-var stream = most.fromPromise(rest('http://myapi.com/things'));
+const stream = most.fromPromise(fetch('http://myapi.com/things'));
 
 // Try to process data from the real API, but fall back
 // to some default data if that fails.
 stream.map(JSON.parse)
-	.recoverWith(function(e) {
-		// console.error(e);
-		return most.of(defaultData);
-	})
+	.recoverWith(e => most.of(defaultData))
 	.forEach(processData);
 ```
 
@@ -561,8 +552,7 @@ stream.map(JSON.parse)
 
 Create a stream in the error state.  This can be useful for functions that need to return a stream, but need to signal an error.
 
-<!-- skip-example -->
-```js
+```
 most.throwError(X): X
 ```
 
@@ -625,23 +615,21 @@ stream.scan(add, 0): 01-3-6->
 
 Unlike [reduce](#reduce) which produces a single, final result, scan emits incremental results.  The resulting stream is of the same proportion as the original.  For example, if the original contains 10 events, the resulting stream will contain 11 (the initial value, followed by 10 incremental events).  If the original stream is infinite, the resulting stream will be infinite.
 
-```js
+```es6
 // Logs a ab abc abcd
 most.from(['a', 'b', 'c', 'd'])
-	.scan(function(string, letter) {
-		return string + letter;
-	}, '')
-	.forEach(console.log.bind(console));
+	.scan((string, letter) => string + letter, '')
+	.forEach(s => console.log(s));
 ```
 
-<!-- skip-example -->
-```js
+```es6
 // Maintain a sliding window of (up to) 3 values in an array
 
 // A stream containing all integers >= 0
-var numbers = most.iterate(function(x) {
-	return x+1;
-}, 0);
+const numbers = most.iterate(x => x + 1, 0);
+
+const nextWindow = (slidingWindow, x) =>
+	slidingWindow.concat(x).slice(-3)
 
 // Logs
 // []
@@ -651,10 +639,9 @@ var numbers = most.iterate(function(x) {
 // [1,2,3]
 // [2,3,4]
 // ... etc ...
-numbers.scan(function(slidingWindow, x) {
-	return slidingWindow.concat(x).slice(-3);
-}, [])
-	.forEach(console.log.bind(console));
+numbers.scan(nextWindow, [])
+	.take(10)
+	.forEach(array => console.log(array));
 ```
 ### chain
 
@@ -677,14 +664,11 @@ stream.chain(f):   -1--2-13---2-1-233|
 
 Note the difference between [`concatMap`](#concatmap) and [`chain`](#chain): `concatMap` concatenates, while `chain` merges.
 
-<!-- skip-example -->
-```js
+```es6
 // Logs: 1 2 1 1 2 1 1 2 2 2
 most.from([1, 2])
-	.chain(function(x) {
-		return most.periodic(x * 1000).take(5).constant(x);
-	})
-	.observe(console.log.bind(console));
+	.chain(x => most.periodic(x * 10).take(5).constant(x))
+	.observe(x => console.log(x));
 ```
 
 ### continueWith
@@ -703,17 +687,11 @@ f(end): 		               1-2-3-4-5->
 stream.continueWith(f): -a-b-c-d-1-2-3-4-5->
 ```
 
-
-<!-- skip-example -->
-```js
-most.periodic(1000, 'x')
+```es6
+most.periodic(10, 'x')
     .take(4)
-    .continueWith(function() {
-        return most.iterate(function(x) {
-            return x + 1;
-        }, 1).take(5)
-    })
-    .observe(console.log.bind(console));
+    .continueWith(() => most.iterate(x => x + 1, 1).take(5))
+		.observe(x => console.log(x));
   // Logs: x 4 times... ends and then logs 1, 2, 3, 4, 5
 ```
 
@@ -739,13 +717,10 @@ f called lazily:      ^      ^          ^
 
 Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
 
-<!-- skip-example -->
-```js
+```es6
 // Logs: 1 1 1 1 1 2 2 2 2 2
 most.from([1, 2])
-	.concatMap(function(x) {
-		return most.periodic(x * 1000).take(5).constant(x);
-	})
+	.concatMap(x => most.periodic(x * 10).take(5).constant(x))
 	.observe(console.log.bind(console));
 ```
 
@@ -771,15 +746,16 @@ In effect, `ap` applies a *time-varying function* to a *time-varying value*.
 
 Materialize event timestamps, transforming `Stream<X>` into `Stream<{ time:number, value:X }>`
 
-```
+```es6
 // Logs
+// { time: 1418740004055, value: 'hello' }
+// { time: 1418740004065, value: 'hello' }
+// { time: 1418740004075, value: 'hello' }
 // { time: 1418740004085, value: 'hello' }
-// { time: 1418740005085, value: 'hello' }
-// { time: 1418740006085, value: 'hello' }
-// { time: 1418740007085, value: 'hello' }
 // ... etc
-most.periodic(1000).constant('hello')
+most.periodic(10).constant('hello')
 	.timestamp()
+	.take(10)
 	.observe(console.log.bind(console));
 ```
 
@@ -855,19 +831,19 @@ Create a new stream by passing items through the provided transducer.
 Most.js supports any transducer that implements the *de facto* JavaScript transducer protocol.  For example, two popular transducers libraries are [transducers-js](https://github.com/cognitect-labs/transducers-js) and [transducers.js](https://github.com/jlongster/transducers.js).
 
 
-```js
+```es6
 // Create a transducer that slices, filters, and maps
-var transducers = require('transducers-js');
+import transducers from 'transducers-js'
 var transducer = transducers.comp(
 	transducers.take(4),
 	transducers.filter(x => x % 2 === 0),
 	transducers.map(x => x + 1)
-);
+)
 
 // Logs 3 5
 most.from([1,2,3,4,5,6,7,8,9])
 	.transduce(transducer)
-	.observe(x => console.log(x));
+	.observe(x => console.log(x))
 ```
 
 **Note on transducer performance:** Transducers perform single-pass transformation.  For many data structures, this can provide a significant performance improvement.  However, most.js's builtin combinators currently outperform popular transducer libraries.  The primary benefit of using transducers with most.js is reusability and portability.
@@ -969,12 +945,12 @@ stream.until(endSignal): -a-b-c|
 
 If `endSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to `stream`.
 
-```js
+```es6
 // Log mouse events until the user clicks. Note that DOM event handlers will
 // automatically be unregistered.
 most.fromEvent('mousemove', document)
 	.until(most.fromEvent('click', document))
-	.forEach(console.log.bind(console));
+	.forEach(mouseEvent => console.log(mouseEvent));
 ```
 
 ### since
@@ -994,11 +970,11 @@ stream.since(startSignal): -------d-e-f->
 
 If `startSignal` is empty or never emits an event, then the returned stream will be effectively equivalent to [`never()`](#mostnever).
 
-```js
+```es6
 // Start logging mouse events when the user clicks.
 most.fromEvent('mousemove', document)
 	.since(most.fromEvent('click', document))
-	.forEach(console.log.bind(console));
+	.forEach(mouseEvent => console.log(mouseEvent));
 ```
 
 ### during
@@ -1017,20 +993,20 @@ stream.during(timeWindow): -----c-d-e-|
 
 This is similar to [slice](#slice), but uses time signals rather than indices to limit the stream.
 
-```js
+```es6
 // After the first click, log mouse move events for 1 second.
 // Note that DOM event handlers will automatically be unregistered.
-var start = most.fromEvent('click', document);
-var end = most.of().delay(1000);
+const start = most.fromEvent('click', document);
+const end = most.of().delay(1000);
 
 // Map the first click to a stream containing a 1 second delay
 // The click represents the window start time, after which
 // the window will be open for 1 second.
-var timeWindow = start.constant(end);
+const timeWindow = start.constant(end);
 
 most.fromEvent('mousemove', document)
 	.during(timeWindow)
-	.observe(console.log.bind(console));
+	.forEach(mouseEvent => console.log(mouseEvent));
 ```
 
 ## Looping
@@ -1044,26 +1020,26 @@ Create a feedback loop that emits one value and feeds back another to be used in
 
 It allows you to maintain and update a "state" (aka feedback, aka `seed` for the next iteration) while emitting a different value.  In contrast, [`scan`](#scan) feeds back and emits the same value.
 
-```js
+```es6
 // Average an array of values
-function average(values) {
-	return values.reduce(function(sum, x) {
-		return sum + x;
-	}, 0) / values.length;
-}
+const average = values =>
+	values.reduce((sum, x) => sum + x, 0) / values.length
+
+const stream = most.iterate(x => x + 1, 0)
 
 // Emit the simple (ie windowed) moving average of the 10 most recent values
-stream.loop(function(values, x) {
+stream.loop((values, x) => {
 	values.push(x);
 	values = values.slice(-10); // Keep up to 10 most recent
-	var avg = average(values);
+	const avg = average(values);
 
 	// Return { seed, value } pair.
 	// seed will feed back into next iteration
 	// value will be propagated
 	return { seed: values, value: avg };
 }, [])
-	.observe(console.log.bind(console));
+	.take(10)
+	.observe(avg => console.log(avg));
 ```
 
 ## Adapting fluent APIs
@@ -1080,7 +1056,7 @@ Functional APIs allow for the highest degree of modularity via external packages
 
 If you prefer using fluent APIs, `thru` allows using those functional APIs in a fluent style.  For example:
 
-```js
+```es6
 import hold from '@most/hold'
 import { periodic } from 'most'
 
@@ -1093,7 +1069,7 @@ periodic(10, 1)
 
 rather than mixing functional and fluent:
 
-```js
+```es6
 import hold from '@most/hold'
 import { periodic } from 'most'
 
@@ -1138,10 +1114,8 @@ Start consuming events from `stream`, processing each with `f`.  The returned pr
 // Log mouse movements until the user clicks, then stop.
 most.fromEvent('mousemove', document)
 	.takeUntil(most.fromEvent('click', document))
-	.observe(console.log.bind(console))
-	.then(function() {
-		console.log('All done');
-	});
+	.observe(x => console.log(x))
+	.then(() => console.log('All done'))
 ```
 
 ### drain
@@ -1204,34 +1178,31 @@ Combining creates a new stream by applying a function to the most recent event f
 
 A combined stream has the same proportion as the max of the proportions of its input streams. To put it imperative terms: combine ends after all its inputs have ended.
 
-```js
+```es6
 // Add the current value of two inputs
 // Updates the result whenever *either* of the inputs changes!
 
 // Create a stream from an <input> value
-function fromInput(input) {
-	return most.fromEvent('change', input)
-		.map(function(e) { return e.target.value })
-		.map(Number);
-}
+const fromInput = input =>
+	most.fromEvent('change', input)
+		.map(e => e.target.value)
+		.map(Number)
 
 // Add two numbers
-function add(x, y) {
-	return x + y;
-}
+const add = (x, y) => x + y
 
 // Create streams for the current value of x and y
-var xStream = fromInput(document.querySelector('input.x'));
-var yStream = fromInput(document.querySelector('input.y'));
+const xStream = fromInput(document.querySelector('input.x'))
+const yStream = fromInput(document.querySelector('input.y'))
 
 // Create a result stream by adding x and y
 // This always adds the latest value of x and y
-var resultStream = xStream.combine(add, yStream);
+const resultStream = most.combine(add, xStream, yStream)
 
-var resultNode = document.querySelector('.result');
-resultStream.observe(function(z) {
-	resultNode.textContent = z;
-});
+const resultNode = document.querySelector('.result')
+resultStream.observe(z => {
+	resultNode.textContent = z
+})
 ```
 
 ### combineArray
@@ -1277,32 +1248,30 @@ While [`combine`](#combine), produces a value whenever an event arrives on any o
 // Updates only when the user clicks a button
 
 // Create a stream from an <input> value
-function fromInput(input) {
-	return most.fromEvent('change', input)
-		.map(function(e) { return e.target.value })
-		.map(Number);
-}
+const fromInput = input =>
+	most.fromEvent('change', input)
+		.map(e => e.target.value)
+		.map(Number)
 
 // Add two numbers
-function add(x, y) {
-	return x + y;
-}
+const add = (x, y) => x + y
 
 // Create streams for the current value of x and y
-var xStream = fromInput(document.querySelector('input.x'));
-var yStream = fromInput(document.querySelector('input.y'));
-var click = most.fromEvent('click', document.querySelector('.button'));
+const xStream = fromInput(document.querySelector('input.x'))
+const yStream = fromInput(document.querySelector('input.y'))
+
+const click = most.fromEvent('click', document.querySelector('.button'))
 
 // Create a result stream by adding the values of x and y
 // at the time the button was clicked.
 // NOTE: add() is NOT called when x and y change, but rather
 // only when the button is clicked.
-var resultStream = click.sample(add, xStream, yStream);
+const resultStream = most.sample(add, click, xStream, yStream)
 
-var resultNode = document.querySelector('.result');
-resultStream.observe(function(z) {
-	resultNode.textContent = z;
-});
+const resultNode = document.querySelector('.result')
+resultStream.observe(z => {
+	resultNode.textContent = z
+})
 ```
 
 ### sampleWith
@@ -1351,16 +1320,14 @@ Zipping correlates *by index* corresponding events from two or more input stream
 
 A zipped stream ends when any one of its input streams ends.
 
-```js
-function add(x, y) {
-	return x + y;
-}
+```es6
+const add = (x, y) => x + y
 
 // Logs 5 7 9
 // In other words: add(1, 4) add(2, 5) add(3, 6)
 most.from([1,2,3])
 	.zip(add, most.from([4,5,6,7,8]))
-	.forEach(console.log.bind(console));
+	.forEach(x => console.log(x))
 ```
 
 ## Combining higher-order streams
@@ -1459,19 +1426,20 @@ stream:         -p---q---r->
 stream.await(): ---1--X
 ```
 
-<!-- skip-example -->
-```js
-var urls = [url1, url2, url3, ...];
+```es6
+const urls = ['http://...', 'http://...', 'http://...']
 
-function fetchContent(url) {
-   // return a promise
+const fetchContent = url => {
+   // ... fetch url and return a promise for it ...
+   //
+   return Promise.resolve(url)
 }
 
-var streamOfPromises = most.from(urls).map(fetchContent);
+const streamOfPromises = most.from(urls).map(fetchContent)
 
-var streamOfContent = streamOfPromises.await();
+const streamOfContent = streamOfPromises.await()
 
-streamOfContent.forEach(console.log.bind(console));
+streamOfContent.forEach(content => console.log(content))
 ```
 
 ## Rate limiting streams
@@ -1498,17 +1466,15 @@ If the stream ends while there is a pending debounced event (e.g. via [`until`](
 
 Debouncing can be extremely useful when dealing with bursts of similar events, for example, debouncing keypress events before initiating a remote search query in a browser application.
 
-```js
-var searchInput = document.querySelector('[name="search-text"]');
-var searchText = most.fromEvent('input', searchInput);
+```es6
+const searchInput = document.querySelector('[name="search-text"]');
+const searchText = most.fromEvent('input', searchInput);
 
 // Logs the current value of the searchInput, only after the
 // user stops typing for 500 millis
 searchText.debounce(500)
-	.map(function(e) {
-		return e.target.value;
-	})
-	.observe(console.log.bind(console));
+	.map(e => e.target.value)
+	.observe(x => console.log(x));
 ```
 
 See the [type-to-search example](../examples) for a more complete example of using `debounce`.

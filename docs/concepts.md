@@ -5,8 +5,8 @@
 Consider the following statement:
 
 <!-- skip-example -->
-```js
-var x = a + b;
+```es6
+const x = a + b;
 ```
 
 In imperative JavaScript, this statement expresses a one-time *assignment*.  We know that the value of `a + b` will be stored in the variable `x` when the statement is executed.  If `a` or `b` changes later, `x` will not.
@@ -33,17 +33,17 @@ A Higher-order stream is a "stream of streams": a stream whose event values are 
 
 Conceptually, a higher-order stream is like an Array of Arrays: `[[1,2,3], [4,5,6], [4,5,6]]`.  For example, to create a higher-order stream similar to that:
 
-```js
+```es6
 most.from([most.from([1,2,3]), most.from([4,5,6]), most.from([7,8,9])]);
 ```
 
 That's not a terribly interesting higher-order stream since it can be easily done with Arrays.  However, higher-order streams can express much more useful things. For example, here is a stream representing all of the mouse move events that occur for 5 seconds after the first mouse click:
 
-```js
-var firstClick = most.fromEvent('click', document).take(1);
-var mousemovesAfterFirstClick = firstClick.map(function() {
-	return most.fromEvent('mousemove', document).takeUntil(most.of().delay(5000));
-});
+```es6
+const firstClick = most.fromEvent('click', document).take(1);
+const mousemovesAfterFirstClick = firstClick.map(() =>
+	most.fromEvent('mousemove', document)
+		.takeUntil(most.of().delay(5000)))
 ```
 
 In that case `mousemovesAfterFirstClick` is a higher order stream containing one event, whose value is a *stream* of `mousemove` events.
