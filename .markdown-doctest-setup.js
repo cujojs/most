@@ -1,4 +1,4 @@
-var most = require('.');
+var most = require(__dirname);
 
 // needed for regeneratorRuntime
 require('babel-polyfill');
