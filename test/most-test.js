@@ -1,66 +1,74 @@
 require('buster').spec.expose();
-var expect = require('buster').expect;
+var assert = require('buster').referee.assert;
 
 var most = require('../most');
+var symbolObservable = require('symbol-observable');
 
 describe('just', function() {
 	it('should be an alias for of', function() {
-		expect(typeof most.just).toBe('function');
-		expect(most.just).toBe(most.of);
+		assert.isFunction(most.just);
+		assert.same(most.just, most.of);
 	});
 });
 
 describe('chain', function() {
 	it('should be an alias for flatMap', function() {
-		expect(typeof most.chain).toBe('function');
-		expect(most.chain).toBe(most.flatMap);
-		expect(most.Stream.prototype.chain).toBe(most.Stream.prototype.flatMap);
+		assert.isFunction(most.chain);
+		assert.same(most.chain, most.flatMap);
+		assert.same(most.Stream.prototype.chain, most.Stream.prototype.flatMap);
 	});
 });
 
 describe('forEach', function() {
 	it('should be an alias for observe', function() {
-		expect(typeof most.forEach).toBe('function');
-		expect(most.forEach).toBe(most.observe);
-		expect(most.Stream.prototype.forEach).toBe(most.Stream.prototype.observe);
+		assert.isFunction(most.forEach);
+		assert.same(most.forEach, most.observe);
+		assert.same(most.Stream.prototype.forEach, most.Stream.prototype.observe);
 	});
 });
 
 describe('takeUntil', function() {
 	it('should be an alias for until', function() {
-		expect(typeof most.takeUntil).toBe('function');
-		expect(most.takeUntil).toBe(most.until);
-		expect(most.Stream.prototype.takeUntil).toBe(most.Stream.prototype.until);
+		assert.isFunction(most.takeUntil);
+		assert.same(most.takeUntil, most.until);
+		assert.same(most.Stream.prototype.takeUntil, most.Stream.prototype.until);
 	});
 });
 
 describe('skipUntil', function() {
 	it('should be an alias for since', function() {
-		expect(typeof most.skipUntil).toBe('function');
-		expect(most.skipUntil).toBe(most.since);
-		expect(most.Stream.prototype.skipUntil).toBe(most.Stream.prototype.since);
+		assert.isFunction(most.skipUntil);
+		assert.same(most.skipUntil, most.since);
+		assert.same(most.Stream.prototype.skipUntil, most.Stream.prototype.since);
 	});
 });
 
 describe('flatMapEnd', function() {
 	it('should be an alias for continueWith', function() {
-		expect(typeof most.flatMapEnd).toBe('function');
-		expect(most.flatMapEnd).toBe(most.continueWith);
-		expect(most.Stream.prototype.flatMapEnd).toBe(most.Stream.prototype.continueWith);
+		assert.isFunction(most.flatMapEnd);
+		assert.same(most.flatMapEnd, most.continueWith);
+		assert.same(most.Stream.prototype.flatMapEnd, most.Stream.prototype.continueWith);
 	});
 
 	describe('flatMapError', function() {
 		it('should be an alias for recoverWith', function () {
-			expect(typeof most.flatMapError).toBe('function');
-			expect(most.flatMapError).toBe(most.recoverWith);
-			expect(most.Stream.prototype.flatMapError).toBe(most.Stream.prototype.recoverWith);
+			assert.isFunction(most.flatMapError);
+			assert.same(most.flatMapError, most.recoverWith);
+			assert.same(most.Stream.prototype.flatMapError, most.Stream.prototype.recoverWith);
 		});
 	});
 });
 
 describe('multicast', function() {
 	it('should be a function', function() {
-		expect(typeof most.multicast).toBe('function');
-		expect(typeof most.Stream.prototype.multicast).toBe('function');
+		assert.isFunction(most.multicast);
+		assert.isFunction(most.Stream.prototype.multicast);
+	});
+});
+
+describe('ES7 Observable API interop', function() {
+	it('should exist', function() {
+		assert.isFunction(most.Stream.prototype.subscribe);
+		assert.isFunction(most.Stream.prototype[symbolObservable]);
 	});
 });
