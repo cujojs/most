@@ -132,14 +132,14 @@ most.of(x): x|
 Create a stream containing only x.
 
 ```js
-var stream = most.of('hello');
-stream.forEach(console.log.bind(console)); // logs hello
+const stream = most.of('hello');
+stream.observe(x => console.log(x)); // logs hello
 ```
 
 ```js
-// Use `just` for easy ES6 import
+// Use `just` for destructured ES6 import
 import { just } from 'most';
-let stream = just('hello');
+const stream = just('hello');
 stream.observe(x => console.log(x));
 ```
 
