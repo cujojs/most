@@ -372,6 +372,8 @@ most.fromEvent('click', container)
 <a name="mostcreate"/>
 ### most.create
 
+**Deprecated**: `most.create` will be moved to a separate package.  Once that package is available, `most.create` will be removed.
+
 ####`most.create(publisher) -> Stream`
 
 Create a push-stream for imperatively pushing events, primarily for situations where existing, declarative sources, like [`fromEvent`](#mostfromevent), [`unfold`](#mostunfold), [`iterate`](#mostiterate), etc. can't be used.

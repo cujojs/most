@@ -44,6 +44,7 @@ Stream.prototype.thru = function(f) {
 var create = require('./lib/source/create');
 
 /**
+ * @deprecated
  * Create a stream by imperatively pushing events.
  * @param {function(add:function(x), end:function(e)):function} run function
  *  that will receive 2 functions as arguments, the first to add new values to the
