@@ -6,6 +6,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var lazy = require('lazy.js');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -73,6 +74,10 @@ suite
 	.add('lodash', function() {
 		// "Merge" synchronous arrays by concatenation
 		return lodash(a).flatten().reduce(sum, 0);
+	})
+	.add('lazy', function() {
+		// "Merge" synchronous arrays by concatenation
+		return lazy(a).flatten().reduce(sum, 0);
 	})
 	.add('Array', function() {
 		// "Merge" synchronous arrays by concatenation

@@ -6,6 +6,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var lazy = require('lazy.js');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -44,6 +45,9 @@ suite
 	}, options)
 	.add('lodash', function() {
 		return lodash(a).uniq(true).reduce(sum, 0);
+	})
+	.add('lazy', function() {
+		return lazy(a).uniq().reduce(sum, 0);
 	})
 	.add('Array', function() {
 		return arrayUniq(a).reduce(sum, 0);

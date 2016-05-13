@@ -5,6 +5,7 @@ var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
+var lazy = require('lazy.js')
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -63,6 +64,9 @@ suite
 	.add('lodash', function() {
 		return lodashConcatMap(identity, a).reduce(sum, 0);
 	})
+	.add('lazy', function() {
+		return lazyConcatMap(identity, a).reduce(sum, 0);
+	})
 	.add('Array', function() {
 		return arrayConcatMap(identity, a).reduce(sum, 0);
 	});
@@ -77,6 +81,10 @@ function arrayConcatMap(f, a) {
 
 function lodashConcatMap(f, a) {
 	return lodash(a).map(f).flatten();
+}
+
+function lazyConcatMap(f, a) {
+	return lazy(a).map(f).flatten();
 }
 
 function sum(x, y) {

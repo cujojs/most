@@ -6,6 +6,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var lazy = require('lazy.js');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -48,6 +49,9 @@ suite
 	.add('lodash', function() {
 		return lodashScan(sum, 0, a).reduce(passthrough, 0);
 	})
+	.add('lazy', function() {
+		return lazyScan(sum, 0, a).reduce(passthrough, 0);
+	})
 	.add('Array', function() {
 		return arrayScan(sum, 0, a).reduce(passthrough, 0);
 	});
@@ -64,6 +68,13 @@ function arrayScan(f, initial, a) {
 function lodashScan(f, initial, a) {
 	var result = initial;
 	return lodash(a).map(function(x) {
+		return result = f(result, x);
+	});
+}
+
+function lazyScan(f, initial, a) {
+	var result = initial;
+	return lazy(a).map(function(x) {
 		return result = f(result, x);
 	});
 }

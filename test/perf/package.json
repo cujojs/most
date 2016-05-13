@@ -23,6 +23,7 @@
     "benchmark": "github:bestiejs/benchmark.js#master",
     "highland": "^2.5.1",
     "kefir": "^3.2.0",
+    "lazy.js": "^0.4.2",
     "lodash": "^3.10.1",
     "rx": "^4.0.7"
   }
