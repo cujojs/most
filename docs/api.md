@@ -4,6 +4,8 @@ most.js API
 1. Reading these docs
 	* [Notation](#notation)
 	* [Concepts](https://github.com/cujojs/most/wiki/Concepts)
+1. API Notes
+	* [ES7 Observable interop](#es7-observable-interop)
 1. Creating streams
 	* [most.of](#mostof), alias [most.just](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -116,6 +118,15 @@ A stream that emits `a`, then `b`, then fails.
 
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
 
+## ES7 Observable interop
+
+Most.js implements a subset of the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable):
+
+* `stream[Symbol.observable]` returns a compatible observable with a `subscribe` method that other implementations can consume.
+* `most.from(observable)` coerces a compliant `observable` (one that provides `[Symbol.observable]`) to a most.js stream.
+
+This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
+
 ## Creating streams
 
 ### most.of
@@ -156,13 +167,22 @@ Create a stream containing the outcome of a promise.  If the promise fulfills, t
 
 ### most.from
 
-####`most.from(iterable) -> Stream`
+####`most.from(iterable | observable) -> Stream`
+
+```
+observable:            -a--b--c--c-->
+most.from(observable): -a--b--c--c-->
+```
 
 ```
 most.from([1,2,3,4]): 1234|
 ```
 
-Create a stream containing all items from an iterable.  The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
+Create a stream containing all items from an observable or iterable.
+
+The observable must provide minimal ES7 observable compliance as per the [es-observable draft](https://github.com/zenparsing/es-observable): it must have a `[Symbol.observable]()` method that return an object with a well-behaved `.subscribe()` method.
+
+The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
 
 ```js
 // Logs 1 2 3 4
