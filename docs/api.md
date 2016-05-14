@@ -127,6 +127,15 @@ Most.js implements a subset of the [ES7 Observable draft spec](https://github.co
 
 This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
 
+### Consuming ES7 Observables with most.js
+
+Most.js can consume observables in a variety of ways:
+
+* `most.from` will coerce an observable to a most.js stream
+*
+
+### Consuming Most.js streams with other libraries
+
 ## Creating streams
 
 ### most.of
