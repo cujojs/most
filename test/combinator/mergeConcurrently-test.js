@@ -1,38 +1,40 @@
-require('buster').spec.expose();
-var expect = require('buster').expect;
+import { spec, referee } from 'buster';
+const { describe, it } = spec
+const { fail, assert } = referee;
 
-var mergeConcurrently = require('../../lib/combinator/mergeConcurrently').mergeConcurrently;
-var periodic = require('../../lib/source/periodic').periodic;
-var take = require('../../lib/combinator/slice').take;
-var just = require('../../lib/source/core').of;
-var fromArray = require('../../lib/source/fromArray').fromArray;
-var te = require('../helper/testEnv');
+import { mergeMapConcurrently, mergeConcurrently } from '../../lib/combinator/mergeConcurrently';
+import { periodic } from '../../lib/source/periodic';
+import { take } from '../../lib/combinator/slice';
+import { drain } from '../../lib/combinator/observe';
+import { of as just } from '../../lib/source/core';
+import { fromArray } from '../../lib/source/fromArray';
+import te from '../helper/testEnv';
 
-var sentinel = { value: 'sentinel' };
+const sentinel = { value: 'sentinel' };
 
-describe('mergeConcurrently', function() {
-	it('should be identity for 1 stream', function() {
-		var s = mergeConcurrently(1, just(periodic(1, sentinel)));
-		var n = 3;
+describe('mergeConcurrently', () => {
+	it('should be identity for 1 stream', () => {
+		const s = mergeConcurrently(1, just(periodic(1, sentinel)));
+		const n = 3;
 
 		return te.collectEvents(take(n, s), te.ticks(n))
-			.then(function(events) {
-				expect(events).toEqual([
+			.then(events => {
+				assert.equals(events, [
 					{ time: 0, value: sentinel },
 					{ time: 1, value: sentinel },
 					{ time: 2, value: sentinel }
-				]);
+				])
 			});
 	});
 
-	it('should merge all when number of streams <= concurrency', function() {
-		var streams = [periodic(1, 1), periodic(1, 2), periodic(1, 3)];
-		var s = mergeConcurrently(streams.length, fromArray(streams));
-		var n = 3;
+	it('should merge all when number of streams <= concurrency', () => {
+		const streams = [periodic(1, 1), periodic(1, 2), periodic(1, 3)];
+		const s = mergeConcurrently(streams.length, fromArray(streams));
+		const n = 3;
 
 		return te.collectEvents(take(n*streams.length, s), te.ticks(n))
-			.then(function(events) {
-				expect(events).toEqual([
+			.then(events => {
+				assert.equals(events, [
 					{ time: 0, value: 1 },
 					{ time: 0, value: 2 },
 					{ time: 0, value: 3 },
@@ -47,16 +49,16 @@ describe('mergeConcurrently', function() {
 
 	});
 
-	it('should merge up to concurrency', function() {
-		var n = 3;
-		var m = 2;
+	it('should merge up to concurrency', () => {
+		const n = 3;
+		const m = 2;
 
-		var streams = [take(n, periodic(1, 1)), take(n, periodic(1, 2)), take(n, periodic(1, 3))];
-		var s = mergeConcurrently(m, fromArray(streams));
+		const streams = [take(n, periodic(1, 1)), take(n, periodic(1, 2)), take(n, periodic(1, 3))];
+		const s = mergeConcurrently(m, fromArray(streams));
 
 		return te.collectEvents(take(n*streams.length, s), te.ticks(m*n))
-			.then(function(events) {
-				expect(events).toEqual([
+			.then(events => {
+				assert.equals(events, [
 					{ time: 0, value: 1 },
 					{ time: 0, value: 2 },
 					{ time: 1, value: 1 },
@@ -68,6 +70,13 @@ describe('mergeConcurrently', function() {
 					{ time: 4, value: 3 }
 				]);
 			});
-
 	});
 });
+
+describe('mergeMapConcurrently', () => {
+	it('when mapping function throws, it should catch and propagate error', () => {
+		const error = new Error()
+		const s = mergeMapConcurrently(x => { throw error; }, 1, just(0));
+		return drain(s).then(fail, e => assert.same(error, e));
+	})
+})
