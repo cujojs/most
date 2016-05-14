@@ -4,7 +4,6 @@ var rx = require('rx');
 var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
-var lodash = require('lodash');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -59,25 +58,9 @@ suite
 	// Highland doesn't have concatMap
 	//.add('highland', function(deferred) {
 	//	runners.runHighland(deferred, highland(a).flatMap(highland).reduce(0, sum));
-	//}, options)
-	.add('lodash', function() {
-		return lodashConcatMap(identity, a).reduce(sum, 0);
-	})
-	.add('Array', function() {
-		return arrayConcatMap(identity, a).reduce(sum, 0);
-	});
+	//}, options);
 
 runners.runSuite(suite);
-
-function arrayConcatMap(f, a) {
-	return a.reduce(function(a, x) {
-		return a.concat(f(x));
-	}, []);
-}
-
-function lodashConcatMap(f, a) {
-	return lodash(a).map(f).flatten();
-}
 
 function sum(x, y) {
 	return x + y;

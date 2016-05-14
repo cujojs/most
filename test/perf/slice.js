@@ -4,7 +4,6 @@ var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
 var bacon = require('baconjs');
-var lodash = require('lodash');
 var highland = require('highland');
 
 var runners = require('./runners');
@@ -49,12 +48,6 @@ suite
 	.add('highland', function(deferred) {
 		runners.runHighland(deferred, highland(a).drop(s).take(t).reduce(0, sum));
 	}, options)
-	.add('lodash', function() {
-		return lodash(a).slice(s).slice(0, t).reduce(sum, 0);
-	})
-	.add('Array', function() {
-		return a.slice(s).slice(0, t).reduce(sum, 0);
-	});
 
 runners.runSuite(suite);
 

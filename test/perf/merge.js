@@ -4,7 +4,6 @@ var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
 var bacon = require('baconjs');
-var lodash = require('lodash');
 var highland = require('highland');
 
 var runners = require('./runners');
@@ -69,15 +68,7 @@ suite
 		var streams = a.map(highland);
 		runners.runHighland(deferred, highland(streams).merge().reduce(0, sum));
 		//runners.runHighland(deferred, highland(streams).flatMap(identity).reduce(0, sum));
-	}, options)
-	.add('lodash', function() {
-		// "Merge" synchronous arrays by concatenation
-		return lodash(a).flatten().reduce(sum, 0);
-	})
-	.add('Array', function() {
-		// "Merge" synchronous arrays by concatenation
-		return Array.prototype.concat.apply([], a).reduce(sum, 0);
-	});
+	}, options);
 
 runners.runSuite(suite);
 
