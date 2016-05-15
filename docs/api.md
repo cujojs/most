@@ -127,14 +127,51 @@ Most.js implements a subset of the [ES7 Observable draft spec](https://github.co
 
 This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
 
+### Consuming Most.js streams with other libraries
+
+Any lib with functions and methods that accept observables should accept most.js Streams seamlessly.  As always, consult the documentation of the other libraries for specifics.
+
 ### Consuming ES7 Observables with most.js
 
-Most.js can consume observables in a variety of ways:
+Use `most.from` to coerce any observable to a most.js stream:
 
-* `most.from` will coerce an observable to a most.js stream
-*
+```js
+import { from } from 'most'
 
-### Consuming Most.js streams with other libraries
+const mostStream = from(anyObservable)
+```
+
+You can use `most.from` in other creative ways as well:
+
+```js
+const functionThatReturnsAnObservable = a => // return an observable
+
+// Using chain (aka flatMap)
+const mostStream = //...
+
+// Use .map.chain
+mostStream.map(functionThatReturnsAnObservable).chain(from)
+	.observe(b => console.log(b))
+
+// Or use function composition, using your favorite FP lib
+mostStream.chain(compose(functionThatReturnsAnObservable, from))
+```
+
+A similar approach works with other higher order operations such as [`join`](#join) and [`switch`](#switch).
+
+```js
+mostStream.map(functionThatReturnsAnObservable).map(from).join()...
+
+mostStream.map(functionThatReturnsAnObservable).map(from).switch()...
+```
+
+Or with merge, combine, etc. by coercing first
+
+```js
+arrayOfObservables = [...]
+most.mergeArray(arrayOfObservables.map(from))
+most.combineArray(combineFunction, arrayOfObservables.map(from))
+```
 
 ## Creating streams
 
