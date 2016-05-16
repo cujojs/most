@@ -57,6 +57,7 @@ most.js API
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
 	* [drain](#drain)
+	* [subscribe](#subscribe)
 1. Combining streams
 	* [merge](#merge)
 	* [mergeArray](#mergearray)
@@ -122,14 +123,16 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 
 Most.js implements a subset of the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable):
 
-* `stream[Symbol.observable]` returns a compatible observable with a `subscribe` method that other implementations can consume.
-* `most.from(observable)` coerces a compliant `observable` (one that provides `[Symbol.observable]`) to a most.js stream.
+* `stream[Symbol.observable]() -> Observable` returns a compatible observable with a `subscribe` method that other implementations can consume.
+* [`most.from(observable) -> Stream`](#mostfrom) coerces a compliant `observable` (one that provides `[Symbol.observable]()`) to a most.js stream.
+* [`stream.forEach(f) -> Promise`](#observe) is fully compatible with the ES7 Observable `forEach` API.
+* [`stream.subscribe(observer) -> Subscription`](#subscribe) subscribes to a most.js Stream using the ES7 Observable `subscribe` API.
 
 This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
 
 ### Consuming Most.js streams with other libraries
 
-Any lib with functions and methods that accept observables should accept most.js Streams seamlessly.  As always, consult the documentation of the other libraries for specifics.
+Consult the documentation of other libraries for specifics.  Any functions and methods that accept ES7 Observable should accept most.js Streams seamlessly.
 
 ### Consuming ES7 Observables with most.js
 
@@ -1178,6 +1181,8 @@ Alias: **forEach**
 
 Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
+The `forEach` alias is compatible with the [ES7 Observable draft spec `forEach`](https://github.com/zenparsing/es-observable#api). Read more about [ES7 Observable interop here](#es7-observable-interop).
+
 ```js
 // Log mouse movements until the user clicks, then stop.
 most.fromEvent('mousemove', document)
@@ -1194,6 +1199,34 @@ most.fromEvent('mousemove', document)
 Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
 The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
+
+### subscribe
+
+####`stream.subscribe(Observer) -> Subscription`
+
+ES7 Observable compatible subscribe.  Start consuming events from `stream` by providing an [ES7 Observer object](https://github.com/zenparsing/es-observable#observer).
+
+```js
+type Observer = {
+  // Receives the next value in the sequence
+  next(value) => void
+  // Receives the sequence error
+  error(errorValue) => void
+  // Receives the sequence completion value
+  complete(completeValue) => void
+}
+```
+
+Returns an [ES7 Subscription object](https://github.com/zenparsing/es-observable#api) that can be used to unsubscribe from the stream of events.
+
+```js
+type Subscription = {
+	// Cancels the subscription
+	unsubscribe() => void
+}
+```
+
+Read more about [ES7 Observable interop here](#es7-observable-interop).
 
 ## Combining streams
 
