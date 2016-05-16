@@ -138,6 +138,7 @@ Consult the documentation of other libraries for specifics.  Any functions and m
 
 Use `most.from` to coerce any observable to a most.js stream:
 
+<!-- skip-example -->
 ```js
 import { from } from 'most'
 
@@ -146,6 +147,7 @@ const mostStream = from(anyObservable)
 
 You can use `most.from` in other creative ways as well:
 
+<!-- skip-example -->
 ```js
 const functionThatReturnsAnObservable = a => // return an observable
 
@@ -162,6 +164,7 @@ mostStream.chain(compose(functionThatReturnsAnObservable, from))
 
 A similar approach works with other higher order operations such as [`join`](#join) and [`switch`](#switch).
 
+<!-- skip-example -->
 ```js
 mostStream.map(functionThatReturnsAnObservable).map(from).join()...
 
@@ -170,6 +173,7 @@ mostStream.map(functionThatReturnsAnObservable).map(from).switch()...
 
 Or with merge, combine, etc. by coercing first
 
+<!-- skip-example -->
 ```js
 arrayOfObservables = [...]
 most.mergeArray(arrayOfObservables.map(from))
@@ -1206,6 +1210,7 @@ The returned promise will fulfill after all the events have been consumed, or wi
 
 ES7 Observable compatible subscribe.  Start consuming events from `stream` by providing an [ES7 Observer object](https://github.com/zenparsing/es-observable#observer).
 
+<!-- skip-example -->
 ```js
 type Observer = {
   // Receives the next value in the sequence
@@ -1219,6 +1224,7 @@ type Observer = {
 
 Returns an [ES7 Subscription object](https://github.com/zenparsing/es-observable#api) that can be used to unsubscribe from the stream of events.
 
+<!-- skip-example -->
 ```js
 type Subscription = {
 	// Cancels the subscription
