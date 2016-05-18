@@ -1238,12 +1238,13 @@ Read more about [ES7 Observable interop here](#es7-observable-interop).
 
 Both [`forEach`](#observe) and [`subscribe`](#subscribe) are supported in the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable), and the following behave similarly:
 
+<!-- skip-example -->
 ```js
 stream.forEach(handleEvent).then(handleEnd, handleError)
 
 stream.subscribe({
-	next: handleEvent
-	complete: handleEnd
+	next: handleEvent,
+	complete: handleEnd,
 	error: handleError
 })
 ```
