@@ -1234,6 +1234,31 @@ type Subscription = {
 
 Read more about [ES7 Observable interop here](#es7-observable-interop).
 
+### `observe`/`forEach` or `subscribe`
+
+Both [`forEach`](#observe) and [`subscribe`](#subscribe) are supported in the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable), and the following behave similarly:
+
+```js
+stream.forEach(handleEvent).then(handleEnd, handleError)
+
+stream.subscribe({
+	next: handleEvent
+	complete: handleEnd
+	error: handleError
+})
+```
+
+However, there are also some important differences.
+
+**`forEach`**
+- returns a Promise, which can be transformed further using `.then`,
+- integrates easily into existing asynchronous code that uses promises
+- encourages declarative programming using [`until`](#until), [`take`](#take), and [`takeWhile`](#takeWhile), etc.
+
+**`subscribe`**
+- returns a `Subscription`,
+- allows imperative unsubscription in cases where declarative isn't possible
+
 ## Combining streams
 
 ### merge
