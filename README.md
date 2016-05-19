@@ -111,7 +111,7 @@ Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  T
 
 ## Reactive Programming
 
-[Reactive programming](docs/concepts.md) is an important concept that provides a lot of advantages: it naturally handles asynchrony and provides a model for dealing with complex data and time flow while also lessening the need to resort to shared mutable state. It has many applications: interactive UIs and animation, client-server communication, robotics, IoT, sensor networks, etc.
+[Reactive programming](https://github.com/cujojs/most/wiki/Concepts) is an important concept that provides a lot of advantages: it naturally handles asynchrony and provides a model for dealing with complex data and time flow while also lessening the need to resort to shared mutable state. It has many applications: interactive UIs and animation, client-server communication, robotics, IoT, sensor networks, etc.
 
 ## Why most.js for Reactive Programming?
 
