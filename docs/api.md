@@ -3,7 +3,7 @@ most.js API
 
 1. Reading these docs
 	* [Notation](#notation)
-	* [Concepts](./concepts.md)
+	* [Concepts](https://github.com/cujojs/most/wiki/Concepts)
 1. Creating streams
 	* [most.of](#mostof), alias [most.just](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -984,7 +984,7 @@ most.fromEvent('mousemove', document)
 ####`stream.during(timeWindow)`
 ####`most.during(timeWindow, stream)`
 
-Create a new stream containing only events that occur during a dynamic [time window](concepts.md#time-windows).
+Create a new stream containing only events that occur during a dynamic [time window](https://github.com/cujojs/most/wiki/Concepts#time-windows).
 
 ```
 stream:                    -a-b-c-d-e-f-g->
@@ -1339,7 +1339,7 @@ most.from([1,2,3])
 ####`stream.switch() -> Stream`
 ####`most.switch(stream) -> Stream`
 
-Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
+Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
 
 ```
 s:               -a-b-c-d-e-f->
@@ -1355,7 +1355,7 @@ stream.switch(): -a-b-c-4-5-6->
 ####`stream.join() -> Stream`
 ####`most.join(stream) -> Stream`
 
-Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that merges all the inner streams as they arrive.
+Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that merges all the inner streams as they arrive.
 
 ```
 s:             ---a---b---c---d-->
@@ -1371,7 +1371,7 @@ stream.join(): ---a---b--4c-5-d6->
 ####`stream.mergeConcurrently(concurrency) -> Stream`
 ####`most.mergeConcurrently(concurrency, stream) -> Stream`
 
-Given a [higher-order stream](concepts.md#higher-order-streams), return a new stream that merges inner streams as they arrive *up to the specified concurrency*.  Once `concurrency` number of streams are being merged, newly arriving streams will be merged after an existing one ends.
+Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that merges inner streams as they arrive *up to the specified concurrency*.  Once `concurrency` number of streams are being merged, newly arriving streams will be merged after an existing one ends.
 
 ```
 s:                           --a--b--c--d--e-->
