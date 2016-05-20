@@ -220,7 +220,7 @@ Create a stream containing the outcome of a promise.  If the promise fulfills, t
 
 ### most.from
 
-####`most.from(iterable | observable) -> Stream`
+####`most.from(Iterable | Observable) -> Stream`
 
 ```
 observable:            -a--b--c--c-->
