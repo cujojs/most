@@ -123,7 +123,7 @@ A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, t
 <a name="es7-observable-interop"/>
 ## Draft ES Observable interop
 
-Most.js implements a subset of the [draft ES Observable proposal spec](https://github.com/zenparsing/es-observable):
+Most.js implements a subset of the [draft ES Observable proposal](https://github.com/zenparsing/es-observable):
 
 * `stream[Symbol.observable]() -> Observable` returns a compatible observable with a `subscribe` method that other implementations can consume.
 * [`most.from(observable) -> Stream`](#mostfrom) coerces a compliant `observable` (one that provides `[Symbol.observable]()`) to a most.js stream.
