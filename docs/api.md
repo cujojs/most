@@ -5,7 +5,7 @@ most.js API
 	* [Notation](#notation)
 	* [Concepts](https://github.com/cujojs/most/wiki/Concepts)
 1. API Notes
-	* [ES7 Observable interop](#es7-observable-interop)
+	* [Draft ES Observable interop](#draft-es-observable-interop)
 1. Creating streams
 	* [most.of](#mostof), alias [most.just](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -119,22 +119,22 @@ A stream that emits `a`, then `b`, then fails.
 
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
 
-## ES7 Observable interop
+## Draft ES Observable interop
 
-Most.js implements a subset of the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable):
+Most.js implements a subset of the [draft ES Observable proposal spec](https://github.com/zenparsing/es-observable):
 
 * `stream[Symbol.observable]() -> Observable` returns a compatible observable with a `subscribe` method that other implementations can consume.
 * [`most.from(observable) -> Stream`](#mostfrom) coerces a compliant `observable` (one that provides `[Symbol.observable]()`) to a most.js stream.
-* [`stream.forEach(f) -> Promise`](#observe) is fully compatible with the ES7 Observable `forEach` API.
-* [`stream.subscribe(observer) -> Subscription`](#subscribe) subscribes to a most.js Stream using the ES7 Observable `subscribe` API.
+* [`stream.forEach(f) -> Promise`](#observe) is fully compatible with the draft ES Observable `forEach` API.
+* [`stream.subscribe(observer) -> Subscription`](#subscribe) subscribes to a most.js Stream using the draft ES Observable `subscribe` API.
 
 This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
 
 ### Consuming most.js streams with other libraries
 
-Consult the documentation of other libraries for specifics.  Any functions and methods that accept ES7 Observable should accept most.js Streams seamlessly.
+Consult the documentation of other libraries for specifics.  Any functions and methods that accept draft ES Observables should accept most.js Streams seamlessly.
 
-### Consuming ES7 Observables with most.js
+### Consuming draft ES Observables with most.js
 
 Use `most.from` to coerce any observable to a most.js stream:
 
@@ -231,9 +231,9 @@ most.from(observable): -a--b--c--c-->
 most.from([1,2,3,4]): 1234|
 ```
 
-Create a stream containing all items from an observable or iterable.
+Create a stream containing all items from an Iterable or Observable.
 
-The observable must provide minimal ES7 observable compliance as per the [es-observable draft](https://github.com/zenparsing/es-observable): it must have a `[Symbol.observable]()` method that return an object with a well-behaved `.subscribe()` method.
+The observable must provide minimal draft ES observable compliance as per the [es-observable draft](https://github.com/zenparsing/es-observable): it must have a `[Symbol.observable]()` method that return an object with a well-behaved `.subscribe()` method.
 
 The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
 
@@ -247,7 +247,7 @@ most.from([1,2,3,4])
 // Strings are Array-like, this works
 // Logs a b c d
 most.from('abcd')
-.forEach(console.log.bind(console));
+	.forEach(console.log.bind(console));
 ```
 
 ```js
@@ -1185,7 +1185,7 @@ Alias: **forEach**
 
 Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
-The `forEach` alias is compatible with the [ES7 Observable draft spec `forEach`](https://github.com/zenparsing/es-observable#api). Read more about [ES7 Observable interop here](#es7-observable-interop).
+The `forEach` alias is compatible with the [draft ES Observable proposal `forEach`](https://github.com/zenparsing/es-observable#api). Read more about [Observable interop here](#es-observable-interop).
 
 ```js
 // Log mouse movements until the user clicks, then stop.
@@ -1208,7 +1208,7 @@ The returned promise will fulfill after all the events have been consumed, or wi
 
 ####`stream.subscribe(Observer) -> Subscription`
 
-ES7 Observable compatible subscribe.  Start consuming events from `stream` by providing an [ES7 Observer object](https://github.com/zenparsing/es-observable#observer).
+Draft ES Observable compatible subscribe.  Start consuming events from `stream` by providing an [Observer object](https://github.com/zenparsing/es-observable#observer).
 
 <!-- skip-example -->
 ```js
@@ -1222,7 +1222,7 @@ type Observer = {
 }
 ```
 
-Returns an [ES7 Subscription object](https://github.com/zenparsing/es-observable#api) that can be used to unsubscribe from the stream of events.
+Returns a [Subscription object](https://github.com/zenparsing/es-observable#api) that can be used to unsubscribe from the stream of events.
 
 <!-- skip-example -->
 ```js
@@ -1232,11 +1232,11 @@ type Subscription = {
 }
 ```
 
-Read more about [ES7 Observable interop here](#es7-observable-interop).
+Read more about [draft ES Observable interop here](#draft-es-observable-interop).
 
 ### `observe`/`forEach` or `subscribe`
 
-Both [`forEach`](#observe) and [`subscribe`](#subscribe) are supported in the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable), and the following behave similarly:
+Both [`forEach`](#observe) and [`subscribe`](#subscribe) are supported in the [draft ES Observable proposal](https://github.com/zenparsing/es-observable), and the following behave similarly:
 
 <!-- skip-example -->
 ```js

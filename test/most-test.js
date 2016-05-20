@@ -66,7 +66,7 @@ describe('multicast', function() {
 	});
 });
 
-describe('ES7 Observable API interop', function() {
+describe('Draft ES Observable API interop', function() {
 	it('should exist', function() {
 		assert.isFunction(most.Stream.prototype.subscribe);
 		assert.isFunction(most.Stream.prototype[symbolObservable]);

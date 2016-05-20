@@ -24,7 +24,8 @@ exports.from     = from;
 exports.periodic = periodic;
 
 //-----------------------------------------------------------------------
-// ES7 Observable interop
+// Draft ES Observable proposal interop
+// https://github.com/zenparsing/es-observable
 
 var subscribe = require('./lib/observable/subscribe').subscribe;
 
