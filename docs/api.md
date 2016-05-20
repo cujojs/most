@@ -4,6 +4,8 @@ most.js API
 1. Reading these docs
 	* [Notation](#notation)
 	* [Concepts](https://github.com/cujojs/most/wiki/Concepts)
+1. API Notes
+	* [ES7 Observable interop](#es7-observable-interop)
 1. Creating streams
 	* [most.of](#mostof), alias [most.just](#mostof)
 	* [most.fromPromise](#mostfrompromise)
@@ -55,6 +57,7 @@ most.js API
 	* [reduce](#reduce)
 	* [observe](#observe), alias [forEach](#observe)
 	* [drain](#drain)
+	* [subscribe](#subscribe)
 1. Combining streams
 	* [merge](#merge)
 	* [mergeArray](#mergearray)
@@ -116,6 +119,67 @@ A stream that emits `a`, then `b`, then fails.
 
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
 
+## ES7 Observable interop
+
+Most.js implements a subset of the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable):
+
+* `stream[Symbol.observable]() -> Observable` returns a compatible observable with a `subscribe` method that other implementations can consume.
+* [`most.from(observable) -> Stream`](#mostfrom) coerces a compliant `observable` (one that provides `[Symbol.observable]()`) to a most.js stream.
+* [`stream.forEach(f) -> Promise`](#observe) is fully compatible with the ES7 Observable `forEach` API.
+* [`stream.subscribe(observer) -> Subscription`](#subscribe) subscribes to a most.js Stream using the ES7 Observable `subscribe` API.
+
+This allows most.js to interoperate seamlessly with other implementations, such as [RxJS 5](http://reactivex.io/rxjs/), and [Kefir](http://rpominov.github.io/kefir/).
+
+### Consuming Most.js streams with other libraries
+
+Consult the documentation of other libraries for specifics.  Any functions and methods that accept ES7 Observable should accept most.js Streams seamlessly.
+
+### Consuming ES7 Observables with most.js
+
+Use `most.from` to coerce any observable to a most.js stream:
+
+<!-- skip-example -->
+```js
+import { from } from 'most'
+
+const mostStream = from(anyObservable)
+```
+
+You can use `most.from` in other creative ways as well:
+
+<!-- skip-example -->
+```js
+const functionThatReturnsAnObservable = a => // return an observable
+
+// Using chain (aka flatMap)
+const mostStream = //...
+
+// Use .map.chain
+mostStream.map(functionThatReturnsAnObservable).chain(from)
+	.observe(b => console.log(b))
+
+// Or use function composition, using your favorite FP lib
+mostStream.chain(compose(functionThatReturnsAnObservable, from))
+```
+
+A similar approach works with other higher order operations such as [`join`](#join) and [`switch`](#switch).
+
+<!-- skip-example -->
+```js
+mostStream.map(functionThatReturnsAnObservable).map(from).join()...
+
+mostStream.map(functionThatReturnsAnObservable).map(from).switch()...
+```
+
+Or with merge, combine, etc. by coercing first
+
+<!-- skip-example -->
+```js
+arrayOfObservables = [...]
+most.mergeArray(arrayOfObservables.map(from))
+most.combineArray(combineFunction, arrayOfObservables.map(from))
+```
+
 ## Creating streams
 
 ### most.of
@@ -156,13 +220,22 @@ Create a stream containing the outcome of a promise.  If the promise fulfills, t
 
 ### most.from
 
-####`most.from(iterable) -> Stream`
+####`most.from(Iterable | Observable) -> Stream`
+
+```
+observable:            -a--b--c--c-->
+most.from(observable): -a--b--c--c-->
+```
 
 ```
 most.from([1,2,3,4]): 1234|
 ```
 
-Create a stream containing all items from an iterable.  The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
+Create a stream containing all items from an observable or iterable.
+
+The observable must provide minimal ES7 observable compliance as per the [es-observable draft](https://github.com/zenparsing/es-observable): it must have a `[Symbol.observable]()` method that return an object with a well-behaved `.subscribe()` method.
+
+The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
 
 ```js
 // Logs 1 2 3 4
@@ -1112,6 +1185,8 @@ Alias: **forEach**
 
 Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
+The `forEach` alias is compatible with the [ES7 Observable draft spec `forEach`](https://github.com/zenparsing/es-observable#api). Read more about [ES7 Observable interop here](#es7-observable-interop).
+
 ```js
 // Log mouse movements until the user clicks, then stop.
 most.fromEvent('mousemove', document)
@@ -1128,6 +1203,62 @@ most.fromEvent('mousemove', document)
 Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
 The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
+
+### subscribe
+
+####`stream.subscribe(Observer) -> Subscription`
+
+ES7 Observable compatible subscribe.  Start consuming events from `stream` by providing an [ES7 Observer object](https://github.com/zenparsing/es-observable#observer).
+
+<!-- skip-example -->
+```js
+type Observer = {
+  // Receives the next value in the sequence
+  next(value) => void
+  // Receives the sequence error
+  error(errorValue) => void
+  // Receives the sequence completion value
+  complete(completeValue) => void
+}
+```
+
+Returns an [ES7 Subscription object](https://github.com/zenparsing/es-observable#api) that can be used to unsubscribe from the stream of events.
+
+<!-- skip-example -->
+```js
+type Subscription = {
+	// Cancels the subscription
+	unsubscribe() => void
+}
+```
+
+Read more about [ES7 Observable interop here](#es7-observable-interop).
+
+### `observe`/`forEach` or `subscribe`
+
+Both [`forEach`](#observe) and [`subscribe`](#subscribe) are supported in the [ES7 Observable draft spec](https://github.com/zenparsing/es-observable), and the following behave similarly:
+
+<!-- skip-example -->
+```js
+stream.forEach(handleEvent).then(handleEnd, handleError)
+
+stream.subscribe({
+	next: handleEvent,
+	complete: handleEnd,
+	error: handleError
+})
+```
+
+However, there are also some important differences.
+
+**`forEach`**
+- returns a Promise, which can be transformed further using `.then`,
+- integrates easily into existing asynchronous code that uses promises
+- encourages declarative programming using [`until`](#until), [`take`](#take), and [`takeWhile`](#takeWhile), etc.
+
+**`subscribe`**
+- returns a `Subscription`,
+- allows imperative unsubscription in cases where declarative isn't possible
 
 ## Combining streams
 
