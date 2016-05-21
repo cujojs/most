@@ -8,7 +8,7 @@ declare interface Thenable<A> {
 }
 
 declare interface Promise<A> {
-  constructor(callback: (resolve: (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void);
+  constructor(callback: (resolve: (value?: A | Thenable<A>) => void, reject: (error?: any) => void) => void): Promise<A>;
 
   then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => U | Thenable<U>): Promise<U>;
   then<U>(onFulfilled?: (value: A) => U | Thenable<U>, onRejected?: (error: any) => void): Promise<U>;
@@ -21,36 +21,6 @@ declare interface Iterable<A> {}
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
-declare interface PolymorphicFunction {
-  <A1, A2, B>(v1: A1, v2: A2): B;
-  <A1, A2, A3, B>(v1: A1, v2: A2, v3: A3): B;
-  <A1, A2, A3, A4, B>(v1: A1, v2: A2, v3: A3, v4: A4): B;
-  <A1, A2, A3, A4, A5, B>(v1: A1, v2: A2, v3: A3, v4: A4, v5: A5): B;
-  <A1, A2, A3, A4, A5, A6, B>(v1: A1, v2: A2, v3: A3, v4: A4, v5: A5, v6: A6): B;
-  <B>(...values: Array<any>): B;
-}
-
-declare interface PolymorphicSignature {
-  <A1, A2, B>(
-    project: (a1: A1, a2: A2) => B,
-    stream2: Stream<A2>): Stream<B>;
-  <A1, A2, A3, B>(
-    project: (a1: A1, a2: A2, a3: A3) => B,
-    stream2: Stream<A2>,
-    stream3: Stream<A3>): Stream<B>;
-  <A1, A2, A3, A4, B>(
-    project: (a1: A1, a2: A2, a3: A3, a4: A4) => B,
-    stream2: Stream<A2>,
-    stream3: Stream<A3>,
-    stream4: Stream<A4>): Stream<B>;
-  <A1, A2, A3, A4, A5, B>(
-    project: (a1: A1, a2: A2, a3: A3, a4: A4, a5: A5) => B,
-    stream2: Stream<A2>,
-    stream3: Stream<A3>,
-    stream4: Stream<A4>,
-    stream5: Stream<A5>): Stream<B>;
-  <B>(project: (...args: Array<any>) => B, ...streams: Array<Stream<any>>): Stream<B>;
-}
 
 export interface Stream<A> {
   reduce<B>(f: (b: B, a: A) => B, b: B): Promise<B>;
@@ -64,21 +34,60 @@ export interface Stream<A> {
   chain<B>(f: (a: A) => Stream<B>): Stream<B>;
   flatMap<B>(f: (a: A) => Stream<B>): Stream<B>;
 
-  // Note:  Without higher-kinded types, the types for these
-  // cannot be written properly
-  ap<B, C>(bs: Stream<B>): Stream<C>;
-  join<B>(): Stream<B>;
-  switch<B>(): Stream<B>;
-  switchLatest<B>(): Stream<B>;
+  ap<B, C>(fs: Stream<(a: A) => B>): Stream<C>;
+
+  // Note: Without higher-kinded types, the types for these
+  // cannot be written in a completely safe manner; See https://github.com/Microsoft/TypeScript/issues/1290
+  // For better type safety, consider using most.join/switch/switchLatest with thru
+  join(): A;
+  switch(): A;
+  switchLatest(): A;
 
   continueWith(f: (a: any) => Stream<A>): Stream<A>;
   concatMap<B>(f: (a: A) => Stream<B>): Stream<B>;
   mergeConcurrently<B>(concurrency: number): Stream<B>;
   merge(...ss: Array<Stream<A>>): Stream<A>;
   mergeArray(streams: Array<Stream<A>>): Stream<A>;
-  combine: PolymorphicSignature;
-  combineArray<B>(f: (...args: Array<any>) => B, streams: Array<Stream<any>>): Stream<B>;
 
+  combine<B, R>(
+    fn: (a: A, b: B) => R,
+    b: Stream<B>
+  ): Stream<R>;
+  combine<B, C, R>(
+    fn: (a: A, b: B, c: C) => R,
+    b: Stream<B>,
+    c: Stream<C>
+  ): Stream<R>;
+  combine<B, C, D, R>(
+    fn: (a: A, b: B, c: C, d: D) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>
+  ): Stream<R>;
+  combine<B, C, D, E, R>(
+    fn: (a: A, b: B, c: C, d: D, e: E) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>,
+    e: Stream<E>
+  ): Stream<R>;
+
+  combineArray<B, R>(
+    fn: (a: A, b: B) => R,
+    array: [Stream<B>]
+  ): Stream<R>;
+  combineArray<B, C, R>(
+    fn: (a: A, b: B, c: C) => R,
+    array: [Stream<B>, Stream<C>]
+  ): Stream<R>;
+  combineArray<B, C, D, R>(
+    fn: (a: A, b: B, c: C, d: D) => R,
+    array: [Stream<B>, Stream<C>, Stream<D>]
+  ): Stream<R>;
+  combineArray<B, C, D, E, R>(
+    fn: (a: A, b: B, c: C, d: D, e: E) => R,
+    array: [Stream<B>, Stream<C>, Stream<D>, Stream<E>]
+  ): Stream<R>;
 
   scan<B>(f: (b: B, a: A) => B, b: B): Stream<B>;
   loop<S, B>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S): Stream<B>;
@@ -88,8 +97,8 @@ export interface Stream<A> {
   startWith(a: A): Stream<A>;
 
   filter(p: (a: A) => boolean): Stream<A>;
-  skipBepeats(): Stream<A>;
-  skipBepeatsWith(eq: (a1: A, a2: A) => boolean): Stream<A>;
+  skipRepeats(): Stream<A>;
+  skipRepeatsWith(eq: (a1: A, a2: A) => boolean): Stream<A>;
 
   take(n: number): Stream<A>;
   skip(n: number): Stream<A>;
@@ -108,16 +117,57 @@ export interface Stream<A> {
   timestamp(): Stream<TimeValue<A>>;
   delay(dt: number): Stream<A>;
 
-  // Note:  Without higher-kinded types, this type cannot be written properly
+  // Note: Without higher-kinded types, this type cannot be written properly
   await<B>(): Stream<B>;
 
-  sample<B>(f: (...as: any[]) => B, ...ss: Array<Stream<any>>): Stream<B>;
+  sample<B, C, R>(
+    fn: (b: B, c: C) => R,
+    b: Stream<B>,
+    c: Stream<C>
+  ): Stream<R>;
+  sample<B, C, D, R>(
+    fn: (b: B, c: C, d: D) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>
+  ): Stream<R>;
+  sample<B, C, D, E, R>(
+    fn: (b: B, c: C, d: D, e: E) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>,
+    e: Stream<E>
+  ): Stream<R>;
+
   sampleWith<A>(sampler: Stream<any>): Stream<A>;
 
-  zip: PolymorphicSignature;
+  zip<B, R>(
+    fn: (a: A, b: B) => R,
+    b: Stream<B>
+  ): Stream<R>;
+  zip<B, C, R>(
+    fn: (a: A, b: B, c: C) => R,
+    b: Stream<B>,
+    c: Stream<C>
+  ): Stream<R>;
+  zip<B, C, D, R>(
+    fn: (a: A, b: B, c: C, d: D) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>
+  ): Stream<R>;
+  zip<B, C, D, E, R>(
+    fn: (a: A, b: B, c: C, d: D, e: E) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>,
+    e: Stream<E>
+  ): Stream<R>;
 
   recoverWith<B>(p: (a: B) => A): Stream<A>;
-  multicast<A>(): Stream<A>;
+  multicast(): Stream<A>;
+
+  thru<B>(transform: (stream: Stream<A>) => Stream<B>): Stream<B>;
 }
 
 declare interface DisposeFn {
@@ -157,8 +207,50 @@ export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>):
 
 export function merge<A>(...ss: Array<Stream<A>>): Stream<A>;
 export function mergeArray<A>(streams: Array<Stream<A>>): Stream<A>;
-export function combine<A>(f: PolymorphicFunction, ...ss: Array<Stream<any>>): Stream<A>;
-export function combineArray<A>(f: (...args: Array<any>) => A, streams: Array<Stream<any>>): Stream<A>;
+
+export function combine<A, B, R>(
+  fn: (a: A, b: B) => R,
+  a: Stream<A>,
+  b: Stream<B>
+): Stream<R>;
+export function combine<A, B, C, R>(
+  fn: (a: A, b: B, c: C) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>
+): Stream<R>;
+export function combine<A, B, C, D, R>(
+  fn: (a: A, b: B, c: C, d: D) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>
+): Stream<R>;
+export function combine<A, B, C, D, E, R>(
+  fn: (a: A, b: B, c: C, d: D, e: E) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>,
+  e: Stream<E>
+): Stream<R>;
+
+export function combineArray<A, B, R>(
+  fn: (a: A, b: B) => R,
+  array: [Stream<A>, Stream<B>]
+): Stream<R>;
+export function combineArray<A, B, C, R>(
+  fn: (a: A, b: B, c: C) => R,
+  array: [Stream<A>, Stream<B>, Stream<C>]
+): Stream<R>;
+export function combineArray<A, B, C, D, R>(
+  fn: (a: A, b: B, c: C, d: D) => R,
+  array: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
+): Stream<R>;
+export function combineArray<A, B, C, D, E, R>(
+  fn: (a: A, b: B, c: C, d: D, e: E) => R,
+  array: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
+): Stream<R>;
 
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
 export function loop<A, B, S>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S, s: Stream<A>): Stream<B>;
@@ -191,11 +283,65 @@ export function delay<A>(dt: number, s: Stream<A>): Stream<A>;
 export function fromPromise<A>(p: Promise<A>): Stream<A>;
 export function await<A>(s: Stream<Promise<A>>): Stream<A>;
 
-export function sample<A>(f: (...as: any[]) => A, sampler: Stream<any>, ...ss: Array<Stream<any>>): Stream<A>;
+export function sample<A, B, R>(
+  fn: (a: A, b: B) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+  b: Stream<B>
+): Stream<R>;
+export function sample<A, B, C, R>(
+  fn: (a: A, b: B, c: C) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>
+): Stream<R>;
+export function sample<A, B, C, D, R>(
+  fn: (a: A, b: B, c: C, d: D) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>
+): Stream<R>;
+export function sample<A, B, C, D, E, R>(
+  fn: (a: A, b: B, c: C, d: D, e: E) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>,
+  e: Stream<E>
+): Stream<R>;
+
 export function sampleWith<A>(sampler: Stream<any>, s: Stream<A>): Stream<A>;
 
-// polymorphic
-export function zip<A>(f: PolymorphicFunction): Stream<A>;
+export function zip<A, B, R>(
+  fn: (a: A, b: B) => R,
+  a: Stream<A>,
+  b: Stream<B>
+): Stream<R>;
+export function zip<A, B, C, R>(
+  fn: (a: A, b: B, c: C) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>
+): Stream<R>;
+export function zip<A, B, C, D, R>(
+  fn: (a: A, b: B, c: C, d: D) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>
+): Stream<R>;
+export function zip<A, B, C, D, E, R>(
+  fn: (a: A, b: B, c: C, d: D, e: E) => R,
+  a: Stream<A>,
+  b: Stream<B>,
+  c: Stream<C>,
+  d: Stream<D>,
+  e: Stream<E>
+): Stream<R>;
 
 export function recoverWith<A, B>(p: (a: B) => A, s: Stream<A>): Stream<A>;
 export function throwError(e: Error): Stream<any>;
