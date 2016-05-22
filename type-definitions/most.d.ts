@@ -74,19 +74,19 @@ export interface Stream<A> {
 
   combineArray<B, R>(
     fn: (a: A, b: B) => R,
-    array: [Stream<B>]
+    streams: [Stream<B>]
   ): Stream<R>;
   combineArray<B, C, R>(
     fn: (a: A, b: B, c: C) => R,
-    array: [Stream<B>, Stream<C>]
+    streams: [Stream<B>, Stream<C>]
   ): Stream<R>;
   combineArray<B, C, D, R>(
     fn: (a: A, b: B, c: C, d: D) => R,
-    array: [Stream<B>, Stream<C>, Stream<D>]
+    streams: [Stream<B>, Stream<C>, Stream<D>]
   ): Stream<R>;
   combineArray<B, C, D, E, R>(
     fn: (a: A, b: B, c: C, d: D, e: E) => R,
-    array: [Stream<B>, Stream<C>, Stream<D>, Stream<E>]
+    streams: [Stream<B>, Stream<C>, Stream<D>, Stream<E>]
   ): Stream<R>;
 
   scan<B>(f: (b: B, a: A) => B, b: B): Stream<B>;
@@ -237,19 +237,19 @@ export function combine<A, B, C, D, E, R>(
 
 export function combineArray<A, B, R>(
   fn: (a: A, b: B) => R,
-  array: [Stream<A>, Stream<B>]
+  streams: [Stream<A>, Stream<B>]
 ): Stream<R>;
 export function combineArray<A, B, C, R>(
   fn: (a: A, b: B, c: C) => R,
-  array: [Stream<A>, Stream<B>, Stream<C>]
+  streams: [Stream<A>, Stream<B>, Stream<C>]
 ): Stream<R>;
 export function combineArray<A, B, C, D, R>(
   fn: (a: A, b: B, c: C, d: D) => R,
-  array: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
+  streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
 ): Stream<R>;
 export function combineArray<A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R,
-  array: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
+  streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
 ): Stream<R>;
 
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
