@@ -2,6 +2,7 @@
   "name": "most",
   "version": "0.19.5",
   "description": "Monadic streams",
+  "typings": "type-definitions/most.d.ts",
   "main": "most.js",
   "files": [
     "most.js",
