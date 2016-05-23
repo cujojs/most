@@ -6,7 +6,8 @@
   "main": "most.js",
   "files": [
     "most.js",
-    "lib/**/*.js"
+    "lib/**/*.js",
+    "type-definitions/*"
   ],
   "scripts": {
     "unit-test": "buster-test",
