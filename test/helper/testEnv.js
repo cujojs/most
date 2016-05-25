@@ -7,6 +7,7 @@ var PropagateTask = require('../../lib/scheduler/PropagateTask');
 var Scheduler = require('../../lib/scheduler/Scheduler');
 var VirtualTimer = require('./VirtualTimer');
 var runSource = require('../../lib/runSource');
+var tap = require('../../lib/combinator/transform').tap;
 var dispose = require('../../lib/disposable/dispose');
 var empty = require('../../lib/source/core').empty;
 
@@ -39,16 +40,18 @@ function ticks(dt) {
 function collectEvents(stream, env) {
 	var into = [];
 	var scheduler = env.scheduler;
-	return runSource.withScheduler(function(x) {
+	var s = tap(function(x) {
 		into.push({ time: scheduler.now(), value: x });
-	}, stream.source, scheduler)
+	}, stream)
+
+	return runSource.withScheduler(s.source, scheduler)
 	.then(function() {
 		return into;
 	});
 }
 
 function drain(stream, env) {
-	return runSource.withScheduler(noop, stream.source, env.scheduler);
+	return runSource.withScheduler(stream.source, env.scheduler);
 }
 
 function noop() {}
