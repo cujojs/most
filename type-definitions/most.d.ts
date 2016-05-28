@@ -225,6 +225,10 @@ declare interface DisposeFn {
   (): void|Promise<any>;
 }
 
+export class Stream<A> implements Stream<A>{
+  constructor(source: Source<A>);
+}
+
 export function create<A>(f: (add: (a: A) => any, end: (x: any) => any, error: (e: Error) => any) => void|DisposeFn): Stream<A>;
 export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
