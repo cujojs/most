@@ -47,7 +47,7 @@ declare interface Scheduler {
   periodic(task: Task): ScheduledTask;
   schedule(delay: number, period: number, task: Task): ScheduledTask;
   cancel(task: Task): void;
-  cancelAll(predicate: (any) => boolean): void;
+  cancelAll(predicate: (val: any) => boolean): void;
 }
 
 declare interface Disposable<A> {
