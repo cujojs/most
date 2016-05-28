@@ -21,26 +21,26 @@ declare interface Iterable<A> {}
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
-declare interface Sink<A> {
+export interface Sink<A> {
   event(time: number, value: A): void;
   end(time: number, value: A): void;
   error(time: number, err: Error): void;
 }
 
-declare interface Task {
+export interface Task {
   run(time: number): void;
   error(time: number, e: Error): void;
   dispose(): void;
 }
 
-declare interface ScheduledTask {
+export interface ScheduledTask {
   task: Task;
   run(): void;
   error(err: Error): void;
   dispose(): void;
 }
 
-declare interface Scheduler {
+export interface Scheduler {
   now(): number;
   asap(task: Task): ScheduledTask;
   delay(task: Task): ScheduledTask;
@@ -50,21 +50,21 @@ declare interface Scheduler {
   cancelAll(predicate: (val: any) => boolean): void;
 }
 
-declare interface Disposable<A> {
+export interface Disposable<A> {
   dispose(): void | Promise<A>;
 }
 
-declare interface Source<A> {
+export interface Source<A> {
   run (sink: Sink<A>, scheduler: Scheduler): Disposable<A>;
 }
 
-declare interface Subscriber<A> {
+export interface Subscriber<A> {
   next(value: A): void;
   error(err: Error): void;
   complete(value: A): void;
 }
 
-declare interface Subscription<A> {
+export interface Subscription<A> {
   unsubscribe(): void;
 }
 
@@ -74,8 +74,6 @@ export interface Stream<A> {
   forEach(f: (a: A) => any): Promise<any>;
   drain(): Promise<any>;
   subscribe(subscriber: Subscriber<A>): Subscription<A>;
-  
-  thru<B>(f: (s: Stream<A>) => Stream<B>): Stream<B>;
 
   constant<B>(b: B): Stream<B>;
   map<B>(f: (a: A) => B): Stream<B>;
@@ -223,7 +221,8 @@ declare interface DisposeFn {
   (): void|Promise<any>;
 }
 
-export class Stream<A> implements Stream<A>{
+export class Stream<A> {
+  source: Source<A>;
   constructor(source: Source<A>);
 }
 
