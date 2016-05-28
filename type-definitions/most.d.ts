@@ -69,8 +69,6 @@ declare interface Subscription<A> {
 }
 
 export interface Stream<A> {
-  source: Source<A>;
-
   reduce<B>(f: (b: B, a: A) => B, b: B): Promise<B>;
   observe(f: (a: A) => any): Promise<any>;
   forEach(f: (a: A) => any): Promise<any>;
