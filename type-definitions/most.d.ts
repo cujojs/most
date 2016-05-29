@@ -21,12 +21,59 @@ declare interface Iterable<A> {}
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
+export interface Sink<A> {
+  event(time: number, value: A): void;
+  end(time: number, value?: A): void;
+  error(time: number, err: Error): void;
+}
+
+export interface Task {
+  run(time: number): void;
+  error(time: number, e: Error): void;
+  dispose(): void;
+}
+
+export interface ScheduledTask {
+  task: Task;
+  run(): void;
+  error(err: Error): void;
+  dispose(): void;
+}
+
+export interface Scheduler {
+  now(): number;
+  asap(task: Task): ScheduledTask;
+  delay(task: Task): ScheduledTask;
+  periodic(task: Task): ScheduledTask;
+  schedule(delay: number, period: number, task: Task): ScheduledTask;
+  cancel(task: Task): void;
+  cancelAll(predicate: (task: Task) => boolean): void;
+}
+
+export interface Disposable<A> {
+  dispose(): void | Promise<A>;
+}
+
+export interface Source<A> {
+  run (sink: Sink<A>, scheduler: Scheduler): Disposable<A>;
+}
+
+export interface Subscriber<A> {
+  next(value: A): void;
+  error(err: Error): void;
+  complete(value?: A): void;
+}
+
+export interface Subscription<A> {
+  unsubscribe(): void;
+}
 
 export interface Stream<A> {
   reduce<B>(f: (b: B, a: A) => B, b: B): Promise<B>;
   observe(f: (a: A) => any): Promise<any>;
   forEach(f: (a: A) => any): Promise<any>;
   drain(): Promise<any>;
+  subscribe(subscriber: Subscriber<A>): Subscription<A>;
 
   constant<B>(b: B): Stream<B>;
   map<B>(f: (a: A) => B): Stream<B>;
@@ -174,6 +221,11 @@ declare interface DisposeFn {
   (): void|Promise<any>;
 }
 
+export class Stream<A> {
+  source: Source<A>;
+  constructor(source: Source<A>);
+}
+
 export function create<A>(f: (add: (a: A) => any, end: (x: any) => any, error: (e: Error) => any) => void|DisposeFn): Stream<A>;
 export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
@@ -191,6 +243,8 @@ export function reduce<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Promise<
 export function observe<A>(f: (a: A) => any, s: Stream<A>): Promise<any>;
 export function forEach<A>(f: (a: A) => any, s: Stream<A>): Promise<any>;
 export function drain<A>(s: Stream<A>): Promise<any>;
+
+export function subscribe<A>(subscriber: Subscriber<A>, s: Stream<A>): Subscription<A>;
 
 export function constant<A, B>(b: B, s: Stream<A>): Stream<B>;
 export function map<A, B>(f: (a: A) => B, s: Stream<A>): Stream<B>;
