@@ -173,7 +173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//-------------------------------------------------------
 
-	var loop = __webpack_require__(37).loop;
+	var loop = __webpack_require__(41).loop;
 
 	exports.loop = loop;
 
@@ -193,7 +193,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//-------------------------------------------------------
 
-	var accumulate = __webpack_require__(39);
+	var accumulate = __webpack_require__(42);
 
 	exports.scan   = accumulate.scan;
 	exports.reduce = accumulate.reduce;
@@ -224,10 +224,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Building and extending
 
-	var unfold = __webpack_require__(40);
-	var iterate = __webpack_require__(41);
-	var generate = __webpack_require__(42);
-	var build = __webpack_require__(43);
+	var unfold = __webpack_require__(43);
+	var iterate = __webpack_require__(44);
+	var generate = __webpack_require__(45);
+	var build = __webpack_require__(46);
 
 	exports.unfold    = unfold.unfold;
 	exports.iterate   = iterate.iterate;
@@ -265,8 +265,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Transforming
 
-	var transform = __webpack_require__(45);
-	var applicative = __webpack_require__(49);
+	var transform = __webpack_require__(36);
+	var applicative = __webpack_require__(48);
 
 	exports.map      = transform.map;
 	exports.constant = transform.constant;
@@ -314,7 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Transducer support
 
-	var transduce = __webpack_require__(53);
+	var transduce = __webpack_require__(52);
 
 	exports.transduce = transduce.transduce;
 
@@ -330,7 +330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// FlatMapping
 
-	var flatMap = __webpack_require__(54);
+	var flatMap = __webpack_require__(53);
 
 	exports.flatMap = exports.chain = flatMap.flatMap;
 	exports.join    = flatMap.join;
@@ -354,7 +354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return flatMap.join(this);
 	};
 
-	var continueWith = __webpack_require__(44).continueWith;
+	var continueWith = __webpack_require__(47).continueWith;
 
 	exports.continueWith = continueWith;
 	exports.flatMapEnd = continueWith;
@@ -370,7 +370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		return continueWith(f, this);
 	};
 
-	var concatMap = __webpack_require__(57).concatMap;
+	var concatMap = __webpack_require__(56).concatMap;
 
 	exports.concatMap = concatMap;
 
@@ -381,7 +381,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Concurrent merging
 
-	var mergeConcurrently = __webpack_require__(55);
+	var mergeConcurrently = __webpack_require__(54);
 
 	exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
 
@@ -401,7 +401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Merging
 
-	var merge = __webpack_require__(58);
+	var merge = __webpack_require__(57);
 
 	exports.merge = merge.merge;
 	exports.mergeArray = merge.mergeArray;
@@ -419,7 +419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Combining
 
-	var combine = __webpack_require__(50);
+	var combine = __webpack_require__(49);
 
 	exports.combine = combine.combine;
 	exports.combineArray = combine.combineArray;
@@ -437,7 +437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Sampling
 
-	var sample = __webpack_require__(59);
+	var sample = __webpack_require__(58);
 
 	exports.sample = sample.sample;
 	exports.sampleWith = sample.sampleWith;
@@ -465,7 +465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Zipping
 
-	var zip = __webpack_require__(60);
+	var zip = __webpack_require__(59);
 
 	exports.zip = zip.zip;
 
@@ -483,7 +483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Switching
 
-	var switchLatest = __webpack_require__(62).switch;
+	var switchLatest = __webpack_require__(61).switch;
 
 	exports.switch       = switchLatest;
 	exports.switchLatest = switchLatest;
@@ -500,7 +500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Filtering
 
-	var filter = __webpack_require__(63);
+	var filter = __webpack_require__(62);
 
 	exports.filter          = filter.filter;
 	exports.skipRepeats     = exports.distinct   = filter.skipRepeats;
@@ -539,7 +539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Slicing
 
-	var slice = __webpack_require__(64);
+	var slice = __webpack_require__(63);
 
 	exports.take      = slice.take;
 	exports.skip      = slice.skip;
@@ -604,7 +604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Time slicing
 
-	var timeslice = __webpack_require__(65);
+	var timeslice = __webpack_require__(64);
 
 	exports.until  = exports.takeUntil = timeslice.takeUntil;
 	exports.since  = exports.skipUntil = timeslice.skipUntil;
@@ -653,7 +653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Delaying
 
-	var delay = __webpack_require__(66).delay;
+	var delay = __webpack_require__(65).delay;
 
 	exports.delay = delay;
 
@@ -668,7 +668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Getting event timestamp
 
-	var timestamp = __webpack_require__(67).timestamp;
+	var timestamp = __webpack_require__(66).timestamp;
 
 	exports.timestamp = timestamp;
 
@@ -684,7 +684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Rate limiting
 
-	var limit = __webpack_require__(68);
+	var limit = __webpack_require__(67);
 
 	exports.throttle = limit.throttle;
 	exports.debounce = limit.debounce;
@@ -715,7 +715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Awaiting Promises
 
-	var promises = __webpack_require__(69);
+	var promises = __webpack_require__(68);
 
 	exports.fromPromise = promises.fromPromise;
 	exports.await       = promises.awaitPromises;
@@ -732,7 +732,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//-----------------------------------------------------------------------
 	// Error handling
 
-	var errors = __webpack_require__(70);
+	var errors = __webpack_require__(69);
 
 	exports.recoverWith  = errors.flatMapError;
 	exports.flatMapError = errors.flatMapError;
@@ -2819,7 +2819,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var runSource = __webpack_require__(35);
+	var run = __webpack_require__(35).withDefaultScheduler;
+	var tap = __webpack_require__(36).tap;
 
 	exports.observe = observe;
 	exports.drain = drain;
@@ -2833,19 +2834,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  an error, or rejects if the stream ends with an error.
 	 */
 	function observe(f, stream) {
-		return runSource.withDefaultScheduler(f, stream.source);
+		return drain(tap(f, stream));
 	}
+
+	var defaultScheduler = __webpack_require__(21);
+	var dispose = __webpack_require__(4);
 
 	/**
-	 * "Run" a stream by
-	 * @param stream
-	 * @return {*}
+	 * "Run" a stream by creating demand and consuming all events
+	 * @param {Stream<T>} stream stream to drain
+	 * @return {Promise} promise that fulfills after the stream ends without
+	 *  an error, or rejects if the stream ends with an error.
 	 */
 	function drain(stream) {
-		return runSource.withDefaultScheduler(noop, stream.source);
+		return run(stream.source);
 	}
-
-	function noop() {}
 
 
 /***/ },
@@ -2856,62 +2859,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var Observer = __webpack_require__(36);
 	var dispose = __webpack_require__(4);
 	var defaultScheduler = __webpack_require__(21);
 
 	exports.withDefaultScheduler = withDefaultScheduler;
 	exports.withScheduler = withScheduler;
 
-	function withDefaultScheduler(f, source) {
-		return withScheduler(f, source, defaultScheduler);
+	function withDefaultScheduler(source) {
+		return withScheduler(source, defaultScheduler);
 	}
 
-	function withScheduler(f, source, scheduler) {
+	function withScheduler(source, scheduler) {
 		return new Promise(function (resolve, reject) {
-			runSource(f, source, scheduler, resolve, reject);
+			runSource(source, scheduler, resolve, reject);
 		});
 	}
 
-	function runSource(f, source, scheduler, resolve, reject) {
+	function runSource(source, scheduler, resolve, reject) {
 		var disposable = dispose.settable();
-		var observer = new Observer(f, resolve, reject, disposable);
+		var observer = new Drain(resolve, reject, disposable);
 
 		disposable.setDisposable(source.run(observer, scheduler));
 	}
 
-
-/***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	module.exports = Observer;
-
-	/**
-	 * Sink that accepts functions to apply to each event, and to end, and error
-	 * signals.
-	 * @constructor
-	 */
-	function Observer(event, end, error, disposable) {
-		this._event = event;
+	function Drain(end, error, disposable) {
 		this._end = end;
 		this._error = error;
 		this._disposable = disposable;
 		this.active = true;
 	}
 
-	Observer.prototype.event = function(t, x) {
-		if (!this.active) {
-			return;
-		}
-		this._event(x);
-	};
+	Drain.prototype.event = function(t, x) {};
 
-	Observer.prototype.end = function(t, x) {
+	Drain.prototype.end = function(t, x) {
 		if (!this.active) {
 			return;
 		}
@@ -2919,7 +2899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		disposeThen(this._end, this._error, this._disposable, x);
 	};
 
-	Observer.prototype.error = function(t, e) {
+	Drain.prototype.error = function(t, e) {
 		this.active = false;
 		disposeThen(this._error, this._error, this._disposable, e);
 	};
@@ -2932,7 +2912,263 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Stream = __webpack_require__(1);
+	var Map = __webpack_require__(37);
+	var Pipe = __webpack_require__(38);
+
+	exports.map = map;
+	exports.constant = constant;
+	exports.tap = tap;
+
+	/**
+	 * Transform each value in the stream by applying f to each
+	 * @param {function(*):*} f mapping function
+	 * @param {Stream} stream stream to map
+	 * @returns {Stream} stream containing items transformed by f
+	 */
+	function map(f, stream) {
+		return new Stream(Map.create(f, stream.source));
+	}
+
+	/**
+	 * Replace each value in the stream with x
+	 * @param {*} x
+	 * @param {Stream} stream
+	 * @returns {Stream} stream containing items replaced with x
+	 */
+	function constant(x, stream) {
+		return map(function() {
+			return x;
+		}, stream);
+	}
+
+	/**
+	 * Perform a side effect for each item in the stream
+	 * @param {function(x:*):*} f side effect to execute for each item. The
+	 *  return value will be discarded.
+	 * @param {Stream} stream stream to tap
+	 * @returns {Stream} new stream containing the same items as this stream
+	 */
+	function tap(f, stream) {
+		return new Stream(new Tap(f, stream.source));
+	}
+
+	function Tap(f, source) {
+		this.source = source;
+		this.f = f;
+	}
+
+	Tap.prototype.run = function(sink, scheduler) {
+		return this.source.run(new TapSink(this.f, sink), scheduler);
+	}
+
+	function TapSink(f, sink) {
+		this.sink = sink;
+		this.f = f;
+	}
+
+	TapSink.prototype.end = Pipe.prototype.end;
+	TapSink.prototype.error = Pipe.prototype.error;
+
+	TapSink.prototype.event = function(t, x) {
+		var f = this.f;
+		f(x);
+		this.sink.event(t, x);
+	}
+
+
+/***/ },
 /* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Pipe = __webpack_require__(38);
+	var Filter = __webpack_require__(39);
+	var FilterMap = __webpack_require__(40);
+	var base = __webpack_require__(2);
+
+	module.exports = Map;
+
+	function Map(f, source) {
+		this.f = f;
+		this.source = source;
+	}
+
+	/**
+	 * Create a mapped source, fusing adjacent map.map, filter.map,
+	 * and filter.map.map if possible
+	 * @param {function(*):*} f mapping function
+	 * @param {{run:function}} source source to map
+	 * @returns {Map|FilterMap} mapped source, possibly fused
+	 */
+	Map.create = function createMap(f, source) {
+		if(source instanceof Map) {
+			return new Map(base.compose(f, source.f), source.source);
+		}
+
+		if(source instanceof Filter) {
+			return new FilterMap(source.p, f, source.source);
+		}
+
+		return new Map(f, source);
+	};
+
+	Map.prototype.run = function(sink, scheduler) {
+		return this.source.run(new MapSink(this.f, sink), scheduler);
+	};
+
+	function MapSink(f, sink) {
+		this.f = f;
+		this.sink = sink;
+	}
+
+	MapSink.prototype.end   = Pipe.prototype.end;
+	MapSink.prototype.error = Pipe.prototype.error;
+
+	MapSink.prototype.event = function(t, x) {
+		var f = this.f;
+		this.sink.event(t, f(x));
+	};
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	module.exports = Pipe;
+
+	/**
+	 * A sink mixin that simply forwards event, end, and error to
+	 * another sink.
+	 * @param sink
+	 * @constructor
+	 */
+	function Pipe(sink) {
+		this.sink = sink;
+	}
+
+	Pipe.prototype.event = function(t, x) {
+		return this.sink.event(t, x);
+	};
+
+	Pipe.prototype.end = function(t, x) {
+		return this.sink.end(t, x);
+	};
+
+	Pipe.prototype.error = function(t, e) {
+		return this.sink.error(t, e);
+	};
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Pipe = __webpack_require__(38);
+
+	module.exports = Filter;
+
+	function Filter(p, source) {
+		this.p = p;
+		this.source = source;
+	}
+
+	/**
+	 * Create a filtered source, fusing adjacent filter.filter if possible
+	 * @param {function(x:*):boolean} p filtering predicate
+	 * @param {{run:function}} source source to filter
+	 * @returns {Filter} filtered source
+	 */
+	Filter.create = function createFilter(p, source) {
+		if (source instanceof Filter) {
+			return new Filter(and(source.p, p), source.source);
+		}
+
+		return new Filter(p, source);
+	};
+
+	Filter.prototype.run = function(sink, scheduler) {
+		return this.source.run(new FilterSink(this.p, sink), scheduler);
+	};
+
+	function FilterSink(p, sink) {
+		this.p = p;
+		this.sink = sink;
+	}
+
+	FilterSink.prototype.end   = Pipe.prototype.end;
+	FilterSink.prototype.error = Pipe.prototype.error;
+
+	FilterSink.prototype.event = function(t, x) {
+		var p = this.p;
+		p(x) && this.sink.event(t, x);
+	};
+
+	function and(p, q) {
+		return function(x) {
+			return p(x) && q(x);
+		};
+	}
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/** @license MIT License (c) copyright 2010-2016 original author or authors */
+	/** @author Brian Cavalier */
+	/** @author John Hann */
+
+	var Pipe = __webpack_require__(38);
+
+	module.exports = FilterMap;
+
+	function FilterMap(p, f, source) {
+		this.p = p;
+		this.f = f;
+		this.source = source;
+	}
+
+	FilterMap.prototype.run = function(sink, scheduler) {
+		return this.source.run(new FilterMapSink(this.p, this.f, sink), scheduler);
+	};
+
+	function FilterMapSink(p, f, sink) {
+		this.p = p;
+		this.f = f;
+		this.sink = sink;
+	}
+
+	FilterMapSink.prototype.event = function(t, x) {
+		var f = this.f;
+		var p = this.p;
+		p(x) && this.sink.event(t, f(x));
+	};
+
+	FilterMapSink.prototype.end = Pipe.prototype.end;
+	FilterMapSink.prototype.error = Pipe.prototype.error;
+
+
+/***/ },
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -2989,40 +3225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 38 */
-/***/ function(module, exports) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	module.exports = Pipe;
-
-	/**
-	 * A sink mixin that simply forwards event, end, and error to
-	 * another sink.
-	 * @param sink
-	 * @constructor
-	 */
-	function Pipe(sink) {
-		this.sink = sink;
-	}
-
-	Pipe.prototype.event = function(t, x) {
-		return this.sink.event(t, x);
-	};
-
-	Pipe.prototype.end = function(t, x) {
-		return this.sink.end(t, x);
-	};
-
-	Pipe.prototype.error = function(t, e) {
-		return this.sink.error(t, e);
-	};
-
-
-/***/ },
-/* 39 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3031,7 +3234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var Pipe = __webpack_require__(38);
-	var runSource = __webpack_require__(35);
+	var runSource = __webpack_require__(35).withDefaultScheduler;
 	var dispose = __webpack_require__(4);
 	var PropagateTask = __webpack_require__(8);
 
@@ -3087,7 +3290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Promise} promise for the file result of the reduce
 	 */
 	function reduce(f, initial, stream) {
-		return runSource.withDefaultScheduler(noop, new Reduce(f, initial, stream.source));
+		return runSource(new Reduce(f, initial, stream.source));
 	}
 
 	function Reduce(f, z, source) {
@@ -3122,7 +3325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 40 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3201,7 +3404,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 41 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3275,7 +3478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 42 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2014 original author or authors */
@@ -3351,7 +3554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 43 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3359,7 +3562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var streamOf = __webpack_require__(3).of;
-	var continueWith = __webpack_require__(44).continueWith;
+	var continueWith = __webpack_require__(47).continueWith;
 
 	exports.concat = concat;
 	exports.cycle = cycle;
@@ -3400,7 +3603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 44 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3472,170 +3675,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Stream = __webpack_require__(1);
-	var Map = __webpack_require__(46);
-
-	exports.map = map;
-	exports.constant = constant;
-	exports.tap = tap;
-
-	/**
-	 * Transform each value in the stream by applying f to each
-	 * @param {function(*):*} f mapping function
-	 * @param {Stream} stream stream to map
-	 * @returns {Stream} stream containing items transformed by f
-	 */
-	function map(f, stream) {
-		return new Stream(Map.create(f, stream.source));
-	}
-
-	/**
-	 * Replace each value in the stream with x
-	 * @param {*} x
-	 * @param {Stream} stream
-	 * @returns {Stream} stream containing items replaced with x
-	 */
-	function constant(x, stream) {
-		return map(function() {
-			return x;
-		}, stream);
-	}
-
-	/**
-	 * Perform a side effect for each item in the stream
-	 * @param {function(x:*):*} f side effect to execute for each item. The
-	 *  return value will be discarded.
-	 * @param {Stream} stream stream to tap
-	 * @returns {Stream} new stream containing the same items as this stream
-	 */
-	function tap(f, stream) {
-		return map(function(x) {
-			f(x);
-			return x;
-		}, stream);
-	}
-
-
-/***/ },
-/* 46 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Pipe = __webpack_require__(38);
-	var Filter = __webpack_require__(47);
-	var FilterMap = __webpack_require__(48);
-	var base = __webpack_require__(2);
-
-	module.exports = Map;
-
-	function Map(f, source) {
-		this.f = f;
-		this.source = source;
-	}
-
-	/**
-	 * Create a mapped source, fusing adjacent map.map, filter.map,
-	 * and filter.map.map if possible
-	 * @param {function(*):*} f mapping function
-	 * @param {{run:function}} source source to map
-	 * @returns {Map|FilterMap} mapped source, possibly fused
-	 */
-	Map.create = function createMap(f, source) {
-		if(source instanceof Map) {
-			return new Map(base.compose(f, source.f), source.source);
-		}
-
-		if(source instanceof Filter) {
-			return new FilterMap(source.p, f, source.source);
-		}
-
-		return new Map(f, source);
-	};
-
-	Map.prototype.run = function(sink, scheduler) {
-		return this.source.run(new MapSink(this.f, sink), scheduler);
-	};
-
-	function MapSink(f, sink) {
-		this.f = f;
-		this.sink = sink;
-	}
-
-	MapSink.prototype.end   = Pipe.prototype.end;
-	MapSink.prototype.error = Pipe.prototype.error;
-
-	MapSink.prototype.event = function(t, x) {
-		var f = this.f;
-		this.sink.event(t, f(x));
-	};
-
-
-/***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var Pipe = __webpack_require__(38);
-
-	module.exports = Filter;
-
-	function Filter(p, source) {
-		this.p = p;
-		this.source = source;
-	}
-
-	/**
-	 * Create a filtered source, fusing adjacent filter.filter if possible
-	 * @param {function(x:*):boolean} p filtering predicate
-	 * @param {{run:function}} source source to filter
-	 * @returns {Filter} filtered source
-	 */
-	Filter.create = function createFilter(p, source) {
-		if (source instanceof Filter) {
-			return new Filter(and(source.p, p), source.source);
-		}
-
-		return new Filter(p, source);
-	};
-
-	Filter.prototype.run = function(sink, scheduler) {
-		return this.source.run(new FilterSink(this.p, sink), scheduler);
-	};
-
-	function FilterSink(p, sink) {
-		this.p = p;
-		this.sink = sink;
-	}
-
-	FilterSink.prototype.end   = Pipe.prototype.end;
-	FilterSink.prototype.error = Pipe.prototype.error;
-
-	FilterSink.prototype.event = function(t, x) {
-		var p = this.p;
-		p(x) && this.sink.event(t, x);
-	};
-
-	function and(p, q) {
-		return function(x) {
-			return p(x) && q(x);
-		};
-	}
-
-
-/***/ },
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3643,45 +3682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var Pipe = __webpack_require__(38);
-
-	module.exports = FilterMap;
-
-	function FilterMap(p, f, source) {
-		this.p = p;
-		this.f = f;
-		this.source = source;
-	}
-
-	FilterMap.prototype.run = function(sink, scheduler) {
-		return this.source.run(new FilterMapSink(this.p, this.f, sink), scheduler);
-	};
-
-	function FilterMapSink(p, f, sink) {
-		this.p = p;
-		this.f = f;
-		this.sink = sink;
-	}
-
-	FilterMapSink.prototype.event = function(t, x) {
-		var f = this.f;
-		var p = this.p;
-		p(x) && this.sink.event(t, f(x));
-	};
-
-	FilterMapSink.prototype.end = Pipe.prototype.end;
-	FilterMapSink.prototype.error = Pipe.prototype.error;
-
-
-/***/ },
-/* 49 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/** @license MIT License (c) copyright 2010-2016 original author or authors */
-	/** @author Brian Cavalier */
-	/** @author John Hann */
-
-	var combine = __webpack_require__(50).combine;
+	var combine = __webpack_require__(49).combine;
 	var apply = __webpack_require__(2).apply;
 
 	exports.ap  = ap;
@@ -3702,7 +3703,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 50 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3710,13 +3711,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var transform = __webpack_require__(45);
+	var transform = __webpack_require__(36);
 	var core = __webpack_require__(3);
 	var Pipe = __webpack_require__(38);
-	var IndexSink = __webpack_require__(51);
+	var IndexSink = __webpack_require__(50);
 	var dispose = __webpack_require__(4);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(52);
+	var invoke = __webpack_require__(51);
 
 	var map = base.map;
 	var tail = base.tail;
@@ -3824,7 +3825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 51 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3862,7 +3863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 52 */
+/* 51 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3887,7 +3888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 53 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4016,15 +4017,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 54 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var mergeConcurrently = __webpack_require__(55).mergeConcurrently;
-	var mergeMapConcurrently = __webpack_require__(55).mergeMapConcurrently;
+	var mergeConcurrently = __webpack_require__(54).mergeConcurrently;
+	var mergeMapConcurrently = __webpack_require__(54).mergeMapConcurrently;
 
 	exports.flatMap = flatMap;
 	exports.join = join;
@@ -4052,7 +4053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 55 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4061,7 +4062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var dispose = __webpack_require__(4);
-	var LinkedList = __webpack_require__(56);
+	var LinkedList = __webpack_require__(55);
 	var identity = __webpack_require__(2).id;
 
 	exports.mergeConcurrently = mergeConcurrently;
@@ -4186,7 +4187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 56 */
+/* 55 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4268,14 +4269,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 57 */
+/* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 
-	var mergeMapConcurrently = __webpack_require__(55).mergeMapConcurrently;
+	var mergeMapConcurrently = __webpack_require__(54).mergeMapConcurrently;
 
 	exports.concatMap = concatMap;
 
@@ -4296,7 +4297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 58 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4305,7 +4306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var Pipe = __webpack_require__(38);
-	var IndexSink = __webpack_require__(51);
+	var IndexSink = __webpack_require__(50);
 	var empty = __webpack_require__(3).empty;
 	var dispose = __webpack_require__(4);
 	var base = __webpack_require__(2);
@@ -4398,7 +4399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 59 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4409,7 +4410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Pipe = __webpack_require__(38);
 	var dispose = __webpack_require__(4);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(52);
+	var invoke = __webpack_require__(51);
 
 	exports.sample = sample;
 	exports.sampleWith = sampleWith;
@@ -4515,7 +4516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 60 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4523,14 +4524,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var transform = __webpack_require__(45);
+	var transform = __webpack_require__(36);
 	var core = __webpack_require__(3);
 	var Sink = __webpack_require__(38);
-	var IndexSink = __webpack_require__(51);
+	var IndexSink = __webpack_require__(50);
 	var dispose = __webpack_require__(4);
 	var base = __webpack_require__(2);
-	var invoke = __webpack_require__(52);
-	var Queue = __webpack_require__(61);
+	var invoke = __webpack_require__(51);
+	var Queue = __webpack_require__(60);
 
 	var map = base.map;
 	var tail = base.tail;
@@ -4654,7 +4655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 61 */
+/* 60 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4725,7 +4726,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 62 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4841,7 +4842,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 63 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4850,7 +4851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Stream = __webpack_require__(1);
 	var Sink = __webpack_require__(38);
-	var Filter = __webpack_require__(47);
+	var Filter = __webpack_require__(39);
 
 	exports.filter = filter;
 	exports.skipRepeats = skipRepeats;
@@ -4921,7 +4922,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 64 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -4932,7 +4933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Sink = __webpack_require__(38);
 	var core = __webpack_require__(3);
 	var dispose = __webpack_require__(4);
-	var Map = __webpack_require__(46);
+	var Map = __webpack_require__(37);
 
 	exports.take = take;
 	exports.skip = skip;
@@ -5106,7 +5107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 65 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5116,7 +5117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Stream = __webpack_require__(1);
 	var Pipe = __webpack_require__(38);
 	var dispose = __webpack_require__(4);
-	var join = __webpack_require__(54).join;
+	var join = __webpack_require__(53).join;
 
 	exports.during    = during;
 	exports.takeUntil = takeUntil;
@@ -5228,7 +5229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 66 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5287,7 +5288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 67 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5324,7 +5325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 68 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5335,7 +5336,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Sink = __webpack_require__(38);
 	var dispose = __webpack_require__(4);
 	var PropagateTask = __webpack_require__(8);
-	var Map = __webpack_require__(46);
+	var Map = __webpack_require__(37);
 
 	exports.throttle = throttle;
 	exports.debounce = debounce;
@@ -5455,7 +5456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 69 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5551,7 +5552,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 70 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -5559,7 +5560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/** @author John Hann */
 
 	var Stream = __webpack_require__(1);
-	var SafeSink = __webpack_require__(71);
+	var SafeSink = __webpack_require__(70);
 	var Pipe = __webpack_require__(38);
 	var dispose = __webpack_require__(4);
 	var tryEvent = __webpack_require__(30);
@@ -5652,7 +5653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 71 */
+/* 70 */
 /***/ function(module, exports) {
 
 	/** @license MIT License (c) copyright 2010-2016 original author or authors */
