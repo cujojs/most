@@ -23,7 +23,7 @@ declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A
 
 export interface Sink<A> {
   event(time: number, value: A): void;
-  end(time: number, value: A): void;
+  end(time: number, value?: A): void;
   error(time: number, err: Error): void;
 }
 
@@ -47,7 +47,7 @@ export interface Scheduler {
   periodic(task: Task): ScheduledTask;
   schedule(delay: number, period: number, task: Task): ScheduledTask;
   cancel(task: Task): void;
-  cancelAll(predicate: (val: any) => boolean): void;
+  cancelAll(predicate: (task: Task) => boolean): void;
 }
 
 export interface Disposable<A> {
@@ -61,7 +61,7 @@ export interface Source<A> {
 export interface Subscriber<A> {
   next(value: A): void;
   error(err: Error): void;
-  complete(value: A): void;
+  complete(value?: A): void;
 }
 
 export interface Subscription<A> {
