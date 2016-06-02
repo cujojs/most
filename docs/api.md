@@ -447,7 +447,7 @@ most.fromEvent('click', container)
 <a name="mostcreate"/>
 ### most.create
 
-**Deprecated**: `most.create` will be moved to a separate package.  Once that package is available, `most.create` will be removed.
+**Deprecated**: [Use `@most/create` instead](https://github.com/mostjs/create)
 
 ####`most.create(publisher) -> Stream`
 
