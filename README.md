@@ -140,7 +140,7 @@ Most.js interoperates seamlessly with ES6 and Promises/A+ promises.  For example
 ```js
 // After 4 seconds, logs 10
 most.from([1, 2, 3, 4])
-	.delay(1000)
+	.zip(v => v, most.periodic(1000))
 	.reduce(function(result, y) {
 		return result + y;
 	}, 0)
