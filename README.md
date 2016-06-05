@@ -36,37 +36,33 @@ First, the HTML fragment for the inputs and a place to display the live result:
 
 Using most.js to make it reactive:
 
-```js
-var most = require('most');
+```es6
+import { fromEvent, combine } from 'most'
 
-var xInput = document.querySelector('input.x');
-var yInput = document.querySelector('input.y');
-var resultNode = document.querySelector('.result');
+const xInput = document.querySelector('input.x')
+const yInput = document.querySelector('input.y')
+const resultNode = document.querySelector('.result')
 
-exports.main = function() {
+const add = (x, y) => x + y
+
+const toNumber = e => Number(e.target.value)
+
+const renderResult = result => {
+	resultNode.textContent = result
+}
+
+export const main = () => {
 	// x represents the current value of xInput
-	var x = most.fromEvent('input', xInput).map(toNumber);
+	const x = fromEvent('input', xInput).map(toNumber)
 
 	// y represents the current value of yInput
-	var y = most.fromEvent('input', yInput).map(toNumber);
+	const y = fromEvent('input', yInput).map(toNumber)
 
 	// result is the live current value of adding x and y
-	var result = most.combine(add, x, y);
+	const result = combine(add, x, y)
 
 	// Observe the result value by rendering it to the resultNode
-	result.observe(renderResult);
-};
-
-function add(x, y) {
-	return x + y;
-}
-
-function toNumber(e) {
-	return Number(e.target.value);
-}
-
-function renderResult(result) {
-	resultNode.textContent = result;
+	result.observe(renderResult)
 }
 ```
 
@@ -88,8 +84,16 @@ As a module:
 npm install --save most
 ```
 
+```es6
+// ES6
+import { /* functions */ } from 'most'
+// or
+import * as most from 'most'
+```
+
 ```js
-var most = require('most');
+// ES5
+var most = require('most')
 ```
 
 As `window.most`:
@@ -137,26 +141,22 @@ Promises are a natural compliment to asynchronous reactive streams. The relation
 
 Most.js interoperates seamlessly with ES6 and Promises/A+ promises.  For example, reducing a stream returns a promise for the final result:
 
-```js
-// After 4 seconds, logs 10
-most.from([1, 2, 3, 4])
+```es6
+import { from } from 'most'
+// After 1 second, logs 10
+from([1, 2, 3, 4])
 	.delay(1000)
-	.reduce(function(result, y) {
-		return result + y;
-	}, 0)
-	.then(function(result) {
-		console.log(result);
-	});
+	.reduce((result, y) => result + y, 0)
+	.then(result => console.log(result))
 ```
 
 You can also create a stream from a promise:
 
-```js
+```es6
+import { fromPromise } from 'most'
 // Logs "hello"
-most.fromPromise(Promise.resolve('hello'))
-	.observe(function(message) {
-		console.log(message);
-	});
+fromPromise(Promise.resolve('hello'))
+	.observe(message => console.log(message))
 ```
 
 #### Generators
@@ -165,38 +165,41 @@ Conceptually, [generators](https://developer.mozilla.org/en-US/docs/Web/JavaScri
 
 Most.js interoperates with ES6 generators and iterators.  For example, you can create an event stream from any ES6 iterable:
 
-```js
+```es6
+import { from } from 'most'
+
 function* allTheIntegers() {
-	let i=0;
+	let i=0
 	while(true) {
-		yield i++;
+		yield i++
 	}
 }
 
 // Log the first 100 integers
-most.from(allTheIntegers())
+from(allTheIntegers())
 	.take(100)
-	.observe(x => console.log(x));
+	.observe(x => console.log(x))
 ```
 
 #### Asynchronous Generators
 
 You can also create an event stream from an *asynchronous generator*, a generator that yields promises:
 
-```js
+```es6
+import { generate } from 'most'
+
 function* allTheIntegers(interval) {
-	let i=0;
+	let i=0
 	while(true) {
-		yield delayPromise(interval, i++);
+		yield delayPromise(interval, i++)
 	}
 }
 
-function delayPromise(ms, value) {
-	return new Promise(resolve => setTimeout(() => resolve(value), ms));
-}
+const delayPromise = (ms, value) =>
+	new Promise(resolve => setTimeout(() => resolve(value), ms))
 
 // Log the first 100 integers, at 1 second intervals
-most.generate(allTheIntegers, 1000)
+generate(allTheIntegers, 1000)
 	.take(100)
-	.observe(x => console.log(x));
+	.observe(x => console.log(x))
 ```
