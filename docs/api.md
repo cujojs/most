@@ -1465,6 +1465,16 @@ most.from([1,2,3])
 	.forEach(x => console.log(x))
 ```
 
+A stream zipped with a stream created by `most.periodic` will emit events in intervals.
+
+```es6
+// Logs new sum every second
+most.from([1, 2, 3, 4])
+	.zip(v => v, most.periodic(1000))
+	.scan((result, y) => result + y, 0)
+	.forEach(x => console.log(x))
+```
+
 ## Combining higher-order streams
 
 ### switch
