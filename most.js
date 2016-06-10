@@ -54,22 +54,6 @@ Stream.prototype.thru = function(f) {
 }
 
 //-----------------------------------------------------------------------
-// Creating
-
-var create = require('./lib/source/create');
-
-/**
- * @deprecated
- * Create a stream by imperatively pushing events.
- * @param {function(add:function(x), end:function(e)):function} run function
- *  that will receive 2 functions as arguments, the first to add new values to the
- *  stream and the second to end the stream. It may *return* a function that
- *  will be called once all consumers have stopped observing the stream.
- * @returns {Stream} stream containing all events added by run before end
- */
-exports.create = create.create;
-
-//-----------------------------------------------------------------------
 // Adapting other sources
 
 var events = require('./lib/source/fromEvent');
@@ -176,18 +160,8 @@ var build = require('./lib/combinator/build');
 exports.unfold    = unfold.unfold;
 exports.iterate   = iterate.iterate;
 exports.generate  = generate.generate;
-exports.cycle     = build.cycle;
 exports.concat    = build.concat;
 exports.startWith = build.cons;
-
-/**
- * @deprecated
- * Tie this stream into a circle, thus creating an infinite stream
- * @returns {Stream} new infinite stream
- */
-Stream.prototype.cycle = function() {
-	return build.cycle(this);
-};
 
 /**
  * @param {Stream} tail

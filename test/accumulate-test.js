@@ -7,7 +7,7 @@ var throwError = require('../lib/combinator/errors').throwError;
 var observe = require('../lib/combinator/observe').observe;
 var drain = require('../lib/combinator/observe').drain;
 var fromArray = require('../lib/source/fromArray').fromArray;
-var create = require('../lib/source/create').create;
+// var create = require('../lib/source/create').create;
 var core = require('../lib/source/core');
 
 var scan = accumulate.scan;
@@ -36,23 +36,23 @@ describe('scan', function() {
 		}, stream);
 	});
 
-	it('should preserve end value', function() {
-		var expectedEndValue = {};
-		var stream = create(function(add, end) {
-			add(1);
-			add(2);
-			end(expectedEndValue);
-		});
-
-		var s = scan(function(a, x) {
-			expect(x).not.toBe(expectedEndValue);
-			return x;
-		}, 0, stream);
-
-		return drain(s).then(function(endValue) {
-			expect(endValue).toBe(expectedEndValue);
-		});
-	});
+	// it('should preserve end value', function() {
+	// 	var expectedEndValue = {};
+	// 	var stream = create(function(add, end) {
+	// 		add(1);
+	// 		add(2);
+	// 		end(expectedEndValue);
+	// 	});
+	//
+	// 	var s = scan(function(a, x) {
+	// 		expect(x).not.toBe(expectedEndValue);
+	// 		return x;
+	// 	}, 0, stream);
+	//
+	// 	return drain(s).then(function(endValue) {
+	// 		expect(endValue).toBe(expectedEndValue);
+	// 	});
+	// });
 
 	it('should dispose', function() {
 		var dispose = this.spy();

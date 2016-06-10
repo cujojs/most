@@ -3,7 +3,6 @@ var expect = require('buster').expect;
 
 var limit = require('../lib/combinator/limit');
 var periodic = require('../lib/source/periodic').periodic;
-var create = require('../lib/source/create').create;
 var delay = require('../lib/combinator/delay').delay;
 var join = require('../lib/combinator/flatMap').join;
 var zip = require('../lib/combinator/zip').zip;

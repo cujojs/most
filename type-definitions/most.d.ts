@@ -124,7 +124,6 @@ export interface Stream<A> {
   scan<B>(f: (b: B, a: A) => B, b: B): Stream<B>;
   loop<S, B>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S): Stream<B>;
 
-  cycle(): Stream<A>;
   concat(s2: Stream<A>): Stream<A>;
   startWith(a: A): Stream<A>;
 
@@ -211,7 +210,6 @@ export class Stream<A> {
   constructor(source: Source<A>);
 }
 
-export function create<A>(f: (add: (a: A) => any, end: (x: any) => any, error: (e: Error) => any) => void|DisposeFn): Stream<A>;
 export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
 export function empty(): Stream<any>;
@@ -294,7 +292,6 @@ export function combineArray<A, B, C, D, E, R>(
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
 export function loop<A, B, S>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S, s: Stream<A>): Stream<B>;
 
-export function cycle<A>(s: Stream<A>): Stream<A>;
 export function concat<A>(s1: Stream<A>, s2: Stream<A>): Stream<A>;
 export function startWith<A>(a: A, s: Stream<A>): Stream<A>;
 
