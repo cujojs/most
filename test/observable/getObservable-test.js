@@ -6,17 +6,20 @@ var getObservable = require('../../lib/observable/getObservable');
 
 describe('getObservable', function() {
 	it('should return null for non-object', function() {
+		assert.same(null, getObservable(0));
 		assert.same(null, getObservable(1));
 		assert.same(null, getObservable(undefined));
 		assert.same(null, getObservable(null));
+		assert.same(null, getObservable(''));
 		assert.same(null, getObservable('string'));
 		assert.same(null, getObservable(true));
+		assert.same(null, getObservable(false));
 	});
 
 	it('should return null for non-observable object', function() {
 		assert.same(null, getObservable({}));
 		assert.same(null, getObservable(null));
-		assert.same(null, getObservable(() => {}));
+		assert.same(null, getObservable(function() {}));
 	});
 
 	it('should throw TypeError for invalid observable', function() {
@@ -44,7 +47,7 @@ describe('getObservable', function() {
 
 	it('should return observable if valid', function() {
 		var outer = {};
-		var inner = { subscribe: () => {} };
+		var inner = { subscribe: function() {} };
 		outer[symbolObservable] = function() {
 			return inner
 		}
