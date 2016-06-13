@@ -106,6 +106,14 @@ bower install --save most`
 <script src="most/dist/most.js"></script>
 ```
 
+### Typescript support
+
+Most.js works with typescript out of the box as it provides [local typings](https://github.com/cujojs/most/blob/master/type-definitions/most.d.ts) that will be read when you import Most.js in your code. You do not need to manually link an external `d.ts` file in your tsconfig.
+
+Most.js has a dependency on native Promises so a type definition for Promise must be available in your setup:  
+ - If your tsconfig is targeting ES6, you do not need to do anything as typescript will include a definition for Promise by default.
+ - If your tsconfig is targeting ES5, you need to provide your own Promise definition. For instance [es6shim.d.ts](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/es6-shim/es6-shim.d.ts)
+
 ## Interoperability
 
 <a href="http://promises-aplus.github.com/promises-spec"><img width="82" height="82" alt="Promises/A+" src="http://promises-aplus.github.com/promises-spec/assets/logo-small.png"></a>
