@@ -5,6 +5,7 @@
 var Stream = require('../../lib/Stream');
 var PropagateTask = require('../../lib/scheduler/PropagateTask');
 var Scheduler = require('../../lib/scheduler/Scheduler');
+var Timeline = require('../../lib/scheduler/Timeline');
 var VirtualTimer = require('./VirtualTimer');
 var runSource = require('../../lib/runSource');
 var tap = require('../../lib/combinator/transform').tap;
@@ -30,7 +31,7 @@ TestEnvironment.prototype.tick = function(dt) {
 
 function newEnv() {
 	var timer = new VirtualTimer();
-	return new TestEnvironment(timer, new Scheduler(timer));
+	return new TestEnvironment(timer, new Scheduler(timer, new Timeline()));
 }
 
 function ticks(dt) {
