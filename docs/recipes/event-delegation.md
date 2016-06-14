@@ -9,7 +9,7 @@ from the element.
 
 The 2nd example is similar, however we use jQuery to handle event delegation.
 
-We use [most.create](../api.md#mostcreate) to produce a push-stream off of those click events.
+We use [mostjs/create](https://github.com/mostjs/multicast) to produce a push-stream off of those click events.
 Essentially each time a user clicks on the `.inner` that event is added to the
 stream which can be observed and processed in a similar manner to the 1st example.
 
