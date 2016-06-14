@@ -1,68 +1,68 @@
-require('buster').spec.expose();
-var expect = require('buster').expect;
+import { spec, referee } from 'buster';
+const { describe, it } = spec
+const { fail, assert } = referee;
 
-var Stream = require('../lib/Stream');
-var accumulate = require('../lib/combinator/accumulate');
-var throwError = require('../lib/combinator/errors').throwError;
-var observe = require('../lib/combinator/observe').observe;
-var drain = require('../lib/combinator/observe').drain;
-var fromArray = require('../lib/source/fromArray').fromArray;
-// var create = require('../lib/source/create').create;
-var core = require('../lib/source/core');
+import Stream from '../lib/Stream'
+import { scan, reduce } from '../lib/combinator/accumulate'
+import { throwError } from '../lib/combinator/errors'
+import { observe, drain } from '../lib/combinator/observe'
 
-var scan = accumulate.scan;
-var reduce = accumulate.reduce;
+import { fromArray } from '../lib/source/fromArray'
+import { empty, of as just } from '../lib/source/core'
 
-var empty = core.empty;
-var streamOf = core.of;
+import FakeDisposeSource from './helper/FakeDisposeSource'
 
-var FakeDisposeSource = require('./helper/FakeDisposeSource');
+const sentinel = { value: 'sentinel' };
+const other = { value: 'other' };
 
-var sentinel = { value: 'sentinel' };
-var other = { value: 'other' };
+function endWith (endValue, { source }) {
+	return new Stream({
+		run: (sink, scheduler) => {
+			return  source.run({
+				end (t, _) {
+					sink.end(t, endValue);
+				},
+				event (t, x) {
+					sink.event(t, x);
+				},
+				error (t, e) {
+					sink.error(t, e);
+				}
+			}, scheduler);
+		}
+	});
+}
 
 describe('scan', function() {
 	it('should yield combined values', function() {
-		var i = 0;
-		var items = 'abcd';
+		let i = 0;
+		const items = 'abcd';
 
-		var stream = scan(function (s, x) {
-			return s + x;
-		}, items[0], fromArray(items.slice(1)));
+		const stream = scan( (s, x) => s + x, items[0], fromArray(items.slice(1)));
 
-		return observe(function(s) {
+		return observe(s => {
 			++i;
-			expect(s).toEqual(items.slice(0, i));
+			assert.equals(s, items.slice(0, i));
 		}, stream);
 	});
 
-	// it('should preserve end value', function() {
-	// 	var expectedEndValue = {};
-	// 	var stream = create(function(add, end) {
-	// 		add(1);
-	// 		add(2);
-	// 		end(expectedEndValue);
-	// 	});
-	//
-	// 	var s = scan(function(a, x) {
-	// 		expect(x).not.toBe(expectedEndValue);
-	// 		return x;
-	// 	}, 0, stream);
-	//
-	// 	return drain(s).then(function(endValue) {
-	// 		expect(endValue).toBe(expectedEndValue);
-	// 	});
-	// });
+	it('should preserve end value', function() {
+		const expectedEndValue = {};
+		const stream = endWith(expectedEndValue, just({}));
+
+		const s = scan((a, x) => x, {}, stream);
+
+		return drain(s).then(endValue =>
+			assert.same(endValue, expectedEndValue));
+	});
 
 	it('should dispose', function() {
-		var dispose = this.spy();
+		const dispose = this.spy();
 
-		var stream = new Stream(new FakeDisposeSource(dispose, streamOf(sentinel).source));
-		var s = scan(function(z, x) { return x; }, 0, stream);
+		const stream = new Stream(new FakeDisposeSource(dispose, just(sentinel).source));
+		const s = scan(function(z, x) { return x; }, 0, stream);
 
-		return drain(s).then(function() {
-			expect(dispose).toHaveBeenCalledOnce();
-		});
+		return drain(s).then(() => assert(dispose.calledOnce));
 	});
 });
 
@@ -71,12 +71,8 @@ describe('reduce', function() {
 	describe('when stream is empty', function() {
 
 		it('should reduce to initial', function() {
-			return reduce(function() {
-				throw new Error();
-			}, sentinel, empty())
-				.then(function(result) {
-					expect(result).toBe(sentinel);
-				});
+			return reduce(() => { throw new Error(); }, sentinel, empty())
+				.then(result => assert.same(result, sentinel));
 		});
 
 	});
@@ -84,23 +80,15 @@ describe('reduce', function() {
 	describe('when stream errors', function() {
 
 		it('should reject', function() {
-			return reduce(function(x) {
-				return x;
-			}, other, throwError(sentinel))
-				.catch(function(e) {
-					expect(e).toBe(sentinel);
-				});
+			return reduce(x => x, other, throwError(sentinel))
+				.catch(e => assert.same(e, sentinel));
 		});
 
 	});
 
 	it('should reduce values', function() {
-		return reduce(function(s, x) {
-			return s+x;
-		}, 'a', fromArray(['b', 'c', 'd']))
-			.then(function(result) {
-				expect(result).toBe('abcd');
-			});
+		return reduce((s, x) => s + x, 'a', fromArray(['b', 'c', 'd']))
+			.then(result => assert.same(result, 'abcd'));
 	});
 
 });
