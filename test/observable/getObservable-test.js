@@ -9,7 +9,6 @@ describe('getObservable', function() {
 		assert.same(null, getObservable(0));
 		assert.same(null, getObservable(1));
 		assert.same(null, getObservable(undefined));
-		assert.same(null, getObservable(null));
 		assert.same(null, getObservable(''));
 		assert.same(null, getObservable('string'));
 		assert.same(null, getObservable(true));
@@ -20,6 +19,7 @@ describe('getObservable', function() {
 		assert.same(null, getObservable({}));
 		assert.same(null, getObservable(null));
 		assert.same(null, getObservable(function() {}));
+		assert.same(null, getObservable([]));
 	});
 
 	it('should throw TypeError for invalid observable', function() {
