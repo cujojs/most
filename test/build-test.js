@@ -22,37 +22,6 @@ var other = { value: 'other' };
 
 describe('build', function() {
 
-	describe('cycle', function() {
-
-		it('should keep repeating', function() {
-			var s = take(9, build.cycle(fromArray([1, 2, 3])));
-
-			return reduce(function(result, x) {
-				return result.concat(x);
-			}, [], s).then(function(result) {
-				expect(result).toEqual([1, 2, 3, 1, 2, 3, 1, 2, 3]);
-			});
-		});
-
-		it('should end on error', function() {
-			var s = build.cycle(fromArray([1, 2, 3]));
-			return observe(function() { throw sentinel; }, s).catch(function(e) {
-				expect(e).toBe(sentinel);
-			});
-		});
-
-		it('should dispose', function() {
-			var dispose = this.spy();
-			var s = new Stream(new FakeDisposeSource(function() {
-				dispose();
-			}, streamOf(0).source));
-
-			return drain(take(1, build.cycle(s))).then(function() {
-				expect(dispose).toHaveBeenCalledOnce();
-			});
-		});
-	});
-
 	describe('startWith', function() {
 		it('should return a stream containing item as head', function() {
 			var s = build.cons(sentinel, empty());
