@@ -1504,7 +1504,11 @@ searchText.debounce(500)
 	.observe(x => console.log(x));
 ```
 
+<!--
+FIXME: Reinstate once type-to-search example is ported
+
 See the [type-to-search example](../examples) for a more complete example of using `debounce`.
+-->
 
 ### throttle
 
