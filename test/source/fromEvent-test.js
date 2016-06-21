@@ -4,6 +4,7 @@ var expect = require('buster').expect;
 var events = require('../../lib/source/fromEvent');
 var fromEvent = events.fromEvent;
 var reduce = require('../../lib/combinator/accumulate').reduce;
+var drain = require('../../lib/combinator/observe').drain;
 var observe = require('../../lib/combinator/observe').observe;
 var take = require('../../lib/combinator/slice').take;
 var FakeEventTarget = require('../helper/FakeEventTarget');
@@ -39,6 +40,25 @@ describe('fromEvent', function() {
 				expect(tick).toBe(1);
 			}, take(1, s));
 		});
+
+		it('should pass capture argument', () => {
+			var source = new FakeEventTarget();
+
+			const expected = {};
+			drain(take(1, fromEvent('test', source, expected)));
+			source.emit('unused');
+
+			expect(source._capture).toBe(expected);
+		})
+
+		it('should pass false if capture not provided', () => {
+			var source = new FakeEventTarget();
+
+			drain(take(1, fromEvent('test', source)));
+			source.emit('unused');
+
+			expect(source._capture).toBe(false);
+		})
 	});
 
 	describe('given an EventEmitter', function() {

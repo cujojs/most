@@ -1,6 +1,6 @@
 import { spec, referee } from 'buster';
-const { describe, it } = spec
-const { fail, assert } = referee;
+const { describe, it } = spec;
+const { assert } = referee;
 
 import Stream from '../lib/Stream'
 import { scan, reduce } from '../lib/combinator/accumulate'
