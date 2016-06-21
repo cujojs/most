@@ -17,7 +17,6 @@ most.js API
 	* [most.unfold](#mostunfold)
 	* [most.generate](#mostgenerate)
 	* [most.fromEvent](#mostfromevent)
-	* [most.create](#mostcreate)
 	* [startWith](#startwith)
 	* [concat](#concat)
 1. Handling errors
@@ -1333,7 +1332,7 @@ stream2:                   -1---2---3---4->
 stream1.zip(add, stream2): -2---4---6---8->
 ```
 
-Zipping correlates *by index* corresponding events from two or more input streams.  Fast streams must wait for slow streams.  For pull streams, this does not cause any buffering.  However, when zipping push streams, a fast push stream, such as those created by [`most.create`](#mostcreate) and [`most.fromEvent`](#mostfromevent) will be forced to buffer events so they can be correlated with corresponding events from the slower stream.
+Zipping correlates *by index* corresponding events from two or more input streams.  Note that zipping a "fast" stream and a "slow" stream will cause buffering.  Events from the fast stream must be buffered in memory until an event at the corresponding index arrives on the slow stream.
 
 A zipped stream ends when any one of its input streams ends.
 
