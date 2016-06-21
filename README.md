@@ -19,7 +19,7 @@ It features an ultra-high performance, low overhead architecture, APIs for easil
 
 * [API docs](docs/api.md)
 * [Recipes](docs/recipes)
-* [Examples](examples)
+* [Examples](https://github.com/mostjs/examples)
 * [Get it](#get-it)
 
 ## Simple example
@@ -68,7 +68,7 @@ export const main = () => {
 
 ## More examples
 
-To [run the example above](examples/add-inputs) and [others](examples) using [RaveJS](https://github.com/RaveJS/rave): clone the repo into a web servable dir, `cd examples/<name> && bower install`, and load `index.html` in your browser.
+You can find the example above and others in the [Examples repo](https://github.com/mostjs/examples).
 
 ## Get it
 
