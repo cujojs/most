@@ -1,5 +1,5 @@
 import { spec, referee } from 'buster';
-const { describe, it } = spec
+const { describe, it } = spec;
 const { fail, assert } = referee;
 
 import { continueWith } from '../../lib/combinator/continueWith';
