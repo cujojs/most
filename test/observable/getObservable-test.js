@@ -43,7 +43,7 @@ describe('getObservable', function() {
 		assert.exception(() => getObservable(outer), e => e === error);
 	});
 
-	it('should return observable if valid', function() {
+	it('should return observable if valid', () => {
 		const inner = { subscribe: function() {} };
 		const outer = {
 			[symbolObservable]: () => inner

@@ -1,57 +1,58 @@
-require('buster').spec.expose();
-var assert = require('buster').referee.assert;
+import { spec, referee } from 'buster';
+const { describe, it } = spec;
+const { assert } = referee;
 
-var most = require('../most');
-var symbolObservable = require('symbol-observable');
+import * as most from '../most';
+import symbolObservable from 'symbol-observable';
 
-describe('just', function() {
-	it('should be an alias for of', function() {
+describe('just', () => {
+	it('should be an alias for of', () => {
 		assert.isFunction(most.just);
 		assert.same(most.just, most.of);
 	});
 });
 
-describe('chain', function() {
-	it('should be an alias for flatMap', function() {
+describe('chain', () => {
+	it('should be an alias for flatMap', () => {
 		assert.isFunction(most.chain);
 		assert.same(most.chain, most.flatMap);
 		assert.same(most.Stream.prototype.chain, most.Stream.prototype.flatMap);
 	});
 });
 
-describe('forEach', function() {
-	it('should be an alias for observe', function() {
+describe('forEach', () => {
+	it('should be an alias for observe', () => {
 		assert.isFunction(most.forEach);
 		assert.same(most.forEach, most.observe);
 		assert.same(most.Stream.prototype.forEach, most.Stream.prototype.observe);
 	});
 });
 
-describe('takeUntil', function() {
-	it('should be an alias for until', function() {
+describe('takeUntil', () => {
+	it('should be an alias for until', () => {
 		assert.isFunction(most.takeUntil);
 		assert.same(most.takeUntil, most.until);
 		assert.same(most.Stream.prototype.takeUntil, most.Stream.prototype.until);
 	});
 });
 
-describe('skipUntil', function() {
-	it('should be an alias for since', function() {
+describe('skipUntil', () => {
+	it('should be an alias for since', () => {
 		assert.isFunction(most.skipUntil);
 		assert.same(most.skipUntil, most.since);
 		assert.same(most.Stream.prototype.skipUntil, most.Stream.prototype.since);
 	});
 });
 
-describe('flatMapEnd', function() {
-	it('should be an alias for continueWith', function() {
+describe('flatMapEnd', () => {
+	it('should be an alias for continueWith', () => {
 		assert.isFunction(most.flatMapEnd);
 		assert.same(most.flatMapEnd, most.continueWith);
 		assert.same(most.Stream.prototype.flatMapEnd, most.Stream.prototype.continueWith);
 	});
 
-	describe('flatMapError', function() {
-		it('should be an alias for recoverWith', function () {
+	describe('flatMapError', () => {
+		it('should be an alias for recoverWith', () => {
 			assert.isFunction(most.flatMapError);
 			assert.same(most.flatMapError, most.recoverWith);
 			assert.same(most.Stream.prototype.flatMapError, most.Stream.prototype.recoverWith);
@@ -59,15 +60,15 @@ describe('flatMapEnd', function() {
 	});
 });
 
-describe('multicast', function() {
-	it('should be a function', function() {
+describe('multicast', () => {
+	it('should be a function', () => {
 		assert.isFunction(most.multicast);
 		assert.isFunction(most.Stream.prototype.multicast);
 	});
 });
 
-describe('Draft ES Observable API interop', function() {
-	it('should exist', function() {
+describe('Draft ES Observable API interop', () => {
+	it('should exist', () => {
 		assert.isFunction(most.Stream.prototype.subscribe);
 		assert.isFunction(most.Stream.prototype[symbolObservable]);
 	});
