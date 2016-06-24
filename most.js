@@ -7,7 +7,7 @@ var base = require('@most/prelude');
 var core = require('./lib/source/core');
 var from = require('./lib/source/from').from;
 var periodic = require('./lib/source/periodic').periodic;
-var symbolObservable = require('symbol-observable');
+var symbolObservable = require('symbol-observable').default;
 
 /**
  * Core stream type
@@ -35,7 +35,7 @@ Stream.prototype.subscribe = function(subscriber) {
 
 Stream.prototype[symbolObservable] = function() {
 	return this;
-}
+};
 
 //-----------------------------------------------------------------------
 // Fluent adapter
