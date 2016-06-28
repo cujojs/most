@@ -1,6 +1,6 @@
 {
   "name": "most",
-  "version": "0.19.7",
+  "version": "1.0.0",
   "description": "Monadic streams",
   "typings": "type-definitions/most.d.ts",
   "main": "most.js",
