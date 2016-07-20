@@ -18,7 +18,7 @@ It features an ultra-high performance, low overhead architecture, APIs for easil
 ## Learn more
 
 * [API docs](docs/api.md)
-* [Recipes](docs/recipes)
+* [Recipes](https://github.com/cujojs/most/wiki/Recipes)
 * [Examples](https://github.com/mostjs/examples)
 * [Get it](#get-it)
 
