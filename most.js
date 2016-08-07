@@ -2,32 +2,29 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-var Stream = require('./lib/Stream');
-var base = require('@most/prelude');
-var core = require('./lib/source/core');
-var from = require('./lib/source/from').from;
-var periodic = require('./lib/source/periodic').periodic;
-var symbolObservable = require('symbol-observable').default;
+import Stream from './lib/Stream';
+import * as base from '@most/prelude';
+import { of, empty, never } from './lib/source/core';
+import { from } from './lib/source/from';
+import { periodic } from './lib/source/periodic';
+import symbolObservable from 'symbol-observable';
 
 /**
  * Core stream type
  * @type {Stream}
  */
-exports.Stream = Stream;
+export { Stream };
 
 // Add of and empty to constructor for fantasy-land compat
-exports.of       = Stream.of    = core.of;
-exports.just     = core.of; // easier ES6 import alias
-exports.empty    = Stream.empty = core.empty;
-exports.never    = core.never;
-exports.from     = from;
-exports.periodic = periodic;
+Stream.of = of;
+Stream.empty = empty;
+export { of, of as just, empty, never, from, periodic };
 
 //-----------------------------------------------------------------------
 // Draft ES Observable proposal interop
 // https://github.com/zenparsing/es-observable
 
-var subscribe = require('./lib/observable/subscribe').subscribe;
+import { subscribe } from './lib/observable/subscribe';
 
 Stream.prototype.subscribe = function(subscriber) {
 	return subscribe(subscriber, this);
@@ -40,7 +37,7 @@ Stream.prototype[symbolObservable] = function() {
 //-----------------------------------------------------------------------
 // Fluent adapter
 
-var thru = require('./lib/combinator/thru').thru;
+import { thru } from './lib/combinator/thru';
 
 /**
  * Adapt a functional stream transform to fluent style.
@@ -56,8 +53,6 @@ Stream.prototype.thru = function(f) {
 //-----------------------------------------------------------------------
 // Adapting other sources
 
-var events = require('./lib/source/fromEvent');
-
 /**
  * Create a stream of events from the supplied EventTarget or EventEmitter
  * @param {String} event event name
@@ -67,16 +62,14 @@ var events = require('./lib/source/fromEvent');
  *  or addListener/removeListener (node EventEmitter: http://nodejs.org/api/events.html)
  * @returns {Stream} stream of events of the specified type from the source
  */
-exports.fromEvent = events.fromEvent;
+export { fromEvent } from './lib/source/fromEvent';
 
 //-----------------------------------------------------------------------
 // Observing
 
-var observe = require('./lib/combinator/observe');
+import { observe, drain } from './lib/combinator/observe';
 
-exports.observe = observe.observe;
-exports.forEach = observe.observe;
-exports.drain   = observe.drain;
+export { observe, observe as forEach, drain};
 
 /**
  * Process all the events in the stream
@@ -84,7 +77,7 @@ exports.drain   = observe.drain;
  *  if the stream fails with an unhandled error.
  */
 Stream.prototype.observe = Stream.prototype.forEach = function(f) {
-	return observe.observe(f, this);
+	return observe(f, this);
 };
 
 /**
@@ -96,14 +89,14 @@ Stream.prototype.observe = Stream.prototype.forEach = function(f) {
  *  if the stream fails with an unhandled error.
  */
 Stream.prototype.drain = function() {
-	return observe.drain(this);
+	return drain(this);
 };
 
 //-------------------------------------------------------
 
-var loop = require('./lib/combinator/loop').loop;
+import { loop } from './lib/combinator/loop';
 
-exports.loop = loop;
+export { loop };
 
 /**
  * Generalized feedback loop. Call a stepper function for each event. The stepper
@@ -121,10 +114,9 @@ Stream.prototype.loop = function(stepper, seed) {
 
 //-------------------------------------------------------
 
-var accumulate = require('./lib/combinator/accumulate');
+import { scan, reduce } from './lib/combinator/accumulate';
 
-exports.scan   = accumulate.scan;
-exports.reduce = accumulate.reduce;
+export { scan, reduce };
 
 /**
  * Create a stream containing successive reduce results of applying f to
@@ -134,7 +126,7 @@ exports.reduce = accumulate.reduce;
  * @returns {Stream} new stream containing successive reduce results
  */
 Stream.prototype.scan = function(f, initial) {
-	return accumulate.scan(f, initial, this);
+	return scan(f, initial, this);
 };
 
 /**
@@ -146,22 +138,18 @@ Stream.prototype.scan = function(f, initial) {
  * @returns {Promise} promise for the file result of the reduce
  */
 Stream.prototype.reduce = function(f, initial) {
-	return accumulate.reduce(f, initial, this);
+	return reduce(f, initial, this);
 };
 
 //-----------------------------------------------------------------------
 // Building and extending
 
-var unfold = require('./lib/source/unfold');
-var iterate = require('./lib/source/iterate');
-var generate = require('./lib/source/generate');
-var build = require('./lib/combinator/build');
+export { unfold } from './lib/source/unfold';
+export { iterate } from './lib/source/iterate';
+export { generate } from './lib/source/generate';
+import { concat, cons as startWith } from './lib/combinator/build';
 
-exports.unfold    = unfold.unfold;
-exports.iterate   = iterate.iterate;
-exports.generate  = generate.generate;
-exports.concat    = build.concat;
-exports.startWith = build.cons;
+export { concat, startWith };
 
 /**
  * @param {Stream} tail
@@ -169,7 +157,7 @@ exports.startWith = build.cons;
  *  all items in tail
  */
 Stream.prototype.concat = function(tail) {
-	return build.concat(this, tail);
+	return concat(this, tail);
 };
 
 /**
@@ -177,19 +165,16 @@ Stream.prototype.concat = function(tail) {
  * @returns {Stream} a new stream with x prepended
  */
 Stream.prototype.startWith = function(x) {
-	return build.cons(x, this);
+	return startWith(x, this);
 };
 
 //-----------------------------------------------------------------------
 // Transforming
 
-var transform = require('./lib/combinator/transform');
-var applicative = require('./lib/combinator/applicative');
+import { map, constant, tap } from './lib/combinator/transform';
+import { ap } from './lib/combinator/applicative';
 
-exports.map      = transform.map;
-exports.constant = transform.constant;
-exports.tap      = transform.tap;
-exports.ap       = applicative.ap;
+export { map, constant, tap, ap };
 
 /**
  * Transform each value in the stream by applying f to each
@@ -197,7 +182,7 @@ exports.ap       = applicative.ap;
  * @returns {Stream} stream containing items transformed by f
  */
 Stream.prototype.map = function(f) {
-	return transform.map(f, this);
+	return map(f, this);
 };
 
 /**
@@ -207,7 +192,7 @@ Stream.prototype.map = function(f) {
  * @returns {Stream} stream containing the cross product of items
  */
 Stream.prototype.ap = function(xs) {
-	return applicative.ap(this, xs);
+	return ap(this, xs);
 };
 
 /**
@@ -216,7 +201,7 @@ Stream.prototype.ap = function(xs) {
  * @returns {Stream} stream containing items replaced with x
  */
 Stream.prototype.constant = function(x) {
-	return transform.constant(x, this);
+	return constant(x, this);
 };
 
 /**
@@ -226,15 +211,15 @@ Stream.prototype.constant = function(x) {
  * @returns {Stream} new stream containing the same items as this stream
  */
 Stream.prototype.tap = function(f) {
-	return transform.tap(f, this);
+	return tap(f, this);
 };
 
 //-----------------------------------------------------------------------
 // Transducer support
 
-var transduce = require('./lib/combinator/transduce');
+import { transduce } from './lib/combinator/transduce';
 
-exports.transduce = transduce.transduce;
+export { transduce };
 
 /**
  * Transform this stream by passing its events through a transducer.
@@ -242,16 +227,15 @@ exports.transduce = transduce.transduce;
  * @return {Stream} stream of events transformed by the transducer
  */
 Stream.prototype.transduce = function(transducer) {
-	return transduce.transduce(transducer, this);
+	return transduce(transducer, this);
 };
 
 //-----------------------------------------------------------------------
 // FlatMapping
 
-var flatMap = require('./lib/combinator/flatMap');
+import { flatMap, join } from './lib/combinator/flatMap';
 
-exports.flatMap = exports.chain = flatMap.flatMap;
-exports.join    = flatMap.join;
+export { flatMap, flatMap as chain, join };
 
 /**
  * Map each value in the stream to a new stream, and merge it into the
@@ -260,7 +244,7 @@ exports.join    = flatMap.join;
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
 Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
-	return flatMap.flatMap(f, this);
+	return flatMap(f, this);
 };
 
 /**
@@ -269,13 +253,12 @@ Stream.prototype.flatMap = Stream.prototype.chain = function(f) {
  * @returns {Stream<X>} new stream containing all events of all inner streams
  */
 Stream.prototype.join = function() {
-	return flatMap.join(this);
+	return join(this);
 };
 
-var continueWith = require('./lib/combinator/continueWith').continueWith;
+import { continueWith } from './lib/combinator/continueWith';
 
-exports.continueWith = continueWith;
-exports.flatMapEnd = continueWith;
+export { continueWith, continueWith as flatMapEnd }; 
 
 /**
  * Map the end event to a new stream, and begin emitting its values.
@@ -288,9 +271,9 @@ Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function(f) {
 	return continueWith(f, this);
 };
 
-var concatMap = require('./lib/combinator/concatMap').concatMap;
+import { concatMap } from './lib/combinator/concatMap';
 
-exports.concatMap = concatMap;
+export { concatMap };
 
 Stream.prototype.concatMap = function(f) {
 	return concatMap(f, this);
@@ -299,9 +282,9 @@ Stream.prototype.concatMap = function(f) {
 //-----------------------------------------------------------------------
 // Concurrent merging
 
-var mergeConcurrently = require('./lib/combinator/mergeConcurrently');
+import { mergeConcurrently } from './lib/combinator/mergeConcurrently';
 
-exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
+export { mergeConcurrently };
 
 /**
  * Flatten a Stream<Stream<X>> to Stream<X> by merging inner
@@ -313,16 +296,15 @@ exports.mergeConcurrently = mergeConcurrently.mergeConcurrently;
  *  streams, with limited concurrency.
  */
 Stream.prototype.mergeConcurrently = function(concurrency) {
-	return mergeConcurrently.mergeConcurrently(concurrency, this);
+	return mergeConcurrently(concurrency, this);
 };
 
 //-----------------------------------------------------------------------
 // Merging
 
-var merge = require('./lib/combinator/merge');
+import { merge, mergeArray } from './lib/combinator/merge';
 
-exports.merge = merge.merge;
-exports.mergeArray = merge.mergeArray;
+export { merge, mergeArray };
 
 /**
  * Merge this stream and all the provided streams
@@ -331,16 +313,15 @@ exports.mergeArray = merge.mergeArray;
  * arbitrary order.
  */
 Stream.prototype.merge = function(/*...streams*/) {
-	return merge.mergeArray(base.cons(this, arguments));
+	return mergeArray(base.cons(this, arguments));
 };
 
 //-----------------------------------------------------------------------
 // Combining
 
-var combine = require('./lib/combinator/combine');
+import { combine, combineArray } from './lib/combinator/combine';
 
-exports.combine = combine.combine;
-exports.combineArray = combine.combineArray;
+export { combine, combineArray };
 
 /**
  * Combine latest events from all input streams
@@ -349,16 +330,15 @@ exports.combineArray = combine.combineArray;
  *  event of each input stream, whenever a new event arrives on any stream.
  */
 Stream.prototype.combine = function(f /*, ...streams*/) {
-	return combine.combineArray(f, base.replace(this, 0, arguments));
+	return combineArray(f, base.replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------
 // Sampling
 
-var sample = require('./lib/combinator/sample');
+import { sample, sampleWith } from './lib/combinator/sample';
 
-exports.sample = sample.sample;
-exports.sampleWith = sample.sampleWith;
+export { sample, sampleWith };
 
 /**
  * When an event arrives on sampler, emit the latest event value from stream.
@@ -367,7 +347,7 @@ exports.sampleWith = sample.sampleWith;
  * @returns {Stream} sampled stream of values
  */
 Stream.prototype.sampleWith = function(sampler) {
-	return sample.sampleWith(sampler, this);
+	return sampleWith(sampler, this);
 };
 
 /**
@@ -377,15 +357,15 @@ Stream.prototype.sampleWith = function(sampler) {
  * @returns {Stream} stream of sampled and transformed values
  */
 Stream.prototype.sample = function(f /* ...streams */) {
-	return sample.sampleArray(f, this, base.tail(arguments));
+	return sampleArray(f, this, base.tail(arguments));
 };
 
 //-----------------------------------------------------------------------
 // Zipping
 
-var zip = require('./lib/combinator/zip');
+import { zip, zipArray } from './lib/combinator/zip';
 
-exports.zip = zip.zip;
+export { zip, zipArray };
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
@@ -395,16 +375,15 @@ exports.zip = zip.zip;
  * @returns {Stream} new stream containing pairs
  */
 Stream.prototype.zip = function(f /*, ...streams*/) {
-	return zip.zipArray(f, base.replace(this, 0, arguments));
+	return zipArray(f, base.replace(this, 0, arguments));
 };
 
 //-----------------------------------------------------------------------
 // Switching
 
-var switchLatest = require('./lib/combinator/switch').switch;
+import { switchLatest } from './lib/combinator/switch';
 
-exports.switch       = switchLatest;
-exports.switchLatest = switchLatest;
+export { switchLatest, switchLatest as switch };
 
 /**
  * Given a stream of streams, return a new stream that adopts the behavior
@@ -418,11 +397,9 @@ Stream.prototype.switch = Stream.prototype.switchLatest = function() {
 //-----------------------------------------------------------------------
 // Filtering
 
-var filter = require('./lib/combinator/filter');
+import { filter, skipRepeats, skipRepeatsWith } from './lib/combinator/filter';
 
-exports.filter          = filter.filter;
-exports.skipRepeats     = exports.distinct   = filter.skipRepeats;
-exports.skipRepeatsWith = exports.distinctBy = filter.skipRepeatsWith;
+export { filter, skipRepeats, skipRepeats as distinct, skipRepeatsWith, skipRepeatsWith as distinctBy };
 
 /**
  * Retain only items matching a predicate
@@ -432,7 +409,7 @@ exports.skipRepeatsWith = exports.distinctBy = filter.skipRepeatsWith;
  * @returns {Stream} stream containing only items for which predicate returns truthy
  */
 Stream.prototype.filter = function(p) {
-	return filter.filter(p, this);
+	return filter(p, this);
 };
 
 /**
@@ -442,7 +419,7 @@ Stream.prototype.filter = function(p) {
  * @returns {Stream} stream with no repeated events
  */
 Stream.prototype.skipRepeats = function() {
-	return filter.skipRepeats(this);
+	return skipRepeats(this);
 };
 
 /**
@@ -451,19 +428,15 @@ Stream.prototype.skipRepeats = function() {
  * @returns {Stream} stream with no repeated events
  */
 Stream.prototype.skipRepeatsWith = function(equals) {
-	return filter.skipRepeatsWith(equals, this);
+	return skipRepeatsWith(equals, this);
 };
 
 //-----------------------------------------------------------------------
 // Slicing
 
-var slice = require('./lib/combinator/slice');
+import { take, skip, slice, takeWhile, skipWhile } from './lib/combinator/slice';
 
-exports.take      = slice.take;
-exports.skip      = slice.skip;
-exports.slice     = slice.slice;
-exports.takeWhile = slice.takeWhile;
-exports.skipWhile = slice.skipWhile;
+export { take, skip, slice, takeWhile, skipWhile };
 
 /**
  * stream:          -abcd-
@@ -472,7 +445,7 @@ exports.skipWhile = slice.skipWhile;
  * @returns {Stream} stream containing at most the first n items from this stream
  */
 Stream.prototype.take = function(n) {
-	return slice.take(n, this);
+	return take(n, this);
 };
 
 /**
@@ -482,7 +455,7 @@ Stream.prototype.take = function(n) {
  * @returns {Stream} stream not containing the first n events
  */
 Stream.prototype.skip = function(n) {
-	return slice.skip(n, this);
+	return skip(n, this);
 };
 
 /**
@@ -494,7 +467,7 @@ Stream.prototype.skip = function(n) {
  * @returns {Stream} stream containing items where start <= index < end
  */
 Stream.prototype.slice = function(start, end) {
-	return slice.slice(start, end, this);
+	return slice(start, end, this);
 };
 
 /**
@@ -505,7 +478,7 @@ Stream.prototype.slice = function(start, end) {
  * first item for which p returns falsy.
  */
 Stream.prototype.takeWhile = function(p) {
-	return slice.takeWhile(p, this);
+	return takeWhile(p, this);
 };
 
 /**
@@ -516,17 +489,15 @@ Stream.prototype.takeWhile = function(p) {
  * first item for which p returns falsy.
  */
 Stream.prototype.skipWhile = function(p) {
-	return slice.skipWhile(p, this);
+	return skipWhile(p, this);
 };
 
 //-----------------------------------------------------------------------
 // Time slicing
 
-var timeslice = require('./lib/combinator/timeslice');
+import { takeUntil, skipUntil, during } from './lib/combinator/timeslice';
 
-exports.until  = exports.takeUntil = timeslice.takeUntil;
-exports.since  = exports.skipUntil = timeslice.skipUntil;
-exports.during = timeslice.during;
+export { takeUntil, takeUntil as until, skipUntil, skipUntil as since, during };
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -538,7 +509,7 @@ exports.during = timeslice.during;
  * the first event in signal.
  */
 Stream.prototype.until = Stream.prototype.takeUntil = function(signal) {
-	return timeslice.takeUntil(signal, this);
+	return takeUntil(signal, this);
 };
 
 /**
@@ -551,7 +522,7 @@ Stream.prototype.until = Stream.prototype.takeUntil = function(signal) {
  * the first event in signal.
  */
 Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
-	return timeslice.skipUntil(signal, this);
+	return skipUntil(signal, this);
 };
 
 /**
@@ -565,15 +536,15 @@ Stream.prototype.since = Stream.prototype.skipUntil = function(signal) {
  * @returns {Stream} new stream containing only events within the provided timespan
  */
 Stream.prototype.during = function(timeWindow) {
-	return timeslice.during(timeWindow, this);
+	return during(timeWindow, this);
 };
 
 //-----------------------------------------------------------------------
 // Delaying
 
-var delay = require('./lib/combinator/delay').delay;
+import { delay } from './lib/combinator/delay';
 
-exports.delay = delay;
+export { delay };
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
@@ -586,9 +557,8 @@ Stream.prototype.delay = function(delayTime) {
 //-----------------------------------------------------------------------
 // Getting event timestamp
 
-var timestamp = require('./lib/combinator/timestamp').timestamp;
-
-exports.timestamp = timestamp;
+import { timestamp } from './lib/combinator/timestamp';
+export { timestamp };
 
 /**
  * Expose event timestamps into the stream. Turns a Stream<X> into
@@ -602,10 +572,9 @@ Stream.prototype.timestamp = function() {
 //-----------------------------------------------------------------------
 // Rate limiting
 
-var limit = require('./lib/combinator/limit');
+import { throttle, debounce } from './lib/combinator/limit';
 
-exports.throttle = limit.throttle;
-exports.debounce = limit.debounce;
+export { throttle, debounce };
 
 /**
  * Limit the rate of events
@@ -615,7 +584,7 @@ exports.debounce = limit.debounce;
  * @returns {Stream} new stream that skips events for throttle period
  */
 Stream.prototype.throttle = function(period) {
-	return limit.throttle(period, this);
+	return throttle(period, this);
 };
 
 /**
@@ -627,16 +596,15 @@ Stream.prototype.throttle = function(period) {
  * @returns {Stream} new debounced stream
  */
 Stream.prototype.debounce = function(period) {
-	return limit.debounce(period, this);
+	return debounce(period, this);
 };
 
 //-----------------------------------------------------------------------
 // Awaiting Promises
 
-var promises = require('./lib/combinator/promises');
+import { fromPromise, awaitPromises } from './lib/combinator/promises';
 
-exports.fromPromise = promises.fromPromise;
-exports.await       = promises.awaitPromises;
+export { fromPromise, awaitPromises, awaitPromises as await };
 
 /**
  * Await promises, turning a Stream<Promise<X>> into Stream<X>.  Preserves
@@ -644,17 +612,15 @@ exports.await       = promises.awaitPromises;
  * @returns {Stream<X>} stream containing non-promise values
  */
 Stream.prototype.await = function() {
-	return promises.awaitPromises(this);
+	return awaitPromises(this);
 };
 
 //-----------------------------------------------------------------------
 // Error handling
 
-var errors = require('./lib/combinator/errors');
+import { recoverWith, flatMapError, throwError } from './lib/combinator/errors';
 
-exports.recoverWith  = errors.flatMapError;
-exports.flatMapError = errors.flatMapError;
-exports.throwError   = errors.throwError;
+export { recoverWith, flatMapError, throwError };
 
 /**
  * If this stream encounters an error, recover and continue with items from stream
@@ -666,15 +632,15 @@ exports.throwError   = errors.throwError;
  * @returns {Stream} new stream which will recover from an error by calling f
  */
 Stream.prototype.recoverWith = Stream.prototype.flatMapError = function(f) {
-	return errors.flatMapError(f, this);
+	return flatMapError(f, this);
 };
 
 //-----------------------------------------------------------------------
 // Multicasting
 
-var multicast = require('@most/multicast').default;
+import multicast from '@most/multicast';
 
-exports.multicast = multicast;
+export { multicast };
 
 /**
  * Transform the stream into multicast stream.  That means that many subscribers
