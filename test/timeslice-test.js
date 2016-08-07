@@ -7,7 +7,7 @@ var periodic = require('../lib/source/periodic').periodic;
 var unfold = require('../lib/source/unfold').unfold;
 var core = require('../lib/source/core');
 var delay = require('../lib/combinator/delay').delay;
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 var merge = require('../lib/combinator/merge').merge;
 
 var streamOf = core.of;

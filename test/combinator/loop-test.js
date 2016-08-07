@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var Stream = require('../../lib/Stream');
+var Stream = require('../../lib/Stream').default;
 var loop = require('../../lib/combinator/loop').loop;
 var reduce = require('../../lib/combinator/accumulate').reduce;
 var drain = require('../../lib/combinator/observe').drain;

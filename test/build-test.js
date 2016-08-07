@@ -9,7 +9,7 @@ var drain = require('../lib/combinator/observe').drain;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 
 var streamOf = core.of;
 var empty = core.empty;

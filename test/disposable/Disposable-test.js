@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var Disposable = require('../../lib/disposable/Disposable');
+var Disposable = require('../../lib/disposable/Disposable').default;
 
 describe('Disposable', function() {
 	it('should call disposer with data', function() {

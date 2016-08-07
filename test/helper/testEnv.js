@@ -2,11 +2,11 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-var Stream = require('../../lib/Stream');
-var PropagateTask = require('../../lib/scheduler/PropagateTask');
-var Scheduler = require('../../lib/scheduler/Scheduler');
-var Timeline = require('../../lib/scheduler/Timeline');
-var VirtualTimer = require('./VirtualTimer');
+var Stream = require('../../lib/Stream').default;
+var PropagateTask = require('../../lib/scheduler/PropagateTask').default;
+var Scheduler = require('../../lib/scheduler/Scheduler').default;
+var Timeline = require('../../lib/scheduler/Timeline').default;
+var VirtualTimer = require('./VirtualTimer')
 var runSource = require('../../lib/runSource');
 var tap = require('../../lib/combinator/transform').tap;
 var dispose = require('../../lib/disposable/dispose');

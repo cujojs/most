@@ -3,7 +3,7 @@ var expect = require('buster').expect;
 
 var slice = require('../lib/combinator/slice');
 var map = require('../lib/combinator/transform').map;
-var Map = require('../lib/fusion/Map');
+var Map = require('../lib/fusion/Map').default;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var reduce = require('../lib/combinator/accumulate').reduce;
 

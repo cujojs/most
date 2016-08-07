@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var assert = require('buster').referee.assert;
 
-var Stream = require('../../lib/Stream');
+var Stream = require('../../lib/Stream').default;
 var from = require('../../lib/source/from').from;
 var observe = require('../../lib/combinator/observe').observe;
 

@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var SafeSink = require('../../lib/sink/SafeSink');
+var SafeSink = require('../../lib/sink/SafeSink').default;
 
 function testSink(event, end, error) {
 	return {

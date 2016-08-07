@@ -8,7 +8,7 @@ var delay = require('../lib/combinator/delay').delay;
 var observe = require('../lib/combinator/observe').observe;
 var periodic = require('../lib/source/periodic').periodic;
 var streamOf = require('../lib/source/core').of;
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 
 var te = require('./helper/testEnv');
 

@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 
 var sentinel = { value: 'sentinel' };
 

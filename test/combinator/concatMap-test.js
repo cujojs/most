@@ -9,7 +9,7 @@ var take = require('../../lib/combinator/slice').take;
 var drain = require('../../lib/combinator/observe').drain;
 var core = require('../../lib/source/core');
 var fromArray = require('../../lib/source/fromArray').fromArray;
-var Stream = require('../../lib/Stream');
+var Stream = require('../../lib/Stream').default;
 
 var te = require('../helper/testEnv');
 var FakeDisposeSource = require('../helper/FakeDisposeSource');

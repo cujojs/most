@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var SettableDisposable = require('../../lib/disposable/SettableDisposable');
+var SettableDisposable = require('../../lib/disposable/SettableDisposable').default;
 
 describe('SettableDisposable', function() {
 	it('should allow setDisposable before dispose', function() {

@@ -13,7 +13,7 @@ var take = require('../lib/combinator/slice').take;
 var observe = require('../lib/combinator/observe').observe;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
-var Map = require('../lib/fusion/Map');
+var Map = require('../lib/fusion/Map').default;
 
 var empty = core.empty;
 var streamOf = core.of;

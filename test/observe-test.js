@@ -4,7 +4,7 @@ var expect = require('buster').expect;
 var observe = require('../lib/combinator/observe');
 var iterate = require('../lib/source/iterate').iterate;
 var take = require('../lib/combinator/slice').take;
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 var streamOf = require('../lib/source/core').of;
 
 var sentinel = { value: 'sentinel' };

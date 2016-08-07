@@ -1,7 +1,7 @@
 require('buster').spec.expose();
 var expect = require('buster').expect;
 
-var switchLatest = require('../lib/combinator/switch').switch;
+var switchLatest = require('../lib/combinator/switch').switchLatest;
 var reduce = require('../lib/combinator/accumulate').reduce;
 var observe = require('../lib/combinator/observe').observe;
 var take = require('../lib/combinator/slice').take;
@@ -9,7 +9,7 @@ var transform = require('../lib/combinator/transform');
 var periodic = require('../lib/source/periodic').periodic;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
-var Stream = require('../lib/Stream');
+var Stream = require('../lib/Stream').default;
 
 var te = require('./helper/testEnv');
 
