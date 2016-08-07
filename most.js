@@ -650,3 +650,12 @@ export { multicast };
 Stream.prototype.multicast = function() {
 	return multicast(this);
 };
+
+//-----------------------------------------------------------------------
+// default scheduler
+
+/**
+ * Export the defaultScheduler so third-party libraries can also make use of it
+ */
+import defaultScheduler from 'lib/scheduler/defaultScheduler'
+export { defaultScheduler }
