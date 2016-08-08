@@ -636,14 +636,14 @@ Stream.prototype.debounce = function(period) {
 var promises = require('./lib/combinator/promises');
 
 exports.fromPromise = promises.fromPromise;
-exports.await       = promises.awaitPromises;
+exports['await']       = promises.awaitPromises;
 
 /**
  * Await promises, turning a Stream<Promise<X>> into Stream<X>.  Preserves
  * event order, but timeshifts events based on promise resolution time.
  * @returns {Stream<X>} stream containing non-promise values
  */
-Stream.prototype.await = function() {
+Stream.prototype['await'] = function() {
 	return promises.awaitPromises(this);
 };
 

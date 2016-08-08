@@ -9,7 +9,7 @@ var transform = require('../lib/combinator/transform');
 var periodic = require('../lib/source/periodic').periodic;
 var fromArray = require('../lib/source/fromArray').fromArray;
 var core = require('../lib/source/core');
-var Stream = require('../lib/Stream');
+import Stream from '../lib/Stream';
 
 var te = require('./helper/testEnv');
 
