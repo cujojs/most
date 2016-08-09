@@ -707,23 +707,16 @@ var require$$0 = Object.freeze({
   	producer.scheduler.asap(producer.task);
   }
 
-  var ponyfill = createCommonjsModule(function (module, exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-  	value: true
-  });
-  exports.default = symbolObservablePonyfill;
   function symbolObservablePonyfill(root) {
   	var result;
-  	var _Symbol = root.Symbol;
+  	var Symbol = root.Symbol;
 
-  	if (typeof _Symbol === 'function') {
-  		if (_Symbol.observable) {
-  			result = _Symbol.observable;
+  	if (typeof Symbol === 'function') {
+  		if (Symbol.observable) {
+  			result = Symbol.observable;
   		} else {
-  			result = _Symbol('observable');
-  			_Symbol.observable = result;
+  			result = Symbol('observable');
+  			Symbol.observable = result;
   		}
   	} else {
   		result = '@@observable';
@@ -731,58 +724,21 @@ var require$$0 = Object.freeze({
 
   	return result;
   };
-  });
 
-  var ponyfill$1 = interopDefault(ponyfill);
-
-
-  var require$$0$2 = Object.freeze({
-  	default: ponyfill$1
-  });
-
-  var index$1 = createCommonjsModule(function (module, exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-  	value: true
-  });
-
-  var _ponyfill = interopDefault(require$$0$2);
-
-  var _ponyfill2 = _interopRequireDefault(_ponyfill);
-
-  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-  var root = undefined; /* global window */
-
-  if (typeof commonjsGlobal !== 'undefined') {
-  	root = commonjsGlobal;
+  var root = undefined;
+  if (typeof global !== 'undefined') {
+  	root = global;
   } else if (typeof window !== 'undefined') {
   	root = window;
   }
 
-  var result = (0, _ponyfill2.default)(root);
-  exports.default = result;
-  });
-
-  var index$2 = interopDefault(index$1);
-
-
-  var require$$0$1 = Object.freeze({
-  	default: index$2
-  });
-
-  var index = createCommonjsModule(function (module) {
-  module.exports = interopDefault(require$$0$1);
-  });
-
-  var symbolObservable = interopDefault(index);
+  var result = symbolObservablePonyfill(root);
 
   function getObservable(o) {
   	var obs = null;
   	if(o) {
   		// Access foreign method only once
-  		var method = o[symbolObservable];
+  		var method = o[result];
   		if(typeof method === 'function') {
   			obs = method.call(o);
   			if(!(obs && typeof obs.subscribe === 'function')) {
@@ -3940,7 +3896,7 @@ var require$$0 = Object.freeze({
   	return subscribe(subscriber, this);
   };
 
-  Stream.prototype[symbolObservable] = function() {
+  Stream.prototype[result] = function() {
   	return this;
   };
 
