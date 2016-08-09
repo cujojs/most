@@ -11,11 +11,11 @@ export default {
   plugins: [
     buble(),
     nodeResolve({
-      jsnext: true, // symbol-observable throws errors when used with this 'true'
+      jsnext: true 
     }),
     commonjs({
-      // Can not resolve '*' type exports without guidance
       exclude: ['node_modules/symbol-observable/**'],
+      // Can not resolve '*' type exports without guidance
       namedExports: {
         '@most/prelude': [
           // array.js
