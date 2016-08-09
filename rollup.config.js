@@ -3,7 +3,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs';
 
 export default {
-  entry: 'most.js',
+  entry: 'src/index.js',
   dest: 'dist/most.js',
   format: 'umd',
   moduleName: 'most',
