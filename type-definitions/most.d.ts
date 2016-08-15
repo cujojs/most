@@ -242,15 +242,25 @@ export function continueWith<A>(f: (a: any) => Stream<A>, s: Stream<A>): Stream<
 export function concatMap<A, B>(f: (a: A) => Stream<B>, s: Stream<A>): Stream<B>;
 export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>): Stream<A>;
 
-export function merge<A, B>(...arr: Array<A | B>): Stream<A | B>;
-export function merge<A, B, C>(...arr: Array<A | B | C>): Stream<A | B | C>;
-export function merge<A, B, C, D>(...arr: Array<A | B | C | D>): Stream<A | B | C | D>;
-export function merge<A, B, C, D, E>(...arr: Array<A | B | C | D | E>): Stream<A | B | C | D | E>;
+export interface Merge {
+    <A>(stream: Stream<A>): Stream<A>;
+    <A, B>(stream1: Stream<A>, stream2: Stream<B>): Stream<A | B>;
+    <A, B, C>(stream1: Stream<A>, stream2: Stream<B>, stream3: Stream<C>): Stream<A | B | C>;
+    <A, B, C, D>(stream1: Stream<A>, stream2: Stream<B>, stream3: Stream<C>, stream4: Stream<D>): Stream<A | B | C | D>;
+    <A, B, C, D, E>(stream1: Stream<A>, stream2: Stream<B>, stream3: Stream<C>, stream4: Stream<D>): Stream<A | B | C | D | E>;
+}
 
-export function mergeArray<A, B>(arr: Array<A | B>): Stream<A | B>;
-export function mergeArray<A, B, C>(arr: Array<A | B | C>): Stream<A | B | C>;
-export function mergeArray<A, B, C, D>(arr: Array<A | B | C | D>): Stream<A | B | C | D>;
-export function mergeArray<A, B, C, D, E>(arr: Array<A | B | C | D | E>): Stream<A | B | C | D | E>;
+export const merge: Merge;
+
+export interface MergeArray {
+    <A>(arr: [Stream<A>]): Stream<A>;
+    <A, B>(arr: [Stream<A>, Stream<B>]): Stream<A | B>;
+    <A, B, C>(arr: [Stream<A>, Stream<B>, Stream<C>]): Stream<A | B | C>;
+    <A, B, C, D>(arr: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]): Stream<A | B | C | D>;
+    <A, B, C, D, E>(arr: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]): Stream<A | B | C | D | E>;
+}
+
+export const mergeArray: MergeArray;
 
 export function combine<A, B, R>(
   fn: (a: A, b: B) => R,
