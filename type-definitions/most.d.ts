@@ -242,8 +242,15 @@ export function continueWith<A>(f: (a: any) => Stream<A>, s: Stream<A>): Stream<
 export function concatMap<A, B>(f: (a: A) => Stream<B>, s: Stream<A>): Stream<B>;
 export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>): Stream<A>;
 
-export function merge<A>(...ss: Array<Stream<A>>): Stream<A>;
-export function mergeArray<A>(streams: Array<Stream<A>>): Stream<A>;
+export function merge<A, B>(...arr: Array<A | B>): Stream<A | B>;
+export function merge<A, B, C>(...arr: Array<A | B | C>): Stream<A | B | C>;
+export function merge<A, B, C, D>(...arr: Array<A | B | C | D>): Stream<A | B | C | D>;
+export function merge<A, B, C, D, E>(...arr: Array<A | B | C | D | E>): Stream<A | B | C | D | E>;
+
+export function mergeArray<A, B>(arr: Array<A | B>): Stream<A | B>;
+export function mergeArray<A, B, C>(arr: Array<A | B | C>): Stream<A | B | C>;
+export function mergeArray<A, B, C, D>(arr: Array<A | B | C | D>): Stream<A | B | C | D>;
+export function mergeArray<A, B, C, D, E>(arr: Array<A | B | C | D | E>): Stream<A | B | C | D | E>;
 
 export function combine<A, B, R>(
   fn: (a: A, b: B) => R,
