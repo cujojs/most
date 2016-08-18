@@ -52,7 +52,7 @@
     "markdown-doctest": "^0.8.0",
     "transducers-js": "^0.4.174",
     "uglify-js": "^2.4.23",
-    "webpack": "^1.12.14"
+    "webpack": "^1.13.2"
   },
   "dependencies": {
     "@most/multicast": "^1.1.1",
