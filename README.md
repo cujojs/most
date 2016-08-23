@@ -116,10 +116,11 @@ Most.js has a dependency on native Promises so a type definition for Promise mus
 
 ## Interoperability
 
-<a href="http://promises-aplus.github.com/promises-spec"><img width="82" height="82" alt="Promises/A+" src="http://promises-aplus.github.com/promises-spec/assets/logo-small.png"></a>
+<a href="http://promises-aplus.github.com/promises-spec"><img width="82" height="82" alt="Promises/A+" src="https://promisesaplus.com/assets/logo-small.png"></a>
 <a href="https://github.com/fantasyland/fantasy-land"><img width="82" height="82" alt="Fantasy Land" src="https://raw.github.com/puffnfresh/fantasy-land/master/logo.png"></a>
+<a href="https://github.com/rpominov/static-land"><img width="131" height="82" src="https://raw.githubusercontent.com/rpominov/static-land/master/logo/logo.png" /></a>
 
-Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  They also implement [Fantasy Land](https://github.com/fantasyland/fantasy-land) `Monoid`, `Functor`, `Applicative`, and `Monad`.
+Most.js streams are [compatible with Promises/A+ and ES6 Promises](promises).  They also implement [Fantasy Land](https://github.com/fantasyland/fantasy-land) and [Static Land](https://github.com/rpominov/static-land) (via [`most-static-land`](https://github.com/mostjs-community/most-static-land)) `Monoid`, `Functor`, `Applicative`, and `Monad`.
 
 ## Reactive Programming
 
