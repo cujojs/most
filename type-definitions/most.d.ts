@@ -2,8 +2,10 @@ declare module "most" {
   type SeedValue<S, V> = { seed: S, value: V };
   type TimeValue<V>    = { time: number, value: V };
 
-  interface Generator<A, B, C> {}
-  interface Iterable<A> {}
+  // es5 does not have typings for this 
+  // use any to allow type-casting
+  type Generator<A, B, C> = any
+  type Iterable = any;
 
   type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
@@ -230,7 +232,7 @@ declare module "most" {
   export function of<A>(a: A): Stream<A>;
   export function empty(): Stream<any>;
   export function never(): Stream<any>;
-  export function from<A>(as: Iterable<A>): Stream<A>;
+  export function from<A>(as: Iterable): Stream<A>;
   export function periodic<A>(period: number, a?: A): Stream<A>;
   export function fromEvent(event: string, target: any, useCapture?: boolean): Stream<Event>;
 
@@ -505,10 +507,13 @@ declare module "most/lib/disposable/SettableDisposable" {
     setDisposable(disposable: Disposable<T>): void;
     dispose(): void | Promise<T>;
   }
+
+  export = SettableDisposable;
 }
 
 declare module "most/lib/disposable/dispose" {
   import { Disposable, Sink } from 'most';
+  import SettableDisposable = require('most/lib/disposable/SettableDisposable');
 
   export function tryDispose<T> (t: number, disposable: Disposable<T>, sink: Sink<T>): Promise<T> | void;
   export function create<T>(dispose: (data: T | void) => Promise<T> | void, data?: T): Disposable<T>;
@@ -530,16 +535,143 @@ declare module "most/lib/disposable/dispose" {
 
   export const all: DisposeAllFn;
 
-  /**
-   * Must be type-casted to SettableDisposable :(
-   * 
-   * 
-   * @export
-   * @template T
-   * @returns {SettableDisposable<T>}
-   */
-  export function settable<T>(): Disposable<T>;
+  export function settable<T>(): SettableDisposable<T>;
 
   export function promised<T>(diposablePromise: Promise<Disposable<T>>): Disposable<T>;
   export function once<T>(disposable: Disposable<T>): Disposable<T>;
+}
+
+declare module "most/lib/sink/DeferredSink" {
+  import { Sink } from 'most';
+
+  class DeferredSink<T> implements Sink<T> {
+    constructor(sink: Sink<T>);
+    event(time: number, value: T): void;
+    end(time: number, value?: T): void;
+    error(time: number, err: Error): void;
+  }
+
+  export = DeferredSink;
+}
+
+declare module "most/lib/sink/IndexSink" {
+  import { Sink } from 'most';
+
+  class IndexSink<T> implements Sink<T> {
+    public index: number;
+    public value: T;
+    public active: boolean;
+    public sink: Sink<IndexSink<T>>;
+    constructor(index: number, sink: Sink<IndexSink<T>>);
+    event(time: number, value: T): void;
+    end(time: number, value?: T): void;
+    error(time: number, err: Error): void;
+  }
+
+  export = IndexSink;
+}
+
+declare module "most/lib/sink/Pipe" {
+  import { Sink } from 'most'
+
+  class Pipe<T> implements Sink<T> {
+    constructor(sink: Sink<T>);
+    event(time: number, value: T): void;
+    end(time: number, value?: T): void;
+    error(time: number, err: Error): void;
+  }
+
+  export = Pipe;
+}
+
+declare module "most/lib/sink/SafeSink" {
+  import { Sink } from 'most';
+
+  class SafeSink<T> implements Sink<T> {
+    public active: boolean;
+    constructor(sink: Sink<T>);
+    event(time: number, value: T): void;
+    end(time: number, value?: T): void;
+    error(time: number, err: Error): void;
+    disable(): Sink<T>;
+  }
+}
+
+declare module "most/lib/fatalError" {
+  function fatalError (err: Error): void;
+
+  export = fatalError;
+}
+
+declare module "most/lib/invoke" {
+  interface InvokeFn {
+    <A, B>(f: (a: A) => B, [A]): B;
+    <A, B, C>(f: (a: A, b: B) => C, [A, B]): C;
+    <A, B, C, D>(f: (a: A, b: B, c: C) => D, [A, B, C]): D;
+    <A, B, C, D, E>(f: (a: A, b: B, c: C, d: D) => E, [A, B, C, D]): E;
+    <R>(f: (...args: any[]) => R, args: any[]): R;
+  }
+
+  const invoke: InvokeFn;
+
+  export = invoke;
+}
+
+declare module "most/lib/iterable" {
+  // es5 doesn't have typings for an Iterable
+  // use any to allow type-casting
+  type Iterable = any;
+
+  export function isIterable(x: any): boolean;
+  export function getIterator(x: any): Iterable;
+  export function makeIterable(f: Function, obj: any): Iterable;
+}
+
+declare module "most/lib/LinkedList" {
+  class LinkedList<T> {
+    add (x: T): void;
+    remove (x: T): void;
+    isEmpty(): boolean;
+    dispose(): Promise<T>;
+  }
+
+  export = LinkedList;
+}
+
+declare module "most/lib/Promise" {
+  export function isPromise(x: any): boolean;
+}
+
+declare module "most/lib/Queue" {
+  class Queue<T> {
+    constructor (capPow2: number);
+    push(x: T): void;
+    shift(): T;
+    isEmpty(): boolean;
+    length(): number;
+  }
+
+  export = Queue;
+}
+
+declare module "most/lib/runSource" {
+  import { Source, Scheduler } from 'most';
+  export function withDefaultScheduler<T>(source: Source<T>): Promise<T>;
+  export function withScheduler<T>(source: Source<T>, scheduler: Scheduler): Promise<T>;
+}
+
+declare module "most/lib/Stream" {
+  import { Source } from 'most';
+  class Stream<T> {
+    public source: Source<T>;
+    constructor(source: Source<T>);
+  }
+
+  export = Stream;
+}
+
+declare module "most/lib/task" {
+  import { Task } from 'most';
+  export function runTask (task: Task): void;
+  export function defer (task: Task): Promise<void>;
 }
