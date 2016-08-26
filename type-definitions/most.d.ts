@@ -6,7 +6,7 @@ declare module "most" {
   interface Iterable<A> {}
 
   type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
-  
+
   export interface Sink<A> {
     event(time: number, value: A): void;
     end(time: number, value?: A): void;
@@ -38,7 +38,7 @@ declare module "most" {
     add(st: ScheduledTask): void;
     remove(st: ScheduledTask): boolean;
     removeAll(predicate: (st: Task) => boolean): void;
-    runTasks(time: number, runTask: (task: Task) => any): void; 
+    runTasks(time: number, runTask: (task: Task) => any): void;
   }
 
   export interface Scheduler {
@@ -481,8 +481,65 @@ declare module "most/lib/scheduler/Timeline" {
     add(task: ScheduledTask): void;
     remove(task: ScheduledTask): boolean;
     removeAll(predicate: (task: Task) => boolean): void;
-    runTasks(time: number, runTask: (task: Task) => any): void;  
+    runTasks(time: number, runTask: (task: Task) => any): void;
   }
 
   export = Timeline;
+}
+
+declare module "most/lib/disposable/Disposable" {
+  import { Disposable as IDisposable } from 'most';
+
+  class Disposable<T> implements IDisposable<T> {
+    constructor(dispose: (data: T | void) => Promise<T> | void, data?: T);
+    dispose(): void | Promise<T>;
+  }
+
+  export = Disposable;
+}
+
+declare module "most/lib/disposable/SettableDisposable" {
+  import { Disposable } from 'most';
+
+  class SettableDisposable<T> implements Disposable<T> {
+    setDisposable(disposable: Disposable<T>): void;
+    dispose(): void | Promise<T>;
+  }
+}
+
+declare module "most/lib/disposable/dispose" {
+  import { Disposable, Sink } from 'most';
+
+  export function tryDispose<T> (t: number, disposable: Disposable<T>, sink: Sink<T>): Promise<T> | void;
+  export function create<T>(dispose: (data: T | void) => Promise<T> | void, data?: T): Disposable<T>;
+  export function empty(): Disposable<void>;
+
+  export interface DisposeAllFn {
+    <A>(disposables: [Disposable<A>]): Disposable<[A]>;
+    <A, B>(disposables: [Disposable<A>, Disposable<B>]): Disposable<[A, B]>;
+    <A, B, C>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>]): Disposable<[A, B, C]>;
+    <A, B, C, D>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>]): Disposable<[A, B, C, D]>;
+    <A, B, C, D, E>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>]): Disposable<[A, B, C, D, E]>;
+    <A, B, C, D, E, F>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>, Disposable<F>]): Disposable<[A, B, C, D, E, F]>;
+    <A, B, C, D, E, F, G>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>, Disposable<F>, Disposable<G>]): Disposable<[A, B, C, D, E, F, G]>;
+    <A, B, C, D, E, F, G, H>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>, Disposable<F>, Disposable<G>, Disposable<H>]): Disposable<[A, B, C, D, E, F, G, H]>;
+    <A, B, C, D, E, F, G, H, I>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>, Disposable<F>, Disposable<G>, Disposable<H>, Disposable<I>]): Disposable<[A, B, C, D, E, F, G, H, I]>;
+    <A, B, C, D, E, F, G, H, I, J>(disposables: [Disposable<A>, Disposable<B>, Disposable<C>, Disposable<D>, Disposable<E>, Disposable<F>, Disposable<G>, Disposable<H>, Disposable<I>, Disposable<J>]): Disposable<[A, B, C, D, E, F, G, H, I, J]>;
+    (...disposables: Array<Disposable<any>>): Disposable<Array<any>>;
+  }
+
+  export const all: DisposeAllFn;
+
+  /**
+   * Must be type-casted to SettableDisposable :(
+   * 
+   * 
+   * @export
+   * @template T
+   * @returns {SettableDisposable<T>}
+   */
+  export function settable<T>(): Disposable<T>;
+
+  export function promised<T>(diposablePromise: Promise<Disposable<T>>): Disposable<T>;
+  export function once<T>(disposable: Disposable<T>): Disposable<T>;
 }
