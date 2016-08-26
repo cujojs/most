@@ -605,10 +605,10 @@ declare module "most/lib/fatalError" {
 
 declare module "most/lib/invoke" {
   interface InvokeFn {
-    <A, B>(f: (a: A) => B, [A]): B;
-    <A, B, C>(f: (a: A, b: B) => C, [A, B]): C;
-    <A, B, C, D>(f: (a: A, b: B, c: C) => D, [A, B, C]): D;
-    <A, B, C, D, E>(f: (a: A, b: B, c: C, d: D) => E, [A, B, C, D]): E;
+    <A, B>(f: (a: A) => B, args: [A]): B;
+    <A, B, C>(f: (a: A, b: B) => C, args: [A, B]): C;
+    <A, B, C, D>(f: (a: A, b: B, c: C) => D, args: [A, B, C]): D;
+    <A, B, C, D, E>(f: (a: A, b: B, c: C, d: D) => E, args: [A, B, C, D]): E;
     <R>(f: (...args: any[]) => R, args: any[]): R;
   }
 
@@ -675,3 +675,4 @@ declare module "most/lib/task" {
   export function runTask (task: Task): void;
   export function defer (task: Task): Promise<void>;
 }
+
