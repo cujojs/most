@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "unit-test": "buster-test",
-    "test": "eslint src/ && npm run unit-test && npm run doctest",
+    "test": "eslint . && npm run unit-test && npm run doctest",
     "build": "rimraf lib dist && buba -i src -o lib && rollup -c && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
     "preversion": "npm run build",
     "doctest": "markdown-doctest"
