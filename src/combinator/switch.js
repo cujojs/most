@@ -15,6 +15,8 @@ export function switchLatest (stream) {
   return new Stream(new Switch(stream.source))
 }
 
+export { switchLatest as switch }
+
 function Switch (source) {
   this.source = source
 }
