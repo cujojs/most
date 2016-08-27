@@ -1,8 +1,8 @@
 {
-	"globals": {
-		"describe": true,
-		"it": true
-	},
-	"predef": [ "-Promise" ],
-	"expr": true
+  "globals": {
+    "describe": true,
+    "it": true
+  },
+  "predef": [ "-Promise" ],
+  "expr": true
 }

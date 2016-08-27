@@ -1,5 +1,5 @@
 var Benchmark = require('benchmark');
-var most = require('../../most');
+var most = require('../../src/index');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
@@ -14,51 +14,51 @@ var kefirFromArray = runners.kefirFromArray;
 var n = runners.getIntArg(1000000);
 var a = new Array(n);
 for(var i = 0; i< a.length; ++i) {
-	a[i] = i;
+  a[i] = i;
 }
 
 var suite = Benchmark.Suite('skip(n/4) -> take(n/2) ' + n + ' integers');
 var options = {
-	defer: true,
-	onError: function(e) {
-		e.currentTarget.failure = e.error;
-	}
+  defer: true,
+  onError: function(e) {
+    e.currentTarget.failure = e.error;
+  }
 };
 
 var s = n * 0.25;
 var t = n * 0.5;
 
 suite
-	.add('most', function(deferred) {
-		runners.runMost(deferred, most.from(a).skip(s).take(t).reduce(sum, 0));
-	}, options)
-	.add('rx 4', function(deferred) {
-		runners.runRx(deferred, rx.Observable.fromArray(a).skip(s).take(t).reduce(sum, 0));
-	}, options)
-	.add('rx 5', function(deferred) {
-		runners.runRx5(deferred,
-			rxjs.Observable.from(a).skip(s).take(t).reduce(sum, 0));
-	}, options)
-	.add('kefir', function(deferred) {
-		runners.runKefir(deferred, kefirFromArray(a).skip(s).take(t).scan(sum, 0).last());
-	}, options)
-	.add('bacon', function(deferred) {
-		runners.runBacon(deferred, bacon.fromArray(a).skip(s).take(t).reduce(0, sum));
-	}, options)
-	.add('highland', function(deferred) {
-		runners.runHighland(deferred, highland(a).drop(s).take(t).reduce(0, sum));
-	}, options)
+  .add('most', function(deferred) {
+    runners.runMost(deferred, most.from(a).skip(s).take(t).reduce(sum, 0));
+  }, options)
+  .add('rx 4', function(deferred) {
+    runners.runRx(deferred, rx.Observable.fromArray(a).skip(s).take(t).reduce(sum, 0));
+  }, options)
+  .add('rx 5', function(deferred) {
+    runners.runRx5(deferred,
+      rxjs.Observable.from(a).skip(s).take(t).reduce(sum, 0));
+  }, options)
+  .add('kefir', function(deferred) {
+    runners.runKefir(deferred, kefirFromArray(a).skip(s).take(t).scan(sum, 0).last());
+  }, options)
+  .add('bacon', function(deferred) {
+    runners.runBacon(deferred, bacon.fromArray(a).skip(s).take(t).reduce(0, sum));
+  }, options)
+  .add('highland', function(deferred) {
+    runners.runHighland(deferred, highland(a).drop(s).take(t).reduce(0, sum));
+  }, options)
 
 runners.runSuite(suite);
 
 function add1(x) {
-	return x + 1;
+  return x + 1;
 }
 
 function even(x) {
-	return x % 2 === 0;
+  return x % 2 === 0;
 }
 
 function sum(x, y) {
-	return x + y;
+  return x + y;
 }
