@@ -1,4 +1,4 @@
-require('babel-register');
+require('buba/register');
 exports.all = {
 	environment: 'node',
 	tests: ['**/*-test.js']
