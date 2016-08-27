@@ -2918,7 +2918,7 @@ var require$$0 = Object.freeze({
 
   Switch.prototype.run = function(sink, scheduler) {
   	var switchSink = new SwitchSink(sink, scheduler);
-  	return all(switchSink, this.source.run(switchSink, scheduler));
+  	return all([switchSink, this.source.run(switchSink, scheduler)]);
   };
 
   function SwitchSink(sink, scheduler) {
@@ -2945,7 +2945,7 @@ var require$$0 = Object.freeze({
   };
 
   SwitchSink.prototype.dispose = function() {
-  	return this._disposeCurrent(0);
+  	return this._disposeCurrent(this.scheduler.now());
   };
 
   SwitchSink.prototype._disposeCurrent = function(t) {
