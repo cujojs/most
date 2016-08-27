@@ -2,8 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Stream from '../Stream';
-import Pipe from '../sink/Pipe';
+import Stream from '../Stream'
+import Pipe from '../sink/Pipe'
 
 /**
  * Generalized feedback loop. Call a stepper function for each event. The stepper
@@ -16,34 +16,34 @@ import Pipe from '../sink/Pipe';
  * @returns {Stream} new stream whose values are the `value` field of the objects
  * returned by the stepper
  */
-export function loop(stepper, seed, stream) {
-	return new Stream(new Loop(stepper, seed, stream.source));
+export function loop (stepper, seed, stream) {
+  return new Stream(new Loop(stepper, seed, stream.source))
 }
 
-function Loop(stepper, seed, source) {
-	this.step = stepper;
-	this.seed = seed;
-	this.source = source;
+function Loop (stepper, seed, source) {
+  this.step = stepper
+  this.seed = seed
+  this.source = source
 }
 
-Loop.prototype.run = function(sink, scheduler) {
-	return this.source.run(new LoopSink(this.step, this.seed, sink), scheduler);
-};
-
-function LoopSink(stepper, seed, sink) {
-	this.step = stepper;
-	this.seed = seed;
-	this.sink = sink;
+Loop.prototype.run = function (sink, scheduler) {
+  return this.source.run(new LoopSink(this.step, this.seed, sink), scheduler)
 }
 
-LoopSink.prototype.error = Pipe.prototype.error;
+function LoopSink (stepper, seed, sink) {
+  this.step = stepper
+  this.seed = seed
+  this.sink = sink
+}
 
-LoopSink.prototype.event = function(t, x) {
-	var result = this.step(this.seed, x);
-	this.seed = result.seed;
-	this.sink.event(t, result.value);
-};
+LoopSink.prototype.error = Pipe.prototype.error
 
-LoopSink.prototype.end = function(t) {
-	this.sink.end(t, this.seed);
-};
+LoopSink.prototype.event = function (t, x) {
+  var result = this.step(this.seed, x)
+  this.seed = result.seed
+  this.sink.event(t, result.value)
+}
+
+LoopSink.prototype.end = function (t) {
+  this.sink.end(t, this.seed)
+}

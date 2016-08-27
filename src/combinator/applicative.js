@@ -2,8 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import { combine } from './combine';
-import { apply } from '@most/prelude';
+import { combine } from './combine'
+import { apply } from '@most/prelude'
 
 /**
  * Assume fs is a stream containing functions, and apply the latest function
@@ -15,6 +15,6 @@ import { apply } from '@most/prelude';
  * @param {Stream} xs stream of values to which to apply all the latest f
  * @returns {Stream} stream containing all the applications of fs to xs
  */
-export function ap(fs, xs) {
-	return combine(apply, fs, xs);
+export function ap (fs, xs) {
+  return combine(apply, fs, xs)
 }

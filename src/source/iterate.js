@@ -2,7 +2,7 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Stream from '../Stream';
+import Stream from '../Stream'
 
 /**
  * Compute a stream by iteratively calling f to produce values
@@ -11,56 +11,56 @@ import Stream from '../Stream';
  * @param {*} x initial value
  * @returns {Stream}
  */
-export function iterate(f, x) {
-	return new Stream(new IterateSource(f, x));
+export function iterate (f, x) {
+  return new Stream(new IterateSource(f, x))
 }
 
-function IterateSource(f, x) {
-	this.f = f;
-	this.value = x;
+function IterateSource (f, x) {
+  this.f = f
+  this.value = x
 }
 
-IterateSource.prototype.run = function(sink, scheduler) {
-	return new Iterate(this.f, this.value, sink, scheduler);
-};
-
-function Iterate(f, initial, sink, scheduler) {
-	this.f = f;
-	this.sink = sink;
-	this.scheduler = scheduler;
-	this.active = true;
-
-	var x = initial;
-
-	var self = this;
-	function err(e) {
-		self.sink.error(self.scheduler.now(), e);
-	}
-
-	function start(iterate) {
-		return stepIterate(iterate, x);
-	}
-
-	Promise.resolve(this).then(start).catch(err);
+IterateSource.prototype.run = function (sink, scheduler) {
+  return new Iterate(this.f, this.value, sink, scheduler)
 }
 
-Iterate.prototype.dispose = function() {
-	this.active = false;
-};
+function Iterate (f, initial, sink, scheduler) {
+  this.f = f
+  this.sink = sink
+  this.scheduler = scheduler
+  this.active = true
 
-function stepIterate(iterate, x) {
-	iterate.sink.event(iterate.scheduler.now(), x);
+  var x = initial
 
-	if(!iterate.active) {
-		return x;
-	}
+  var self = this
+  function err (e) {
+    self.sink.error(self.scheduler.now(), e)
+  }
 
-	var f = iterate.f;
-	return Promise.resolve(f(x)).then(function(y) {
-		return continueIterate(iterate, y);
-	});
+  function start (iterate) {
+    return stepIterate(iterate, x)
+  }
+
+  Promise.resolve(this).then(start).catch(err)
 }
 
-function continueIterate(iterate, x) {
-	return !iterate.active ? iterate.value : stepIterate(iterate, x);
+Iterate.prototype.dispose = function () {
+  this.active = false
+}
+
+function stepIterate (iterate, x) {
+  iterate.sink.event(iterate.scheduler.now(), x)
+
+  if (!iterate.active) {
+    return x
+  }
+
+  var f = iterate.f
+  return Promise.resolve(f(x)).then(function (y) {
+    return continueIterate(iterate, y)
+  })
+}
+
+function continueIterate (iterate, x) {
+  return !iterate.active ? iterate.value : stepIterate(iterate, x)
 }

@@ -2,9 +2,9 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Stream from '../Stream';
-import EventTargetSource from './EventTargetSource'; 
-import EventEmitterSource from './EventEmitterSource';
+import Stream from '../Stream'
+import EventTargetSource from './EventTargetSource'
+import EventEmitterSource from './EventEmitterSource'
 
 /**
  * Create a stream from an EventTarget, such as a DOM Node, or EventEmitter.
@@ -15,20 +15,20 @@ import EventEmitterSource from './EventEmitterSource';
  * @returns {Stream} stream containing all events of the specified type
  * from the source.
  */
-export function fromEvent(event, source, capture) {
-	var s;
+export function fromEvent (event, source, capture) { // eslint-disable-line complexity
+  var s
 
-	if(typeof source.addEventListener === 'function' && typeof source.removeEventListener === 'function') {
-		if(arguments.length < 3) {
-			capture = false
-		}
+  if (typeof source.addEventListener === 'function' && typeof source.removeEventListener === 'function') {
+    if (arguments.length < 3) {
+      capture = false
+    }
 
-		s = new EventTargetSource(event, source, capture);
-	} else if(typeof source.addListener === 'function' && typeof source.removeListener === 'function') {
-		s = new EventEmitterSource(event, source);
-	} else {
-		throw new Error('source must support addEventListener/removeEventListener or addListener/removeListener');
-	}
+    s = new EventTargetSource(event, source, capture)
+  } else if (typeof source.addListener === 'function' && typeof source.removeListener === 'function') {
+    s = new EventEmitterSource(event, source)
+  } else {
+    throw new Error('source must support addEventListener/removeEventListener or addListener/removeListener')
+  }
 
-	return new Stream(s);
+  return new Stream(s)
 }

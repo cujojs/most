@@ -2,6 +2,6 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-export function thru(f, stream) {
-	return f(stream);
+export function thru (f, stream) {
+  return f(stream)
 }

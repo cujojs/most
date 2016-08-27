@@ -2,124 +2,124 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import * as base from '@most/prelude';
+import * as base from '@most/prelude'
 
-export default function Timeline() {
-	this.tasks = [];
+export default function Timeline () {
+  this.tasks = []
 }
 
-Timeline.prototype.nextArrival = function() {
-	return this.isEmpty() ? Infinity : this.tasks[0].time;
+Timeline.prototype.nextArrival = function () {
+  return this.isEmpty() ? Infinity : this.tasks[0].time
 }
 
-Timeline.prototype.isEmpty = function() {
-	return this.tasks.length === 0;
+Timeline.prototype.isEmpty = function () {
+  return this.tasks.length === 0
 }
 
-Timeline.prototype.add = function(st) {
-	insertByTime(st, this.tasks);
+Timeline.prototype.add = function (st) {
+  insertByTime(st, this.tasks)
 }
 
-Timeline.prototype.remove = function(st) {
-	var i = binarySearch(st.time, this.tasks);
+Timeline.prototype.remove = function (st) {
+  var i = binarySearch(st.time, this.tasks)
 
-	if(i >= 0 && i < this.tasks.length) {
-		var at = base.findIndex(st, this.tasks[i].events);
-		if(at >= 0) {
-			this.tasks[i].events.splice(at, 1);
-			return true;
-		}
-	}
+  if (i >= 0 && i < this.tasks.length) {
+    var at = base.findIndex(st, this.tasks[i].events)
+    if (at >= 0) {
+      this.tasks[i].events.splice(at, 1)
+      return true
+    }
+  }
 
-	return false;
+  return false
 }
 
-Timeline.prototype.removeAll = function(f) {
-	for(var i = 0, l = this.tasks.length; i < l; ++i) {
-		removeAllFrom(f, this.tasks[i]);
-	}
-};
-
-Timeline.prototype.runTasks = function(t, runTask) {
-	var tasks = this.tasks;
-	var l = tasks.length;
-	var i = 0;
-
-	while(i < l && tasks[i].time <= t) {
-		++i;
-	}
-
-	this.tasks = tasks.slice(i);
-
-	// Run all ready tasks
-	for (var j = 0; j < i; ++j) {
-		this.tasks = runTasks(runTask, tasks[j], this.tasks);
-	}
+Timeline.prototype.removeAll = function (f) {
+  for (var i = 0, l = this.tasks.length; i < l; ++i) {
+    removeAllFrom(f, this.tasks[i])
+  }
 }
 
-function runTasks(runTask, timeslot, tasks) {
-	var events = timeslot.events;
-	for(var i=0; i<events.length; ++i) {
-		var task = events[i];
+Timeline.prototype.runTasks = function (t, runTask) {
+  var tasks = this.tasks
+  var l = tasks.length
+  var i = 0
 
-		if(task.active) {
-			runTask(task);
+  while (i < l && tasks[i].time <= t) {
+    ++i
+  }
 
-			// Reschedule periodic repeating tasks
-			// Check active again, since a task may have canceled itself
-			if(task.period >= 0 && task.active) {
-				task.time = task.time + task.period;
-				insertByTime(task, tasks);
-			}
-		}
-	}
+  this.tasks = tasks.slice(i)
 
-	return tasks;
+  // Run all ready tasks
+  for (var j = 0; j < i; ++j) {
+    this.tasks = runTasks(runTask, tasks[j], this.tasks)
+  }
 }
 
-function insertByTime(task, timeslots) {
-	var l = timeslots.length;
+function runTasks (runTask, timeslot, tasks) { // eslint-disable-line complexity
+  var events = timeslot.events
+  for (var i = 0; i < events.length; ++i) {
+    var task = events[i]
 
-	if(l === 0) {
-		timeslots.push(newTimeslot(task.time, [task]));
-		return;
-	}
+    if (task.active) {
+      runTask(task)
 
-	var i = binarySearch(task.time, timeslots);
+      // Reschedule periodic repeating tasks
+      // Check active again, since a task may have canceled itself
+      if (task.period >= 0 && task.active) {
+        task.time = task.time + task.period
+        insertByTime(task, tasks)
+      }
+    }
+  }
 
-	if(i >= l) {
-		timeslots.push(newTimeslot(task.time, [task]));
-	} else if(task.time === timeslots[i].time) {
-		timeslots[i].events.push(task);
-	} else {
-		timeslots.splice(i, 0, newTimeslot(task.time, [task]));
-	}
+  return tasks
 }
 
-function removeAllFrom(f, timeslot) {
-	timeslot.events = base.removeAll(f, timeslot.events);
+function insertByTime (task, timeslots) { // eslint-disable-line complexity
+  var l = timeslots.length
+
+  if (l === 0) {
+    timeslots.push(newTimeslot(task.time, [task]))
+    return
+  }
+
+  var i = binarySearch(task.time, timeslots)
+
+  if (i >= l) {
+    timeslots.push(newTimeslot(task.time, [task]))
+  } else if (task.time === timeslots[i].time) {
+    timeslots[i].events.push(task)
+  } else {
+    timeslots.splice(i, 0, newTimeslot(task.time, [task]))
+  }
 }
 
-function binarySearch(t, sortedArray) {
-	var lo = 0;
-	var hi = sortedArray.length;
-	var mid, y;
-
-	while (lo < hi) {
-		mid = Math.floor((lo + hi) / 2);
-		y = sortedArray[mid];
-
-		if (t === y.time) {
-			return mid;
-		} else if (t < y.time) {
-			hi = mid;
-		} else {
-			lo = mid + 1;
-		}
-	}
-	return hi;
+function removeAllFrom (f, timeslot) {
+  timeslot.events = base.removeAll(f, timeslot.events)
 }
 
-function newTimeslot(t, events) {
-	return { time: t, events: events };
+function binarySearch (t, sortedArray) { // eslint-disable-line complexity
+  var lo = 0
+  var hi = sortedArray.length
+  var mid, y
+
+  while (lo < hi) {
+    mid = Math.floor((lo + hi) / 2)
+    y = sortedArray[mid]
+
+    if (t === y.time) {
+      return mid
+    } else if (t < y.time) {
+      hi = mid
+    } else {
+      lo = mid + 1
+    }
+  }
+  return hi
+}
+
+function newTimeslot (t, events) {
+  return { time: t, events: events }
 }

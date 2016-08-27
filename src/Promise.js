@@ -2,6 +2,6 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-export function isPromise(p) {
-	return p !== null && typeof p === 'object' && typeof p.then === 'function';
+export function isPromise (p) {
+  return p !== null && typeof p === 'object' && typeof p.then === 'function'
 }

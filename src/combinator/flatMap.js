@@ -2,7 +2,7 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import { mergeConcurrently, mergeMapConcurrently } from './mergeConcurrently';
+import { mergeConcurrently, mergeMapConcurrently } from './mergeConcurrently'
 
 /**
  * Map each value in the stream to a new stream, and merge it into the
@@ -11,8 +11,8 @@ import { mergeConcurrently, mergeMapConcurrently } from './mergeConcurrently';
  * @param {Stream} stream
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
-export function flatMap(f, stream) {
-	return mergeMapConcurrently(f, Infinity, stream);
+export function flatMap (f, stream) {
+  return mergeMapConcurrently(f, Infinity, stream)
 }
 
 /**
@@ -21,6 +21,6 @@ export function flatMap(f, stream) {
  * @param {Stream<Stream<X>>} stream stream of streams
  * @returns {Stream<X>} new stream containing all events of all inner streams
  */
-export function join(stream) {
-	return mergeConcurrently(Infinity, stream);
+export function join (stream) {
+  return mergeConcurrently(Infinity, stream)
 }

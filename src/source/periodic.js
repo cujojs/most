@@ -2,9 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Stream from '../Stream';
-import * as dispose from '../disposable/dispose';
-import PropagateTask from '../scheduler/PropagateTask';
+import Stream from '../Stream'
+import PropagateTask from '../scheduler/PropagateTask'
 
 /**
  * Create a stream that emits the current time periodically
@@ -12,15 +11,15 @@ import PropagateTask from '../scheduler/PropagateTask';
  * @param {*} value value to emit each period
  * @returns {Stream} new stream that emits the current time every period
  */
-export function periodic(period, value) {
-	return new Stream(new Periodic(period, value));
+export function periodic (period, value) {
+  return new Stream(new Periodic(period, value))
 }
 
-function Periodic(period, value) {
-	this.period = period;
-	this.value = value;
+function Periodic (period, value) {
+  this.period = period
+  this.value = value
 }
 
-Periodic.prototype.run = function(sink, scheduler) {
-	return scheduler.periodic(this.period, PropagateTask.event(this.value, sink));
-};
+Periodic.prototype.run = function (sink, scheduler) {
+  return scheduler.periodic(this.period, PropagateTask.event(this.value, sink))
+}

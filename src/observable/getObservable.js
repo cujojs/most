@@ -2,20 +2,20 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import symbolObservable from 'symbol-observable';
+import symbolObservable from 'symbol-observable'
 
-export default function getObservable(o) {
-	var obs = null;
-	if(o) {
-		// Access foreign method only once
-		var method = o[symbolObservable];
-		if(typeof method === 'function') {
-			obs = method.call(o);
-			if(!(obs && typeof obs.subscribe === 'function')) {
-				throw new TypeError('invalid observable ' + obs);
-			}
-		}
-	}
+export default function getObservable (o) { // eslint-disable-line complexity
+  var obs = null
+  if (o) {
+  // Access foreign method only once
+    var method = o[symbolObservable]
+    if (typeof method === 'function') {
+      obs = method.call(o)
+      if (!(obs && typeof obs.subscribe === 'function')) {
+        throw new TypeError('invalid observable ' + obs)
+      }
+    }
+  }
 
-	return obs;
+  return obs
 }

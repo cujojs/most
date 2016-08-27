@@ -2,7 +2,7 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import { mergeMapConcurrently } from './mergeConcurrently';
+import { mergeMapConcurrently } from './mergeConcurrently'
 
 /**
  * Map each value in stream to a new stream, and concatenate them all
@@ -15,6 +15,6 @@ import { mergeMapConcurrently } from './mergeConcurrently';
  * @param {Stream} stream
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
-export function concatMap(f, stream) {
-	return mergeMapConcurrently(f, 1, stream);
+export function concatMap (f, stream) {
+  return mergeMapConcurrently(f, 1, stream)
 }

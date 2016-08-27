@@ -2,11 +2,11 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Pipe from '../sink/Pipe';
+import Pipe from '../sink/Pipe'
 
-export default function Filter(p, source) {
-	this.p = p;
-	this.source = source;
+export default function Filter (p, source) {
+  this.p = p
+  this.source = source
 }
 
 /**
@@ -15,33 +15,33 @@ export default function Filter(p, source) {
  * @param {{run:function}} source source to filter
  * @returns {Filter} filtered source
  */
-Filter.create = function createFilter(p, source) {
-	if (source instanceof Filter) {
-		return new Filter(and(source.p, p), source.source);
-	}
+Filter.create = function createFilter (p, source) {
+  if (source instanceof Filter) {
+    return new Filter(and(source.p, p), source.source)
+  }
 
-	return new Filter(p, source);
-};
-
-Filter.prototype.run = function(sink, scheduler) {
-	return this.source.run(new FilterSink(this.p, sink), scheduler);
-};
-
-function FilterSink(p, sink) {
-	this.p = p;
-	this.sink = sink;
+  return new Filter(p, source)
 }
 
-FilterSink.prototype.end   = Pipe.prototype.end;
-FilterSink.prototype.error = Pipe.prototype.error;
+Filter.prototype.run = function (sink, scheduler) {
+  return this.source.run(new FilterSink(this.p, sink), scheduler)
+}
 
-FilterSink.prototype.event = function(t, x) {
-	var p = this.p;
-	p(x) && this.sink.event(t, x);
-};
+function FilterSink (p, sink) {
+  this.p = p
+  this.sink = sink
+}
 
-function and(p, q) {
-	return function(x) {
-		return p(x) && q(x);
-	};
+FilterSink.prototype.end = Pipe.prototype.end
+FilterSink.prototype.error = Pipe.prototype.error
+
+FilterSink.prototype.event = function (t, x) {
+  var p = this.p
+  p(x) && this.sink.event(t, x)
+}
+
+function and (p, q) {
+  return function (x) {
+    return p(x) && q(x)
+  }
 }

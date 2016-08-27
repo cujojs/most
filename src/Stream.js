@@ -2,6 +2,6 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-export default function Stream(source) {
-	this.source = source;
+export default function Stream (source) {
+  this.source = source
 }

@@ -1,13 +1,13 @@
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
-import Disposable from './Disposable';
-import SettableDisposable from './SettableDisposable';
-import { isPromise } from '../Promise';
-import * as base from '@most/prelude';
+import Disposable from './Disposable'
+import SettableDisposable from './SettableDisposable'
+import { isPromise } from '../Promise'
+import * as base from '@most/prelude'
 
-var map = base.map;
-var identity = base.id;
+var map = base.map
+var identity = base.id
 
 /**
  * Call disposable.dispose.  If it returns a promise, catch promise
@@ -17,13 +17,13 @@ var identity = base.id;
  * @param {{error: function}} sink
  * @return {*} result of disposable.dispose
  */
-export function tryDispose(t, disposable, sink) {
-	var result = disposeSafely(disposable);
-	return isPromise(result)
-		? result.catch(function (e) {
-			sink.error(t, e);
-		})
-		: result;
+export function tryDispose (t, disposable, sink) {
+  var result = disposeSafely(disposable)
+  return isPromise(result)
+    ? result.catch(function (e) {
+      sink.error(t, e)
+    })
+    : result
 }
 
 /**
@@ -33,8 +33,8 @@ export function tryDispose(t, disposable, sink) {
  * @param {*?} data any data to be passed to disposer function
  * @return {Disposable}
  */
-export function create(dispose, data) {
-	return once(new Disposable(dispose, data));
+export function create (dispose, data) {
+  return once(new Disposable(dispose, data))
 }
 
 /**
@@ -42,8 +42,8 @@ export function create(dispose, data) {
  * requirement when no actual resource needs to be disposed.
  * @return {Disposable|exports|module.exports}
  */
-export function empty() {
-	return new Disposable(identity, void 0);
+export function empty () {
+  return new Disposable(identity, void 0)
 }
 
 /**
@@ -51,20 +51,20 @@ export function empty() {
  * @param {Array<Disposable>} disposables
  * @return {Disposable}
  */
-export function all(disposables) {
-	return create(disposeAll, disposables);
+export function all (disposables) {
+  return create(disposeAll, disposables)
 }
 
-function disposeAll(disposables) {
-	return Promise.all(map(disposeSafely, disposables));
+function disposeAll (disposables) {
+  return Promise.all(map(disposeSafely, disposables))
 }
 
-function disposeSafely(disposable) {
-	try {
-		return disposable.dispose();
-	} catch(e) {
-		return Promise.reject(e);
-	}
+function disposeSafely (disposable) {
+  try {
+    return disposable.dispose()
+  } catch (e) {
+    return Promise.reject(e)
+  }
 }
 
 /**
@@ -72,16 +72,16 @@ function disposeSafely(disposable) {
  * @param {Promise<Disposable>} disposablePromise
  * @return {Disposable}
  */
-export function promised(disposablePromise) {
-	return create(disposePromise, disposablePromise);
+export function promised (disposablePromise) {
+  return create(disposePromise, disposablePromise)
 }
 
-function disposePromise(disposablePromise) {
-	return disposablePromise.then(disposeOne);
+function disposePromise (disposablePromise) {
+  return disposablePromise.then(disposeOne)
 }
 
-function disposeOne(disposable) {
-	return disposable.dispose();
+function disposeOne (disposable) {
+  return disposable.dispose()
 }
 
 /**
@@ -89,8 +89,8 @@ function disposeOne(disposable) {
  * be set later.
  * @return {SettableDisposable}
  */
-export function settable() {
-	return new SettableDisposable();
+export function settable () {
+  return new SettableDisposable()
 }
 
 /**
@@ -99,20 +99,20 @@ export function settable() {
  * @param {{ dispose: function() }} disposable
  * @return {Disposable} wrapped disposable
  */
-export function once(disposable) {
-	return new Disposable(disposeMemoized, memoized(disposable));
+export function once (disposable) {
+  return new Disposable(disposeMemoized, memoized(disposable))
 }
 
-function disposeMemoized(memoized) {
-	if(!memoized.disposed) {
-		memoized.disposed = true;
-		memoized.value = disposeSafely(memoized.disposable);
-		memoized.disposable = void 0;
-	}
+function disposeMemoized (memoized) {
+  if (!memoized.disposed) {
+    memoized.disposed = true
+    memoized.value = disposeSafely(memoized.disposable)
+    memoized.disposable = void 0
+  }
 
-	return memoized.value;
+  return memoized.value
 }
 
-function memoized(disposable) {
-	return { disposed: false, disposable: disposable, value: void 0 };
+function memoized (disposable) {
+  return { disposed: false, disposable: disposable, value: void 0 }
 }

@@ -3,7 +3,7 @@
 /** @author John Hann */
 
 export default function fatalError (e) {
-	setTimeout(function() {
-		throw e;
-	}, 0);
+  setTimeout(function () {
+    throw e
+  }, 0)
 }

@@ -8,11 +8,11 @@
  * @param {*?} data any data to be passed to disposer function
  * @constructor
  */
-export default function Disposable(dispose, data) {
-	this._dispose = dispose;
-	this._data = data;
+export default function Disposable (dispose, data) {
+  this._dispose = dispose
+  this._data = data
 }
 
-Disposable.prototype.dispose = function() {
-	return this._dispose(this._data);
-};
+Disposable.prototype.dispose = function () {
+  return this._dispose(this._data)
+}

@@ -2,8 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import { withDefaultScheduler as run } from '../runSource';
-import { tap } from './transform';
+import { withDefaultScheduler as run } from '../runSource'
+import { tap } from './transform'
 
 /**
  * Observe all the event values in the stream in time order. The
@@ -13,8 +13,8 @@ import { tap } from './transform';
  * @return {Promise} promise that fulfills after the stream ends without
  *  an error, or rejects if the stream ends with an error.
  */
-export function observe(f, stream) {
-	return drain(tap(f, stream));
+export function observe (f, stream) {
+  return drain(tap(f, stream))
 }
 
 /**
@@ -23,6 +23,6 @@ export function observe(f, stream) {
  * @return {Promise} promise that fulfills after the stream ends without
  *  an error, or rejects if the stream ends with an error.
  */
-export function drain(stream) {
-	return run(stream.source);
+export function drain (stream) {
+  return run(stream.source)
 }
