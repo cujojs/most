@@ -1,3 +1,4 @@
+require('buba/register')
 var most = require('./src/index')
 
 // needed for regeneratorRuntime
@@ -38,9 +39,5 @@ module.exports = {
 
     stream: most.empty(),
     mousemovesAfterFirstClick: most.empty()
-  },
-
-  babel: {
-    stage: 0
   }
 }
