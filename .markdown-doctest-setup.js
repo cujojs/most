@@ -1,4 +1,5 @@
-var most = require(__dirname);
+require('buba/register')
+var most = require('./src/index')
 
 // needed for regeneratorRuntime
 require('babel-polyfill');
@@ -38,9 +39,5 @@ module.exports = {
 
     stream: most.empty(),
     mousemovesAfterFirstClick: most.empty()
-  },
-
-  babel: {
-    stage: 0
   }
 }

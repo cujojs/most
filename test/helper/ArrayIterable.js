@@ -1,29 +1,29 @@
-var makeIterable = require('../../lib/iterable').makeIterable;
-var Iteration = require('./Iteration');
+var makeIterable = require('../../src/iterable').makeIterable
+var Iteration = require('./Iteration')
 
-module.exports = ArrayIterable;
+module.exports = ArrayIterable
 
-function ArrayIterable(a) {
-	this.array = a;
+function ArrayIterable (a) {
+  this.array = a
 }
 
-ArrayIterable.prototype = makeIterable(function() {
-	return new ArrayIterator(this.array);
-}, ArrayIterable.prototype);
+ArrayIterable.prototype = makeIterable(function () {
+  return new ArrayIterator(this.array)
+}, ArrayIterable.prototype)
 
-function ArrayIterator(a) {
-	this.array = a;
-	this.index = 0;
-	this.length = a.length >>> 0;
+function ArrayIterator (a) {
+  this.array = a
+  this.index = 0
+  this.length = a.length >>> 0
 }
 
-ArrayIterator.prototype.next = function() {
-	var l = this.length;
-	if(this.index < l) {
-		var x = this.array[this.index];
-		this.index += 1;
-		return new Iteration(false, x);
-	}
+ArrayIterator.prototype.next = function () {
+  var l = this.length
+  if (this.index < l) {
+    var x = this.array[this.index]
+    this.index += 1
+    return new Iteration(false, x)
+  }
 
-	return Iteration.DONE;
-};
+  return Iteration.DONE
+}
