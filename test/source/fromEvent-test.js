@@ -1,151 +1,147 @@
-require('buster').spec.expose();
-var expect = require('buster').expect;
+/* global describe, it */
+require('buster').spec.expose()
+var expect = require('buster').expect
 
-var events = require('../../lib/source/fromEvent');
-var fromEvent = events.fromEvent;
-var reduce = require('../../lib/combinator/accumulate').reduce;
-var drain = require('../../lib/combinator/observe').drain;
-var observe = require('../../lib/combinator/observe').observe;
-var take = require('../../lib/combinator/slice').take;
-var FakeEventTarget = require('../helper/FakeEventTarget');
-var FakeEventEmitter = require('../helper/FakeEventEmitter');
+var events = require('../../src/source/fromEvent')
+var fromEvent = events.fromEvent
+var reduce = require('../../src/combinator/accumulate').reduce
+var drain = require('../../src/combinator/observe').drain
+var observe = require('../../src/combinator/observe').observe
+var take = require('../../src/combinator/slice').take
+var FakeEventTarget = require('../helper/FakeEventTarget')
+var FakeEventEmitter = require('../helper/FakeEventEmitter')
 
-var sentinel = { value: 'sentinel' };
-var other = { value: 'other' };
+var sentinel = { value: 'sentinel' }
+var other = { value: 'other' }
 
-describe('fromEvent', function() {
+describe('fromEvent', function () {
+  describe('given an EventTarget', function () {
+    it('should contain emitted items', function () {
+      return verifyContainsEmittedItems(new FakeEventTarget())
+    })
 
-	describe('given an EventTarget', function() {
+    it('should unlisten on end', function () {
+      return verifyUnlistenOnEnd.call(this, new FakeEventTarget())
+    })
 
-		it('should contain emitted items', function() {
-			return verifyContainsEmittedItems(new FakeEventTarget());
-		});
+    it('should propagate event synchronously', function () {
+      var tick = 0
+      var source = new FakeEventTarget()
+      var s = fromEvent('test', source)
 
-		it('should unlisten on end', function() {
-			return verifyUnlistenOnEnd.call(this, new FakeEventTarget());
-		});
+      setTimeout(function () {
+        tick = 1
+        source.emit(sentinel)
+        tick = 2
+      }, 0)
 
-		it('should propagate event synchronously', function() {
-			var tick = 0;
-			var source = new FakeEventTarget();
-			var s = fromEvent('test', source);
+      return observe(function () {
+        expect(tick).toBe(1)
+      }, take(1, s))
+    })
 
-			setTimeout(function() {
-				tick = 1;
-				source.emit(sentinel);
-				tick = 2;
-			}, 0);
+    it('should pass capture argument', () => {
+      var source = new FakeEventTarget()
 
-			return observe(function() {
-				expect(tick).toBe(1);
-			}, take(1, s));
-		});
+      const expected = {}
+      drain(take(1, fromEvent('test', source, expected)))
+      source.emit('unused')
 
-		it('should pass capture argument', () => {
-			var source = new FakeEventTarget();
+      expect(source._capture).toBe(expected)
+    })
 
-			const expected = {};
-			drain(take(1, fromEvent('test', source, expected)));
-			source.emit('unused');
+    it('should pass false if capture not provided', () => {
+      var source = new FakeEventTarget()
 
-			expect(source._capture).toBe(expected);
-		})
+      drain(take(1, fromEvent('test', source)))
+      source.emit('unused')
 
-		it('should pass false if capture not provided', () => {
-			var source = new FakeEventTarget();
+      expect(source._capture).toBe(false)
+    })
+  })
 
-			drain(take(1, fromEvent('test', source)));
-			source.emit('unused');
+  describe('given an EventEmitter', function () {
+    it('should contain emitted items', function () {
+      return verifyContainsEmittedItems(new FakeEventEmitter())
+    })
 
-			expect(source._capture).toBe(false);
-		})
-	});
+    it('should unlisten on end', function () {
+      return verifyUnlistenOnEnd.call(this, new FakeEventEmitter())
+    })
 
-	describe('given an EventEmitter', function() {
+    it('should convert multiple arguments to array', function () {
+      var evented = new FakeEventEmitter()
+      var values = [sentinel, other, 1]
 
-		it('should contain emitted items', function() {
-			return verifyContainsEmittedItems(new FakeEventEmitter());
-		});
+      var s = take(1, fromEvent('event', evented))
 
-		it('should unlisten on end', function() {
-			return verifyUnlistenOnEnd.call(this, new FakeEventEmitter());
-		});
+      setTimeout(function () {
+        evented.emit.apply(evented, values)
+      }, 0)
 
-		it('should convert multiple arguments to array', function() {
-			var evented = new FakeEventEmitter();
-			var values = [sentinel, other, 1];
+      return observe(function (array) {
+        expect(array).toEqual(values)
+      }, s)
+    })
+  })
+})
 
-			var s = take(1, fromEvent('event', evented));
-
-			setTimeout(function () {
-				evented.emit.apply(evented, values);
-			}, 0);
-
-			return observe(function (array) {
-				expect(array).toEqual(values);
-			}, s);
-		});
-
-	});
-
-});
-
-function randomBoolean() {
-	return Math.random() >= 0.5;
+function randomBoolean () {
+  return Math.random() >= 0.5
 }
 
-function testEvents(verify, values, source, stream) {
-	setTimeout(function () {
-		values.forEach(function (x) {
-			source.emit(x);
-		});
-	}, 0);
+function testEvents (verify, values, source, stream) {
+  setTimeout(function () {
+    values.forEach(function (x) {
+      source.emit(x)
+    })
+  }, 0)
 
-	return reduce(function(count, x) {
-		verify(x);
-		return count+1;
-	}, 0, stream);
+  return reduce(function (count, x) {
+    verify(x)
+    return count + 1
+  }, 0, stream)
 }
 
 function verifyContainsEmittedItems (evented) {
-	var values = [sentinel, sentinel, sentinel];
-	var stream = take(values.length, fromEvent('event', evented, randomBoolean()));
+  var values = [sentinel, sentinel, sentinel]
+  var stream = take(values.length, fromEvent('event', evented, randomBoolean()))
 
-	return testEvents(function (x) {
-		expect(x).toBe(sentinel);
-	}, values, evented, stream).then(function(count) {
-		expect(count).toBe(values.length);
-	});
+  return testEvents(function (x) {
+    expect(x).toBe(sentinel)
+  }, values, evented, stream).then(function (count) {
+    expect(count).toBe(values.length)
+  })
 }
 
 function verifyUnlistenOnEnd (evented) {
-	var spy = spyOnRemove(this, evented);
-	var values = [sentinel, sentinel, sentinel];
+  var spy = spyOnRemove(this, evented)
+  var values = [sentinel, sentinel, sentinel]
 
-	var stream = take(1, fromEvent('event', evented, randomBoolean()));
+  var stream = take(1, fromEvent('event', evented, randomBoolean()))
 
-	return testEvents(function(x) {
-		expect(x).toBe(sentinel);
-	}, values, evented, stream).then(function (count) {
-		expect(count).toBe(1);
-	}).then(function() {
-		expect(spy).toHaveBeenCalled();
-	});
+  return testEvents(function (x) {
+    expect(x).toBe(sentinel)
+  }, values, evented, stream).then(function (count) {
+    expect(count).toBe(1)
+  }).then(function () {
+    expect(spy).toHaveBeenCalled()
+  })
 }
 
-function spyOnRemove(context, evented) {
-	var spy;
-	if(typeof evented.removeEventListener === 'function') {
-		spy = context.spy(evented.removeEventListener);
-		evented.removeEventListener = spy;
-		return spy;
-	}
+function spyOnRemove (context, evented) {
+  var spy
+  if (typeof evented.removeEventListener === 'function') {
+    spy = context.spy(evented.removeEventListener)
+    evented.removeEventListener = spy
+    return spy
+  }
 
-	if(typeof evented.removeListener === 'function') {
-		spy = context.spy(evented.removeListener);
-		evented.removeListener = spy;
-		return spy;
-	}
+  if (typeof evented.removeListener === 'function') {
+    spy = context.spy(evented.removeListener)
+    evented.removeListener = spy
+    return spy
+  }
 
-	throw new Error('Unsupported event emitter type');
+  throw new Error('Unsupported event emitter type')
 }

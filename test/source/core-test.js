@@ -1,29 +1,26 @@
-require('buster').spec.expose();
-var expect = require('buster').expect;
+/* global describe, it */
+require('buster').spec.expose()
+var expect = require('buster').expect
 
-var core = require('../../lib/source/core');
-var observe = require('../../lib/combinator/observe').observe;
+var core = require('../../src/source/core')
+var observe = require('../../src/combinator/observe').observe
 
-var sentinel = { value: 'sentinel' };
+var sentinel = { value: 'sentinel' }
 
-describe('of', function() {
+describe('of', function () {
+  it('should contain one item', function () {
+    return observe(function (x) {
+      expect(x).toBe(sentinel)
+    }, core.of(sentinel))
+  })
+})
 
-	it('should contain one item', function() {
-		return observe(function(x) {
-			expect(x).toBe(sentinel);
-		}, core.of(sentinel));
-	});
-
-});
-
-describe('empty', function() {
-
-	it('should yield no items before end', function() {
-		return observe(function(x) {
-			throw new Error('not empty ' + x);
-		}, core.empty()).then(function() {
-			expect(true).toBeTrue();
-		});
-	});
-
-});
+describe('empty', function () {
+  it('should yield no items before end', function () {
+    return observe(function (x) {
+      throw new Error('not empty ' + x)
+    }, core.empty()).then(function () {
+      expect(true).toBeTrue()
+    })
+  })
+})

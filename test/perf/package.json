@@ -15,12 +15,13 @@
     "slice": "node ./slice.js",
     "skipRepeats": "node ./skipRepeats.js",
     "zip": "node ./zip.js",
-    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run merge-nested && npm run zip && npm run sample && npm run scan && npm run slice && npm run skipRepeats"
+    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run merge-nested && npm run zip && npm run scan && npm run slice && npm run skipRepeats"
   },
   "dependencies": {
     "@reactivex/rxjs": "^5.0.0-beta.8",
     "baconjs": "^0.7.84",
     "benchmark": "github:bestiejs/benchmark.js#master",
+    "buba": "^2.0.3",
     "highland": "^2.8.1",
     "kefir": "^3.2.3",
     "rx": "^4.1.0"

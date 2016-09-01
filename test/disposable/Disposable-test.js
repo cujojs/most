@@ -1,18 +1,19 @@
-require('buster').spec.expose();
-var expect = require('buster').expect;
+/* global describe, it */
+require('buster').spec.expose()
+var expect = require('buster').expect
 
-var Disposable = require('../../lib/disposable/Disposable');
+var Disposable = require('../../src/disposable/Disposable').default
 
-describe('Disposable', function() {
-	it('should call disposer with data', function() {
-		var spy = this.spy(function(x) {
-			return x;
-		});
-		var data = {};
+describe('Disposable', function () {
+  it('should call disposer with data', function () {
+    var spy = this.spy(function (x) {
+      return x
+    })
+    var data = {}
 
-		var d = new Disposable(spy, data);
+    var d = new Disposable(spy, data)
 
-		expect(d.dispose()).toBe(data);
-		expect(spy).toHaveBeenCalledOnceWith(data);
-	});
-});
+    expect(d.dispose()).toBe(data)
+    expect(spy).toHaveBeenCalledOnceWith(data)
+  })
+})
