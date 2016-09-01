@@ -2,7 +2,7 @@ declare module "most" {
   type SeedValue<S, V> = { seed: S, value: V };
   type TimeValue<V>    = { time: number, value: V };
 
-  // es5 does not have typings for this 
+  // es5 does not have typings for this
   // use any to allow type-casting
   type Generator<A, B, C> = any
   type Iterable = any;
@@ -410,13 +410,13 @@ declare module "most/lib/scheduler/ClockTimer" {
     clearTimer(task: Task | number): void;
   }
 
-  export = ClockTimer;
+  export default ClockTimer;
 }
 
 declare module "most/lib/scheduler/defaultScheduler" {
   import { Scheduler } from 'most';
   const defaultScheduler: Scheduler;
-  export = defaultScheduler;
+  export default defaultScheduler;
 }
 
 declare module "most/lib/scheduler/PropagateTask" {
@@ -432,7 +432,7 @@ declare module "most/lib/scheduler/PropagateTask" {
     error (time: number, err: Error): void;
   }
 
-  export = PropagateTask;
+  export default PropagateTask;
 }
 
 declare module "most/lib/scheduler/ScheduledTask" {
@@ -446,7 +446,7 @@ declare module "most/lib/scheduler/ScheduledTask" {
     dispose(): void;
   }
 
-  export = ScheduledTask;
+  export default ScheduledTask;
 }
 
 declare module "most/lib/scheduler/Scheduler" {
@@ -470,7 +470,7 @@ declare module "most/lib/scheduler/Scheduler" {
     protected _runReadyTasksBound(): void;
   }
 
-  export = Scheduler;
+  export default Scheduler;
 }
 
 declare module "most/lib/scheduler/Timeline" {
@@ -486,7 +486,7 @@ declare module "most/lib/scheduler/Timeline" {
     runTasks(time: number, runTask: (task: Task) => any): void;
   }
 
-  export = Timeline;
+  export default Timeline;
 }
 
 declare module "most/lib/disposable/Disposable" {
@@ -497,7 +497,7 @@ declare module "most/lib/disposable/Disposable" {
     dispose(): void | Promise<T>;
   }
 
-  export = Disposable;
+  export default Disposable;
 }
 
 declare module "most/lib/disposable/SettableDisposable" {
@@ -508,7 +508,7 @@ declare module "most/lib/disposable/SettableDisposable" {
     dispose(): void | Promise<T>;
   }
 
-  export = SettableDisposable;
+  export default SettableDisposable;
 }
 
 declare module "most/lib/disposable/dispose" {
@@ -551,7 +551,7 @@ declare module "most/lib/sink/DeferredSink" {
     error(time: number, err: Error): void;
   }
 
-  export = DeferredSink;
+  export default DeferredSink;
 }
 
 declare module "most/lib/sink/IndexSink" {
@@ -568,7 +568,7 @@ declare module "most/lib/sink/IndexSink" {
     error(time: number, err: Error): void;
   }
 
-  export = IndexSink;
+  export default IndexSink;
 }
 
 declare module "most/lib/sink/Pipe" {
@@ -581,7 +581,7 @@ declare module "most/lib/sink/Pipe" {
     error(time: number, err: Error): void;
   }
 
-  export = Pipe;
+  export default Pipe;
 }
 
 declare module "most/lib/sink/SafeSink" {
@@ -600,7 +600,7 @@ declare module "most/lib/sink/SafeSink" {
 declare module "most/lib/fatalError" {
   function fatalError (err: Error): void;
 
-  export = fatalError;
+  export default fatalError;
 }
 
 declare module "most/lib/invoke" {
@@ -614,7 +614,7 @@ declare module "most/lib/invoke" {
 
   const invoke: InvokeFn;
 
-  export = invoke;
+  export default invoke;
 }
 
 declare module "most/lib/iterable" {
@@ -635,7 +635,7 @@ declare module "most/lib/LinkedList" {
     dispose(): Promise<T>;
   }
 
-  export = LinkedList;
+  export default LinkedList;
 }
 
 declare module "most/lib/Promise" {
@@ -651,7 +651,7 @@ declare module "most/lib/Queue" {
     length(): number;
   }
 
-  export = Queue;
+  export default Queue;
 }
 
 declare module "most/lib/runSource" {
@@ -667,7 +667,7 @@ declare module "most/lib/Stream" {
     constructor(source: Source<T>);
   }
 
-  export = Stream;
+  export default Stream;
 }
 
 declare module "most/lib/task" {
@@ -675,4 +675,3 @@ declare module "most/lib/task" {
   export function runTask (task: Task): void;
   export function defer (task: Task): Promise<void>;
 }
-
