@@ -1,5 +1,6 @@
+require('buba/register')
 var Benchmark = require('benchmark');
-var most = require('../../..src/index');
+var most = require('../../src/index');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');

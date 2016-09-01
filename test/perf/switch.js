@@ -1,3 +1,4 @@
+require('buba/register')
 var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
