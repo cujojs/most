@@ -18,6 +18,8 @@ export { Stream }
 // Add of and empty to constructor for fantasy-land compat
 Stream.of = of
 Stream.empty = empty
+// Add from to constructor for ES Observable compat
+Stream.from = from
 export { of, of as just, empty, never, from, periodic }
 
 // -----------------------------------------------------------------------
