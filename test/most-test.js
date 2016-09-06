@@ -71,5 +71,6 @@ describe('Draft ES Observable API interop', () => {
   it('should exist', () => {
     assert.isFunction(most.Stream.prototype.subscribe)
     assert.isFunction(most.Stream.prototype[symbolObservable])
+    assert.isFunction(most.Stream.from)
   })
 })
