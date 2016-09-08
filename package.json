@@ -4,12 +4,13 @@
   "description": "Monadic streams",
   "typings": "type-definitions/most.d.ts",
   "main": "lib/index.js",
+  "module": "src/index.js",
   "jsnext:main": "src/index.js",
   "files": [
-    "most.js",
-    "lib/**/*.js",
-    "type-definitions/*",
-    "dist/*"
+    "src",
+    "lib",
+    "type-definitions",
+    "dist"
   ],
   "scripts": {
     "unit-test": "buster-test",
