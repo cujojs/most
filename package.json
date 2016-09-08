@@ -7,7 +7,6 @@
   "module": "src/index.js",
   "jsnext:main": "src/index.js",
   "files": [
-    "most.js",
     "src",
     "lib",
     "type-definitions",

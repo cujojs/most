@@ -10,35 +10,32 @@
     "node"
   ],
   "keywords": [
-	"reactive",
-	"reactive programming",
-	"reactive streams",
-	"stream",
-	"streams",
-	"event stream",
-	"promise",
-	"promises",
-	"promises-aplus",
-	"fantasy-land",
-	"monad",
-	"monadic",
-	"functional",
-	"async",
-	"cujojs",
-	"cujo"
+    "reactive",
+    "reactive programming",
+    "reactive streams",
+    "stream",
+    "streams",
+    "event stream",
+    "promise",
+    "promises",
+    "promises-aplus",
+    "fantasy-land",
+    "monad",
+    "monadic",
+    "functional",
+    "async",
+    "cujojs",
+    "cujo"
   ],
   "license": "MIT",
   "ignore": [
     "**/.*",
-	"/*.js",
+    "/*.js",
     "node_modules",
     "bower_components",
     "examples",
     "test",
     "lib",
     "package.json"
-  ],
-  "dependencies": {
-    "when": "~3.7.3"
-  }
+  ]
 }
