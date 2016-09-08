@@ -28,6 +28,19 @@ function cons (x, a) {
   return b
 }
 
+// append :: a -> [a] -> [a]
+// a with x appended
+function append (x, a) {
+  var l = a.length
+  var b = new Array(l + 1)
+  for (var i = 0; i < l; ++i) {
+    b[i] = a[i]
+  }
+
+  b[l] = x
+  return b
+}
+
 // drop :: Int -> [a] -> [a]
 // drop first n elements
 function drop (n, a) { // eslint-disable-line complexity
@@ -107,6 +120,40 @@ function replace (x, i, a) { // eslint-disable-line complexity
   for (var j = 0; j < l; ++j) {
     b[j] = i === j ? x : a[j]
   }
+  return b
+}
+
+// remove :: Int -> [a] -> [a]
+// remove element at index
+function remove (i, a) {  // eslint-disable-line complexity
+  if (i < 0) {
+    throw new TypeError('i must be >= 0')
+  }
+
+  var l = a.length
+  if (l === 0 || i >= l) { // exit early if index beyond end of array
+    return a
+  }
+
+  if (l === 1) { // exit early if index in bounds and length === 1
+    return []
+  }
+
+  return unsafeRemove(i, a, l - 1)
+}
+
+// unsafeRemove :: Int -> [a] -> Int -> [a]
+// Internal helper to remove element at index
+function unsafeRemove (i, a, l) {
+  var b = new Array(l)
+  var j
+  for (j = 0; j < i; ++j) {
+    b[j] = a[j]
+  }
+  for (j = i; j < l; ++j) {
+    b[j] = a[j + 1]
+  }
+
   return b
 }
 
@@ -3759,64 +3806,6 @@ var emptyDisposable = {
   dispose: function dispose$1 () {}
 }
 
-// append :: a -> [a] -> [a]
-// a with x appended
-function append$1 (x, a) {
-  var l = a.length
-  var b = new Array(l + 1)
-  for (var i = 0; i < l; ++i) {
-    b[i] = a[i]
-  }
-
-  b[l] = x
-  return b
-}
-
-// remove :: Int -> [a] -> [a]
-// remove element at index
-function remove$1 (i, a) {  // eslint-disable-line complexity
-  if (i < 0) {
-    throw new TypeError('i must be >= 0')
-  }
-
-  var l = a.length
-  if (l === 0 || i >= l) { // exit early if index beyond end of array
-    return a
-  }
-
-  if (l === 1) { // exit early if index in bounds and length === 1
-    return []
-  }
-
-  return unsafeRemove$1(i, a, l - 1)
-}
-
-// unsafeRemove :: Int -> [a] -> Int -> [a]
-// Internal helper to remove element at index
-function unsafeRemove$1 (i, a, l) {
-  var b = new Array(l)
-  var j
-  for (j = 0; j < i; ++j) {
-    b[j] = a[j]
-  }
-  for (j = i; j < l; ++j) {
-    b[j] = a[j + 1]
-  }
-
-  return b
-}
-
-// findIndex :: a -> [a] -> Int
-// find index of x in a, from the left
-function findIndex$1 (x, a) {
-  for (var i = 0, l = a.length; i < l; ++i) {
-    if (x === a[i]) {
-      return i
-    }
-  }
-  return -1
-}
-
 var MulticastSource = function MulticastSource (source) {
   this.source = source
   this.sinks = []
@@ -3838,15 +3827,15 @@ MulticastSource.prototype._dispose = function _dispose () {
 };
 
 MulticastSource.prototype.add = function add (sink) {
-  this.sinks = append$1(sink, this.sinks)
+  this.sinks = append(sink, this.sinks)
   return this.sinks.length
 };
 
-MulticastSource.prototype.remove = function remove$1$$ (sink) {
-  var i = findIndex$1(sink, this.sinks)
+MulticastSource.prototype.remove = function remove$1 (sink) {
+  var i = findIndex(sink, this.sinks)
   // istanbul ignore next
   if (i >= 0) {
-    this.sinks = remove$1(i, this.sinks)
+    this.sinks = remove(i, this.sinks)
   }
 
   return this.sinks.length
