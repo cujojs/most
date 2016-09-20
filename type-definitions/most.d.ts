@@ -195,7 +195,7 @@ export interface Stream<A> {
     e: Stream<E>
   ): Stream<R>;
 
-  recoverWith<B>(p: (a: B) => A): Stream<A>;
+  recoverWith<B>(p: (a: B) => Stream<A>): Stream<A>;
   multicast(): Stream<A>;
 
   thru<B>(transform: (stream: Stream<A>) => Stream<B>): Stream<B>;
@@ -379,7 +379,7 @@ export function zip<A, B, C, D, E, R>(
   e: Stream<E>
 ): Stream<R>;
 
-export function recoverWith<A, B>(p: (a: B) => A, s: Stream<A>): Stream<A>;
+export function recoverWith<A, B>(p: (a: B) => Stream<A>, s: Stream<A>): Stream<A>;
 export function throwError(e: Error): Stream<any>;
 
 export function multicast<A>(s: Stream<A>): Stream<A>;
