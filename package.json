@@ -49,7 +49,7 @@
     "babel-polyfill": "^6.13.0",
     "buba": "3.0.1",
     "buster": "^0.7.18",
-    "eslint": "^3.4.0",
+    "eslint": "^3.6.0",
     "markdown-doctest": "^0.8.1",
     "rimraf": "^2.5.4",
     "rollup": "^0.36.0",
