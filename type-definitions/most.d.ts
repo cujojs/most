@@ -120,6 +120,10 @@ export interface Stream<A> {
     fn: (a: A, b: B, c: C, d: D, e: E) => R,
     streams: [Stream<B>, Stream<C>, Stream<D>, Stream<E>]
   ): Stream<R>;
+  combineArray<V, R>(
+    fn: (a: A, ...rest: V[]) => R,
+    streams: Stream<V>[]
+  ): Stream<R>;
 
   scan<B>(f: (b: B, a: A) => B, b: B): Stream<B>;
   loop<S, B>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S): Stream<B>;
@@ -287,6 +291,10 @@ export function combineArray<A, B, C, D, R>(
 export function combineArray<A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R,
   streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
+): Stream<R>;
+export function combineArray<V, R> (
+  fn: (...items: V[]) => R,
+  items: Stream<V>[]
 ): Stream<R>;
 
 export function scan<A, B>(f: (b: B, a: A) => B, b: B, s: Stream<A>): Stream<B>;
