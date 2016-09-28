@@ -1402,7 +1402,7 @@ s:                           --a--b--c--d--e-->
 t:                           --x------y|
 u:                           -1--2--3--4--5--6>
 stream:                      -s--t--u--------->
-stream.mergeConcurrently(2): --a------y4d-5e-6>
+stream.mergeConcurrently(2): --a--b--cy4d-5e-6>
 ```
 
 Note that `u` is only merged *after* `t` ends, due to the concurrency level of `2`.
