@@ -99,7 +99,7 @@ var most = require('most')
 As `window.most`:
 
 ```
-bower install --save most`
+bower install --save most
 ```
 
 ```html
