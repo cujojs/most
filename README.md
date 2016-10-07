@@ -109,6 +109,12 @@ bower install --save most
 As a library via cdn :
 
 ```html
+<!-- unminified -->
+<script src="https://unpkg.com/most/dist/most.js"></script>
+```
+
+```html
+<!-- minified -->
 <script src="https://unpkg.com/most/dist/most.min.js"></script>
 ```
 
