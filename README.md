@@ -106,6 +106,18 @@ bower install --save most
 <script src="most/dist/most.js"></script>
 ```
 
+As a library via cdn :
+
+```html
+<!-- unminified -->
+<script src="https://unpkg.com/most/dist/most.js"></script>
+```
+
+```html
+<!-- minified -->
+<script src="https://unpkg.com/most/dist/most.min.js"></script>
+```
+
 ### Typescript support
 
 Most.js works with typescript out of the box as it provides [local typings](https://github.com/cujojs/most/blob/master/type-definitions/most.d.ts) that will be read when you import Most.js in your code. You do not need to manually link an external `d.ts` file in your tsconfig.
