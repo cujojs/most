@@ -554,7 +554,7 @@ declare module "most/lib/disposable/SettableDisposable" {
 
 declare module "most/src/disposable/dispose" {
   import { Disposable, Sink } from 'most';
-  import SettableDisposable = require('most/src/disposable/SettableDisposable');
+  import SettableDisposable from 'most/src/disposable/SettableDisposable';
 
   export function tryDispose<T>(t: number, disposable: Disposable<T>, sink: Sink<T>): Promise<T> | T | void;
   export function create<T>(dispose: (data: T | void) => Promise<T> | void, data?: T): Disposable<T>;
