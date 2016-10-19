@@ -2,7 +2,7 @@ declare type SeedValue<S, V> = { seed: S, value: V };
 declare type TimeValue<V>    = { time: number, value: V };
 
 declare interface Generator<A, B, C> {}
-declare interface Iterable<A> {}
+declare interface Iterable<A> { [Symbol.iterator](): IterableIterator<A>; }
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
