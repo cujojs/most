@@ -20,7 +20,7 @@ LinkedList.prototype.add = function (x) {
     this.head.prev = x
     x.next = this.head
   }
-  this.head = x;
+  this.head = x
   ++this.length
 }
 
