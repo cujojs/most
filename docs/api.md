@@ -468,7 +468,7 @@ stream2:                 -d-e-f->
 stream1.concat(stream2): -a-b-c-d-e-f->
 ```
 
-Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), [flatMap](#flatmap) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
+Note that this effectively *timeshifts* events from `stream2` past the end time of `stream1`.  In contrast, other operations such as [`combine`](#combine), [`merge`](#merge), [chain](#chain) *preserve event arrival times*, allowing events from the multiple combined streams to interleave.
 
 ## Handling errors
 
@@ -673,7 +673,7 @@ stream.concatMap(f): -1--2--31----2----31-2-3|
 f called lazily:      ^      ^          ^
 ```
 
-Note the difference between [`concatMap`](#concatmap) and [`flatMap`](#flatmap): `concatMap` concatenates, while `flatMap` merges.
+Note the difference between [`concatMap`](#concatmap) and [`chain`](#chain): `concatMap` concatenates, while `chain` merges.
 
 ```es6
 // Logs: 1 1 1 1 1 2 2 2 2 2
