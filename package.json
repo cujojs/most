@@ -61,6 +61,7 @@
   "dependencies": {
     "@most/multicast": "^1.2.3",
     "@most/prelude": "^1.4.0",
+    "fantasy-land": "^2.0.0",
     "symbol-observable": "^1.0.2"
   }
 }

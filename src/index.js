@@ -9,24 +9,16 @@ import { from } from './source/from'
 import { periodic } from './source/periodic'
 import symbolObservable from 'symbol-observable'
 
-/**
- * Core stream type
- * @type {Stream}
- */
-export { Stream }
-
-// Add of and empty to constructor for fantasy-land compat
-Stream.of = of
-Stream.empty = empty
-// Add from to constructor for ES Observable compat
-Stream.from = from
-export { of, of as just, empty, never, from, periodic }
+export { Stream, of, of as just, empty, never, from, periodic }
 
 // -----------------------------------------------------------------------
 // Draft ES Observable proposal interop
 // https://github.com/zenparsing/es-observable
 
 import { subscribe } from './observable/subscribe'
+
+Stream.of = of
+Stream.from = from
 
 Stream.prototype.subscribe = function (subscriber) {
   return subscribe(subscriber, this)
@@ -188,10 +180,11 @@ Stream.prototype.map = function (f) {
 }
 
 /**
- * Assume this stream contains functions, and apply each function to each item
- * in the provided stream.  This generates, in effect, a cross product.
- * @param {Stream} xs stream of items to which
- * @returns {Stream} stream containing the cross product of items
+ * Assume this stream contains functions, and apply the most recent function
+ * to the most recent value in xs
+ * @param {Stream} xs stream of items to which to apply the most recent function
+ * @returns {Stream} stream containing the results of applying the most recent function
+ * to the most recent value in xs
  */
 Stream.prototype.ap = function (xs) {
   return ap(this, xs)
@@ -652,3 +645,20 @@ export { multicast }
 Stream.prototype.multicast = function () {
   return multicast(this)
 }
+
+// -----------------------------------------------------------------------
+// Fantasy Land 2.0
+
+import fl from 'fantasy-land'
+
+// Stream.of was already added
+Stream.empty = empty
+
+Stream.prototype[fl.map] = Stream.prototype.map
+Stream.prototype[fl.chain] = Stream.prototype.chain
+Stream.prototype[fl.concat] = Stream.prototype.concat
+// FL ap argument order is reversed from most.js 1.x ap
+Stream.prototype[fl.ap] = function (fs) {
+  return ap(fs, this)
+}
+
