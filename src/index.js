@@ -11,6 +11,8 @@ import symbolObservable from 'symbol-observable'
 
 export { Stream, of, of as just, empty, never, from, periodic }
 
+Stream.empty = empty
+
 // -----------------------------------------------------------------------
 // Draft ES Observable proposal interop
 // https://github.com/zenparsing/es-observable
@@ -651,8 +653,8 @@ Stream.prototype.multicast = function () {
 
 import fl from 'fantasy-land'
 
-// Stream.of was already added
-Stream.empty = empty
+Stream[fl.of] = Stream.of
+Stream[fl.empty] = Stream.empty
 
 Stream.prototype[fl.map] = Stream.prototype.map
 Stream.prototype[fl.chain] = Stream.prototype.chain
