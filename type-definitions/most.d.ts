@@ -220,7 +220,7 @@ export function empty(): Stream<any>;
 export function never(): Stream<any>;
 export function from<A>(as: Iterable<A>): Stream<A>;
 export function periodic<A>(period: number, a?: A): Stream<A>;
-export function fromEvent(event: string, target: any, useCapture?: boolean): Stream<Event>;
+export function fromEvent<T extends Event>(event: string, target: any, useCapture?: boolean): Stream<T>;
 
 export function unfold<A, B, S>(f: (seed: S) => SeedValue<S, B|Promise<B>>, seed: S): Stream<B>;
 export function iterate<A>(f: (a: A) => A|Promise<A>, a: A): Stream<A>;
