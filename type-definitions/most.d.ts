@@ -391,3 +391,23 @@ export function recoverWith<A, B>(p: (a: B) => Stream<A>, s: Stream<A>): Stream<
 export function throwError(e: Error): Stream<any>;
 
 export function multicast<A>(s: Stream<A>): Stream<A>;
+
+declare const defaultScheduler: Scheduler;
+export { defaultScheduler }
+
+export class PropagateTask<T> implements Task {
+	protected _run: (time: number, value: T, sink: Sink<T>) => any
+	protected value: T;
+	protected sink: Sink<T>;
+	protected active: boolean;
+
+	constructor (run: (time: number, value: T, sink: Sink<T>) => any, value: T, sink: Sink<T>);
+
+	static event <T> (value: T, sink: Sink<T>): PropagateTask<T>;
+	static error (error: Error, sink: Sink<any>): PropagateTask<any>;
+	static end <T> (value: T, sink: Sink<T>): PropagateTask<T>;
+
+	run(time: number): void;
+  error(time: number, e: Error): void;
+  dispose(): void;
+}
