@@ -652,3 +652,13 @@ export { multicast }
 Stream.prototype.multicast = function () {
   return multicast(this)
 }
+
+// export the instance of the defaultScheduler for third-party libraries
+import defaultScheduler from './scheduler/defaultScheduler'
+
+export { defaultScheduler }
+
+// export an implementation of Task used internally for third-party libraries
+import PropagateTask from './scheduler/PropagateTask'
+
+export { PropagateTask }
