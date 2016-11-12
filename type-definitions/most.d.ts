@@ -408,6 +408,6 @@ export class PropagateTask<T> implements Task {
 	static end <T> (value: T, sink: Sink<T>): PropagateTask<T>;
 
 	run(time: number): void;
-  error(time: number, e: Error): void;
-  dispose(): void;
+	error(time: number, e: Error): void;
+	dispose(): void;
 }
