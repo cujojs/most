@@ -3,9 +3,6 @@ declare module "most" {
   declare type SeedValue<S, V> = { seed: S, value: V };
   declare type TimeValue<V> = { time: number, value: V };
 
-  declare interface Generator<A, B, C> {}
-  declare interface Iterable<A> {}
-
   declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
   declare export interface Sink<A> {
@@ -38,7 +35,7 @@ declare module "most" {
   }
 
   declare export interface Disposable<A> {
-    dispose(): void | Promise<A>;
+    dispose(): void | Promise<any>;
   }
 
   declare export interface Source<A> {
