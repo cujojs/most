@@ -16,7 +16,7 @@
 
 | Name          | Description           
 | ------------- |:-------------:
-| [most-proxy](https://github.com/mostjs/most-proxy) | Circular dependencies for most
+| [most-proxy](https://github.com/mostjs-community/most-proxy) | Circular dependencies for most
 | [most-subject](https://github.com/mostjs-community/most-subject)     | Subjects for Most.js
 | [most-test](https://github.com/mostjs-community/most-test) | Unit Testing Tools for Most.js
 | [mostify](https://github.com/mostjs-community/mostify) | Like promisify but for most.js
