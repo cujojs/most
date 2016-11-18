@@ -1,21 +1,24 @@
 ### Most Core Packages & Examples
 | Name          | Description           
-| ------------- |:-------------:
-| [prelude](https://github.com/mostjs/prelude) | Base functional programming utils for mostjs packages
-| [stream](https://github.com/mostjs/stream)     | Core stream type  
+| :------------- |:-------------
 | [sample](https://github.com/mostjs/sample) | A standalone implementation of sample and sampleArray
 | [multicast](https://github.com/mostjs/multicast) | Efficient source sharing of an underlying streamy
 | [hold](https://github.com/mostjs/hold) | Deliver the most recently seen event to new observers
 | [create](https://github.com/mostjs/create) | Imperatively push events into a Stream
 | [dom-event](https://github.com/mostjs/dom-event) | Streamlined DOM Events
+| [examples](https://github.com/mostjs/examples) | Most.js examples
+
+### Most Tools for  Contributors
+| Name | Description
+| :-----| :---------
+| [prelude](https://github.com/mostjs/prelude) | Base functional programming utils for mostjs packages
 | [package-starter](https://github.com/mostjs/package-starter) | A well-crafted starter for mostjs packages
 | [eslint-config-most](https://github.com/mostjs/eslint-config-most) | Shareable ESLint config for mostjs packages
-| [examples](https://github.com/mostjs/examples) | Most.js examples
 
 ### Most Community Packages
 
 | Name          | Description           
-| ------------- |:-------------:
+| :------------- |:-------------
 | [most-proxy](https://github.com/mostjs-community/most-proxy) | Circular dependencies for most
 | [most-subject](https://github.com/mostjs-community/most-subject)     | Subjects for Most.js
 | [most-test](https://github.com/mostjs-community/most-test) | Unit Testing Tools for Most.js
