@@ -442,40 +442,40 @@ export function sample<A, B, C, D, E, R>(
   e: Stream<E>
 ): Stream<R>;
 export function sample<R>(
-	f: (...args: any[]) => R,
-	sampler: Stream<any>,
-	...streams: Stream<any>[]
+  f: (...args: any[]) => R,
+  sampler: Stream<any>,
+  ...streams: Stream<any>[]
 ): Stream<R>;
 
 // all three params
 export function sampleArray
 <A, B, R>(
   fn: (a: A, b: B) => R,
-	sampler: Stream<any>,
+  sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>]
 ): Stream<R>;
 export function sampleArray
 <A, B, C, R>(
   fn: (a: A, b: B, c: C) => R,
-	sampler: Stream<any>,
+  sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>]
 ): Stream<R>;
 export function sampleArray
 <A, B, C, D, R>(
   fn: (a: A, b: B, c: C, d: D) => R,
-	sampler: Stream<any>,
+  sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
 ): Stream<R>;
 export function sampleArray
 <A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R,
-	sampler: Stream<any>,
+  sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
 ): Stream<R>;
 export function sampleArray
 <V, R> (
   fn: (...items: V[]) => R,
-	sampler: Stream<any>,
+  sampler: Stream<any>,
   items: Stream<V>[]
 ): Stream<R>;
 
@@ -483,31 +483,31 @@ export function sampleArray
 export function sampleArray
 <A, B, R>(
   fn: (a: A, b: B) => R):
-	(sampler: Stream<any>,
+  (sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, R>(
   fn: (a: A, b: B, c: C) => R):
-	(sampler: Stream<any>,
+  (sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, R>(
   fn: (a: A, b: B, c: C, d: D) => R,):
-	(sampler: Stream<any>,
+  (sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R):
-	(sampler: Stream<any>,
+  (sampler: Stream<any>,
   streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
 ) => Stream<R>;
 export function sampleArray
 <V, R> (
   fn: (...items: V[]) => R,):
-	(sampler: Stream<any>,
+  (sampler: Stream<any>,
   items: Stream<V>[]
 ) => Stream<R>;
 
@@ -515,31 +515,31 @@ export function sampleArray
 export function sampleArray
 <A, B, R>(
   fn: (a: A, b: B) => R,
-	sampler: Stream<any>):
+  sampler: Stream<any>):
   (streams: [Stream<A>, Stream<B>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, R>(
   fn: (a: A, b: B, c: C) => R,
-	sampler: Stream<any>):
+  sampler: Stream<any>):
   (streams: [Stream<A>, Stream<B>, Stream<C>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, R>(
   fn: (a: A, b: B, c: C, d: D) => R,
-	sampler: Stream<any>):
+  sampler: Stream<any>):
   (streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R,
-	sampler: Stream<any>):
+  sampler: Stream<any>):
   (streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
 ) => Stream<R>;
 export function sampleArray
 <V, R> (
   fn: (...items: V[]) => R,
-	sampler: Stream<any>):
+  sampler: Stream<any>):
   (items: Stream<V>[]
 ) => Stream<R>;
 
@@ -547,31 +547,31 @@ export function sampleArray
 export function sampleArray
 <A, B, R>(
   fn: (a: A, b: B) => R):
-	(sampler: Stream<any>) =>
+  (sampler: Stream<any>) =>
   (streams: [Stream<A>, Stream<B>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, R>(
   fn: (a: A, b: B, c: C) => R):
-	(sampler: Stream<any>) =>
+  (sampler: Stream<any>) =>
   (streams: [Stream<A>, Stream<B>, Stream<C>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, R>(
   fn: (a: A, b: B, c: C, d: D) => R):
-	(sampler: Stream<any>) =>
+  (sampler: Stream<any>) =>
   (streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>]
 ) => Stream<R>;
 export function sampleArray
 <A, B, C, D, E, R>(
   fn: (a: A, b: B, c: C, d: D, e: E) => R):
-	(sampler: Stream<any>) =>
+  (sampler: Stream<any>) =>
   (streams: [Stream<A>, Stream<B>, Stream<C>, Stream<D>, Stream<E>]
 ) => Stream<R>;
 export function sampleArray
 <V, R> (
   fn: (...items: V[]) => R):
-	(sampler: Stream<any>) =>
+  (sampler: Stream<any>) =>
   (items: Stream<V>[]
 ) => Stream<R>;
 
@@ -605,8 +605,8 @@ export function zip<A, B, C, D, E, R>(
   e: Stream<E>
 ): Stream<R>;
 export function zip<R>(
-	f: (...args: any[]) => R,
-	...streams: Stream<any>[]
+  f: (...args: any[]) => R,
+  ...streams: Stream<any>[]
 );
 
 export function zipArray<A, B, R>(
@@ -666,18 +666,18 @@ declare const defaultScheduler: Scheduler;
 export { defaultScheduler }
 
 export class PropagateTask<T> implements Task {
-	protected _run: (time: number, value: T, sink: Sink<T>) => any
-	protected value: T;
-	protected sink: Sink<T>;
-	protected active: boolean;
+  protected _run: (time: number, value: T, sink: Sink<T>) => any
+  protected value: T;
+  protected sink: Sink<T>;
+  protected active: boolean;
 
-	constructor (run: (time: number, value: T, sink: Sink<T>) => any, value: T, sink: Sink<T>);
+  constructor (run: (time: number, value: T, sink: Sink<T>) => any, value: T, sink: Sink<T>);
 
-	static event <T> (value: T, sink: Sink<T>): PropagateTask<T>;
-	static error (error: Error, sink: Sink<any>): PropagateTask<any>;
-	static end <T> (value: T, sink: Sink<T>): PropagateTask<T>;
+  static event <T> (value: T, sink: Sink<T>): PropagateTask<T>;
+  static error (error: Error, sink: Sink<any>): PropagateTask<any>;
+  static end <T> (value: T, sink: Sink<T>): PropagateTask<T>;
 
-	run(time: number): void;
-	error(time: number, e: Error): void;
-	dispose(): void;
+  run(time: number): void;
+  error(time: number, e: Error): void;
+  dispose(): void;
 }
