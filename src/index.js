@@ -359,7 +359,7 @@ import { sample, sampleArray as _sampleArray, sampleWith as _sampleWith } from '
 
 export { sample }
 export const sampleWith = base.curry2(_sampleWith)
-export const sampleArray = base.curry2(_sampleArray)
+export const sampleArray = base.curry3(_sampleArray)
 
 /**
  * When an event arrives on sampler, emit the latest event value from stream.
