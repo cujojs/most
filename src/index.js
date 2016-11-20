@@ -6,7 +6,7 @@ import Stream from './Stream'
 import * as base from '@most/prelude'
 import { of, empty, never } from './source/core'
 import { from } from './source/from'
-import { periodic as _periodic } from './source/periodic'
+import { periodic } from './source/periodic'
 import symbolObservable from 'symbol-observable'
 
 /**
@@ -20,8 +20,7 @@ Stream.of = of
 Stream.empty = empty
 // Add from to constructor for ES Observable compat
 Stream.from = from
-export { of, of as just, empty, never, from }
-export const periodic = base.curry2(_periodic)
+export { of, of as just, empty, never, from, periodic }
 
 // -----------------------------------------------------------------------
 // Draft ES Observable proposal interop
@@ -154,8 +153,7 @@ Stream.prototype.reduce = function (f, initial) {
 import { unfold as _unfold } from './source/unfold'
 export const unfold = base.curry2(_unfold)
 
-import { iterate as _iterate } from './source/iterate'
-export const iterate = base.curry2(_iterate)
+export { iterate } from './source/iterate'
 
 export { generate } from './source/generate'
 
