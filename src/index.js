@@ -6,7 +6,7 @@ import Stream from './Stream'
 import * as base from '@most/prelude'
 import { of, empty, never } from './source/core'
 import { from } from './source/from'
-import { periodic } from './source/periodic'
+import { periodic as _periodic } from './source/periodic'
 import symbolObservable from 'symbol-observable'
 
 /**
@@ -20,7 +20,8 @@ Stream.of = of
 Stream.empty = empty
 // Add from to constructor for ES Observable compat
 Stream.from = from
-export { of, of as just, empty, never, from, periodic }
+export { of, of as just, empty, never, from }
+export const periodic = base.curry2(_periodic)
 
 // -----------------------------------------------------------------------
 // Draft ES Observable proposal interop
@@ -64,14 +65,17 @@ Stream.prototype.thru = function (f) {
  *  or addListener/removeListener (node EventEmitter: http://nodejs.org/api/events.html)
  * @returns {Stream} stream of events of the specified type from the source
  */
-export { fromEvent } from './source/fromEvent'
+import { fromEvent as _fromEvent } from './source/fromEvent'
+export const fromEvent = base.curry2(_fromEvent)
 
 // -----------------------------------------------------------------------
 // Observing
 
-import { observe, drain } from './combinator/observe'
+import { observe as _observe, drain } from './combinator/observe'
 
-export { observe, observe as forEach, drain }
+export { drain }
+export const observe = base.curry2(_observe)
+export const forEach = base.curry2(_observe)
 
 /**
  * Process all the events in the stream
@@ -79,7 +83,7 @@ export { observe, observe as forEach, drain }
  *  if the stream fails with an unhandled error.
  */
 Stream.prototype.observe = Stream.prototype.forEach = function (f) {
-  return observe(f, this)
+  return _observe(f, this)
 }
 
 /**
@@ -96,9 +100,9 @@ Stream.prototype.drain = function () {
 
 // -------------------------------------------------------
 
-import { loop } from './combinator/loop'
+import { loop as _loop } from './combinator/loop'
 
-export { loop }
+export const loop = base.curry3(loop)
 
 /**
  * Generalized feedback loop. Call a stepper function for each event. The stepper
@@ -111,14 +115,15 @@ export { loop }
  * returned by the stepper
  */
 Stream.prototype.loop = function (stepper, seed) {
-  return loop(stepper, seed, this)
+  return _loop(stepper, seed, this)
 }
 
 // -------------------------------------------------------
 
-import { scan, reduce } from './combinator/accumulate'
+import { scan as _scan, reduce as _reduce } from './combinator/accumulate'
 
-export { scan, reduce }
+export const scan = base.curry3(_scan)
+export const reduce = base.curry3(_reduce)
 
 /**
  * Create a stream containing successive reduce results of applying f to
@@ -128,7 +133,7 @@ export { scan, reduce }
  * @returns {Stream} new stream containing successive reduce results
  */
 Stream.prototype.scan = function (f, initial) {
-  return scan(f, initial, this)
+  return _scan(f, initial, this)
 }
 
 /**
@@ -140,18 +145,24 @@ Stream.prototype.scan = function (f, initial) {
  * @returns {Promise} promise for the file result of the reduce
  */
 Stream.prototype.reduce = function (f, initial) {
-  return reduce(f, initial, this)
+  return _reduce(f, initial, this)
 }
 
 // -----------------------------------------------------------------------
 // Building and extending
 
-export { unfold } from './source/unfold'
-export { iterate } from './source/iterate'
-export { generate } from './source/generate'
-import { concat, cons as startWith } from './combinator/build'
+import { unfold as _unfold } from './source/unfold'
+export const unfold = base.curry2(_unfold)
 
-export { concat, startWith }
+import { iterate as _iterate } from './source/iterate'
+export const iterate = base.curry2(_iterate)
+
+export { generate } from './source/generate'
+
+import { concat as _concat, cons as _startWith } from './combinator/build'
+
+export const concat = base.curry2(_concat)
+export const startWith = base.curry2(_startWith)
 
 /**
  * @param {Stream} tail
@@ -159,7 +170,7 @@ export { concat, startWith }
  *  all items in tail
  */
 Stream.prototype.concat = function (tail) {
-  return concat(this, tail)
+  return _concat(this, tail)
 }
 
 /**
@@ -167,16 +178,19 @@ Stream.prototype.concat = function (tail) {
  * @returns {Stream} a new stream with x prepended
  */
 Stream.prototype.startWith = function (x) {
-  return startWith(x, this)
+  return _startWith(x, this)
 }
 
 // -----------------------------------------------------------------------
 // Transforming
 
-import { map, constant, tap } from './combinator/transform'
-import { ap } from './combinator/applicative'
+import { map as _map, constant as _constant, tap as _tap } from './combinator/transform'
+import { ap as _ap } from './combinator/applicative'
 
-export { map, constant, tap, ap }
+export const map = base.curry2(_map)
+export const constant = base.curry2(_constant)
+export const tap = base.curry2(_tap)
+export const ap = base.curry2(_ap)
 
 /**
  * Transform each value in the stream by applying f to each
@@ -184,7 +198,7 @@ export { map, constant, tap, ap }
  * @returns {Stream} stream containing items transformed by f
  */
 Stream.prototype.map = function (f) {
-  return map(f, this)
+  return _map(f, this)
 }
 
 /**
@@ -194,7 +208,7 @@ Stream.prototype.map = function (f) {
  * @returns {Stream} stream containing the cross product of items
  */
 Stream.prototype.ap = function (xs) {
-  return ap(this, xs)
+  return _ap(this, xs)
 }
 
 /**
@@ -203,7 +217,7 @@ Stream.prototype.ap = function (xs) {
  * @returns {Stream} stream containing items replaced with x
  */
 Stream.prototype.constant = function (x) {
-  return constant(x, this)
+  return _constant(x, this)
 }
 
 /**
@@ -213,15 +227,15 @@ Stream.prototype.constant = function (x) {
  * @returns {Stream} new stream containing the same items as this stream
  */
 Stream.prototype.tap = function (f) {
-  return tap(f, this)
+  return _tap(f, this)
 }
 
 // -----------------------------------------------------------------------
 // Transducer support
 
-import { transduce } from './combinator/transduce'
+import { transduce as _transduce } from './combinator/transduce'
 
-export { transduce }
+export const transduce = base.curry2(_transduce)
 
 /**
  * Transform this stream by passing its events through a transducer.
@@ -229,15 +243,18 @@ export { transduce }
  * @return {Stream} stream of events transformed by the transducer
  */
 Stream.prototype.transduce = function (transducer) {
-  return transduce(transducer, this)
+  return _transduce(transducer, this)
 }
 
 // -----------------------------------------------------------------------
 // FlatMapping
 
-import { flatMap, join } from './combinator/flatMap'
+import { flatMap as _flatMap, join } from './combinator/flatMap'
 
-export { flatMap, flatMap as chain, join }
+export const flatMap = base.curry2(_flatMap)
+export const chain = flatMap
+
+export { join }
 
 /**
  * Map each value in the stream to a new stream, and merge it into the
@@ -246,7 +263,7 @@ export { flatMap, flatMap as chain, join }
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
 Stream.prototype.flatMap = Stream.prototype.chain = function (f) {
-  return flatMap(f, this)
+  return _flatMap(f, this)
 }
 
 /**
@@ -258,9 +275,10 @@ Stream.prototype.join = function () {
   return join(this)
 }
 
-import { continueWith } from './combinator/continueWith'
+import { continueWith as _continueWith } from './combinator/continueWith'
 
-export { continueWith, continueWith as flatMapEnd }
+export const continueWith = base.curry2(_continueWith)
+export const flatMapEnd = continueWith
 
 /**
  * Map the end event to a new stream, and begin emitting its values.
@@ -270,23 +288,23 @@ export { continueWith, continueWith as flatMapEnd }
  * followed by all events from the stream returned by f.
  */
 Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function (f) {
-  return continueWith(f, this)
+  return _continueWith(f, this)
 }
 
-import { concatMap } from './combinator/concatMap'
+import { concatMap as _concatMap } from './combinator/concatMap'
 
-export { concatMap }
+export const concatMap = base.curry2(_concatMap)
 
 Stream.prototype.concatMap = function (f) {
-  return concatMap(f, this)
+  return _concatMap(f, this)
 }
 
 // -----------------------------------------------------------------------
 // Concurrent merging
 
-import { mergeConcurrently } from './combinator/mergeConcurrently'
+import { mergeConcurrently as _mergeConcurrently } from './combinator/mergeConcurrently'
 
-export { mergeConcurrently }
+export const mergeConcurrently = base.curry2(_mergeConcurrently)
 
 /**
  * Flatten a Stream<Stream<X>> to Stream<X> by merging inner
@@ -298,7 +316,7 @@ export { mergeConcurrently }
  *  streams, with limited concurrency.
  */
 Stream.prototype.mergeConcurrently = function (concurrency) {
-  return mergeConcurrently(concurrency, this)
+  return _mergeConcurrently(concurrency, this)
 }
 
 // -----------------------------------------------------------------------
@@ -321,9 +339,10 @@ Stream.prototype.merge = function (/* ...streams*/) {
 // -----------------------------------------------------------------------
 // Combining
 
-import { combine, combineArray } from './combinator/combine'
+import { combine, combineArray as _combineArray } from './combinator/combine'
 
-export { combine, combineArray }
+export { combine }
+export const combineArray = base.curry2(_combineArray)
 
 /**
  * Combine latest events from all input streams
@@ -332,15 +351,17 @@ export { combine, combineArray }
  *  event of each input stream, whenever a new event arrives on any stream.
  */
 Stream.prototype.combine = function (f /*, ...streams*/) {
-  return combineArray(f, base.replace(this, 0, arguments))
+  return _combineArray(f, base.replace(this, 0, arguments))
 }
 
 // -----------------------------------------------------------------------
 // Sampling
 
-import { sample, sampleArray, sampleWith } from './combinator/sample'
+import { sample, sampleArray as _sampleArray, sampleWith as _sampleWith } from './combinator/sample'
 
-export { sample, sampleArray, sampleWith }
+export { sample }
+export const sampleWith = base.curry2(_sampleWith)
+export const sampleArray = base.curry2(_sampleArray)
 
 /**
  * When an event arrives on sampler, emit the latest event value from stream.
@@ -349,7 +370,7 @@ export { sample, sampleArray, sampleWith }
  * @returns {Stream} sampled stream of values
  */
 Stream.prototype.sampleWith = function (sampler) {
-  return sampleWith(sampler, this)
+  return _sampleWith(sampler, this)
 }
 
 /**
@@ -359,15 +380,16 @@ Stream.prototype.sampleWith = function (sampler) {
  * @returns {Stream} stream of sampled and transformed values
  */
 Stream.prototype.sample = function (f /* ...streams */) {
-  return sampleArray(f, this, base.tail(arguments))
+  return _sampleArray(f, this, base.tail(arguments))
 }
 
 // -----------------------------------------------------------------------
 // Zipping
 
-import { zip, zipArray } from './combinator/zip'
+import { zip, zipArray as _zipArray } from './combinator/zip'
 
-export { zip, zipArray }
+export { zip }
+export const zipArray = base.curry2(_zipArray)
 
 /**
  * Pair-wise combine items with those in s. Given 2 streams:
@@ -377,7 +399,7 @@ export { zip, zipArray }
  * @returns {Stream} new stream containing pairs
  */
 Stream.prototype.zip = function (f /*, ...streams*/) {
-  return zipArray(f, base.replace(this, 0, arguments))
+  return _zipArray(f, base.replace(this, 0, arguments))
 }
 
 // -----------------------------------------------------------------------
@@ -399,9 +421,12 @@ Stream.prototype.switch = Stream.prototype.switchLatest = function () {
 // -----------------------------------------------------------------------
 // Filtering
 
-import { filter, skipRepeats, skipRepeatsWith } from './combinator/filter'
+import { filter as _filter, skipRepeats, skipRepeatsWith as _skipRepeatsWith } from './combinator/filter'
 
-export { filter, skipRepeats, skipRepeats as distinct, skipRepeatsWith, skipRepeatsWith as distinctBy }
+export const filter = base.curry2(_filter)
+export { skipRepeats, skipRepeats as distinct }
+export const skipRepeatsWith = base.curry2(_skipRepeatsWith)
+export const distinctBy = skipRepeatsWith
 
 /**
  * Retain only items matching a predicate
@@ -411,7 +436,7 @@ export { filter, skipRepeats, skipRepeats as distinct, skipRepeatsWith, skipRepe
  * @returns {Stream} stream containing only items for which predicate returns truthy
  */
 Stream.prototype.filter = function (p) {
-  return filter(p, this)
+  return _filter(p, this)
 }
 
 /**
@@ -430,15 +455,19 @@ Stream.prototype.skipRepeats = function () {
  * @returns {Stream} stream with no repeated events
  */
 Stream.prototype.skipRepeatsWith = function (equals) {
-  return skipRepeatsWith(equals, this)
+  return _skipRepeatsWith(equals, this)
 }
 
 // -----------------------------------------------------------------------
 // Slicing
 
-import { take, skip, slice, takeWhile, skipWhile } from './combinator/slice'
+import { take as _take, skip as _skip, slice as _slice, takeWhile as _takeWhile, skipWhile as _skipWhile } from './combinator/slice'
 
-export { take, skip, slice, takeWhile, skipWhile }
+export const take = base.curry2(_take)
+export const skip = base.curry2(_skip)
+export const slice = base.curry3(_slice)
+export const takeWhile = base.curry2(_takeWhile)
+export const skipWhile = base.curry2(_skipWhile)
 
 /**
  * stream:          -abcd-
@@ -447,7 +476,7 @@ export { take, skip, slice, takeWhile, skipWhile }
  * @returns {Stream} stream containing at most the first n items from this stream
  */
 Stream.prototype.take = function (n) {
-  return take(n, this)
+  return _take(n, this)
 }
 
 /**
@@ -457,7 +486,7 @@ Stream.prototype.take = function (n) {
  * @returns {Stream} stream not containing the first n events
  */
 Stream.prototype.skip = function (n) {
-  return skip(n, this)
+  return _skip(n, this)
 }
 
 /**
@@ -469,7 +498,7 @@ Stream.prototype.skip = function (n) {
  * @returns {Stream} stream containing items where start <= index < end
  */
 Stream.prototype.slice = function (start, end) {
-  return slice(start, end, this)
+  return _slice(start, end, this)
 }
 
 /**
@@ -480,7 +509,7 @@ Stream.prototype.slice = function (start, end) {
  * first item for which p returns falsy.
  */
 Stream.prototype.takeWhile = function (p) {
-  return takeWhile(p, this)
+  return _takeWhile(p, this)
 }
 
 /**
@@ -491,15 +520,19 @@ Stream.prototype.takeWhile = function (p) {
  * first item for which p returns falsy.
  */
 Stream.prototype.skipWhile = function (p) {
-  return skipWhile(p, this)
+  return _skipWhile(p, this)
 }
 
 // -----------------------------------------------------------------------
 // Time slicing
 
-import { takeUntil, skipUntil, during } from './combinator/timeslice'
+import { takeUntil as _takeUntil, skipUntil as _skipUntil, during as _during } from './combinator/timeslice'
 
-export { takeUntil, takeUntil as until, skipUntil, skipUntil as since, during }
+export const takeUntil = base.curry2(_takeUntil)
+export const until = takeUntil
+export const skipUntil = base.curry2(_skipUntil)
+export const since = skipUntil
+export const during = base.curry2(_during)
 
 /**
  * stream:                    -a-b-c-d-e-f-g->
@@ -511,7 +544,7 @@ export { takeUntil, takeUntil as until, skipUntil, skipUntil as since, during }
  * the first event in signal.
  */
 Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
-  return takeUntil(signal, this)
+  return _takeUntil(signal, this)
 }
 
 /**
@@ -524,7 +557,7 @@ Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
  * the first event in signal.
  */
 Stream.prototype.since = Stream.prototype.skipUntil = function (signal) {
-  return skipUntil(signal, this)
+  return _skipUntil(signal, this)
 }
 
 /**
@@ -538,22 +571,22 @@ Stream.prototype.since = Stream.prototype.skipUntil = function (signal) {
  * @returns {Stream} new stream containing only events within the provided timespan
  */
 Stream.prototype.during = function (timeWindow) {
-  return during(timeWindow, this)
+  return _during(timeWindow, this)
 }
 
 // -----------------------------------------------------------------------
 // Delaying
 
-import { delay } from './combinator/delay'
+import { delay as _delay } from './combinator/delay'
 
-export { delay }
+export const delay = base.curry2(_delay)
 
 /**
  * @param {Number} delayTime milliseconds to delay each item
  * @returns {Stream} new stream containing the same items, but delayed by ms
  */
 Stream.prototype.delay = function (delayTime) {
-  return delay(delayTime, this)
+  return _delay(delayTime, this)
 }
 
 // -----------------------------------------------------------------------
@@ -574,9 +607,10 @@ Stream.prototype.timestamp = function () {
 // -----------------------------------------------------------------------
 // Rate limiting
 
-import { throttle, debounce } from './combinator/limit'
+import { throttle as _throttle, debounce as _debounce } from './combinator/limit'
 
-export { throttle, debounce }
+export const throttle = base.curry2(_throttle)
+export const debounce = base.curry2(_debounce)
 
 /**
  * Limit the rate of events
@@ -586,7 +620,7 @@ export { throttle, debounce }
  * @returns {Stream} new stream that skips events for throttle period
  */
 Stream.prototype.throttle = function (period) {
-  return throttle(period, this)
+  return _throttle(period, this)
 }
 
 /**
@@ -598,7 +632,7 @@ Stream.prototype.throttle = function (period) {
  * @returns {Stream} new debounced stream
  */
 Stream.prototype.debounce = function (period) {
-  return debounce(period, this)
+  return _debounce(period, this)
 }
 
 // -----------------------------------------------------------------------
@@ -620,9 +654,11 @@ Stream.prototype.await = function () {
 // -----------------------------------------------------------------------
 // Error handling
 
-import { recoverWith, flatMapError, throwError } from './combinator/errors'
+import { recoverWith as _recoverWith, flatMapError as _flatMapError, throwError } from './combinator/errors'
 
-export { recoverWith, flatMapError, throwError }
+export const recoverWith = base.curry2(_recoverWith)
+export const flatMapError = base.curry2(_flatMapError)
+export { throwError }
 
 /**
  * If this stream encounters an error, recover and continue with items from stream
@@ -634,7 +670,7 @@ export { recoverWith, flatMapError, throwError }
  * @returns {Stream} new stream which will recover from an error by calling f
  */
 Stream.prototype.recoverWith = Stream.prototype.flatMapError = function (f) {
-  return flatMapError(f, this)
+  return _flatMapError(f, this)
 }
 
 // -----------------------------------------------------------------------
