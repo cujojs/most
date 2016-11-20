@@ -75,7 +75,7 @@ import { observe as _observe, drain } from './combinator/observe'
 
 export { drain }
 export const observe = base.curry2(_observe)
-export const forEach = base.curry2(_observe)
+export const forEach = observe
 
 /**
  * Process all the events in the stream
@@ -654,10 +654,10 @@ Stream.prototype.await = function () {
 // -----------------------------------------------------------------------
 // Error handling
 
-import { recoverWith as _recoverWith, flatMapError as _flatMapError, throwError } from './combinator/errors'
+import { recoverWith as _recoverWith, throwError } from './combinator/errors'
 
 export const recoverWith = base.curry2(_recoverWith)
-export const flatMapError = base.curry2(_flatMapError)
+export const flatMapError = recoverWith
 export { throwError }
 
 /**
@@ -670,7 +670,7 @@ export { throwError }
  * @returns {Stream} new stream which will recover from an error by calling f
  */
 Stream.prototype.recoverWith = Stream.prototype.flatMapError = function (f) {
-  return _flatMapError(f, this)
+  return _recoverWith(f, this)
 }
 
 // -----------------------------------------------------------------------
