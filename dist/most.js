@@ -1097,7 +1097,7 @@ function SubscribeObserver (fatalError$$1, subscriber, disposable) {
 }
 
 SubscribeObserver.prototype.event = function (t, x) {
-  if (typeof this.subscriber.next === 'function') {
+  if (!this.disposable.disposed && typeof this.subscriber.next === 'function') {
     this.subscriber.next(x);
   }
 };
@@ -4430,6 +4430,9 @@ Stream.prototype.multicast = function () {
   return multicast(this)
 };
 
+// export the instance of the defaultScheduler for third-party libraries
+// export an implementation of Task used internally for third-party libraries
+
 exports.Stream = Stream;
 exports.of = of;
 exports.just = of;
@@ -4494,6 +4497,8 @@ exports.recoverWith = recoverWith;
 exports.flatMapError = flatMapError;
 exports.throwError = throwError;
 exports.multicast = multicast;
+exports.defaultScheduler = defaultScheduler;
+exports.PropagateTask = PropagateTask;
 exports.fromEvent = fromEvent;
 exports.unfold = unfold;
 exports.iterate = iterate;
