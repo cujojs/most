@@ -26,7 +26,7 @@ export function SubscribeObserver (fatalError, subscriber, disposable) {
 }
 
 SubscribeObserver.prototype.event = function (t, x) {
-  if (typeof this.subscriber.next === 'function') {
+  if (!this.disposable.disposed && typeof this.subscriber.next === 'function') {
     this.subscriber.next(x)
   }
 }
