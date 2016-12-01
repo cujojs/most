@@ -54,11 +54,6 @@ describe('SubscribeObserver', function () {
       assert.same(undefined, so.event(1, 1))
     })
 
-    it('should be noop when its disposed', function () {
-      var so = new SubscribeObserver(fail, { next: fail }, { disposed: true })
-      assert.same(undefined, so.event(1, 1))
-    })
-
     it('should call subscriber.next if present', function () {
       var events = []
       var subscriber = {
