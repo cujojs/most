@@ -107,6 +107,33 @@ describe('SubscribeObserver', function () {
         assert.same(error, e)
       })
     })
+
+    it('should prevent end after end', done => {
+      let completeCount = 0
+      const subscriber = {
+        complete () {
+          completeCount += 1
+        }
+      }
+
+      const disposable = {
+        disposed: false,
+        dispose () {
+          this.disposed = true
+        }
+      }
+
+      const so = new SubscribeObserver(fail, subscriber, disposable)
+      so.end(0, 0)
+      so.end(1, 1)
+
+      // A bit of a halting problem here, but ok in practice.
+      setTimeout(() => {
+        assert(disposable.disposed)
+        assert.same(1, completeCount)
+        done()
+      }, 5)
+    })
   })
 
   describe('error', function () {

@@ -32,8 +32,10 @@ SubscribeObserver.prototype.event = function (t, x) {
 }
 
 SubscribeObserver.prototype.end = function (t, x) {
-  var s = this.subscriber
-  doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x)
+  if (!this.disposable.disposed) {
+    var s = this.subscriber
+    doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x)
+  }
 }
 
 SubscribeObserver.prototype.error = function (t, e) {
