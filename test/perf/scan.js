@@ -6,6 +6,7 @@ var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -35,6 +36,9 @@ suite
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred, rxjs.Observable.from(a).scan(sum, 0).reduce(passthrough, 0));
+  }, options)
+  .add('xstream', function(deferred) {
+    runners.runXstream(deferred, xs.fromArray(a).fold(sum, 0).fold(passthrough, 0).last());
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).scan(sum, 0).scan(passthrough, 0).last());

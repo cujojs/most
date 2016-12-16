@@ -10,6 +10,7 @@ exports.runKefir       = runKefir;
 exports.kefirFromArray = kefirFromArray;
 exports.runBacon       = runBacon;
 exports.runHighland    = runHighland;
+exports.runXstream     = runXstream;
 
 exports.getIntArg      = getIntArg;
 exports.getIntArg2     = getIntArg2;
@@ -80,6 +81,19 @@ function runRx(deferred, rxStream) {
       deferred.resolve();
     },
     onError: function(e) {
+      deferred.benchmark.emit({ type: 'error', error: e });
+      deferred.resolve(e);
+    }
+  });
+}
+
+function runXstream(deferred, xsStream) {
+  xsStream.addListener({
+    next: noop,
+    complete: function() {
+      deferred.resolve();
+    },
+    error: function(e) {
       deferred.benchmark.emit({ type: 'error', error: e });
       deferred.resolve(e);
     }

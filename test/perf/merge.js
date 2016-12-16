@@ -6,6 +6,7 @@ var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -55,6 +56,10 @@ suite
     runners.runRx5(deferred,
       rxjs.Observable.merge.apply(rxjs.Observable, streams).reduce(sum, 0))
   }, options)
+  .add('xstream', function(deferred) {
+    var streams = a.map(xs.fromArray);
+    runners.runXstream(deferred, xs.merge.apply(xs, streams).fold(sum, 0).last())
+  }, options)
   .add('kefir', function(deferred) {
     var streams = a.map(kefirFromArray);
     runners.runKefir(deferred, kefir.merge(streams).scan(sum, 0).last());
@@ -62,7 +67,7 @@ suite
   .add('bacon', function(deferred) {
     var streams = a.map(bacon.fromArray);
     runners.runBacon(deferred, bacon.mergeAll(streams).reduce(0, sum));
-  }, options);
+  }, options)
   // .add('highland', function(deferred) {
   // Commented out because it never finishes on Node >= 6.9.1 on my machine
   //   // HELP WANTED: Is there a better way to do this in highland?

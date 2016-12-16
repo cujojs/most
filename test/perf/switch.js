@@ -7,6 +7,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -57,12 +58,15 @@ suite
       rx.Observable.fromArray(a).flatMapLatest(
         function(x) {return rx.Observable.fromArray(x)}).reduce(sum, 0));
   }, options)
+  .add('xstream', function(deferred) {
+    runners.runXstream(deferred, xs.fromArray(a).map(bacon.fromArray).flatten().fold(sum, 0).last());
+  }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).flatMapLatest(kefirFromArray).scan(sum, 0).last());
   }, options)
   .add('bacon', function(deferred) {
     runners.runBacon(deferred, bacon.fromArray(a).flatMapLatest(bacon.fromArray).reduce(0, sum));
-  }, options);
+  }, options)
 
 runners.runSuite(suite);
 
