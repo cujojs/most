@@ -48,6 +48,7 @@ suite
   .add('highland', function(deferred) {
     runners.runHighland(deferred, highland(a).zip(highland(b)).map(addPair).reduce(0, add));
   }, options)
+  // There is no zip in xstream
 
 runners.runSuite(suite);
 

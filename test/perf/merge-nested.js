@@ -6,9 +6,11 @@ var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
+xs.prototype.merge = function (s) { return xs.merge(this, s) }
 
 // Merging n streams, each containing m items.
 // Results in a single stream that merges in n x m items
@@ -107,6 +109,22 @@ suite
   .add('rx 5 (depth 100)', function(deferred) {
     var s = merge(100, function(x) {return rxjs.Observable.from(x)});
     runners.runRx5(deferred, s.reduce(sum, 0));
+  }, options)
+  .add('xstream (depth 2)', function(deferred) {
+    var s = merge(2, xs.fromArray);
+    runners.runXstream(deferred, s.fold(sum, 0).last());
+  }, options)
+  .add('xstream (depth 5)', function(deferred) {
+    var s = merge(5, xs.fromArray);
+    runners.runXstream(deferred, s.fold(sum, 0).last());
+  }, options)
+  .add('xstream (depth 10)', function(deferred) {
+    var s = merge(10, xs.fromArray);
+    runners.runXstream(deferred, s.fold(sum, 0).last());
+  }, options)
+  .add('xstream (depth 100)', function(deferred) {
+    var s = merge(100, xs.fromArray);
+    runners.runXstream(deferred, s.fold(sum, 0).last());
   }, options)
   .add('kefir (depth 2)', function(deferred) {
     var s = merge(2, kefirFromArray)

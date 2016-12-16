@@ -6,9 +6,11 @@ var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
+var xstreamDropRepeats = require('xstream/extra/dropRepeats').default;
 
 // Create a stream from an Array of n integers
 // filter out odds, map remaining evens by adding 1, then reduce by summing
@@ -35,6 +37,9 @@ suite
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred, rxjs.Observable.from(a).distinctUntilChanged().reduce(sum, 0));
+  }, options)
+  .add('xstream', function(deferred) {
+    runners.runXstream(deferred, xs.fromArray(a).compose(xstreamDropRepeats()).fold(sum, 0).last());
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).skipDuplicates().scan(sum, 0).last());

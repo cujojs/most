@@ -5,9 +5,11 @@ var rx = require('rx');
 var rxjs = require('@reactivex/rxjs');
 var kefir = require('kefir');
 var bacon = require('baconjs');
+var xs = require('xstream').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
+var xstreamFlattenSequentially = require('xstream/extra/flattenSequentially').default;
 
 // flatMapping n streams, each containing m items.
 // Results in a single stream that merges in m x n items
@@ -49,6 +51,9 @@ suite
   }, options)
   .add('rx 5', function(deffered) {
     runners.runRx5(deffered, rxjs.Observable.from(a).concatMap(function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
+  }, options)
+  .add('xstream', function(deferred) {
+    runners.runXstream(deferred, xs.fromArray(a).map(xs.fromArray).compose(xstreamFlattenSequentially).fold(sum, 0).last())
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).flatMapConcat(kefirFromArray).scan(sum, 0).last());
