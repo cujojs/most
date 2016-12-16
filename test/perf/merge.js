@@ -62,14 +62,15 @@ suite
   .add('bacon', function(deferred) {
     var streams = a.map(bacon.fromArray);
     runners.runBacon(deferred, bacon.mergeAll(streams).reduce(0, sum));
-  }, options)
-  .add('highland', function(deferred) {
-    // HELP WANTED: Is there a better way to do this in highland?
-    // The two approaches below perform similarly
-    var streams = a.map(highland);
-    runners.runHighland(deferred, highland(streams).merge().reduce(0, sum));
-    //runners.runHighland(deferred, highland(streams).flatMap(identity).reduce(0, sum));
   }, options);
+  // .add('highland', function(deferred) {
+  // Commented out because it never finishes on Node >= 6.9.1 on my machine
+  //   // HELP WANTED: Is there a better way to do this in highland?
+  //   // The two approaches below perform similarly
+  //   var streams = a.map(highland);
+  //   runners.runHighland(deferred, highland(streams).merge().reduce(0, sum));
+  //   //runners.runHighland(deferred, highland(streams).flatMap(identity).reduce(0, sum));
+  // }, options);
 
 runners.runSuite(suite);
 
