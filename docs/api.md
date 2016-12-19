@@ -65,7 +65,7 @@ most.js API
 	* [sampleWith](#samplewith)
 	* [zip](#zip)
 1. Combining higher order streams
-	* [switch](#switch), alias [switchLatest](#switch)
+	* [switchLatest](#switchlatest), alias [switch](#switchlatest)
 	* [join](#join)
 	* [mergeConcurrently](#mergeconcurrently)
 1. Awaiting promises
@@ -1358,18 +1358,20 @@ most.from([1, 2, 3, 4])
 
 ## Combining higher-order streams
 
-### switch
+### switchLatest
 
-####`stream.switch() -> Stream`
+Alias: **switch**
+
+####`stream.switchLatest() -> Stream`
 ####`most.switchLatest(stream) -> Stream`
 
 Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
 
 ```
-s:               -a-b-c-d-e-f->
-t:               -1-2-3-4-5-6->
-stream:          -s-----t----->
-stream.switch(): -a-b-c-4-5-6->
+s:                     -a-b-c-d-e-f->
+t:                     -1-2-3-4-5-6->
+stream:                -s-----t----->
+stream.switchLatest(): -a-b-c-4-5-6->
 ```
 
 *TODO: Example*
