@@ -163,7 +163,7 @@ function removeAll (f, a) {
   var l = a.length;
   var b = new Array(l);
   var j = 0;
-  for (var x, i = 0; i < l; ++i) {
+  for (var x = void 0, i = 0; i < l; ++i) {
     x = a[i];
     if (!f(x)) {
       b[j] = x;
@@ -204,16 +204,7 @@ var compose = function (f, g) { return function (x) { return f(g(x)); }; };
 var apply = function (f, x) { return f(x); };
 
 // curry2 :: ((a, b) -> c) -> (a -> b -> c)
-function curry2 (f) {
-  function curried (a, b) {
-    switch (arguments.length) {
-      case 0: return curried
-      case 1: return function (b) { return f(a, b); }
-      default: return f(a, b)
-    }
-  }
-  return curried
-}
+
 
 // curry3 :: ((a, b, c) -> d) -> (a -> b -> c -> d)
 
@@ -357,14 +348,6 @@ function disposeSafely (disposable) {
  * @return {Disposable}
  */
 
-
-function disposePromise (disposablePromise) {
-  return disposablePromise.then(disposeOne)
-}
-
-function disposeOne (disposable) {
-  return disposable.dispose()
-}
 
 /**
  * Create a disposable proxy that allows its underlying disposable to
@@ -1103,6 +1086,10 @@ SubscribeObserver.prototype.event = function (t, x) {
 };
 
 SubscribeObserver.prototype.end = function (t, x) {
+  console.log(this.disposable);
+  if (this.disposable.disposed) {
+    return
+  }
   var s = this.subscriber;
   doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x);
 };
@@ -3838,7 +3825,7 @@ function tryEnd$1 (t, x, sink) {
   }
 }
 
-var dispose$1$1 = function (disposable) { return disposable.dispose(); };
+var dispose = function (disposable) { return disposable.dispose(); };
 
 var emptyDisposable = {
   dispose: function dispose$1 () {}
@@ -3861,7 +3848,7 @@ MulticastSource.prototype.run = function run (sink, scheduler) {
 MulticastSource.prototype._dispose = function _dispose () {
   var disposable = this._disposable;
   this._disposable = emptyDisposable;
-  return Promise.resolve(disposable).then(dispose$1$1)
+  return Promise.resolve(disposable).then(dispose)
 };
 
 MulticastSource.prototype.add = function add (sink) {
