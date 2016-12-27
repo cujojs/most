@@ -14,8 +14,9 @@
     "scan": "node ./scan.js",
     "slice": "node ./slice.js",
     "skipRepeats": "node ./skipRepeats.js",
+    "switch": "node ./switch.js",
     "zip": "node ./zip.js",
-    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run merge-nested && npm run zip && npm run scan && npm run slice && npm run skipRepeats"
+    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run merge-nested && npm run zip && npm run scan && npm run slice && npm run skipRepeats && npm run switch"
   },
   "dependencies": {
     "@reactivex/rxjs": "^5.0.1",

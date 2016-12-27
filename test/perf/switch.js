@@ -59,7 +59,7 @@ suite
         function(x) {return rx.Observable.fromArray(x)}).reduce(sum, 0));
   }, options)
   .add('xstream', function(deferred) {
-    runners.runXstream(deferred, xs.fromArray(a).map(bacon.fromArray).flatten().fold(sum, 0).last());
+    runners.runXstream(deferred, xs.fromArray(a).map(xs.fromArray).flatten().fold(sum, 0).last());
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).flatMapLatest(kefirFromArray).scan(sum, 0).last());
