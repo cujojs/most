@@ -174,7 +174,7 @@ export interface Stream<A> {
     e: Stream<E>
   ): Stream<R>;
 
-  sampleWith<A>(sampler: Stream<any>): Stream<A>;
+  sampleWith(sampler: Stream<any>): Stream<A>;
 
   zip<B, R>(
     fn: (a: A, b: B) => R,
