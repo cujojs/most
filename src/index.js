@@ -237,6 +237,7 @@ Stream.prototype.transduce = function (transducer) {
 
 import { flatMap, join } from './combinator/flatMap'
 
+// @deprecated flatMap, use chain instead
 export { flatMap, flatMap as chain, join }
 
 /**
@@ -245,11 +246,14 @@ export { flatMap, flatMap as chain, join }
  * @param {function(x:*):Stream} f chaining function, must return a Stream
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
-Stream.prototype.flatMap = Stream.prototype.chain = function (f) {
+Stream.prototype.chain = function (f) {
   return flatMap(f, this)
 }
 
-/**
+// @deprecated use chain instead
+Stream.prototype.flatMap = Stream.prototype.chain
+
+  /**
  * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
  * streams to the outer. Event arrival times are preserved.
  * @returns {Stream<X>} new stream containing all events of all inner streams
@@ -260,6 +264,7 @@ Stream.prototype.join = function () {
 
 import { continueWith } from './combinator/continueWith'
 
+// @deprecated flatMapEnd, use continueWith instead
 export { continueWith, continueWith as flatMapEnd }
 
 /**
@@ -269,9 +274,12 @@ export { continueWith, continueWith as flatMapEnd }
  * @returns {Stream} new stream that emits all events from the original stream,
  * followed by all events from the stream returned by f.
  */
-Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function (f) {
+Stream.prototype.continueWith = function (f) {
   return continueWith(f, this)
 }
+
+// @deprecated use continueWith instead
+Stream.prototype.flatMapEnd = Stream.prototype.continueWith
 
 import { concatMap } from './combinator/concatMap'
 
@@ -385,6 +393,7 @@ Stream.prototype.zip = function (f /*, ...streams*/) {
 
 import { switchLatest } from './combinator/switch'
 
+// @deprecated switch, use switchLatest instead
 export { switchLatest, switchLatest as switch }
 
 /**
@@ -392,15 +401,20 @@ export { switchLatest, switchLatest as switch }
  * of the most recent inner stream.
  * @returns {Stream} switching stream
  */
-Stream.prototype.switch = Stream.prototype.switchLatest = function () {
+Stream.prototype.switchLatest = function () {
   return switchLatest(this)
 }
+
+// @deprecated use switchLatest instead
+Stream.prototype.switch = Stream.prototype.switchLatest
 
 // -----------------------------------------------------------------------
 // Filtering
 
 import { filter, skipRepeats, skipRepeatsWith } from './combinator/filter'
 
+// @deprecated distinct, use skipRepeats instead
+// @deprecated distinctBy, use skipRepeatsWith instead
 export { filter, skipRepeats, skipRepeats as distinct, skipRepeatsWith, skipRepeatsWith as distinctBy }
 
 /**
@@ -499,6 +513,8 @@ Stream.prototype.skipWhile = function (p) {
 
 import { takeUntil, skipUntil, during } from './combinator/timeslice'
 
+// @deprecated takeUntil, use until instead
+// @deprecated skipUntil, use since instead
 export { takeUntil, takeUntil as until, skipUntil, skipUntil as since, during }
 
 /**
@@ -510,11 +526,14 @@ export { takeUntil, takeUntil as until, skipUntil, skipUntil as since, during }
  * @returns {Stream} new stream containing only events that occur before
  * the first event in signal.
  */
-Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
+Stream.prototype.until = function (signal) {
   return takeUntil(signal, this)
 }
 
-/**
+// @deprecated use until instead
+Stream.prototype.takeUntil = Stream.prototype.until
+
+  /**
  * stream:                    -a-b-c-d-e-f-g->
  * signal:                    -------x
  * takeUntil(signal, stream): -------d-e-f-g->
@@ -523,11 +542,14 @@ Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
  * @returns {Stream} new stream containing only events that occur after
  * the first event in signal.
  */
-Stream.prototype.since = Stream.prototype.skipUntil = function (signal) {
+Stream.prototype.since = function (signal) {
   return skipUntil(signal, this)
 }
 
-/**
+// @deprecated use since instead
+Stream.prototype.skipUntil = Stream.prototype.since
+
+  /**
  * stream:                    -a-b-c-d-e-f-g->
  * timeWindow:                -----s
  * s:                               -----t
@@ -606,6 +628,7 @@ Stream.prototype.debounce = function (period) {
 
 import { fromPromise, awaitPromises } from './combinator/promises'
 
+// @deprecated await, use awaitPromises instead
 export { fromPromise, awaitPromises, awaitPromises as await }
 
 /**
@@ -613,15 +636,19 @@ export { fromPromise, awaitPromises, awaitPromises as await }
  * event order, but timeshifts events based on promise resolution time.
  * @returns {Stream<X>} stream containing non-promise values
  */
-Stream.prototype.await = function () {
+Stream.prototype.awaitPromises = function () {
   return awaitPromises(this)
 }
+
+// @deprecated use awaitPromises instead
+Stream.prototype.await = Stream.prototype.awaitPromises
 
 // -----------------------------------------------------------------------
 // Error handling
 
 import { recoverWith, flatMapError, throwError } from './combinator/errors'
 
+// @deprecated flatMapError, use recoverWith instead
 export { recoverWith, flatMapError, throwError }
 
 /**
@@ -633,9 +660,12 @@ export { recoverWith, flatMapError, throwError }
  * @param {function(error:*):Stream} f function which returns a new stream
  * @returns {Stream} new stream which will recover from an error by calling f
  */
-Stream.prototype.recoverWith = Stream.prototype.flatMapError = function (f) {
+Stream.prototype.recoverWith = function (f) {
   return flatMapError(f, this)
 }
+
+// @deprecated use recoverWith instead
+Stream.prototype.flatMapError = Stream.prototype.recoverWith
 
 // -----------------------------------------------------------------------
 // Multicasting

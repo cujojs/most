@@ -7,7 +7,7 @@ most.js API
 1. API Notes
 	* [Draft ES Observable interop](#draft-es-observable-interop)
 1. Creating streams
-	* [most.of](#mostof), alias [most.just](#mostof)
+	* [most.just](#mostjust), alias [most.of](#mostjust)
 	* [most.fromPromise](#mostfrompromise)
 	* [most.from](#mostfrom)
 	* [most.periodic](#mostperiodic)
@@ -69,7 +69,7 @@ most.js API
 	* [join](#join)
 	* [mergeConcurrently](#mergeconcurrently)
 1. Awaiting promises
-	* [await](#await)
+	* [awaitPromises](#awaitPromises), alias [await](#awaitPromises)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
@@ -182,12 +182,12 @@ most.combineArray(combineFunction, arrayOfObservables.map(from))
 
 ## Creating streams
 
-### most.of
+### most.just
 
-ES6 import-friendly alias: `most.just`
+Alias: `most.of`
 
-####`most.of(x) -> Stream`
 ####`most.just(x) -> Stream`
+####`most.of(x) -> Stream`
 
 ```
 most.of(x): x|
@@ -267,14 +267,17 @@ stream.take(100)
 
 ### most.periodic
 
-####`most.periodic(period, x) -> Stream`
+####`most.periodic(period) -> Stream`
+####`most.periodic(period, x) -> Stream` (deprecated)
+
+**Note:** periodic's second argument (`x`) is deprecated. To create a periodic stream with a specific value use `constant(x, periodic(period))`
 
 ```
-most.periodic(2, x): x-x-x-x-x-x->
-most.periodic(5, x): x----x----x->
+most.periodic(2): x-x-x-x-x-x-> (x === undefined)
+most.periodic(5, a): a----a----a->
 ```
 
-Create an infinite stream containing events that arrive every `period` milliseconds, and whose value is `x`.
+Create an infinite stream containing events that arrive every `period` milliseconds, and whose value is `undefined`.
 
 ### most.empty
 
@@ -1415,19 +1418,21 @@ To control concurrency, `mergeConcurrently` must maintain an internal queue of n
 
 ## Awaiting promises
 
-### await
+### awaitPromises
 
-####`stream.await() -> Stream`
-####`most.await(stream) -> Stream`
+Deprecated alias: `await`
+
+####`stream.awaitPromises() -> Stream`
+####`most.awaitPromises(stream) -> Stream`
 
 Given a stream of promises, ie Stream&lt;Promise&lt;X&gt;&gt;, return a new stream containing the fulfillment values, ie Stream&lt;X&gt;.
 
 ```
-promise p:      ---1
-promise q:      ------2
-promise r:      -3
-stream:         -p---q---r->
-stream.await(): ---1--2--3->
+promise p:              ---1
+promise q:              ------2
+promise r:              -3
+stream:                 -p---q---r->
+stream.awaitPromises(): ---1--2--3->
 ```
 
 Event *times* may be delayed.  However, event *order* is always preserved, regardless of promise fulfillment order.
@@ -1441,17 +1446,17 @@ promise q:                        --------2
 promise r:                        ------3
 stream:                           -p-q-r----->
 stream.chain(most.fromPromise):   --1---3-2-->
-stream.await():                   --1-----23->
+stream.awaitPromises():           --1-----23->
 ```
 
 If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [recoverWith](#recoverwith) for error recovery.  For example:
 
 ```
-promise p:      ---1
-promise q:      ------X
-promise r:      -3
-stream:         -p---q---r->
-stream.await(): ---1--X
+promise p:              ---1
+promise q:              ------X
+promise r:              -3
+stream:                 -p---q---r->
+stream.awaitPromises(): ---1--X
 ```
 
 ```es6
