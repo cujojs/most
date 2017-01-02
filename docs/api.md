@@ -237,6 +237,8 @@ The observable must provide minimal draft ES observable compliance as per the [e
 
 The iterable can be an Array, Array-like, or anything that supports the [iterable protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/iterable) or [iterator protocol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/The_Iterator_protocol), such as a [generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*). Providing a finite iterable, such as an Array, creates a finite stream. Providing an infinite iterable, such as an infinite generator, creates an infinite stream.
 
+**Note:** `from` will fail fast by throwing a `TypeError` *synchronously* when passed a value that is not an `Iterable`, `Iterator`, or `Observable`.  This indicates an invalid use of `from`, which should be fixed/prevented rather than handled at runtime. 
+
 ```js
 // Logs 1 2 3 4
 most.from([1,2,3,4])
