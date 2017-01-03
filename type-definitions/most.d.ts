@@ -8,6 +8,7 @@ declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A
 
 export interface Sink<A> {
   event(time: number, value: A): void;
+  // end value parameter is deprecated
   end(time: number, value?: A): void;
   error(time: number, err: Error): void;
 }
@@ -46,6 +47,7 @@ export interface Source<A> {
 export interface Subscriber<A> {
   next(value: A): void;
   error(err: Error): void;
+  // complete value parameter is deprecated
   complete(value?: A): void;
 }
 
@@ -405,6 +407,7 @@ export class PropagateTask<T> implements Task {
 
 	static event <T> (value: T, sink: Sink<T>): PropagateTask<T>;
 	static error (error: Error, sink: Sink<any>): PropagateTask<any>;
+  // end value parameter is deprecated
 	static end <T> (value: T, sink: Sink<T>): PropagateTask<T>;
 
 	run(time: number): void;
