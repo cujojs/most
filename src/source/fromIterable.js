@@ -15,27 +15,16 @@ function IterableSource (iterable) {
 }
 
 IterableSource.prototype.run = function (sink, scheduler) {
-  return new IteratorProducer(getIterator(this.iterable), sink, scheduler)
+  return scheduler.asap(new PropagateTask(runProducer, getIterator(this.iterable), sink))
 }
 
-function IteratorProducer (iterator, sink, scheduler) {
-  this.scheduler = scheduler
-  this.iterator = iterator
-  this.task = new PropagateTask(runProducer, this, sink)
-  scheduler.asap(this.task)
-}
+function runProducer (t, iterator, sink) {
+  let r = iterator.next()
 
-IteratorProducer.prototype.dispose = function () {
-  return this.task.dispose()
-}
-
-function runProducer (t, producer, sink) {
-  var x = producer.iterator.next()
-  if (x.done) {
-    sink.end(t, x.value)
-  } else {
-    sink.event(t, x.value)
+  while (!r.done && this.active) {
+    sink.event(t, r.value)
+    r = iterator.next()
   }
 
-  producer.scheduler.asap(producer.task)
+  sink.end(t, r.value)
 }
