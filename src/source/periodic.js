@@ -8,11 +8,11 @@ import PropagateTask from '../scheduler/PropagateTask'
 /**
  * Create a stream that emits the current time periodically
  * @param {Number} period periodicity of events in millis
- * @param {*} value value to emit each period
+ * @param {*} deprecatedValue @deprecated value to emit each period
  * @returns {Stream} new stream that emits the current time every period
  */
-export function periodic (period, value) {
-  return new Stream(new Periodic(period, value))
+export function periodic (period, deprecatedValue) {
+  return new Stream(new Periodic(period, deprecatedValue))
 }
 
 function Periodic (period, value) {
