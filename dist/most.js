@@ -574,29 +574,18 @@ function IterableSource (iterable) {
 }
 
 IterableSource.prototype.run = function (sink, scheduler) {
-  return new IteratorProducer(getIterator(this.iterable), sink, scheduler)
+  return scheduler.asap(new PropagateTask(runProducer$1, getIterator(this.iterable), sink))
 };
 
-function IteratorProducer (iterator, sink, scheduler) {
-  this.scheduler = scheduler;
-  this.iterator = iterator;
-  this.task = new PropagateTask(runProducer$1, this, sink);
-  scheduler.asap(this.task);
-}
+function runProducer$1 (t, iterator, sink) {
+  var r = iterator.next();
 
-IteratorProducer.prototype.dispose = function () {
-  return this.task.dispose()
-};
-
-function runProducer$1 (t, producer, sink) {
-  var x = producer.iterator.next();
-  if (x.done) {
-    sink.end(t, x.value);
-  } else {
-    sink.event(t, x.value);
+  while (!r.done && this.active) {
+    sink.event(t, r.value);
+    r = iterator.next();
   }
 
-  producer.scheduler.asap(producer.task);
+  sink.end(t, r.value);
 }
 
 function symbolObservablePonyfill(root) {
@@ -730,11 +719,11 @@ function from (a) { // eslint-disable-line complexity
 /**
  * Create a stream that emits the current time periodically
  * @param {Number} period periodicity of events in millis
- * @param {*} value value to emit each period
+ * @param {*} deprecatedValue @deprecated value to emit each period
  * @returns {Stream} new stream that emits the current time every period
  */
-function periodic (period, value) {
-  return new Stream(new Periodic(period, value))
+function periodic (period, deprecatedValue) {
+  return new Stream(new Periodic(period, deprecatedValue))
 }
 
 function Periodic (period, value) {
@@ -1086,12 +1075,10 @@ SubscribeObserver.prototype.event = function (t, x) {
 };
 
 SubscribeObserver.prototype.end = function (t, x) {
-  console.log(this.disposable);
-  if (this.disposable.disposed) {
-    return
+  if (!this.disposable.disposed) {
+    var s = this.subscriber;
+    doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x);
   }
-  var s = this.subscriber;
-  doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x);
 };
 
 SubscribeObserver.prototype.error = function (t, e) {
@@ -4076,11 +4063,14 @@ Stream.prototype.transduce = function (transducer) {
  * @param {function(x:*):Stream} f chaining function, must return a Stream
  * @returns {Stream} new stream containing all events from each stream returned by f
  */
-Stream.prototype.flatMap = Stream.prototype.chain = function (f) {
+Stream.prototype.chain = function (f) {
   return flatMap(f, this)
 };
 
-/**
+// @deprecated use chain instead
+Stream.prototype.flatMap = Stream.prototype.chain;
+
+  /**
  * Monadic join. Flatten a Stream<Stream<X>> to Stream<X> by merging inner
  * streams to the outer. Event arrival times are preserved.
  * @returns {Stream<X>} new stream containing all events of all inner streams
@@ -4096,9 +4086,12 @@ Stream.prototype.join = function () {
  * @returns {Stream} new stream that emits all events from the original stream,
  * followed by all events from the stream returned by f.
  */
-Stream.prototype.continueWith = Stream.prototype.flatMapEnd = function (f) {
+Stream.prototype.continueWith = function (f) {
   return continueWith(f, this)
 };
+
+// @deprecated use continueWith instead
+Stream.prototype.flatMapEnd = Stream.prototype.continueWith;
 
 Stream.prototype.concatMap = function (f) {
   return concatMap(f, this)
@@ -4191,9 +4184,12 @@ Stream.prototype.zip = function (f /*, ...streams*/) {
  * of the most recent inner stream.
  * @returns {Stream} switching stream
  */
-Stream.prototype.switch = Stream.prototype.switchLatest = function () {
+Stream.prototype.switchLatest = function () {
   return switchLatest(this)
 };
+
+// @deprecated use switchLatest instead
+Stream.prototype.switch = Stream.prototype.switchLatest;
 
 // -----------------------------------------------------------------------
 // Filtering
@@ -4297,11 +4293,14 @@ Stream.prototype.skipWhile = function (p) {
  * @returns {Stream} new stream containing only events that occur before
  * the first event in signal.
  */
-Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
+Stream.prototype.until = function (signal) {
   return takeUntil(signal, this)
 };
 
-/**
+// @deprecated use until instead
+Stream.prototype.takeUntil = Stream.prototype.until;
+
+  /**
  * stream:                    -a-b-c-d-e-f-g->
  * signal:                    -------x
  * takeUntil(signal, stream): -------d-e-f-g->
@@ -4310,11 +4309,14 @@ Stream.prototype.until = Stream.prototype.takeUntil = function (signal) {
  * @returns {Stream} new stream containing only events that occur after
  * the first event in signal.
  */
-Stream.prototype.since = Stream.prototype.skipUntil = function (signal) {
+Stream.prototype.since = function (signal) {
   return skipUntil(signal, this)
 };
 
-/**
+// @deprecated use since instead
+Stream.prototype.skipUntil = Stream.prototype.since;
+
+  /**
  * stream:                    -a-b-c-d-e-f-g->
  * timeWindow:                -----s
  * s:                               -----t
@@ -4385,9 +4387,12 @@ Stream.prototype.debounce = function (period) {
  * event order, but timeshifts events based on promise resolution time.
  * @returns {Stream<X>} stream containing non-promise values
  */
-Stream.prototype.await = function () {
+Stream.prototype.awaitPromises = function () {
   return awaitPromises(this)
 };
+
+// @deprecated use awaitPromises instead
+Stream.prototype.await = Stream.prototype.awaitPromises;
 
 // -----------------------------------------------------------------------
 // Error handling
@@ -4401,9 +4406,12 @@ Stream.prototype.await = function () {
  * @param {function(error:*):Stream} f function which returns a new stream
  * @returns {Stream} new stream which will recover from an error by calling f
  */
-Stream.prototype.recoverWith = Stream.prototype.flatMapError = function (f) {
+Stream.prototype.recoverWith = function (f) {
   return flatMapError(f, this)
 };
+
+// @deprecated use recoverWith instead
+Stream.prototype.flatMapError = Stream.prototype.recoverWith;
 
 // -----------------------------------------------------------------------
 // Multicasting
