@@ -19,7 +19,7 @@ IterableSource.prototype.run = function (sink, scheduler) {
 }
 
 function runProducer (t, iterator, sink) {
-  let r = iterator.next()
+  var r = iterator.next()
 
   while (!r.done && this.active) {
     sink.event(t, r.value)
