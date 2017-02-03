@@ -224,7 +224,7 @@ export function just<A>(a: A): Stream<A>;
 export function of<A>(a: A): Stream<A>;
 export function empty(): Stream<any>;
 export function never(): Stream<any>;
-export function from<A>(as: Array<A> | Iterable<A> | Observable<A>): Stream<A>;
+export function from<A>(as: ArrayLike<A> | Iterable<A> | Observable<A>): Stream<A>;
 export function periodic<A>(period: number, a?: A): Stream<A>;
 export function fromEvent<T extends Event>(event: string, target: any, useCapture?: boolean): Stream<T>;
 
