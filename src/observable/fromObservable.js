@@ -4,6 +4,7 @@
 
 import Stream from '../Stream'
 import * as dispose from '../disposable/dispose'
+import { tryEnd, tryEvent } from '../source/tryEvent'
 
 export function fromObservable (observable) {
   return new Stream(new ObservableSource(observable))
@@ -30,11 +31,11 @@ export function SubscriberSink (sink, scheduler) {
 }
 
 SubscriberSink.prototype.next = function (x) {
-  this.sink.event(this.scheduler.now(), x)
+  tryEvent(this.scheduler.now(), x, this.sink)
 }
 
 SubscriberSink.prototype.complete = function (x) {
-  this.sink.end(this.scheduler.now(), x)
+  tryEnd(this.scheduler.now(), x, this.sink)
 }
 
 SubscriberSink.prototype.error = function (e) {
