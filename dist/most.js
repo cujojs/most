@@ -647,6 +647,26 @@ function getObservable (o) { // eslint-disable-line complexity
 /** @author Brian Cavalier */
 /** @author John Hann */
 
+function tryEvent (t, x, sink) {
+  try {
+    sink.event(t, x);
+  } catch (e) {
+    sink.error(t, e);
+  }
+}
+
+function tryEnd (t, x, sink) {
+  try {
+    sink.end(t, x);
+  } catch (e) {
+    sink.error(t, e);
+  }
+}
+
+/** @license MIT License (c) copyright 2010-2016 original author or authors */
+/** @author Brian Cavalier */
+/** @author John Hann */
+
 function fromObservable (observable) {
   return new Stream(new ObservableSource(observable))
 }
@@ -672,11 +692,11 @@ function SubscriberSink (sink, scheduler) {
 }
 
 SubscriberSink.prototype.next = function (x) {
-  this.sink.event(this.scheduler.now(), x);
+  tryEvent(this.scheduler.now(), x, this.sink);
 };
 
 SubscriberSink.prototype.complete = function (x) {
-  this.sink.end(this.scheduler.now(), x);
+  tryEnd(this.scheduler.now(), x, this.sink);
 };
 
 SubscriberSink.prototype.error = function (e) {
@@ -1112,26 +1132,6 @@ function doDispose (fatal, subscriber, complete, error, disposable, x) {
 
 function thru (f, stream) {
   return f(stream)
-}
-
-/** @license MIT License (c) copyright 2010-2016 original author or authors */
-/** @author Brian Cavalier */
-/** @author John Hann */
-
-function tryEvent (t, x, sink) {
-  try {
-    sink.event(t, x);
-  } catch (e) {
-    sink.error(t, e);
-  }
-}
-
-function tryEnd (t, x, sink) {
-  try {
-    sink.end(t, x);
-  } catch (e) {
-    sink.error(t, e);
-  }
 }
 
 /** @license MIT License (c) copyright 2010-2016 original author or authors */

@@ -3,7 +3,9 @@ require('buster').spec.expose()
 var assert = require('buster').referee.assert
 
 var reduce = require('../../src/combinator/accumulate').reduce
+var map = require('../../src/combinator/transform').map
 var fo = require('../../src/observable/fromObservable')
+var subscribe = require('../../src/observable/subscribe').subscribe
 var fromObservable = fo.fromObservable
 var ObservableSource = fo.ObservableSource
 var SubscriberSink = fo.SubscriberSink
@@ -28,6 +30,30 @@ describe('fromObservable', function () {
       .then(function (a) {
         assert.equals(events, a)
       })
+  })
+
+  it('should handle thrown errors', function (done) {
+    var o = simpleObservable(function (observer) {
+      observer.next(1)
+
+      return function () {}
+    })
+
+    function boom () {
+      throw new Error('boom!')
+    }
+
+    assert.equals(true, true) // buster requires an assertion
+
+    var s = map(boom, fromObservable(o))
+
+    subscribe({
+      next () { done(new Error('next should not be called')) },
+
+      error () { done() },
+
+      complete () { done(new Error('complete should not be called')) }
+    }, s)
   })
 })
 
