@@ -7,7 +7,6 @@
 | [create](https://github.com/mostjs/create) | Imperatively push events into a Stream
 | [dom-event](https://github.com/mostjs/dom-event) | Streamlined DOM Events
 | [examples](https://github.com/mostjs/examples) | Most.js examples
-| [core](https://github.com/mostjs/core) | Most.js core event stream
 
 ### Most Tools for  Contributors
 | Name | Description
