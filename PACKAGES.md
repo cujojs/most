@@ -28,3 +28,5 @@
 | [most-dispatch](https://github.com/mostjs-community/most-dispatch) | A selective multicast operator for Most.js
 | [about](https://github.com/mostjs-community/about) | About the mostjs community, how to contribute, and code of conduct
 | [most-file-reader](https://github.com/mostjs-community/most-file-reader) | FileReader combinator for most
+| [most-combineobj](https://github.com/mostjs-community/combineobj) | Transform an object of streams into a stream of objects
+| [most-chunksOf](https://github.com/mostjs-community/most-chunksOf) | Splits a list into length-n pieces
