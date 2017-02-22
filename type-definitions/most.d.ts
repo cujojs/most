@@ -179,6 +179,10 @@ export interface Stream<A> {
     d: Stream<D>,
     e: Stream<E>
   ): Stream<R>;
+  sample<B,R>(
+    fn: (...values: B[]) => R,
+    ...streams: Stream<B>[]
+  ): Stream<R>;
 
   sampleWith(sampler: Stream<any>): Stream<A>;
 
@@ -362,6 +366,11 @@ export function sample<A, B, C, D, E, R>(
   c: Stream<C>,
   d: Stream<D>,
   e: Stream<E>
+): Stream<R>;
+export function sample<A, R>(
+  fn: (...values: A[]) => R,
+  sampler: Stream<any>,
+  ...streams: Stream<A>[]
 ): Stream<R>;
 
 export function sampleWith<A>(sampler: Stream<any>, s: Stream<A>): Stream<A>;
