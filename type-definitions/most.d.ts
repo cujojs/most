@@ -161,6 +161,11 @@ export interface Stream<A> {
   // Note: Without higher-kinded types, this type cannot be written properly
   await<B>(): Stream<B>;
 
+  sample<B, V, R>(
+    fn: (b: B, ...values: V[]) => R,
+    b: Stream<B>,
+    ...streams: Stream<V>[]
+  ): Stream<R>;
   sample<B, C, V, R>(
     fn: (b: B, c: C, ...values: V[]) => R,
     b: Stream<B>,
@@ -340,6 +345,12 @@ export function delay<A>(dt: number, s: Stream<A>): Stream<A>;
 export function fromPromise<A>(p: Promise<A>): Stream<A>;
 export function await<A>(s: Stream<Promise<A>>): Stream<A>;
 
+export function sample<A, V, R>(
+  fn: (a: A, ...values: V[]) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+  ...streams: Stream<V>[]
+): Stream<R>;
 export function sample<A, B, V, R>(
   fn: (a: A, b: B, ...values: V[]) => R,
   sampler: Stream<any>,
