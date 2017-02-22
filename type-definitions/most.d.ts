@@ -227,6 +227,7 @@ export function never(): Stream<any>;
 export function from<A>(as: ArrayLike<A> | Iterable<A> | Observable<A>): Stream<A>;
 export function periodic<A>(period: number, a?: A): Stream<A>;
 export function fromEvent<T extends Event>(event: string, target: any, useCapture?: boolean): Stream<T>;
+export function fromEvent<T>(event: string, target: any): Stream<T>;
 
 export function unfold<A, B, S>(f: (seed: S) => SeedValue<S, B|Promise<B>>, seed: S): Stream<B>;
 export function iterate<A>(f: (a: A) => A|Promise<A>, a: A): Stream<A>;
