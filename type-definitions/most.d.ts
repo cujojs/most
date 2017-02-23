@@ -59,7 +59,7 @@ export interface Subscription<A> {
   unsubscribe(): void;
 }
 
-export interface Stream<A> {
+export interface Stream<A> extends Source<A> {
   reduce<B>(f: (b: B, a: A) => B, b: B): Promise<B>;
   observe(f: (a: A) => any): Promise<any>;
   forEach(f: (a: A) => any): Promise<any>;
