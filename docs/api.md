@@ -138,6 +138,7 @@ Consult the documentation of other libraries for specifics.  Any functions and m
 
 Use `most.from` to coerce any observable to a most.js stream:
 
+<!-- skip-example -->
 ```js
 import { from } from 'most'
 
