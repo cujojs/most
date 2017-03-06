@@ -138,7 +138,6 @@ Consult the documentation of other libraries for specifics.  Any functions and m
 
 Use `most.from` to coerce any observable to a most.js stream:
 
-<!-- skip-example -->
 ```js
 import { from } from 'most'
 
@@ -1040,6 +1039,30 @@ hold(periodic(10, 1)
 	.take(5)
 	.scan((total, increment) => total + increment, 0))
 	.observe(x => console.log(x))
+```
+
+#### Multiple arguments
+
+Multiple arguments should be handled via partial application of the function passed to thru, using `bind` or a currying or partial application utility from your favorite functional programming library.
+
+<!-- skip-example -->
+```es6
+// Via curried transform
+const transform = curry((x, y, z, stream) => /* ... */)
+
+const stream2 = stream1.thru(transform(x, y, z))
+```
+
+<!-- skip-example -->
+```es6
+// Via partial application
+const transform = (x, y, z, stream) => // ...
+
+// Partially apply with partial application helper
+const stream2 = stream1.thru(partial(transform(x, y, z)))
+
+// Or, partially apply with bind
+const stream2 = stream1.thru(transform.bind(null, x, y, z)))
 ```
 
 ## Consuming streams
