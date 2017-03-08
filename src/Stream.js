@@ -6,6 +6,6 @@ export default function Stream (source) {
   this.source = source
 }
 
-Stream.prototype.run = function (sink, source) {
-  return this.source.run(sink, source)
+Stream.prototype.run = function (sink, scheduler) {
+  return this.source.run(sink, scheduler)
 }
