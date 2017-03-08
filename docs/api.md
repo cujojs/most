@@ -27,7 +27,7 @@ most.js API
 	* [constant](#constant)
 	* [scan](#scan)
 	* [chain](#chain), alias [flatMap](#chain)
-	* [continueWith](#continuewith), alias [flatMapEnd](#flatmapend)
+	* [continueWith](#continuewith), alias [flatMapEnd](#continuewith)
 	* [concatMap](#concatmap)
 	* [ap](#ap)
 	* [timestamp](#timestamp)
@@ -69,7 +69,7 @@ most.js API
 	* [join](#join)
 	* [mergeConcurrently](#mergeconcurrently)
 1. Awaiting promises
-	* [awaitPromises](#awaitPromises), alias [await](#awaitPromises)
+	* [awaitPromises](#awaitpromises), alias [await](#awaitpromises)
 1. Rate limiting streams
 	* [debounce](#debounce)
 	* [throttle](#throttle)
