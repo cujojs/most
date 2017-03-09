@@ -1060,7 +1060,7 @@ const stream2 = stream1.thru(transform(x, y, z))
 const transform = (x, y, z, stream) => // ...
 
 // Partially apply with partial application helper
-const stream2 = stream1.thru(partial(transform(x, y, z)))
+const stream2 = stream1.thru(partial(transform, x, y, z))
 
 // Or, partially apply with bind
 const stream2 = stream1.thru(transform.bind(null, x, y, z)))
