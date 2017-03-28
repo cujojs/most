@@ -22,9 +22,5 @@ function runProducer (t, array, sink) {
     sink.event(t, array[i])
   }
 
-  this.active && end(t)
-
-  function end (t) {
-    sink.end(t)
-  }
+  this.active && sink.end(t)
 }
