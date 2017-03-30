@@ -186,8 +186,8 @@ most.combineArray(combineFunction, arrayOfObservables.map(from))
 
 Alias: `most.of`
 
-####`most.just(x) -> Stream`
-####`most.of(x) -> Stream`
+#### `most.just(x) -> Stream`
+#### `most.of(x) -> Stream`
 
 ```
 most.of(x): x|
@@ -209,7 +209,7 @@ stream.observe(x => console.log(x));
 
 ### most.fromPromise
 
-####`most.fromPromise(promise) -> Stream`
+#### `most.fromPromise(promise) -> Stream`
 
 ```
 promise:                   ----a
@@ -220,7 +220,7 @@ Create a stream containing the outcome of a promise.  If the promise fulfills, t
 
 ### most.from
 
-####`most.from(Iterable | Observable) -> Stream`
+#### `most.from(Iterable | Observable) -> Stream`
 
 ```
 observable:            -a--b--c--c-->
@@ -269,8 +269,8 @@ stream.take(100)
 
 ### most.periodic
 
-####`most.periodic(period) -> Stream`
-####`most.periodic(period, x) -> Stream` (deprecated)
+#### `most.periodic(period) -> Stream`
+#### `most.periodic(period, x) -> Stream` (deprecated)
 
 **Note:** periodic's second argument (`x`) is deprecated. To create a periodic stream with a specific value use `constant(x, periodic(period))`
 
@@ -283,7 +283,7 @@ Create an infinite stream containing events that arrive every `period` milliseco
 
 ### most.empty
 
-####`most.empty() -> Stream`
+#### `most.empty() -> Stream`
 
 ```
 most.empty(): |
@@ -293,7 +293,7 @@ Create an already-ended stream containing no events.
 
 ### most.never
 
-####`most.never() -> Stream`
+#### `most.never() -> Stream`
 
 ```
 most.never(): ---->
@@ -303,7 +303,7 @@ Create a stream that contains no events and never ends.
 
 ### most.iterate
 
-####`most.iterate(f, initial) -> Stream`
+#### `most.iterate(f, initial) -> Stream`
 
 Build an infinite stream by computing successive items iteratively.  Conceptually, the stream will contain: `[initial, f(initial), f(f(initial)), ...]`
 
@@ -336,7 +336,7 @@ const delay = y =>
 
 ### most.unfold
 
-####`most.unfold(f, seed) -> Stream`
+#### `most.unfold(f, seed) -> Stream`
 
 Build a stream by computing successive items.  Whereas [`reduce`](#reduce) tears down a stream to a final value, `unfold` builds up a stream from a seed value.
 
@@ -368,7 +368,7 @@ most.unfold(id =>
 
 ### most.generate
 
-####`most.generate(generator, ...args) -> Stream`
+#### `most.generate(generator, ...args) -> Stream`
 
 Build a stream by running an *asynchronous generator*: a generator which yields promises.
 
@@ -395,7 +395,7 @@ most.generate(countdown, 1000, 3)
 
 ### most.fromEvent
 
-####`most.fromEvent(eventType, source [, useCapture=false]) -> Stream`
+#### `most.fromEvent(eventType, source [, useCapture=false]) -> Stream`
 
 ```
 source:                            -a--b-c---d->
@@ -450,8 +450,8 @@ most.fromEvent('click', container)
 
 ### startWith
 
-####`stream.startWith(x) -> Stream`
-####`most.startWith(x, stream) -> Stream`
+#### `stream.startWith(x) -> Stream`
+#### `most.startWith(x, stream) -> Stream`
 
 Create a new stream containing `x` followed by all events in `stream`.
 
@@ -462,8 +462,8 @@ stream.startWith(x): xa-b-c-d->
 
 ### concat
 
-####`stream1.concat(stream2) -> Stream`
-####`most.concat(stream1, stream2) -> Stream`
+#### `stream1.concat(stream2) -> Stream`
+#### `most.concat(stream1, stream2) -> Stream`
 
 Create a new stream containing all events in `stream1` followed by all events in `stream2`.
 
@@ -481,8 +481,8 @@ Note that this effectively *timeshifts* events from `stream2` past the end time 
 
 Alias: **flatMapError**
 
-####`stream.recoverWith(f) -> Stream`
-####`most.recoverWith(f, stream) -> Stream`
+#### `stream.recoverWith(f) -> Stream`
+#### `most.recoverWith(f, stream) -> Stream`
 
 Recover from a stream failure by calling a function to create a new stream.
 
@@ -511,7 +511,7 @@ stream.map(JSON.parse)
 
 ### most.throwError
 
-####`most.throwError(error) -> Stream`
+#### `most.throwError(error) -> Stream`
 
 Create a stream in the error state.  This can be useful for functions that need to return a stream, but need to signal an error.
 
@@ -524,8 +524,8 @@ most.throwError(X): X
 
 ### map
 
-####`stream.map(f) -> Stream`
-####`most.map(f, stream) -> Stream`
+#### `stream.map(f) -> Stream`
+#### `most.map(f, stream) -> Stream`
 
 Create a new stream by applying `f` to each event of the input stream.
 
@@ -545,8 +545,8 @@ most.from([1,2,3,4])
 
 ### constant
 
-####`stream.constant(x) -> Stream`
-####`most.constant(x, stream) -> Stream`
+#### `stream.constant(x) -> Stream`
+#### `most.constant(x, stream) -> Stream`
 
 Create a new stream by replacing each event of the input stream with `x`.
 
@@ -564,8 +564,8 @@ most.from([1,2,3,4])
 
 ### scan
 
-####`stream.scan(f, initial) -> Stream`
-####`most.scan(f, initial, stream) -> Stream`
+#### `stream.scan(f, initial) -> Stream`
+#### `most.scan(f, initial, stream) -> Stream`
 
 Create a new stream containing incrementally accumulated results, starting with the provided initial value.
 
@@ -610,8 +610,8 @@ numbers.scan(nextWindow, [])
 
 Alias: **flatMap**
 
-####`stream.chain(f) -> Stream`
-####`most.chain(f, stream) -> Stream`
+#### `stream.chain(f) -> Stream`
+#### `most.chain(f, stream) -> Stream`
 
 Transform each event in `stream` into a stream, and then merge it into the resulting stream. Note that `f` *must* return a stream.
 
@@ -636,8 +636,8 @@ most.from([1, 2])
 
 ### continueWith
 
-####`stream.continueWith(f) -> Stream`
-####`most.continueWith(f, stream) -> Stream`
+#### `stream.continueWith(f) -> Stream`
+#### `most.continueWith(f, stream) -> Stream`
 
 Replace the end signal with a new stream returned by f. Note that f *must* return a stream.
 
@@ -660,8 +660,8 @@ most.periodic(10, 'x')
 
 ### concatMap
 
-####`stream.concatMap(f) -> Stream`
-####`most.concatMap(f, stream) -> Stream`
+#### `stream.concatMap(f) -> Stream`
+#### `most.concatMap(f, stream) -> Stream`
 
 Transform each event in `stream` into a stream, and then concatenate it onto the end of the resulting stream. Note that `f` *must* return a stream.
 
@@ -689,8 +689,8 @@ most.from([1, 2])
 
 ### ap
 
-####`streamOfFunctions.ap(stream) -> Stream`
-####`most.ap(streamOfFunctions, stream) -> Stream`
+#### `streamOfFunctions.ap(stream) -> Stream`
+#### `most.ap(streamOfFunctions, stream) -> Stream`
 
 Apply the latest function in `streamOfFunctions` to the latest value in `stream`.
 
@@ -704,8 +704,8 @@ In effect, `ap` applies a *time-varying function* to a *time-varying value*.
 
 ### timestamp
 
-####`stream.timestamp() -> Stream`
-####`most.timestamp(stream) -> Stream`
+#### `stream.timestamp() -> Stream`
+#### `most.timestamp(stream) -> Stream`
 
 Materialize event timestamps, transforming `Stream<X>` into `Stream<{ time:number, value:X }>`
 
@@ -724,8 +724,8 @@ most.periodic(10).constant('hello')
 
 ### tap
 
-####`stream.tap(f) -> Stream`
-####`most.tap(f, stream) -> Stream`
+#### `stream.tap(f) -> Stream`
+#### `most.tap(f, stream) -> Stream`
 
 Perform a side-effect for each event in `stream`.
 
@@ -740,8 +740,8 @@ For each event in `stream`, `f` is called, but the value of its result is ignore
 
 ### filter
 
-####`stream.filter(predicate) -> Stream`
-####`most.filter(predicate, stream) -> Stream`
+#### `stream.filter(predicate) -> Stream`
+#### `most.filter(predicate, stream) -> Stream`
 
 Create a stream containing only events for which `predicate` returns truthy.
 
@@ -752,8 +752,8 @@ stream.filter(even): ---2---4->
 
 ### skipRepeats
 
-####`stream.skipRepeats() -> Stream`
-####`most.skipRepeats(stream) -> Stream`
+#### `stream.skipRepeats() -> Stream`
+#### `most.skipRepeats(stream) -> Stream`
 
 Create a new stream with *adjacent* repeated events removed.
 
@@ -766,8 +766,8 @@ Note that `===` is used to identify duplicate items.  To use a different compari
 
 ### skipRepeatsWith
 
-####`stream.skipRepeatsWith(equals) -> Stream`
-####`most.skipRepeatsWith(equals, stream) -> Stream`
+#### `stream.skipRepeatsWith(equals) -> Stream`
+#### `most.skipRepeatsWith(equals, stream) -> Stream`
 
 Create a new stream with *adjacent* repeated events removed, using the provided `equals` function.
 
@@ -784,8 +784,8 @@ The `equals` function should accept two values and return truthy if the two valu
 
 ### transduce
 
-####`stream.transduce(transducer) -> Stream`
-####`most.transduce(transducer, stream) -> Stream`
+#### `stream.transduce(transducer) -> Stream`
+#### `most.transduce(transducer, stream) -> Stream`
 
 Create a new stream by passing items through the provided transducer.
 
@@ -815,8 +815,8 @@ most.from([1,2,3,4,5,6,7,8,9])
 
 ### slice
 
-####`stream.slice(start, end) -> Stream`
-####`most.slice(start, end, stream) -> Stream`
+#### `stream.slice(start, end) -> Stream`
+#### `most.slice(start, end, stream) -> Stream`
 
 Create a new stream containing only events where `start <= index < end`, where `index` is the ordinal index of an event in `stream`.
 
@@ -832,8 +832,8 @@ If stream contains fewer than `start` events, the returned stream will be empty.
 
 ### take
 
-####`stream.take(n) -> Stream`
-####`most.take(n, stream) -> Stream`
+#### `stream.take(n) -> Stream`
+#### `most.take(n, stream) -> Stream`
 
 Create a new stream containing at most `n` events from `stream`.
 
@@ -849,8 +849,8 @@ If `stream` contains fewer than `n` events, the returned stream will be effectiv
 
 ### skip
 
-####`stream.skip(n) -> Stream`
-####`most.skip(n, stream) -> Stream`
+#### `stream.skip(n) -> Stream`
+#### `most.skip(n, stream) -> Stream`
 
 Create a new stream that omits the first `n` events from `stream`.
 
@@ -869,8 +869,8 @@ If `stream` contains fewer than `n` events, the returned stream will be empty.
 
 ### takeWhile
 
-####`stream.takeWhile(predicate) -> Stream`
-####`most.takeWhile(predicate, stream) -> Stream`
+#### `stream.takeWhile(predicate) -> Stream`
+#### `most.takeWhile(predicate, stream) -> Stream`
 
 Create a new stream containing all events until `predicate` returns false.
 
@@ -881,8 +881,8 @@ stream.takeWhile(even): -2-4-|
 
 ### skipWhile
 
-####`stream.skipWhile(predicate) -> Stream`
-####`most.skipWhile(predicate, stream) -> Stream`
+#### `stream.skipWhile(predicate) -> Stream`
+#### `most.skipWhile(predicate, stream) -> Stream`
 
 Create a new stream containing all events after `predicate` returns false.
 
@@ -895,8 +895,8 @@ stream.skipWhile(even): -----5-6-8->
 
 Alias: **takeUntil**
 
-####`stream.until(endSignal) -> Stream`
-####`most.until(endSignal, stream) -> Stream`
+#### `stream.until(endSignal) -> Stream`
+#### `most.until(endSignal, stream) -> Stream`
 
 Create a new stream containing all events until `endSignal` emits an event.
 
@@ -920,8 +920,8 @@ most.fromEvent('mousemove', document)
 
 Alias: **skipUntil**
 
-####`stream.since(startSignal) -> Stream`
-####`most.since(startSignal, stream) -> Stream`
+#### `stream.since(startSignal) -> Stream`
+#### `most.since(startSignal, stream) -> Stream`
 
 Create a new stream containing all events after `startSignal` emits its first event.
 
@@ -942,8 +942,8 @@ most.fromEvent('mousemove', document)
 
 ### during
 
-####`stream.during(timeWindow)`
-####`most.during(timeWindow, stream)`
+#### `stream.during(timeWindow)`
+#### `most.during(timeWindow, stream)`
 
 Create a new stream containing only events that occur during a dynamic [time window](https://github.com/cujojs/most/wiki/Concepts#time-windows).
 
@@ -976,8 +976,8 @@ most.fromEvent('mousemove', document)
 
 ### loop
 
-####`stream.loop(stepper, seed) -> Stream`
-####`most.loop(stepper, seed, stream) -> Stream`
+#### `stream.loop(stepper, seed) -> Stream`
+#### `most.loop(stepper, seed, stream) -> Stream`
 
 Create a feedback loop that emits one value and feeds back another to be used in the next iteration.
 
@@ -1009,7 +1009,7 @@ stream.loop((values, x) => {
 
 ### thru
 
-####`stream.thru(transform) -> Stream`
+#### `stream.thru(transform) -> Stream`
 
 `transform(stream: Stream) -> Stream`
 
@@ -1070,8 +1070,8 @@ const stream2 = stream1.thru(transform.bind(null, x, y, z)))
 
 ### reduce
 
-####`stream.reduce(f, initial) -> Promise`
-####`most.reduce(f, initial, stream) -> Promise`
+#### `stream.reduce(f, initial) -> Promise`
+#### `most.reduce(f, initial, stream) -> Promise`
 
 Reduce a stream, returning a promise for the ultimate result.
 
@@ -1090,10 +1090,10 @@ The reduce function (`f` above)
 
 Alias: **forEach**
 
-####`stream.observe(f) -> Promise`
-####`stream.forEach(f) -> Promise`
-####`most.observe(f, stream) -> Promise`
-####`most.forEach(f, stream) -> Promise`
+#### `stream.observe(f) -> Promise`
+#### `stream.forEach(f) -> Promise`
+#### `most.observe(f, stream) -> Promise`
+#### `most.forEach(f, stream) -> Promise`
 
 Start consuming events from `stream`, processing each with `f`.  The returned promise will fulfill after all the events have been consumed, or will reject if the stream fails and the [error is not handled](#handling-errors).
 
@@ -1109,8 +1109,8 @@ most.fromEvent('mousemove', document)
 
 ### drain
 
-####`stream.drain() -> Promise`
-####`most.drain(stream) -> Promise`
+#### `stream.drain() -> Promise`
+#### `most.drain(stream) -> Promise`
 
 Start consuming events from `stream`.  This can be useful in some cases where you don't want or need to process the terminal events--e.g. when all processing has been done via upstream side-effects.  Most times, however, you'll use [`observe`](#observe) to consume *and process* terminal events.
 
@@ -1118,7 +1118,7 @@ The returned promise will fulfill after all the events have been consumed, or wi
 
 ### subscribe
 
-####`stream.subscribe(Observer) -> Subscription`
+#### `stream.subscribe(Observer) -> Subscription`
 
 Draft ES Observable compatible subscribe.  Start consuming events from `stream` by providing an [Observer object](https://github.com/zenparsing/es-observable#observer).
 
@@ -1177,8 +1177,8 @@ However, there are also some important differences.
 
 ### merge
 
-####`stream1.merge(stream2) -> Stream`
-####`most.merge(stream1, stream2) -> Stream`
+#### `stream1.merge(stream2) -> Stream`
+#### `most.merge(stream1, stream2) -> Stream`
 
 Create a new stream containing events from `stream1` and `stream2`.
 
@@ -1194,7 +1194,7 @@ In contrast to `concat`, `merge` preserves the arrival times of events. That is,
 
 ### mergeArray
 
-####`most.mergeArray(arrayOfStreams) -> Stream`
+#### `most.mergeArray(arrayOfStreams) -> Stream`
 
 Array form of [merge](#merge).  Create a new Stream containing all events from all streams in `arrayOfStreams`.
 
@@ -1209,8 +1209,8 @@ See [merge](#merge) for more details.
 
 ### combine
 
-####`stream1.combine(f, stream2) -> Stream`
-####`most.combine(f, stream1, stream2) -> Stream`
+#### `stream1.combine(f, stream2) -> Stream`
+#### `most.combine(f, stream1, stream2) -> Stream`
 
 Create a new stream that emits the set of latest event values from all input streams whenever a new event arrives on any input stream.
 
@@ -1253,7 +1253,7 @@ resultStream.observe(z => {
 
 ### combineArray
 
-####`most.combineArray(f, arrayOfStreams) -> Stream`
+#### `most.combineArray(f, arrayOfStreams) -> Stream`
 
 Array form of [combine](#combine). Create a new stream that emits the set of latest event values from all input streams whenever a new event arrives on any input stream.
 
@@ -1268,8 +1268,8 @@ See [combine](#combine) for more details.
 
 ### sample
 
-####`sampler.sample(f, ...streams) -> Stream`
-####`most.sample(f, sampler, ...streams) -> Stream`
+#### `sampler.sample(f, ...streams) -> Stream`
+#### `most.sample(f, sampler, ...streams) -> Stream`
 
 Create a new stream by combining sampled values from many input streams.
 
@@ -1322,8 +1322,8 @@ resultStream.observe(z => {
 
 ### sampleWith
 
-####`values.sampleWith(sampler) -> Stream`
-####`most.sampleWith(sampler, values) -> Stream`
+#### `values.sampleWith(sampler) -> Stream`
+#### `most.sampleWith(sampler, values) -> Stream`
 
 When an event arrives on sampler, emit the latest event value from values.  Effectively equivalent to `sampler.sample(identity, values);`
 
@@ -1351,8 +1351,8 @@ most.fromEvent('mousemove', document)
 
 ### zip
 
-####`stream1.zip(f, stream2) -> Stream`
-####`most.zip(f, stream1, stream2) -> Stream`
+#### `stream1.zip(f, stream2) -> Stream`
+#### `most.zip(f, stream1, stream2) -> Stream`
 
 Create a new stream by applying a function to corresponding pairs of events from the inputs streams.
 
@@ -1392,8 +1392,8 @@ most.from([1, 2, 3, 4])
 
 Alias: **switch**
 
-####`stream.switchLatest() -> Stream`
-####`most.switchLatest(stream) -> Stream`
+#### `stream.switchLatest() -> Stream`
+#### `most.switchLatest(stream) -> Stream`
 
 Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that adopts the behavior of (ie emits the events of) the most recent inner stream.
 
@@ -1408,8 +1408,8 @@ stream.switchLatest(): -a-b-c-4-5-6->
 
 ### join
 
-####`stream.join() -> Stream`
-####`most.join(stream) -> Stream`
+#### `stream.join() -> Stream`
+#### `most.join(stream) -> Stream`
 
 Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that merges all the inner streams as they arrive.
 
@@ -1424,8 +1424,8 @@ stream.join(): ---a---b--4c-5-d6->
 
 ### mergeConcurrently
 
-####`stream.mergeConcurrently(concurrency) -> Stream`
-####`most.mergeConcurrently(concurrency, stream) -> Stream`
+#### `stream.mergeConcurrently(concurrency) -> Stream`
+#### `most.mergeConcurrently(concurrency, stream) -> Stream`
 
 Given a [higher-order stream](https://github.com/cujojs/most/wiki/Concepts#higher-order-streams), return a new stream that merges inner streams as they arrive *up to the specified concurrency*.  Once `concurrency` number of streams are being merged, newly arriving streams will be merged after an existing one ends.
 
@@ -1449,8 +1449,8 @@ To control concurrency, `mergeConcurrently` must maintain an internal queue of n
 
 Deprecated alias: `await`
 
-####`stream.awaitPromises() -> Stream`
-####`most.awaitPromises(stream) -> Stream`
+#### `stream.awaitPromises() -> Stream`
+#### `most.awaitPromises(stream) -> Stream`
 
 Given a stream of promises, ie Stream&lt;Promise&lt;X&gt;&gt;, return a new stream containing the fulfillment values, ie Stream&lt;X&gt;.
 
@@ -1506,8 +1506,8 @@ streamOfContent.forEach(content => console.log(content))
 
 ### debounce
 
-####`stream.debounce(debounceTime) -> Stream`
-####`most.debounce(debounceTime, stream) -> Stream`
+#### `stream.debounce(debounceTime) -> Stream`
+#### `most.debounce(debounceTime, stream) -> Stream`
 
 Wait for a burst of events to subside and emit only the last event in the burst.
 
@@ -1545,8 +1545,8 @@ See the [type-to-search example](../examples) for a more complete example of usi
 
 ### throttle
 
-####`stream.throttle(throttlePeriod) -> Stream`
-####`most.throttle(throttlePeriod, stream) -> Stream`
+#### `stream.throttle(throttlePeriod) -> Stream`
+#### `most.throttle(throttlePeriod, stream) -> Stream`
 
 Limit the rate of events to at most one per throttlePeriod.
 
@@ -1561,8 +1561,8 @@ In contrast to debounce, throttle simply drops events that occur more often than
 
 ### delay
 
-####`stream.delay(delayTime) -> Stream`
-####`most.delay(delayTime, stream) -> Stream`
+#### `stream.delay(delayTime) -> Stream`
+#### `most.delay(delayTime, stream) -> Stream`
 
 Timeshift a `stream` by `delayTime`.
 
@@ -1578,8 +1578,8 @@ Delaying a stream timeshifts all the events by the same amount.  Delaying doesn'
 
 ### multicast
 
-####`stream.multicast() -> Stream`
-####`most.multicast(stream) -> Stream`
+#### `stream.multicast() -> Stream`
+#### `most.multicast(stream) -> Stream`
 
 Returns a stream equivalent to the original, but which can be shared more efficiently among multiple consumers.
 
