@@ -87,13 +87,12 @@ SliceSink.prototype.event = function (t, x) { // eslint-disable-line complexity
   this.take -= 1
   this.sink.event(t, x)
   if (this.take === 0) {
-    this.dispose()
     this.sink.end(t, x)
   }
 }
 
 SliceSink.prototype.dispose = function () {
-  return this.disposable.dispose()
+  this.disposable.dispose()
 }
 
 export function takeWhile (p, stream) {
@@ -129,7 +128,6 @@ TakeWhileSink.prototype.event = function (t, x) {
   if (this.active) {
     this.sink.event(t, x)
   } else {
-    this.dispose()
     this.sink.end(t, x)
   }
 }
