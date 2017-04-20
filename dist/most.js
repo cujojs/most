@@ -12,6 +12,10 @@ function Stream (source) {
   this.source = source;
 }
 
+Stream.prototype.run = function (sink, scheduler) {
+  return this.source.run(sink, scheduler)
+};
+
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 
 // Non-mutating array operations
@@ -531,11 +535,7 @@ function runProducer (t, array, sink) {
     sink.event(t, array[i]);
   }
 
-  this.active && end(t);
-
-  function end (t) {
-    sink.end(t);
-  }
+  this.active && sink.end(t);
 }
 
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -3167,20 +3167,20 @@ function Slice (min, max, source) {
 }
 
 Slice.prototype.run = function (sink, scheduler) {
-  return new SliceSink(this.min, this.max - this.min, this.source, sink, scheduler)
+  return this.source.run(new SliceSink(this.min, this.max - this.min, sink), scheduler)
 };
 
-function SliceSink (skip, take, source, sink, scheduler) {
+function SliceSink (skip, take, sink) {
   this.sink = sink;
   this.skip = skip;
   this.take = take;
-  this.disposable = once(source.run(this, scheduler));
 }
 
 SliceSink.prototype.end = Pipe.prototype.end;
 SliceSink.prototype.error = Pipe.prototype.error;
 
-SliceSink.prototype.event = function (t, x) { // eslint-disable-line complexity
+SliceSink.prototype.event = function (t, x) {
+  /* eslint complexity: [1, 4] */
   if (this.skip > 0) {
     this.skip -= 1;
     return
@@ -3193,13 +3193,8 @@ SliceSink.prototype.event = function (t, x) { // eslint-disable-line complexity
   this.take -= 1;
   this.sink.event(t, x);
   if (this.take === 0) {
-    this.dispose();
     this.sink.end(t, x);
   }
-};
-
-SliceSink.prototype.dispose = function () {
-  return this.disposable.dispose()
 };
 
 function takeWhile (p, stream) {
@@ -3212,14 +3207,13 @@ function TakeWhile (p, source) {
 }
 
 TakeWhile.prototype.run = function (sink, scheduler) {
-  return new TakeWhileSink(this.p, this.source, sink, scheduler)
+  return this.source.run(new TakeWhileSink(this.p, sink), scheduler)
 };
 
-function TakeWhileSink (p, source, sink, scheduler) {
+function TakeWhileSink (p, sink) {
   this.p = p;
   this.sink = sink;
   this.active = true;
-  this.disposable = once(source.run(this, scheduler));
 }
 
 TakeWhileSink.prototype.end = Pipe.prototype.end;
@@ -3235,13 +3229,8 @@ TakeWhileSink.prototype.event = function (t, x) {
   if (this.active) {
     this.sink.event(t, x);
   } else {
-    this.dispose();
     this.sink.end(t, x);
   }
-};
-
-TakeWhileSink.prototype.dispose = function () {
-  return this.disposable.dispose()
 };
 
 function skipWhile (p, stream) {
