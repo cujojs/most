@@ -78,3 +78,14 @@ describe('skipWhile', function () {
     return expectArray([5, 6, 7, 8, 9], s)
   })
 })
+
+describe('skipAfter', function () {
+  it('should skip all elements after the first one for the condition is true', function () {
+    var a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    var s = slice.skipAfter(function (x) {
+      return x > 5
+    }, fromArray(a))
+
+    return expectArray([0, 1, 2, 3, 4, 5, 6], s)
+  })
+})

@@ -44,6 +44,7 @@ most.js API
 	* [skip](#skip)
 	* [takeWhile](#takewhile)
 	* [skipWhile](#skipwhile)
+	* [skipAfter](#skipAfter)
 	* [until](#until), alias [takeUntil](#until)
 	* [since](#since), alias [skipUntil](#since)
 	* [during](#during)
@@ -888,7 +889,19 @@ Create a new stream containing all events after `predicate` returns false.
 
 ```
 stream:                 -2-4-5-6-8->
-stream.skipWhile(even): -----5-6-8->
+stream.skipAfter(even): -----5-6-8->
+```
+
+### skipAfter
+
+#### `stream.skipAfter(predicate) -> Stream`
+#### `most.skipAfter(predicate, stream) -> Stream`
+
+Create a new stream containing all events before and including when the `predicate` returns true.
+
+```
+stream:                 -1-2-4-5-6-8->
+stream.skipAfter(even): ---1-2->
 ```
 
 ### until
