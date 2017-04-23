@@ -889,7 +889,7 @@ Create a new stream containing all events after `predicate` returns false.
 
 ```
 stream:                 -2-4-5-6-8->
-stream.skipAfter(even): -----5-6-8->
+stream.skipWhile(even): -----5-6-8->
 ```
 
 ### skipAfter
