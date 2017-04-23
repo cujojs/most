@@ -44,7 +44,7 @@ most.js API
 	* [skip](#skip)
 	* [takeWhile](#takewhile)
 	* [skipWhile](#skipwhile)
-	* [skipAfter](#skipAfter)
+	* [skipAfter](#skipafter)
 	* [until](#until), alias [takeUntil](#until)
 	* [since](#since), alias [skipUntil](#since)
 	* [during](#during)
