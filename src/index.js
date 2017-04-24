@@ -510,7 +510,7 @@ Stream.prototype.skipWhile = function (p) {
 
 /**
  * stream:                        -123456789->
- * skipAfter(x => x === 5, stream): ---12345->
+ * skipAfter(x => x === 5, stream): ---12345|
  * @param {function(x:*):boolean} p predicate
  * @returns {Stream} stream containing items up to, *and including*, the
  * first item for which p returns truthy.

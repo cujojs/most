@@ -901,7 +901,7 @@ Create a new stream containing all events before and including when the `predica
 
 ```
 stream:                 -1-2-4-5-6-8->
-stream.skipAfter(even): ---1-2->
+stream.skipAfter(even): ---1-2|
 ```
 
 ### until

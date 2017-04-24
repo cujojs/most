@@ -161,7 +161,7 @@ SkipWhileSink.prototype.event = function (t, x) {
 }
 
 export function skipAfter (p, stream) {
-  return new stream.constructor(new SkipAfter(p, stream.source))
+  return new Stream(new SkipAfter(p, stream.source))
 }
 
 function SkipAfter (p, source) {
@@ -180,12 +180,16 @@ function SkipAfterSink (p, sink) {
 }
 
 SkipAfterSink.prototype.event = function event (t, x) {
+  if (this.skipping) {
+    return
+  }
+
   var p = this.p
+  this.skipping = p(x)
+  this.sink.event(t, x)
+
   if (this.skipping) {
     this.sink.end(t, x)
-  } else {
-    this.skipping = p(x)
-    this.sink.event(t, x)
   }
 }
 
