@@ -159,3 +159,39 @@ SkipWhileSink.prototype.event = function (t, x) {
 
   this.sink.event(t, x)
 }
+
+export function skipAfter (p, stream) {
+  return new Stream(new SkipAfter(p, stream.source))
+}
+
+function SkipAfter (p, source) {
+  this.p = p
+  this.source = source
+}
+
+SkipAfter.prototype.run = function run (sink, scheduler) {
+  return this.source.run(new SkipAfterSink(this.p, sink), scheduler)
+}
+
+function SkipAfterSink (p, sink) {
+  this.p = p
+  this.sink = sink
+  this.skipping = false
+}
+
+SkipAfterSink.prototype.event = function event (t, x) {
+  if (this.skipping) {
+    return
+  }
+
+  var p = this.p
+  this.skipping = p(x)
+  this.sink.event(t, x)
+
+  if (this.skipping) {
+    this.sink.end(t, x)
+  }
+}
+
+SkipAfterSink.prototype.end = Pipe.prototype.end
+SkipAfterSink.prototype.error = Pipe.prototype.error

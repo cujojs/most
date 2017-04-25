@@ -6,6 +6,7 @@ var slice = require('../src/combinator/slice')
 var map = require('../src/combinator/transform').map
 var Map = require('../src/fusion/Map').default
 var fromArray = require('../src/source/fromArray').fromArray
+var empty = require('../src/source/core').empty
 
 var expectArray = require('./helper/stream-helper').expectArray
 
@@ -76,5 +77,36 @@ describe('skipWhile', function () {
     }, fromArray(a))
 
     return expectArray([5, 6, 7, 8, 9], s)
+  })
+})
+
+describe('skipAfter', function () {
+  it('should be empty if source stream is empty', function () {
+    var spy = this.spy()
+    var s = slice.skipAfter(function (x) {
+      return false
+    }, empty())
+
+    return s.observe(spy).then(function () {
+      expect(spy).not.toHaveBeenCalled()
+    })
+  })
+
+  it('should skip all elements after the first one for which the condition is true', function () {
+    var a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    var s = slice.skipAfter(function (x) {
+      return x === 5
+    }, fromArray(a))
+
+    return expectArray([0, 1, 2, 3, 4, 5], s)
+  })
+
+  it('should contain all elements when condition is false', function () {
+    var a = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    var s = slice.skipAfter(function (x) {
+      return false
+    }, fromArray(a))
+
+    return expectArray(a, s)
   })
 })
