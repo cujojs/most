@@ -900,8 +900,8 @@ stream.skipWhile(even): -----5-6-8->
 Create a new stream containing all events before and including when the `predicate` returns true.
 
 ```
-stream:                 -1-2-4-5-6-8->
-stream.skipAfter(even): ---1-2|
+stream:                 -1-2-3-4-5-6-8->
+stream.skipAfter(even): -1-2|
 ```
 
 ### until
