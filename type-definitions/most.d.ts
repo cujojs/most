@@ -145,6 +145,7 @@ export interface Stream<A> extends Source<A> {
   skip(n: number): Stream<A>;
   takeWhile(p: (a: A) => boolean): Stream<A>;
   skipWhile(p: (a: A) => boolean): Stream<A>;
+  skipAfter(p: (a: A) => boolean): Stream<A>;
   slice(start: number, end: number): Stream<A>;
 
   until(signal: Stream<any>): Stream<A>;
@@ -318,6 +319,7 @@ export function take<A>(n: number, s: Stream<A>): Stream<A>;
 export function skip<A>(n: number, s: Stream<A>): Stream<A>;
 export function takeWhile<A>(p: (a:  A) => boolean, s: Stream<A>): Stream<A>;
 export function skipWhile<A>(p: (a: A) => boolean, s: Stream<A>): Stream<A>;
+export function skipAfter<A>(p: (a: A) => boolean, s: Stream<A>): Stream<A>;
 export function slice<A>(start: number, end: number, s: Stream<A>): Stream<A>;
 
 export function until<A>(signal: Stream<any>, s: Stream<A>): Stream<A>;
