@@ -3267,6 +3267,42 @@ SkipWhileSink.prototype.event = function (t, x) {
   this.sink.event(t, x);
 };
 
+function skipAfter (p, stream) {
+  return new Stream(new SkipAfter(p, stream.source))
+}
+
+function SkipAfter (p, source) {
+  this.p = p;
+  this.source = source;
+}
+
+SkipAfter.prototype.run = function run (sink, scheduler) {
+  return this.source.run(new SkipAfterSink(this.p, sink), scheduler)
+};
+
+function SkipAfterSink (p, sink) {
+  this.p = p;
+  this.sink = sink;
+  this.skipping = false;
+}
+
+SkipAfterSink.prototype.event = function event (t, x) {
+  if (this.skipping) {
+    return
+  }
+
+  var p = this.p;
+  this.skipping = p(x);
+  this.sink.event(t, x);
+
+  if (this.skipping) {
+    this.sink.end(t, x);
+  }
+};
+
+SkipAfterSink.prototype.end = Pipe.prototype.end;
+SkipAfterSink.prototype.error = Pipe.prototype.error;
+
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
@@ -4270,6 +4306,17 @@ Stream.prototype.skipWhile = function (p) {
   return skipWhile(p, this)
 };
 
+/**
+ * stream:                         -123456789->
+ * skipAfter(x => x === 5, stream):-12345|
+ * @param {function(x:*):boolean} p predicate
+ * @returns {Stream} stream containing items up to, *and including*, the
+ * first item for which p returns truthy.
+ */
+Stream.prototype.skipAfter = function (p) {
+  return skipAfter(p, this)
+};
+
 // -----------------------------------------------------------------------
 // Time slicing
 
@@ -4465,6 +4512,7 @@ exports.skip = skip;
 exports.slice = slice;
 exports.takeWhile = takeWhile;
 exports.skipWhile = skipWhile;
+exports.skipAfter = skipAfter;
 exports.takeUntil = takeUntil;
 exports.until = takeUntil;
 exports.skipUntil = skipUntil;
