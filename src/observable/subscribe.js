@@ -7,7 +7,7 @@ import * as dispose from '../disposable/dispose'
 import fatalError from '../fatalError'
 
 export function subscribe (subscriber, stream) {
-  if (subscriber == null || typeof subscriber !== 'object') {
+  if (Object(subscriber) !== subscriber) {
     throw new TypeError('subscriber must be an object')
   }
 
