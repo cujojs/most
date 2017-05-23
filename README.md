@@ -125,7 +125,7 @@ Most.js works with typescript out of the box as it provides [local typings](http
 
 Most.js has a dependency on native Promises so a type definition for Promise must be available in your setup:  
  - If your tsconfig is targeting ES6, you do not need to do anything as typescript will include a definition for Promise by default.
- - If your tsconfig is targeting ES5, you need to provide your own Promise definition. For instance [es6shim.d.ts](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/es6-shim/es6-shim.d.ts)
+ - If your tsconfig is targeting ES5, you need to provide your own Promise definition. For instance [es6-shim.d.ts](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/types/es6-shim/es6-shim.d.ts)
 
 ## Interoperability
 
