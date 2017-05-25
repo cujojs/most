@@ -163,22 +163,29 @@ export interface Stream<A> extends Source<A> {
   await<B>(): Stream<B>;
 
   sample<B, C, R>(
-    fn: (b: B, c: C) => R,
-    b: Stream<B>,
-    c: Stream<C>
-  ): Stream<R>;
-  sample<B, C, D, R>(
-    fn: (b: B, c: C, d: D) => R,
+    fn: (b: B, c: C, ...values: V[]) => R,
     b: Stream<B>,
     c: Stream<C>,
-    d: Stream<D>
+    ...streams: Stream<V>[]
   ): Stream<R>;
-  sample<B, C, D, E, R>(
-    fn: (b: B, c: C, d: D, e: E) => R,
+  sample<B, C, D, R>(
+    fn: (b: B, c: C, d: D, ...values: V[]) => R,
     b: Stream<B>,
     c: Stream<C>,
     d: Stream<D>,
-    e: Stream<E>
+    ...streams: Stream<V>[]
+  ): Stream<R>;
+  sample<B, C, D, E, R>(
+    fn: (b: B, c: C, d: D, e: E, ...values: V[]) => R,
+    b: Stream<B>,
+    c: Stream<C>,
+    d: Stream<D>,
+    e: Stream<E>,
+    ...streams: Stream<V>[]
+  ): Stream<R>;
+  sample<B,R>(
+    fn: (...values: V[]) => R,
+    ...streams: Stream<V>[]
   ): Stream<R>;
 
   sampleWith(sampler: Stream<any>): Stream<A>;
@@ -365,6 +372,11 @@ export function sample<A, B, C, D, E, R>(
   c: Stream<C>,
   d: Stream<D>,
   e: Stream<E>
+): Stream<R>;
+export function sample<A, R>(
+  fn: (...values: A[]) => R,
+  sampler: Stream<any>,
+  ...streams: Stream<A>[]
 ): Stream<R>;
 
 export function sampleWith<A>(sampler: Stream<any>, s: Stream<A>): Stream<A>;
