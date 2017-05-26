@@ -45,7 +45,7 @@
   "license": "MIT",
   "devDependencies": {
     "@most/eslint-config-most": "^1.0.3",
-    "@most/hold": "2.0.0",
+    "@most/hold": "^2.0.0",
     "babel-polyfill": "^6.20.0",
     "buba": "^4.0.1",
     "buster": "^0.7.18",
