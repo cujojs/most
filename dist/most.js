@@ -1070,7 +1070,7 @@ var defaultScheduler = new Scheduler(new ClockTimer(), new Timeline());
 /** @author John Hann */
 
 function subscribe (subscriber, stream) {
-  if (subscriber == null || typeof subscriber !== 'object') {
+  if (Object(subscriber) !== subscriber) {
     throw new TypeError('subscriber must be an object')
   }
 
