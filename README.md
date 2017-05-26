@@ -8,6 +8,8 @@ _  /  / / / /_/ /____/ /_  /
 
 # Monadic streams for reactive programming
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/cujojs/most.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
 [![Join the chat at https://gitter.im/cujojs/most](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cujojs/most?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
