@@ -12,7 +12,7 @@ var SubscribeObserver = s.SubscribeObserver
 var Subscription = s.Subscription
 
 describe('subscribe', function () {
-  it('should return { unsubscribe: () => void }', function () {
+  it('should return { unsubscribe: () => void } when passed an object', function () {
     var subscription = subscribe({}, empty())
 
     refute.same(null, subscription)
@@ -22,7 +22,17 @@ describe('subscribe', function () {
     assert.same(undefined, subscription.unsubscribe())
   })
 
-  it('should throw TypeError if subscriber not an object', function () {
+  it('should return { unsubscribe: () => void } when passed a function', function () {
+    var subscription = subscribe(function () {}, empty())
+
+    refute.same(null, subscription)
+    assert.isObject(subscription)
+    assert.isFunction(subscription.unsubscribe)
+
+    assert.same(undefined, subscription.unsubscribe())
+  })
+
+  it('should throw TypeError if subscriber not an object (or function)', function () {
     assert.exception(function () {
       subscribe(null, empty())
     }, function (e) { return e instanceof TypeError })
