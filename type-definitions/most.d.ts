@@ -29,8 +29,8 @@ export interface ScheduledTask {
 export interface Scheduler {
   now(): number;
   asap(task: Task): ScheduledTask;
-  delay(task: Task): ScheduledTask;
-  periodic(task: Task): ScheduledTask;
+  delay(delay: number, task: Task): ScheduledTask;
+  periodic(period: number, task: Task): ScheduledTask;
   schedule(delay: number, period: number, task: Task): ScheduledTask;
   cancel(task: Task): void;
   cancelAll(predicate: (task: Task) => boolean): void;
