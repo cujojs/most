@@ -1577,7 +1577,7 @@ In contrast to debounce, throttle simply drops events that occur more often than
 #### `stream.delay(delayTime) -> Stream`
 #### `most.delay(delayTime, stream) -> Stream`
 
-Timeshift a `stream` by `delayTime`.
+Timeshift a `stream` by `delayTime` in milliseconds.
 
 ```
 stream:          -a-b-c-d->
