@@ -36,7 +36,7 @@ export interface Scheduler {
   cancelAll(predicate: (task: Task) => boolean): void;
 }
 
-export interface Disposable<A> {
+export interface Disposable<A = any> {
   dispose(): void | Promise<A>;
 }
 
