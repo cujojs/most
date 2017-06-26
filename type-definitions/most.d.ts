@@ -137,6 +137,7 @@ export interface Stream<A> extends Source<A> {
   concat(s2: Stream<A>): Stream<A>;
   startWith(a: A): Stream<A>;
 
+  filter<B extends A>(p: (val: A) => val is B): Stream<B>;
   filter(p: (a: A) => boolean): Stream<A>;
   skipRepeats(): Stream<A>;
   skipRepeatsWith(eq: (a1: A, a2: A) => boolean): Stream<A>;
@@ -311,6 +312,10 @@ export function loop<A, B, S>(f: (seed: S, a: A) => SeedValue<S, B>, seed: S, s:
 export function concat<A>(s1: Stream<A>, s2: Stream<A>): Stream<A>;
 export function startWith<A>(a: A, s: Stream<A>): Stream<A>;
 
+export function filter<A, B extends A>(
+  p: (val: A) => val is B,
+  s: Stream<A>
+): Stream<B>;
 export function filter<A>(p: (a: A) => boolean, s: Stream<A>): Stream<A>;
 export function skipRepeats<A>(s: Stream<A>): Stream<A>;
 export function skipRepeatsWith<A>(eq: (a1: A, a2: A) => boolean, s: Stream<A>): Stream<A>;
