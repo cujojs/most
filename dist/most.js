@@ -167,7 +167,7 @@ function removeAll (f, a) {
   var l = a.length;
   var b = new Array(l);
   var j = 0;
-  for (var x = void 0, i = 0; i < l; ++i) {
+  for (var x = (void 0), i = 0; i < l; ++i) {
     x = a[i];
     if (!f(x)) {
       b[j] = x;
@@ -412,11 +412,11 @@ PropagateTask.event = function (value, sink) {
 };
 
 PropagateTask.end = function (value, sink) {
-  return new PropagateTask(end$1, value, sink)
+  return new PropagateTask(end, value, sink)
 };
 
 PropagateTask.error = function (value, sink) {
-  return new PropagateTask(error$1, value, sink)
+  return new PropagateTask(error, value, sink)
 };
 
 PropagateTask.prototype.dispose = function () {
@@ -437,7 +437,7 @@ PropagateTask.prototype.error = function (t, e) {
   this.sink.error(t, e);
 };
 
-function error$1 (t, e, sink) {
+function error (t, e, sink) {
   sink.error(t, e);
 }
 
@@ -445,7 +445,7 @@ function emit (t, x, sink) {
   sink.event(t, x);
 }
 
-function end$1 (t, x, sink) {
+function end (t, x, sink) {
   sink.end(t, x);
 }
 
@@ -479,7 +479,7 @@ function runJust (t, x, sink) {
  * Stream containing no events and ends immediately
  * @returns {Stream}
  */
-function empty$$1 () {
+function empty () {
   return EMPTY
 }
 
@@ -1922,7 +1922,7 @@ function handle (generate, result) {
   return Promise.resolve(result.value).then(function (x) {
     return emit$1(generate, x)
   }, function (e) {
-    return error$2(generate, e)
+    return error$1(generate, e)
   })
 }
 
@@ -1931,7 +1931,7 @@ function emit$1 (generate, x) {
   return next(generate, x)
 }
 
-function error$2 (generate, e) {
+function error$1 (generate, e) {
   return handle(generate, generate.iterator.throw(e))
 }
 
@@ -2097,7 +2097,7 @@ function combine (f /*, ...streams */) {
 */
 function combineArray (f, streams) {
   var l = streams.length;
-  return l === 0 ? empty$$1()
+  return l === 0 ? empty()
   : l === 1 ? map$2(f, streams[0])
   : new Stream(combineSources(f, streams))
 }
@@ -2582,7 +2582,7 @@ function merge (/* ...streams*/) {
  */
 function mergeArray (streams) {
   var l = streams.length;
-  return l === 0 ? empty$$1()
+  return l === 0 ? empty()
     : l === 1 ? streams[0]
     : new Stream(mergeSources(streams))
 }
@@ -2843,7 +2843,7 @@ function zip (f /*, ...streams */) {
 *  using f
 */
 function zipArray (f, streams) {
-  return streams.length === 0 ? empty$$1()
+  return streams.length === 0 ? empty()
 : streams.length === 1 ? map$2(f, streams[0])
 : new Stream(new Zip(f, map$4(getSource$2, streams)))
 }
@@ -3140,7 +3140,7 @@ function skip (n, stream) {
  * @returns {Stream} stream containing items where start <= index < end
  */
 function slice (start, end, stream) {
-  return end <= start ? empty$$1()
+  return end <= start ? empty()
     : new Stream(sliceSource(start, end, stream.source))
 }
 
@@ -3915,7 +3915,7 @@ function multicast (stream) {
 
 // Add of and empty to constructor for fantasy-land compat
 Stream.of = of;
-Stream.empty = empty$$1;
+Stream.empty = empty;
 // Add from to constructor for ES Observable compat
 Stream.from = from;
 // -----------------------------------------------------------------------
@@ -4467,7 +4467,7 @@ Stream.prototype.multicast = function () {
 exports.Stream = Stream;
 exports.of = of;
 exports.just = of;
-exports.empty = empty$$1;
+exports.empty = empty;
 exports.never = never;
 exports.from = from;
 exports.periodic = periodic;
