@@ -5,6 +5,7 @@
 import Stream from '../Stream'
 import Pipe from '../sink/Pipe'
 import * as core from '../source/core'
+import * as dispose from '../disposable/dispose'
 import Map from '../fusion/Map'
 
 /**
@@ -60,13 +61,18 @@ function Slice (min, max, source) {
 }
 
 Slice.prototype.run = function (sink, scheduler) {
-  return this.source.run(new SliceSink(this.min, this.max - this.min, sink), scheduler)
+  var disposable = dispose.settable()
+  var sliceSink = new SliceSink(this.min, this.max - this.min, sink, disposable)
+
+  disposable.setDisposable(this.source.run(sliceSink, scheduler))
+  return disposable
 }
 
-function SliceSink (skip, take, sink) {
+function SliceSink (skip, take, sink, disposable) {
   this.sink = sink
   this.skip = skip
   this.take = take
+  this.disposable = disposable
 }
 
 SliceSink.prototype.end = Pipe.prototype.end
@@ -86,6 +92,7 @@ SliceSink.prototype.event = function (t, x) {
   this.take -= 1
   this.sink.event(t, x)
   if (this.take === 0) {
+    this.disposable.dispose()
     this.sink.end(t, x)
   }
 }
@@ -100,13 +107,18 @@ function TakeWhile (p, source) {
 }
 
 TakeWhile.prototype.run = function (sink, scheduler) {
-  return this.source.run(new TakeWhileSink(this.p, sink), scheduler)
+  var disposable = dispose.settable()
+  var takeWhileSink = new TakeWhileSink(this.p, sink, disposable)
+
+  disposable.setDisposable(this.source.run(takeWhileSink, scheduler))
+  return disposable
 }
 
-function TakeWhileSink (p, sink) {
+function TakeWhileSink (p, sink, disposable) {
   this.p = p
   this.sink = sink
   this.active = true
+  this.disposable = disposable
 }
 
 TakeWhileSink.prototype.end = Pipe.prototype.end
@@ -122,6 +134,7 @@ TakeWhileSink.prototype.event = function (t, x) {
   if (this.active) {
     this.sink.event(t, x)
   } else {
+    this.disposable.dispose()
     this.sink.end(t, x)
   }
 }
