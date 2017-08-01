@@ -2,10 +2,12 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import Stream from '../Stream'
-import Pipe from '../sink/Pipe'
 import * as core from '../source/core'
+import * as dispose from '../disposable/dispose'
+
 import Map from '../fusion/Map'
+import Pipe from '../sink/Pipe'
+import Stream from '../Stream'
 
 /**
  * @param {number} n
@@ -60,13 +62,15 @@ function Slice (min, max, source) {
 }
 
 Slice.prototype.run = function (sink, scheduler) {
-  return this.source.run(new SliceSink(this.min, this.max - this.min, sink), scheduler)
+  return new SliceSink(this.min, this.max - this.min, this.source, sink, scheduler)
 }
 
-function SliceSink (skip, take, sink) {
+function SliceSink (skip, take, source, sink, scheduler) {
   this.sink = sink
   this.skip = skip
   this.take = take
+  this.disposable = dispose.settable()
+  this.disposable.setDisposable(source.run(this, scheduler))
 }
 
 SliceSink.prototype.end = Pipe.prototype.end
@@ -85,9 +89,15 @@ SliceSink.prototype.event = function (t, x) {
 
   this.take -= 1
   this.sink.event(t, x)
+
   if (this.take === 0) {
+    this.dispose()
     this.sink.end(t, x)
   }
+}
+
+SliceSink.prototype.dispose = function () {
+  return this.disposable.dispose()
 }
 
 export function takeWhile (p, stream) {
@@ -100,13 +110,15 @@ function TakeWhile (p, source) {
 }
 
 TakeWhile.prototype.run = function (sink, scheduler) {
-  return this.source.run(new TakeWhileSink(this.p, sink), scheduler)
+  return new TakeWhileSink(this.p, this.source, sink, scheduler)
 }
 
-function TakeWhileSink (p, sink) {
+function TakeWhileSink (p, source, sink, scheduler) {
   this.p = p
   this.sink = sink
   this.active = true
+  this.disposable = dispose.settable()
+  this.disposable.setDisposable(source.run(this, scheduler))
 }
 
 TakeWhileSink.prototype.end = Pipe.prototype.end
@@ -122,8 +134,13 @@ TakeWhileSink.prototype.event = function (t, x) {
   if (this.active) {
     this.sink.event(t, x)
   } else {
+    this.dispose()
     this.sink.end(t, x)
   }
+}
+
+TakeWhileSink.prototype.dispose = function () {
+  return this.disposable.dispose()
 }
 
 export function skipWhile (p, stream) {
