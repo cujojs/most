@@ -1,7 +1,7 @@
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.most = global.most || {})));
+	(factory((global.most = {})));
 }(this, (function (exports) { 'use strict';
 
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
@@ -206,13 +206,6 @@ var compose = function (f, g) { return function (x) { return f(g(x)); }; };
 
 // apply :: (a -> b) -> a -> b
 var apply = function (f, x) { return f(x); };
-
-// curry2 :: ((a, b) -> c) -> (a -> b -> c)
-
-
-// curry3 :: ((a, b, c) -> d) -> (a -> b -> c -> d)
-
-/** @license MIT License (c) copyright 2016 original author or authors */
 
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
@@ -3167,13 +3160,18 @@ function Slice (min, max, source) {
 }
 
 Slice.prototype.run = function (sink, scheduler) {
-  return this.source.run(new SliceSink(this.min, this.max - this.min, sink), scheduler)
+  var disposable = settable();
+  var sliceSink = new SliceSink(this.min, this.max - this.min, sink, disposable);
+
+  disposable.setDisposable(this.source.run(sliceSink, scheduler));
+  return disposable
 };
 
-function SliceSink (skip, take, sink) {
+function SliceSink (skip, take, sink, disposable) {
   this.sink = sink;
   this.skip = skip;
   this.take = take;
+  this.disposable = disposable;
 }
 
 SliceSink.prototype.end = Pipe.prototype.end;
@@ -3193,6 +3191,7 @@ SliceSink.prototype.event = function (t, x) {
   this.take -= 1;
   this.sink.event(t, x);
   if (this.take === 0) {
+    this.disposable.dispose();
     this.sink.end(t, x);
   }
 };
@@ -3207,13 +3206,18 @@ function TakeWhile (p, source) {
 }
 
 TakeWhile.prototype.run = function (sink, scheduler) {
-  return this.source.run(new TakeWhileSink(this.p, sink), scheduler)
+  var disposable = settable();
+  var takeWhileSink = new TakeWhileSink(this.p, sink, disposable);
+
+  disposable.setDisposable(this.source.run(takeWhileSink, scheduler));
+  return disposable
 };
 
-function TakeWhileSink (p, sink) {
+function TakeWhileSink (p, sink, disposable) {
   this.p = p;
   this.sink = sink;
   this.active = true;
+  this.disposable = disposable;
 }
 
 TakeWhileSink.prototype.end = Pipe.prototype.end;
@@ -3229,6 +3233,7 @@ TakeWhileSink.prototype.event = function (t, x) {
   if (this.active) {
     this.sink.event(t, x);
   } else {
+    this.disposable.dispose();
     this.sink.end(t, x);
   }
 };
