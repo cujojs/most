@@ -104,7 +104,7 @@ describe('debounce', function () {
     var s = new Stream(new FakeDisposeSource(dispose, streamOf(sentinel).source))
     var debounced = limit.debounce(1, s)
 
-    return drain(s).then(function () {
+    return drain(debounced).then(function () {
       expect(dispose).toHaveBeenCalledOnce()
     })
   })
