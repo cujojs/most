@@ -110,7 +110,7 @@ DebounceSink.prototype.error = function (t, x) {
 
 DebounceSink.prototype.dispose = function () {
   this._clearTimer()
-  this.disposable.dispose()
+  return this.disposable.dispose()
 }
 
 DebounceSink.prototype._clearTimer = function () {

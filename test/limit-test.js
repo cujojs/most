@@ -10,6 +10,9 @@ var take = require('../src/combinator/slice').take
 var fromArray = require('../src/source/fromArray').fromArray
 var core = require('../src/source/core')
 var Map = require('../src/fusion/Map').default
+var drain = require('../src/combinator/observe').drain
+var Stream = require('../src/Stream').default
+var FakeDisposeSource = require('./helper/FakeDisposeSource')
 
 var empty = core.empty
 var streamOf = core.of
@@ -94,6 +97,16 @@ describe('debounce', function () {
           { time: 7, value: 2 }
         ])
       })
+  })
+
+  it('should dispose', function () {
+    var dispose = this.spy()
+    var s = new Stream(new FakeDisposeSource(dispose, streamOf(sentinel).source))
+    var debounced = limit.debounce(1, s)
+
+    return drain(s).then(function () {
+      expect(dispose).toHaveBeenCalledOnce()
+    })
   })
 })
 
