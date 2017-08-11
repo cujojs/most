@@ -1119,7 +1119,7 @@ function doDispose (fatal, subscriber, complete, error, disposable, x) {
   }).catch(fatal);
 }
 
-/** @license MIT License (c) copyright 2010-2016 original author or authors */
+/** @license MIT License (c) copyright 2010-2017 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
 
@@ -3570,9 +3570,7 @@ function DebounceSink (dt, source, sink, scheduler) {
   this.scheduler = scheduler;
   this.value = void 0;
   this.timer = null;
-
-  var sourceDisposable = source.run(this, scheduler);
-  this.disposable = all([this, sourceDisposable]);
+  this.disposable = source.run(this, scheduler);
 }
 
 DebounceSink.prototype.event = function (t, x) {
@@ -3596,6 +3594,7 @@ DebounceSink.prototype.error = function (t, x) {
 
 DebounceSink.prototype.dispose = function () {
   this._clearTimer();
+  return this.disposable.dispose()
 };
 
 DebounceSink.prototype._clearTimer = function () {
