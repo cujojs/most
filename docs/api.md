@@ -1022,13 +1022,15 @@ stream.loop((values, x) => {
 
 ### thru
 
-#### `stream.thru(transform) -> Stream`
+#### `stream.thru(transform) -> R`
 
-`transform(stream: Stream) -> Stream`
+`transform (stream: Stream<A>) -> R`
 
 Use a functional API in fluent style.
 
 Functional APIs allow for the highest degree of modularity via external packages, such as [`@most/hold`](https://github.com/mostjs/hold), *without the risks of modifying prototypes*.
+
+Note that the `transform` function may return any type (not just a Stream), and `.thru(transform)` will also return that type.
 
 If you prefer using fluent APIs, `thru` allows using those functional APIs in a fluent style.  For example:
 
@@ -1053,6 +1055,23 @@ hold(periodic(10, 1)
 	.take(5)
 	.scan((total, increment) => total + increment, 0))
 	.observe(x => console.log(x))
+```
+
+Note also that the function passed to `thru` is not restricted to returning a stream.  For example:
+
+```es6
+import { from } from 'most'
+
+const lastAsPromise = (stream) =>
+  stream.reduce((_, x) => x)
+
+// since lastAsPromise returns a Promise
+// stream.thru(lastAsPromise) *also* returns a Promise because
+
+// logs 3
+from([1, 2, 3])
+  .thru(lastAsPromise) // returns a Promise
+  .then(x => console.log(x))
 ```
 
 #### Multiple arguments

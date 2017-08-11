@@ -1,22 +1,20 @@
-/* global describe, it */
-require('buster').spec.expose()
-var expect = require('buster').expect
+import { spec, referee } from 'buster'
+const { describe, it } = spec
+const { assert } = referee
 
-var thru = require('../../src/combinator/thru').thru
+import { thru } from '../../src/combinator/thru'
 
 describe('thru', function () {
   it('should apply f to stream', function () {
-    var stream = {}
-    var expected = {}
-    function f (s) {
-      return expected
-    }
+    const stream = {}
+    const expected = {}
+    const f = s => expected
 
-    expect(thru(f, stream)).toBe(expected)
+    assert.same(expected, thru(f, stream))
   })
 
   it('should throw synchronously if f throws synchronously', function () {
-    var error = new Error()
+    const error = new Error()
     function f () {
       throw error
     }
@@ -24,7 +22,7 @@ describe('thru', function () {
     try {
       thru(f, {})
     } catch (e) {
-      expect(e).toBe(error)
+      assert.same(error, e)
     }
   })
 })

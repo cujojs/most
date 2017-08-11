@@ -210,7 +210,7 @@ export interface Stream<A> extends Source<A> {
   recoverWith<B>(p: (a: B) => Stream<A>): Stream<A>;
   multicast(): Stream<A>;
 
-  thru<B>(transform: (stream: Stream<A>) => Stream<B>): Stream<B>;
+  thru<B>(transform: (stream: Stream<A>) => B): B;
 }
 
 declare interface DisposeFn {
