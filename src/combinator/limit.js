@@ -84,9 +84,7 @@ function DebounceSink (dt, source, sink, scheduler) {
   this.scheduler = scheduler
   this.value = void 0
   this.timer = null
-
-  var sourceDisposable = source.run(this, scheduler)
-  this.disposable = dispose.all([this, sourceDisposable])
+  this.disposable = source.run(this, scheduler)
 }
 
 DebounceSink.prototype.event = function (t, x) {
