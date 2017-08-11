@@ -4,7 +4,6 @@
 
 import Stream from '../Stream'
 import Pipe from '../sink/Pipe'
-import * as dispose from '../disposable/dispose'
 import PropagateTask from '../scheduler/PropagateTask'
 import Map from '../fusion/Map'
 
