@@ -160,8 +160,8 @@ export interface Stream<A> extends Source<A> {
   timestamp(): Stream<TimeValue<A>>;
   delay(dt: number): Stream<A>;
 
-  // Note: Without higher-kinded types, this type cannot be written properly
-  await<B>(): Stream<B>;
+  await<B>(this: Stream<Promise<B>>): Stream<B>;
+  awaitPromises<B>(this: Stream<Promise<B>>): Stream<B>;
 
   sample<B, C, R>(
     fn: (b: B, c: C) => R,
@@ -340,6 +340,7 @@ export function delay<A>(dt: number, s: Stream<A>): Stream<A>;
 
 export function fromPromise<A>(p: Promise<A>): Stream<A>;
 export function await<A>(s: Stream<Promise<A>>): Stream<A>;
+export function awaitPromises<A>(s: Stream<Promise<A>>): Stream<A>;
 
 export function sample<A, B, R>(
   fn: (a: A, b: B) => R,
