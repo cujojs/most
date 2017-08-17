@@ -40,7 +40,7 @@ SubscribeObserver.prototype.end = function (t, x) {
         s.complete(x)
       }
     }).catch(function (e) {
-      throwError(e, s.error, fatalError)
+      throwError(e, s.error.bind(s), fatalError)
     })
   }
 }
@@ -49,7 +49,7 @@ SubscribeObserver.prototype.error = function (t, e) {
   var s = this.subscriber
   var fatalError = this.fatalError
   Promise.resolve(this.disposable.dispose()).then(function () {
-    throwError(e, s.error, fatalError)
+    throwError(e, s.error.bind(s), fatalError)
   })
 }
 
