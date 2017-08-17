@@ -34,13 +34,23 @@ SubscribeObserver.prototype.event = function (t, x) {
 SubscribeObserver.prototype.end = function (t, x) {
   if (!this.disposable.disposed) {
     var s = this.subscriber
-    doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x)
+    var fatalError = this.fatalError
+    Promise.resolve(this.disposable.dispose()).then(function () {
+      if (typeof s.complete === 'function') {
+        s.complete(x)
+      }
+    }).catch(function (e) {
+      throwError(e, s, fatalError)
+    })
   }
 }
 
 SubscribeObserver.prototype.error = function (t, e) {
   var s = this.subscriber
-  doDispose(this.fatalError, s, s.error, s.error, this.disposable, e)
+  var fatalError = this.fatalError
+  Promise.resolve(this.disposable.dispose()).then(function () {
+    throwError(e, s, fatalError)
+  })
 }
 
 export function Subscription (disposable) {
@@ -51,14 +61,14 @@ Subscription.prototype.unsubscribe = function () {
   this.disposable.dispose()
 }
 
-function doDispose (fatal, subscriber, complete, error, disposable, x) {
-  Promise.resolve(disposable.dispose()).then(function () {
-    if (typeof complete === 'function') {
-      complete.call(subscriber, x)
+function throwError (e1, subscriber, throwError) {
+  if (typeof subscriber.error === 'function') {
+    try {
+      subscriber.error(e1)
+    } catch (e2) {
+      throwError(e2)
     }
-  }).catch(function (e) {
-    if (typeof error === 'function') {
-      error.call(subscriber, e)
-    }
-  }).catch(fatal)
+  } else {
+    throwError(e1)
+  }
 }

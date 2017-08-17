@@ -172,5 +172,18 @@ describe('SubscribeObserver', function () {
         assert.same(error, e)
       })
     })
+
+    it('should not swallow error if handler is not present', () => {
+      var error = new Error()
+
+      return new Promise(function (resolve) {
+        var subscriber = {}
+
+        var so = new SubscribeObserver(resolve, subscriber, dispose.empty())
+        so.error(0, error)
+      }).then(function (e) {
+        assert.same(error, e)
+      })
+    })
   })
 })
