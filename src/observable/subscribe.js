@@ -40,7 +40,7 @@ SubscribeObserver.prototype.end = function (t, x) {
         s.complete(x)
       }
     }).catch(function (e) {
-      throwError(e, s.error.bind(s), fatalError)
+      throwError(e, s, fatalError)
     })
   }
 }
@@ -49,7 +49,7 @@ SubscribeObserver.prototype.error = function (t, e) {
   var s = this.subscriber
   var fatalError = this.fatalError
   Promise.resolve(this.disposable.dispose()).then(function () {
-    throwError(e, s.error.bind(s), fatalError)
+    throwError(e, s, fatalError)
   })
 }
 
@@ -61,14 +61,14 @@ Subscription.prototype.unsubscribe = function () {
   this.disposable.dispose()
 }
 
-function throwError (e1, throw1, throw2) {
-  if (typeof throw1 === 'function') {
+function throwError (e1, subscriber, throwError) {
+  if (typeof subscriber.error === 'function') {
     try {
-      throw1(e1)
+      subscriber.error(e1)
     } catch (e2) {
-      throw2(e2)
+      throwError(e2)
     }
   } else {
-    throw2(e1)
+    throwError(e1)
   }
 }
