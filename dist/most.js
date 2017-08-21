@@ -1090,13 +1090,23 @@ SubscribeObserver.prototype.event = function (t, x) {
 SubscribeObserver.prototype.end = function (t, x) {
   if (!this.disposable.disposed) {
     var s = this.subscriber;
-    doDispose(this.fatalError, s, s.complete, s.error, this.disposable, x);
+    var fatalError$$1 = this.fatalError;
+    Promise.resolve(this.disposable.dispose()).then(function () {
+      if (typeof s.complete === 'function') {
+        s.complete(x);
+      }
+    }).catch(function (e) {
+      throwError(e, s, fatalError$$1);
+    });
   }
 };
 
 SubscribeObserver.prototype.error = function (t, e) {
   var s = this.subscriber;
-  doDispose(this.fatalError, s, s.error, s.error, this.disposable, e);
+  var fatalError$$1 = this.fatalError;
+  Promise.resolve(this.disposable.dispose()).then(function () {
+    throwError(e, s, fatalError$$1);
+  });
 };
 
 function Subscription (disposable) {
@@ -1107,16 +1117,16 @@ Subscription.prototype.unsubscribe = function () {
   this.disposable.dispose();
 };
 
-function doDispose (fatal, subscriber, complete, error, disposable, x) {
-  Promise.resolve(disposable.dispose()).then(function () {
-    if (typeof complete === 'function') {
-      complete.call(subscriber, x);
+function throwError (e1, subscriber, throwError) {
+  if (typeof subscriber.error === 'function') {
+    try {
+      subscriber.error(e1);
+    } catch (e2) {
+      throwError(e2);
     }
-  }).catch(function (e) {
-    if (typeof error === 'function') {
-      error.call(subscriber, e);
-    }
-  }).catch(fatal);
+  } else {
+    throwError(e1);
+  }
 }
 
 /** @license MIT License (c) copyright 2010-2017 original author or authors */
@@ -3746,7 +3756,7 @@ var flatMapError = recoverWith;
  * @param {*} e error value, preferably an Error or Error subtype
  * @returns {Stream} new stream containing only an error
  */
-function throwError (e) {
+function throwError$1 (e) {
   return new Stream(new ErrorSource(e))
 }
 
@@ -4531,7 +4541,7 @@ exports.awaitPromises = awaitPromises;
 exports.await = awaitPromises;
 exports.recoverWith = recoverWith;
 exports.flatMapError = flatMapError;
-exports.throwError = throwError;
+exports.throwError = throwError$1;
 exports.multicast = multicast;
 exports.defaultScheduler = defaultScheduler;
 exports.PropagateTask = PropagateTask;
