@@ -18,7 +18,7 @@
     "build": "npm run build:dist && npm run build:min && npm run build:flow",
     "build:dist": "rimraf lib dist && buba src -o lib && rollup -c",
     "build:min": "uglifyjs dist/most.js -c \"warnings=false\" -m > dist/most.min.js",
-    "build:flow": "cpy type-definitions/most.js.flow dist",
+    "build:flow": "cpy src/index.js.flow lib",
     "preversion": "npm run build",
     "doctest": "markdown-doctest"
   },
