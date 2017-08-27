@@ -74,16 +74,13 @@ export interface Stream<A> extends Source<A> {
 
   ap<B, C>(fs: Stream<(a: A) => B>): Stream<C>;
 
-  // Note: Without higher-kinded types, the types for these
-  // cannot be written in a completely safe manner; See https://github.com/Microsoft/TypeScript/issues/1290
-  // For better type safety, consider using most.join/switch/switchLatest with thru
-  join(): A;
-  switch(): A;
-  switchLatest(): A;
+  join<B>(this: Stream<Stream<B>>): Stream<B>;
+  switch<B>(this: Stream<Stream<B>>): Stream<B>;
+  switchLatest<B>(this: Stream<Stream<B>>): Stream<B>;
 
   continueWith(f: (a: any) => Stream<A>): Stream<A>;
   concatMap<B>(f: (a: A) => Stream<B>): Stream<B>;
-  mergeConcurrently<B>(concurrency: number): Stream<B>;
+  mergeConcurrently<B>(this: Stream<Stream<B>>, concurrency: number): Stream<B>;
   merge(...ss: Array<Stream<A>>): Stream<A>;
   mergeArray(streams: Array<Stream<A>>): Stream<A>;
 
