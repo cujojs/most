@@ -5,27 +5,27 @@ declare type TimeValue<V> = { time: number, value: V };
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
-export interface Sink<A> {
+export type Sink<A> = {
   event(time: number, value: A): void;
   // end value parameter is deprecated
   end(time: number, value?: A): void;
   error(time: number, err: Error): void;
 }
 
-export interface Task {
+export type Task = {
   run(time: number): void;
   error(time: number, e: Error): void;
   dispose(): void;
 }
 
-export interface ScheduledTask {
+export type ScheduledTask = {
   task: Task;
   run(): void;
   error(err: Error): void;
   dispose(): void;
 }
 
-export interface Scheduler {
+export type Scheduler = {
   now(): number;
   asap(task: Task): ScheduledTask;
   delay(delay: number, task: Task): ScheduledTask;
@@ -35,26 +35,26 @@ export interface Scheduler {
   cancelAll(predicate: (task: Task) => boolean): void;
 }
 
-export interface Disposable<A> {
+export type Disposable<A> = {
   dispose(): void | Promise<A>;
 }
 
-export interface Source<A> {
+export type Source<A> = {
   run (sink: Sink<A>, scheduler: Scheduler): Disposable<A>;
 }
 
-export interface Observable<A> {
+export type Observable<A> = {
   subscribe(subscriber: Subscriber<A>): Subscription<A>;
 }
 
-export interface Subscriber<A> {
+export type Subscriber<A> = {
   next(value: A): void;
   error(err: Error): void;
   // complete value parameter is deprecated
   complete(value?: A): void;
 }
 
-export interface Subscription<A> {
+export type Subscription<A> = {
   unsubscribe(): void;
 }
 
