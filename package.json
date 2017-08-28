@@ -15,7 +15,10 @@
   "scripts": {
     "unit-test": "buster-test",
     "test": "eslint src test && npm run unit-test && npm run doctest",
-    "build": "rimraf lib dist && buba src -o lib && rollup -c && uglifyjs dist/most.js -c \"warnings=false\" -m -o dist/most.min.js",
+    "build": "npm run build:dist && npm run build:min && npm run build:flow",
+    "build:dist": "rimraf lib dist && buba src -o lib && rollup -c",
+    "build:min": "uglifyjs dist/most.js -c \"warnings=false\" -m > dist/most.min.js",
+    "build:flow": "cpy src/index.js.flow lib",
     "preversion": "npm run build",
     "doctest": "markdown-doctest"
   },
@@ -49,6 +52,7 @@
     "babel-polyfill": "^6.20.0",
     "buba": "^4.0.1",
     "buster": "^0.7.18",
+    "cpy-cli": "^1.0.1",
     "eslint": "^3.12.1",
     "markdown-doctest": "^0.9.1",
     "rimraf": "^2.5.4",
