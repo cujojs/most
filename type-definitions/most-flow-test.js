@@ -6,10 +6,10 @@ subscribe({}, just(1))
 subscribe({ next: d => { (d: number) } }, just(1))
 subscribe({ error: err => { (err: Error) } }, just(1))
 subscribe({ complete: () => {} }, just(1))
-const { unsubscribe } = subscribe({
-  next: () => {},
-  error: () => {},
-  complete: () => {}
+const { unsubscribe } = subscribe(new class {
+  next() {};
+  error() {};
+  complete() {};
 }, just(1))
 unsubscribe()
 // $ExpectError
