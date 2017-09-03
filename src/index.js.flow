@@ -77,6 +77,7 @@ declare export class Stream<A> {
   ap<B, C>(fs: Stream<(a: A) => B>): Stream<C>;
 
   continueWith(f: (a: any) => Stream<A>): Stream<A>;
+  alt(f: () => Stream<A>): Stream<A>;
   concatMap<B>(f: (a: A) => Stream<B>): Stream<B>;
   mergeConcurrently<B>(concurrency: number): Stream<B>;
   merge(...ss: Array<Stream<A>>): Stream<A>;
@@ -210,6 +211,7 @@ declare export class Stream<A> {
 declare export function just<A>(a: A): Stream<A>;
 declare export function of<A>(a: A): Stream<A>;
 declare export function empty(): Stream<any>;
+declare export function zero(): Stream<any>;
 declare export function never(): Stream<any>;
 declare export function from<A>(as: A[] | Iterable<A> | Observable<A>): Stream<A>;
 declare export function periodic<A>(period: number, a?: A): Stream<A>;
@@ -237,6 +239,7 @@ declare export function join<A>(s: Stream<Stream<A>>): Stream<A>;
 declare export function switchLatest<A>(s: Stream<Stream<A>>): Stream<A>;
 
 declare export function continueWith<A>(f: (a: any) => Stream<A>, s: Stream<A>): Stream<A>;
+declare export function alt<A>(f: () => Stream<A>, s: Stream<A>): Stream<A>;
 declare export function concatMap<A, B>(f: (a: A) => Stream<B>, s: Stream<A>): Stream<B>;
 declare export function mergeConcurrently<A>(concurrency: number, s: Stream<Stream<A>>): Stream<A>;
 

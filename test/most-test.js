@@ -12,6 +12,13 @@ describe('just', () => {
   })
 })
 
+describe('zero', () => {
+  it('should be an alias for empty', () => {
+    assert.isFunction(most.zero)
+    assert.same(most.zero, most.empty)
+  })
+})
+
 describe('chain', () => {
   it('should be an alias for flatMap', () => {
     assert.isFunction(most.chain)
@@ -41,6 +48,14 @@ describe('skipUntil', () => {
     assert.isFunction(most.skipUntil)
     assert.same(most.skipUntil, most.since)
     assert.same(most.Stream.prototype.skipUntil, most.Stream.prototype.since)
+  })
+})
+
+describe('alt', () => {
+  it('should be an alias for continueWith', () => {
+    assert.isFunction(most.alt)
+    assert.same(most.alt, most.continueWith)
+    assert.same(most.Stream.prototype.alt, most.Stream.prototype.continueWith)
   })
 })
 

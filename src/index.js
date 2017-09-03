@@ -17,10 +17,10 @@ export { Stream }
 
 // Add of and empty to constructor for fantasy-land compat
 Stream.of = of
-Stream.empty = empty
+Stream.empty = Stream.zero = empty
 // Add from to constructor for ES Observable compat
 Stream.from = from
-export { of, of as just, empty, never, from, periodic }
+export { of, of as just, empty, empty as zero, never, from, periodic }
 
 // -----------------------------------------------------------------------
 // Draft ES Observable proposal interop
@@ -265,7 +265,7 @@ Stream.prototype.join = function () {
 import { continueWith } from './combinator/continueWith'
 
 // @deprecated flatMapEnd, use continueWith instead
-export { continueWith, continueWith as flatMapEnd }
+export { continueWith, continueWith as alt, continueWith as flatMapEnd }
 
 /**
  * Map the end event to a new stream, and begin emitting its values.
@@ -278,6 +278,7 @@ Stream.prototype.continueWith = function (f) {
   return continueWith(f, this)
 }
 
+Stream.prototype.alt = Stream.prototype.continueWith
 // @deprecated use continueWith instead
 Stream.prototype.flatMapEnd = Stream.prototype.continueWith
 
