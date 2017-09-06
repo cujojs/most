@@ -65,7 +65,7 @@
   "dependencies": {
     "@most/multicast": "^1.2.5",
     "@most/prelude": "^1.4.0",
-    "flow-bin": "^0.53.1",
+    "flow-bin": "^0.54.1",
     "symbol-observable": "^1.0.2"
   }
 }
