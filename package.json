@@ -54,6 +54,7 @@
     "buster": "^0.7.18",
     "cpy-cli": "^1.0.1",
     "eslint": "^3.12.1",
+    "flow-bin": "^0.54.1",
     "markdown-doctest": "^0.9.1",
     "rimraf": "^2.5.4",
     "rollup": "^0.45.2",
@@ -65,7 +66,6 @@
   "dependencies": {
     "@most/multicast": "^1.2.5",
     "@most/prelude": "^1.4.0",
-    "flow-bin": "^0.53.1",
     "symbol-observable": "^1.0.2"
   }
 }
