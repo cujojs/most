@@ -13,8 +13,8 @@
     "dist"
   ],
   "scripts": {
-    "unit-test": "buster-test",
-    "test": "eslint src test && npm run unit-test && npm run doctest",
+    "test:unit": "buster-test",
+    "test": "eslint test/flow src test && flow check && npm run test:unit && npm run doctest",
     "build": "npm run build:dist && npm run build:min && npm run build:flow",
     "build:dist": "rimraf lib dist && buba src -o lib && rollup -c",
     "build:min": "uglifyjs dist/most.js -c \"warnings=false\" -m > dist/most.min.js",

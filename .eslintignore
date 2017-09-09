@@ -6,4 +6,5 @@ benchmark/
 experiments/
 perf/
 test/perf/
+test/flow/
 dist/

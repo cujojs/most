@@ -1,6 +1,6 @@
 // @flow
 
-import { just, subscribe } from '../src'
+import { just, subscribe } from '../../src'
 
 subscribe({}, just(1))
 subscribe({ next: d => { (d: number) } }, just(1))
