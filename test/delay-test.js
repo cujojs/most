@@ -1,23 +1,19 @@
-/* global describe, it */
-require('buster').spec.expose()
-var expect = require('buster').expect
+import { spec, referee } from 'buster'
+const { describe, it } = spec
+const { assert } = referee
 
-var delay = require('../src/combinator/delay').delay
-var streamOf = require('../src/source/core').of
+import { delay } from '../src/combinator/delay'
+import { collectEvents, makeEvents, ticks } from './helper/testEnv'
 
-var te = require('./helper/testEnv')
-
-var sentinel = { value: 'sentinel' }
-
-describe('delay', function () {
-  it('should delay events by delayTime', function () {
-    var dt = 1
-    var s = delay(dt, streamOf(sentinel))
-
-    return te.collectEvents(s, te.ticks(dt + 1)).then(function (events) {
-      expect(events.length).toBe(1)
-      expect(events[0].time).toBe(dt)
-      expect(events[0].value).toBe(sentinel)
-    })
+describe('delay', () => {
+  it('should delay events by delayTime', () => {
+    const n = 2
+    const dt = 1
+    const s = delay(dt, makeEvents(dt, n))
+    return collectEvents(s, ticks(n + dt)).then(events =>
+      assert.equals(events, [
+        { time: 1, value: 0 },
+        { time: 2, value: 1 }
+      ]))
   })
 })
