@@ -18,6 +18,7 @@ exports.collectEvents = collectEvents
 exports.drain = drain
 exports.atTimes = atTimes
 exports.makeEvents = makeEvents
+exports.at = at
 
 function TestEnvironment (timer, scheduler) {
   this.timer = timer
@@ -61,6 +62,10 @@ function makeEvents (dt, n) {
     events[i] = { time: (i * dt), value: i }
   }
   return atTimes(events)
+}
+
+function at (time, value) {
+  return atTimes([{ time: time, value: value }])
 }
 
 function atTimes (array) {

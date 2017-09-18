@@ -1,23 +1,37 @@
-/* global describe, it */
-require('buster').spec.expose()
-var expect = require('buster').expect
+import { spec, referee } from 'buster'
+const { describe, it } = spec
+const { assert } = referee
 
-var delay = require('../src/combinator/delay').delay
-var streamOf = require('../src/source/core').of
+import { delay } from '../src/combinator/delay'
+import { map, tap } from '../src/combinator/transform'
+import { switchLatest } from '../src/combinator/switch'
+import { continueWith } from '../src/combinator/continueWith'
+import { take } from '../src/combinator/slice'
+import { of as just } from '../src/source/core'
+import { periodic } from '../src/source/periodic'
+import { collectEvents, makeEvents, ticks, at } from './helper/testEnv'
 
-var te = require('./helper/testEnv')
+describe('delay', () => {
+  it('should delay events by delayTime', () => {
+    const n = 2
+    const dt = 1
+    const s = delay(dt, makeEvents(dt, n))
+    return collectEvents(s, ticks(n + dt)).then(events =>
+      assert.equals(events, [
+        { time: 1, value: 0 },
+        { time: 2, value: 1 }
+      ]))
+  })
 
-var sentinel = { value: 'sentinel' }
+  it('should dispose pending tasks', () => {
+    // Test derived from example:
+    // https://github.com/cujojs/most/issues/488
+    let count = 0
+    const toDelay = x => tap(() => count++, delay(10, just(x)))
+    const s0 = switchLatest(map(toDelay, take(2, periodic(1, 1))))
+    const s1 = continueWith(() => at(100, 0), s0)
 
-describe('delay', function () {
-  it('should delay events by delayTime', function () {
-    var dt = 1
-    var s = delay(dt, streamOf(sentinel))
-
-    return te.collectEvents(s, te.ticks(dt + 1)).then(function (events) {
-      expect(events.length).toBe(1)
-      expect(events[0].time).toBe(dt)
-      expect(events[0].value).toBe(sentinel)
-    })
+    return collectEvents(s1, ticks(30)).then(() =>
+      assert.equals(1, count))
   })
 })
