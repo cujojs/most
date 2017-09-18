@@ -3458,8 +3458,8 @@ function DelaySink (dt, sink, scheduler) {
 
 DelaySink.prototype.dispose = function () {
   var self = this;
-  this.scheduler.cancelAll(function (task) {
-    return task.sink === self.sink
+  this.scheduler.cancelAll(function (scheduledTask) {
+    return scheduledTask.task.sink === self.sink
   });
 };
 
