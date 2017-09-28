@@ -64,7 +64,7 @@
     "uglify-js": "^3.0.11"
   },
   "dependencies": {
-    "@most/multicast": "^1.2.5",
+    "@most/multicast": "1.2.5",
     "@most/prelude": "^1.4.0",
     "symbol-observable": "^1.0.2"
   }
