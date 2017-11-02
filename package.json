@@ -54,7 +54,7 @@
     "buster": "^0.7.18",
     "cpy-cli": "^1.0.1",
     "eslint": "^3.12.1",
-    "flow-bin": "^0.54.1",
+    "flow-bin": "^0.58.0",
     "markdown-doctest": "^0.9.1",
     "rimraf": "^2.5.4",
     "rollup": "^0.45.2",
