@@ -30,3 +30,8 @@
 | [most-file-reader](https://github.com/mostjs-community/most-file-reader) | FileReader combinator for most
 | [most-combineobj](https://github.com/mostjs-community/combineobj) | Transform an object of streams into a stream of objects
 | [most-chunksOf](https://github.com/mostjs-community/most-chunksOf) | Splits a list into length-n pieces
+| [most-proxy](https://github.com/mostjs-community/most-proxy) | Circular dependencies for most
+| [most-buffer](https://github.com/craft-ai/most-utils/tree/master/packages/most-buffer) | Gather streams events into buffers (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
+| [most-limiter](https://github.com/craft-ai/most-utils/tree/master/packages/most-limiter) | Lossless rate limiter (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
+| [most-nth](https://github.com/craft-ai/most-utils/tree/master/packages/most-nth) | Gets the event at ordinal index n of a stream as a Promise (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
+| [most-nth](https://github.com/craft-ai/most-utils/tree/master/packages/most-nth) | Creates a stream of numbers in a range (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
