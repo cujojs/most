@@ -34,4 +34,4 @@
 | [most-buffer](https://github.com/craft-ai/most-utils/tree/master/packages/most-buffer) | Gather streams events into buffers (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
 | [most-limiter](https://github.com/craft-ai/most-utils/tree/master/packages/most-limiter) | Lossless rate limiter (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
 | [most-nth](https://github.com/craft-ai/most-utils/tree/master/packages/most-nth) | Gets the event at ordinal index n of a stream as a Promise (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
-| [most-nth](https://github.com/craft-ai/most-utils/tree/master/packages/most-nth) | Creates a stream of numbers in a range (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
+| [most-range](https://github.com/craft-ai/most-utils/tree/master/packages/most-range) | Creates a stream of numbers in a range (part of [craft-ai/most-utils](https://github.com/craft-ai/most-utils)
