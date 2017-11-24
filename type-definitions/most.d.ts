@@ -1,4 +1,5 @@
 declare type SeedValue<S, V> = { seed: S, value: V };
+declare type UnfoldValue<S, V> = SeedValue<S,V> | { done: boolean }
 declare type TimeValue<V>    = { time: number, value: V };
 
 declare interface Generator<A, B, C> {}
@@ -228,7 +229,7 @@ export function periodic<A>(period: number, a?: A): Stream<A>;
 export function fromEvent<T extends Event>(event: string, target: any, useCapture?: boolean): Stream<T>;
 export function fromEvent<T>(event: string, target: any): Stream<T>;
 
-export function unfold<A, B, S>(f: (seed: S) => SeedValue<S, B|Promise<B>>, seed: S): Stream<B>;
+export function unfold<A, B, S>(f: (seed: S) => UnfoldValue<S, B> | Promise<UnfoldValue<S, B>>, seed: S): Stream<B>;
 export function iterate<A>(f: (a: A) => A|Promise<A>, a: A): Stream<A>;
 export function generate<A>(g: CreateGenerator<A>, ...args: Array<any>): Stream<A>;
 
