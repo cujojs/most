@@ -1,10 +1,11 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { fail, assert } = referee
 
 import { fromArray } from '../../src/source/fromArray'
 import { map } from '../../src/combinator/transform'
 import { subscribe } from '../../src/observable/subscribe'
+
+const { describe, it } = spec
+const { fail, assert } = referee
 
 describe('unsubscribe', () => {
   it('should prevent observation after unsubscribe', done => {

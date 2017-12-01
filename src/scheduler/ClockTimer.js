@@ -4,7 +4,7 @@
 
 import { defer } from '../task'
 
-/*global setTimeout, clearTimeout*/
+/* global setTimeout, clearTimeout */
 
 export default function ClockTimer () {}
 

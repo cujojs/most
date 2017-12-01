@@ -535,15 +535,15 @@ function runProducer (t, array, sink) {
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-/*global Set, Symbol*/
+/* global Set, Symbol */
 var iteratorSymbol;
 // Firefox ships a partial implementation using the name @@iterator.
 // https://bugzilla.mozilla.org/show_bug.cgi?id=907077#c14
 if (typeof Set === 'function' && typeof new Set()['@@iterator'] === 'function') {
   iteratorSymbol = '@@iterator';
 } else {
-  iteratorSymbol = typeof Symbol === 'function' && Symbol.iterator ||
-  '_es6shim_iterator_';
+  iteratorSymbol = typeof Symbol === 'function' ? Symbol.iterator
+  : '_es6shim_iterator_';
 }
 
 function isIterable (o) {
@@ -887,7 +887,7 @@ Scheduler.prototype._runReadyTasks = function (now) {
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-/*global setTimeout, clearTimeout*/
+/* global setTimeout, clearTimeout */
 
 function ClockTimer () {}
 
@@ -1886,7 +1886,7 @@ function continueIterate (iterate, x) {
  * @param f
  * @returns {Stream}
  */
-function generate (f /*, ...args */) {
+function generate (f /* ...args */) {
   return new Stream(new GenerateSource(f, tail(arguments)))
 }
 
@@ -2061,7 +2061,7 @@ IndexSink.prototype.error = Pipe.prototype.error;
 /** @author John Hann */
 
 function invoke (f, args) {
-	/*eslint complexity: [2,7]*/
+  /* eslint complexity: [2,7] */
   switch (args.length) {
     case 0: return f()
     case 1: return f(args[0])
@@ -2087,7 +2087,7 @@ var tail$1 = tail;
  * @returns {Stream} stream containing the result of applying f to the most recent
  *  event of each input stream, whenever a new event arrives on any stream.
  */
-function combine (f /*, ...streams */) {
+function combine (f /* ...streams */) {
   return combineArray(f, tail$1(arguments))
 }
 
@@ -2573,7 +2573,7 @@ var reduce$2 = reduce;
  * list in time order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-function merge (/* ...streams*/) {
+function merge (/* ...streams */) {
   return mergeArray(copy$1(arguments))
 }
 
@@ -2662,7 +2662,7 @@ MergeSink.prototype.end = function (t, indexedValue) {
  *  on sampler
  * @returns {Stream} stream of sampled and transformed values
  */
-function sample (f, sampler /*, ...streams */) {
+function sample (f, sampler /* ...streams */) {
   return sampleArray(f, sampler, drop(2, arguments))
 }
 
@@ -2832,7 +2832,7 @@ var tail$2 = tail;
  * @returns {Stream} new stream with items at corresponding indices combined
  *  using f
  */
-function zip (f /*, ...streams */) {
+function zip (f /* ...streams */) {
   return zipArray(f, tail$2(arguments))
 }
 
@@ -3391,7 +3391,7 @@ function LowerBound (signal, sink, scheduler) {
   this.disposable = signal.run(this, scheduler);
 }
 
-LowerBound.prototype.event = function (t /*, x */) {
+LowerBound.prototype.event = function (t /* x */) {
   if (t < this.value) {
     this.value = t;
   }
@@ -3656,7 +3656,7 @@ function AwaitSink (sink, scheduler) {
   this.queue = Promise.resolve();
   var self = this;
 
-	// Pre-create closures, to avoid creating them per event
+  // Pre-create closures, to avoid creating them per event
   this._eventBound = function (x) {
     self.sink.event(self.scheduler.now(), x);
   };
@@ -3927,6 +3927,8 @@ function multicast (stream) {
 /** @author Brian Cavalier */
 /** @author John Hann */
 
+/* eslint import/first: 0 */
+
 // Add of and empty to constructor for fantasy-land compat
 Stream.of = of;
 Stream.empty = empty;
@@ -4161,7 +4163,7 @@ Stream.prototype.mergeConcurrently = function (concurrency) {
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-Stream.prototype.merge = function (/* ...streams*/) {
+Stream.prototype.merge = function (/* ...streams */) {
   return mergeArray(cons(this, arguments))
 };
 
@@ -4174,7 +4176,7 @@ Stream.prototype.merge = function (/* ...streams*/) {
  * @returns {Stream} stream containing the result of applying f to the most recent
  *  event of each input stream, whenever a new event arrives on any stream.
  */
-Stream.prototype.combine = function (f /*, ...streams*/) {
+Stream.prototype.combine = function (f /* ...streams */) {
   return combineArray(f, replace(this, 0, arguments))
 };
 
@@ -4211,7 +4213,7 @@ Stream.prototype.sample = function (f /* ...streams */) {
  * @param {function(a:Stream, b:Stream, ...):*} f function to combine items
  * @returns {Stream} new stream containing pairs
  */
-Stream.prototype.zip = function (f /*, ...streams*/) {
+Stream.prototype.zip = function (f /* ...streams */) {
   return zipArray(f, replace(this, 0, arguments))
 };
 

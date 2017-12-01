@@ -1,6 +1,4 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert, refute } = referee
 
 import { switch as switchLatest } from '../src/combinator/switch'
 import { observe } from '../src/combinator/observe'
@@ -11,6 +9,9 @@ import { fromArray } from '../src/source/fromArray'
 import { empty, of as just } from '../src/source/core'
 
 import te from './helper/testEnv'
+
+const { describe, it } = spec
+const { assert, refute } = referee
 
 describe('switch', () => {
   describe('when input is empty', () => {

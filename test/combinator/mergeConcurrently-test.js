@@ -1,6 +1,4 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { fail, assert } = referee
 
 import { mergeMapConcurrently, mergeConcurrently } from '../../src/combinator/mergeConcurrently'
 import { periodic } from '../../src/source/periodic'
@@ -9,6 +7,9 @@ import { drain } from '../../src/combinator/observe'
 import { of as just } from '../../src/source/core'
 import { fromArray } from '../../src/source/fromArray'
 import te from '../helper/testEnv'
+
+const { describe, it } = spec
+const { fail, assert } = referee
 
 const sentinel = { value: 'sentinel' }
 

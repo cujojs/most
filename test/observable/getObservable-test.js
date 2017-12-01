@@ -1,9 +1,10 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert } = referee
 
 import symbolObservable from 'symbol-observable'
 import getObservable from '../../src/observable/getObservable'
+
+const { describe, it } = spec
+const { assert } = referee
 
 describe('getObservable', function () {
   it('should return null for non-object', () => {

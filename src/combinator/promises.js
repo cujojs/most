@@ -42,7 +42,7 @@ function AwaitSink (sink, scheduler) {
   this.queue = Promise.resolve()
   var self = this
 
-	// Pre-create closures, to avoid creating them per event
+  // Pre-create closures, to avoid creating them per event
   this._eventBound = function (x) {
     self.sink.event(self.scheduler.now(), x)
   }

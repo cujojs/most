@@ -1,8 +1,9 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert } = referee
 
 import { thru } from '../../src/combinator/thru'
+
+const { describe, it } = spec
+const { assert } = referee
 
 describe('thru', function () {
   it('should apply f to stream', function () {

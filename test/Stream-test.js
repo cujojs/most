@@ -1,8 +1,8 @@
 import { spec, referee } from 'buster'
+import Stream from '../src/Stream'
+
 const { describe, it } = spec
 const { assert } = referee
-
-import Stream from '../src/Stream'
 
 const sentinel = { value: 'sentinel' }
 
@@ -17,7 +17,8 @@ describe('Stream', function () {
       const source = {
         run: function (sink, scheduler) {
           return {
-            sink, scheduler,
+            sink,
+            scheduler,
             dispose () {
               return Promise.resolve(sentinel)
             }
