@@ -1,9 +1,10 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert } = referee
 
 import * as most from '../src/index'
 import symbolObservable from 'symbol-observable'
+
+const { describe, it } = spec
+const { assert } = referee
 
 describe('just', () => {
   it('should be an alias for of', () => {

@@ -62,7 +62,7 @@ describe('fromPromise', function () {
   })
 
   it('should be recoverable if promise rejects', function () {
-    var s = promises.fromPromise(Promise.reject())
+    var s = promises.fromPromise(Promise.reject(new Error()))
       .recoverWith(function () {
         return promises.fromPromise(Promise.resolve(sentinel))
       })

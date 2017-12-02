@@ -17,7 +17,7 @@ var reduce = base.reduce
  * list in time order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-export function merge (/* ...streams*/) {
+export function merge (/* ...streams */) {
   return mergeArray(copy(arguments))
 }
 

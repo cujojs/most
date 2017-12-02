@@ -1,6 +1,4 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert } = referee
 
 import { delay } from '../src/combinator/delay'
 import { map, tap } from '../src/combinator/transform'
@@ -10,6 +8,9 @@ import { take } from '../src/combinator/slice'
 import { of as just } from '../src/source/core'
 import { periodic } from '../src/source/periodic'
 import { collectEvents, makeEvents, ticks, at } from './helper/testEnv'
+
+const { describe, it } = spec
+const { assert } = referee
 
 describe('delay', () => {
   it('should delay events by delayTime', () => {

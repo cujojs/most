@@ -14,9 +14,10 @@
   ],
   "scripts": {
     "test:unit": "buster-test",
-    "test": "eslint test/flow src test && flow check && npm run test:unit && npm run doctest",
+    "test": "npm run lint && flow check && npm run test:unit && npm run doctest",
+    "lint": "standard --fix --verbose 'src/**/*.js' 'test/**/*.js' | snazzy",
     "build": "npm run build:dist && npm run build:min && npm run build:flow",
-    "build:dist": "rimraf lib dist && buba src -o lib && rollup -c",
+    "build:dist": "buba src -o lib && rollup -c",
     "build:min": "uglifyjs dist/most.js -c \"warnings=false\" -m > dist/most.min.js",
     "build:flow": "cpy src/index.js.flow lib",
     "preversion": "npm run build",
@@ -47,19 +48,20 @@
   "author": "brian@hovercraftstudios.com",
   "license": "MIT",
   "devDependencies": {
-    "@most/eslint-config-most": "^1.0.3",
     "@most/hold": "^2.0.0",
+    "babel-eslint": "^8.0.2",
     "babel-polyfill": "^6.20.0",
     "buba": "^4.0.1",
     "buster": "^0.7.18",
     "cpy-cli": "^1.0.1",
-    "eslint": "^3.12.1",
-    "flow-bin": "^0.54.1",
+    "eslint-plugin-flowtype": "^2.39.1",
+    "flow-bin": "^0.59.0",
     "markdown-doctest": "^0.9.1",
-    "rimraf": "^2.5.4",
     "rollup": "^0.45.2",
-    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-buble": "^0.18.0",
     "rollup-plugin-node-resolve": "^3.0.0",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.3",
     "transducers-js": "^0.4.174",
     "uglify-js": "^3.0.11"
   },
@@ -67,5 +69,14 @@
     "@most/multicast": "^1.2.5",
     "@most/prelude": "^1.4.0",
     "symbol-observable": "^1.0.2"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "plugins": [
+      "flowtype"
+    ],
+    "ignore": [
+      "test/perf/"
+    ]
   }
 }

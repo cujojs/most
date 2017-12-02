@@ -2,7 +2,7 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-/*global setTimeout, clearTimeout*/
+/* global setTimeout, clearTimeout */
 
 module.exports = VirtualTimer
 

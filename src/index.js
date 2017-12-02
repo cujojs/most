@@ -2,6 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
+/* eslint import/first: 0 */
+
 import Stream from './Stream'
 import * as base from '@most/prelude'
 import { of, empty, never } from './source/core'
@@ -322,7 +324,7 @@ export { merge, mergeArray }
  * order.  If two events are simultaneous they will be merged in
  * arbitrary order.
  */
-Stream.prototype.merge = function (/* ...streams*/) {
+Stream.prototype.merge = function (/* ...streams */) {
   return mergeArray(base.cons(this, arguments))
 }
 
@@ -339,7 +341,7 @@ export { combine, combineArray }
  * @returns {Stream} stream containing the result of applying f to the most recent
  *  event of each input stream, whenever a new event arrives on any stream.
  */
-Stream.prototype.combine = function (f /*, ...streams*/) {
+Stream.prototype.combine = function (f /*, ...streams */) {
   return combineArray(f, base.replace(this, 0, arguments))
 }
 
@@ -384,7 +386,7 @@ export { zip, zipArray }
  * @param {function(a:Stream, b:Stream, ...):*} f function to combine items
  * @returns {Stream} new stream containing pairs
  */
-Stream.prototype.zip = function (f /*, ...streams*/) {
+Stream.prototype.zip = function (f /*, ...streams */) {
   return zipArray(f, base.replace(this, 0, arguments))
 }
 

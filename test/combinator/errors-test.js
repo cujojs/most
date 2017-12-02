@@ -1,11 +1,12 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { fail, assert } = referee
 
 import { throwError, recoverWith } from '../../src/combinator/errors'
 import { map } from '../../src/combinator/transform'
 import { observe, drain } from '../../src/combinator/observe'
 import { of as just } from '../../src/source/core'
+
+const { describe, it } = spec
+const { fail, assert } = referee
 
 const sentinel = { value: 'sentinel' }
 const other = { value: 'other' }

@@ -1,6 +1,4 @@
 import { spec, referee } from 'buster'
-const { describe, it } = spec
-const { assert } = referee
 
 import Stream from '../src/Stream'
 import { scan, reduce } from '../src/combinator/accumulate'
@@ -11,6 +9,9 @@ import { fromArray } from '../src/source/fromArray'
 import { empty, of as just } from '../src/source/core'
 
 import FakeDisposeSource from './helper/FakeDisposeSource'
+
+const { describe, it } = spec
+const { assert } = referee
 
 const sentinel = { value: 'sentinel' }
 const other = { value: 'other' }
