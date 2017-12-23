@@ -1,13 +1,13 @@
-declare type SeedValue<S, V> = { seed: S, value: V };
-declare type UnfoldValue<S, V> = SeedValue<S,V> | { done: boolean }
-declare type TimeValue<V>    = { time: number, value: V };
+declare type SeedValue<S, V>   = { seed: S, value: V };
+declare type UnfoldValue<S, V> = SeedValue<S,V> | { done: true, value?: V }
+declare type TimeValue<V>      = { time: number, value: V };
 
 declare interface Generator<A, B, C> {}
 declare interface Iterable<A> { [Symbol.iterator](): IterableIterator<A> }
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
-export interface Sink<A> {
+export interface Sink<A> { 
   event(time: number, value: A): void;
   // end value parameter is deprecated
   end(time: number, value?: A): void;
