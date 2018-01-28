@@ -4,8 +4,11 @@ var expect = require('buster').expect
 
 var limit = require('../src/combinator/limit')
 var periodic = require('../src/source/periodic').periodic
+var delay = require('../src/combinator/delay').delay
+var until = require('../src/combinator/timeslice').takeUntil
 var zip = require('../src/combinator/zip').zip
 var transform = require('../src/combinator/transform')
+var startWith = require('../src/combinator/build').cons
 var take = require('../src/combinator/slice').take
 var fromArray = require('../src/source/fromArray').fromArray
 var core = require('../src/source/core')
@@ -16,6 +19,7 @@ var FakeDisposeSource = require('./helper/FakeDisposeSource')
 
 var empty = core.empty
 var streamOf = core.of
+var never = core.never
 
 var map = transform.map
 
@@ -77,6 +81,18 @@ describe('debounce', function () {
           expect(events).toEqual([{ time: 9, value: expected }])
         })
     })
+  })
+
+  it('should not repeat last event when end is delayed', function () {
+    // See https://github.com/cujojs/most/issues/514
+    var expected = Math.random()
+    var end = delay(5, streamOf(null))
+    var debounced = limit.debounce(1, until(end, startWith(expected, never())))
+
+    return te.collectEvents(debounced, te.ticks(5))
+      .then(function (events) {
+        expect(events).toEqual([{ time: 1, value: expected }])
+      })
   })
 
   it('should allow events that occur less frequently than debounce period', function () {
