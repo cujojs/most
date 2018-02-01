@@ -3586,7 +3586,12 @@ function DebounceSink (dt, source, sink, scheduler) {
 DebounceSink.prototype.event = function (t, x) {
   this._clearTimer();
   this.value = x;
-  this.timer = this.scheduler.delay(this.dt, PropagateTask.event(x, this.sink));
+  this.timer = this.scheduler.delay(this.dt, new DebounceTask(this, x));
+};
+
+DebounceSink.prototype._event = function (t, x) {
+  this._clearTimer();
+  this.sink.event(t, x);
 };
 
 DebounceSink.prototype.end = function (t, x) {
@@ -3615,6 +3620,21 @@ DebounceSink.prototype._clearTimer = function () {
   this.timer = null;
   return true
 };
+
+function DebounceTask (debounce, value) {
+  this.debounce = debounce;
+  this.value = value;
+}
+
+DebounceTask.prototype.run = function (t) {
+  this.debounce._event(t, this.value);
+};
+
+DebounceTask.prototype.error = function (t, e) {
+  this.debounce.error(t, e);
+};
+
+DebounceTask.prototype.dispose = function () {};
 
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
