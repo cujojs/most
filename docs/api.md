@@ -119,7 +119,6 @@ A stream that emits `a`, then `b`, then fails.
 A stream that emits `a`, then `b`, then `c`, then nothing, then `d`, then `e`, then `f`, and then continues infinitely.
 
 
-<a name="es7-observable-interop"/>
 ## Draft ES Observable interop
 
 Most.js implements a subset of the [draft ES Observable proposal](https://github.com/zenparsing/es-observable):
