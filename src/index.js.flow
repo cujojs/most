@@ -154,6 +154,9 @@ declare export class Stream<A> {
   timestamp(): Stream<TimeValue<A>>;
   delay(dt: number): Stream<A>;
 
+  await<B>(): Stream<B>;
+  awaitPromises<B>(): Stream<B>;
+
   sample<B, C, R>(
     fn: (b: B, c: C) => R,
     b: Stream<B>,
