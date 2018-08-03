@@ -5,7 +5,7 @@ declare type TimeValue<V> = { time: number, value: V };
 
 declare type CreateGenerator<A> = (...args: Array<any>) => Generator<A|Promise<A>, any, any>;
 
-export type Sink<A> = {
+export type Sink<+A> = {
   event(time: number, value: A): void;
   // end value parameter is deprecated
   end(time: number, value?: A): void;
