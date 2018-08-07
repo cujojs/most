@@ -6,6 +6,7 @@ exports.runSuite       = runSuite;
 exports.runMost        = runMost;
 exports.runRx          = runRx;
 exports.runRx5         = runRx5;
+exports.runRx6         = runRx6;
 exports.runKefir       = runKefir;
 exports.kefirFromArray = kefirFromArray;
 exports.runBacon       = runBacon;
@@ -101,6 +102,19 @@ function runXstream(deferred, xsStream) {
 }
 
 function runRx5(deferred, rxStream) {
+  rxStream.subscribe({
+    next: noop,
+    complete: function() {
+      deferred.resolve();
+    },
+    error: function(e) {
+      deferred.benchmark.emit({ type: 'error', error: e });
+      deferred.resolve(e);
+    }
+  });
+}
+
+function runRx6(deferred, rxStream) {
   rxStream.subscribe({
     next: noop,
     complete: function() {

@@ -19,13 +19,14 @@
     "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run merge-nested && npm run zip && npm run scan && npm run slice && npm run skipRepeats && npm run switch"
   },
   "dependencies": {
-    "@reactivex/rxjs": "^5.0.1",
-    "baconjs": "^0.7.89",
+    "@reactivex/rxjs": "5.5.11",
+    "baconjs": "^2.0.9",
     "benchmark": "github:bestiejs/benchmark.js#master",
     "buba": "^4.0.1",
     "highland": "^2.10.1",
     "kefir": "^3.6.1",
     "rx": "^4.1.0",
-    "xstream": "10.x"
+    "rxjs": "^6.2.2",
+    "xstream": "11.x"
   }
 }

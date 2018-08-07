@@ -2,7 +2,9 @@ require('buba/register')
 var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
-var rxjs = require('@reactivex/rxjs')
+var rxjs = require('@reactivex/rxjs');
+var rxjs6 = require('rxjs');
+var rxjs6Operators = require('rxjs/operators');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
@@ -54,6 +56,13 @@ suite
     runners.runRx5(deferred,
       rxjs.Observable.from(a).flatMap(
         function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
+  }, options)
+  .add('rx 6', function(deferred) {
+    runners.runRx6(deferred,
+      rxjs6.from(a).pipe(
+        rxjs6Operators.flatMap(function(x) {return rxjs6.of(x)}),
+        rxjs6Operators.reduce(sum, 0))
+      )
   }, options)
   .add('xstream', function(deferred) {
     runners.runXstream(deferred, xs.fromArray(a).map(xs.fromArray).compose(xstreamFlattenConcurrently).fold(sum, 0).last());
