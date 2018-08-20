@@ -1495,6 +1495,8 @@ stream.awaitPromises(): ---1--2--3->
 
 Event *times* may be delayed.  However, event *order* is always preserved, regardless of promise fulfillment order.
 
+##### Using fulfillment order
+
 To create a stream that merges promises in fulfillment order, use
 `stream.chain(most.fromPromise)`.  Note the difference:
 
@@ -1507,6 +1509,8 @@ stream.chain(most.fromPromise):   --1---3-2-->
 stream.awaitPromises():           --1-----23->
 ```
 
+##### Rejected promises
+
 If a promise rejects, the stream will be in an error state with the rejected promise's reason as its error.  See [recoverWith](#recoverwith) for error recovery.  For example:
 
 ```
@@ -1515,6 +1519,18 @@ promise q:              ------X
 promise r:              -3
 stream:                 -p---q---r->
 stream.awaitPromises(): ---1--X
+```
+
+##### Forever pending promises
+
+If a promise remains pending forever, the stream will never produce any events beyond that promise. Use a promise timeout or race in such cases to ensure that all promises either fulfill or reject.  For example:
+
+```
+promise p:              ---1
+promise q:              ----------->
+promise r:              -3
+stream:                 -p---q---r->
+stream.awaitPromises(): ---1------->
 ```
 
 ```es6
