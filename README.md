@@ -13,6 +13,16 @@ _  /  / / / /_/ /____/ /_  /
 [![Build Status](https://travis-ci.org/cujojs/most.svg?branch=master)](https://travis-ci.org/cujojs/most)
 [![Join the chat at https://gitter.im/cujojs/most](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cujojs/most?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+## Starting a new project?
+
+Strongly consider starting with [`@most/core`](https://github.com/mostjs/core).  It is the foundation of the upcoming most 2.0, has [improved documentation](http://mostcore.rtfd.io/), new features, better tree-shaking build characteristics, and simpler APIs.  Updating from `@most/core` to most 2.0 will be simple and non-breaking.
+
+## Using most 1.x already on an existing project?
+
+You can keep using most 1.x, and update to either [`@most/core`](https://github.com/mostjs/core) or most 2.0 when you're ready.  See the [upgrade guide](https://mostcore.readthedocs.io/en/latest/upgrading-guide.html) for more information.
+
+## What is it?
+
 Most.js is a toolkit for reactive programming.  It helps you compose asynchronous operations on streams of values and events, e.g. WebSocket messages, DOM events, etc, and on time-varying values, e.g. the "current value" of an &lt;input&gt;, without many of the hazards of side effects and mutable shared state.
 
 It features an ultra-high performance, low overhead architecture, APIs for easily creating event streams from existing sources, like DOM events, and a small but powerful set of operations for merging, filtering, transforming, and reducing event streams and time-varying values.
