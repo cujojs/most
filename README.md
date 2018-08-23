@@ -15,7 +15,7 @@ _  /  / / / /_/ /____/ /_  /
 
 ## Starting a new project?
 
-Strongly consider starting with [`@most/core`](https://github.com/mostjs/core).  It is the foundation of the upcoming most 2.0, has [improved documentation](http://mostcore.rtfd.io/), new features, better tree-shaking build characteristics, and simpler APIs.  Updating from `@most/core` to most 2.0 will be simple and non-breaking.
+Strongly consider starting with [`@most/core`](https://github.com/mostjs/core).  It is the foundation of the upcoming most 2.0, has [improved documentation](http://mostcore.rtfd.io/), new features, better tree-shaking build characteristics, and simpler APIs.  Updating from `@most/core` to most 2.0 will be non-breaking and straightforward.
 
 ## Using most 1.x already on an existing project?
 

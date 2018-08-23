@@ -1,5 +1,14 @@
-most.js API
-===========
+## Starting a new project?
+
+Strongly consider starting with [`@most/core`](https://github.com/mostjs/core).  It is the foundation of the upcoming most 2.0, has [improved documentation](http://mostcore.rtfd.io/), new features, better tree-shaking build characteristics, and simpler APIs.  Updating from `@most/core` to most 2.0 will be non-breaking and straightforward.
+
+## Using most 1.x already on an existing project?
+
+You can keep using most 1.x, and update to either [`@most/core`](https://github.com/mostjs/core) or most 2.0 when you're ready.  See the [upgrade guide](https://mostcore.readthedocs.io/en/latest/upgrading-guide.html) for more information.
+
+---
+
+# most.js API
 
 1. Reading these docs
 	* [Notation](#notation)
