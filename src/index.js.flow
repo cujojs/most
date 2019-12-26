@@ -198,7 +198,7 @@ declare export class Stream<A> {
     e: Stream<E>
   ): Stream<R>;
 
-  recoverWith<B>(p: (a: B) => Stream<A>): Stream<A>;
+  recoverWith<B, C>(p: (a: B) => Stream<C>): Stream<A | C>;
   multicast(): Stream<A>;
 
   thru<B>(transform: (stream: Stream<A>) => B): B;
@@ -380,7 +380,7 @@ declare export function zip<A, B, C, D, E, R>(
   e: Stream<E>
 ): Stream<R>;
 
-declare export function recoverWith<A, B>(p: (a: B) => Stream<A>, s: Stream<A>): Stream<A>;
+declare export function recoverWith<A, B, C>(p: (a: B) => Stream<C>, s: Stream<A>): Stream<A | C>;
 declare export function throwError(e: Error): Stream<any>;
 
 declare export function multicast<A>(s: Stream<A>): Stream<A>;
