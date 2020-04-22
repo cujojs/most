@@ -3556,7 +3556,7 @@ ThrottleSink.prototype.error = Pipe.prototype.error;
 
 /**
  * Wait for a burst of events to subside and emit only the last event in the burst
- * @param {Number} period events occuring more frequently than this
+ * @param {Number} period events occurring more frequently than this
  *  will be suppressed
  * @param {Stream} stream stream to debounce
  * @returns {Stream} new debounced stream
@@ -4443,7 +4443,7 @@ Stream.prototype.throttle = function (period) {
  * Wait for a burst of events to subside and emit only the last event in the burst
  * stream:              abcd----abcd----
  * debounce(2, stream): -----d-------d--
- * @param {Number} period events occuring more frequently than this
+ * @param {Number} period events occurring more frequently than this
  *  on the provided scheduler will be suppressed
  * @returns {Stream} new debounced stream
  */
