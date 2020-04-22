@@ -160,6 +160,10 @@ export interface Stream<A> extends Source<A> {
   await<B>(this: Stream<Promise<B>>): Stream<B>;
   awaitPromises<B>(this: Stream<Promise<B>>): Stream<B>;
 
+  sample<B, R>(
+    fn: (b: B) => R,
+    b: Stream<B>,
+  ): Stream<R>;
   sample<B, C, R>(
     fn: (b: B, c: C) => R,
     b: Stream<B>,
@@ -339,6 +343,11 @@ export function fromPromise<A>(p: Promise<A>): Stream<A>;
 export function await<A>(s: Stream<Promise<A>>): Stream<A>;
 export function awaitPromises<A>(s: Stream<Promise<A>>): Stream<A>;
 
+export function sample<A, R>(
+  fn: (a: A) => R,
+  sampler: Stream<any>,
+  a: Stream<A>,
+): Stream<R>;
 export function sample<A, B, R>(
   fn: (a: A, b: B) => R,
   sampler: Stream<any>,
