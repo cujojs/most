@@ -1311,7 +1311,7 @@ See [combine](#combine) for more details.
 #### `sampler.sample(f, ...streams) -> Stream`
 #### `most.sample(f, sampler, ...streams) -> Stream`
 
-Create a new stream by combining sampled values from many input streams.
+Create a new stream by combining sampled values from one or more input streams.
 
 ```
 s1:                          -1-----2-----3->
