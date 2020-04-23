@@ -43,6 +43,22 @@ describe('await', function () {
       expect(spy).toHaveBeenCalledOnce()
     })
   })
+
+  it('should not propagate after dispose', function () {
+    var spy = this.spy()
+
+    return promises
+      .fromPromise(new Promise(resolve => setTimeout(resolve, 1)))
+      .tap(spy)
+      .merge(streamOf())
+      .take(1)
+      .drain()
+      .then(() => {
+        return new Promise(resolve => setTimeout(resolve, 1))
+      }).then(() => {
+        expect(spy).not.toHaveBeenCalled()
+      })
+  })
 })
 
 describe('fromPromise', function () {

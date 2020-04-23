@@ -33,27 +33,36 @@ function Await (source) {
 }
 
 Await.prototype.run = function (sink, scheduler) {
-  return this.source.run(new AwaitSink(sink, scheduler), scheduler)
+  return new AwaitSink(this.source, sink, scheduler)
 }
 
-function AwaitSink (sink, scheduler) {
+function AwaitSink (source, sink, scheduler) {
   this.sink = sink
   this.scheduler = scheduler
   this.queue = Promise.resolve()
+  this.disposable = source.run(this, scheduler)
+  this.active = true
   var self = this
 
   // Pre-create closures, to avoid creating them per event
   this._eventBound = function (x) {
+    if (!self.active) return
     self.sink.event(self.scheduler.now(), x)
   }
 
   this._endBound = function (x) {
+    if (!self.active) return
     self.sink.end(self.scheduler.now(), x)
   }
 
   this._errorBound = function (e) {
     self.sink.error(self.scheduler.now(), e)
   }
+}
+
+AwaitSink.prototype.dispose = function () {
+  this.active = false
+  return this.disposable.dispose()
 }
 
 AwaitSink.prototype.event = function (t, promise) {
