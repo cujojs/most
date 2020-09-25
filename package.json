@@ -68,7 +68,7 @@
   "dependencies": {
     "@most/multicast": "^1.2.5",
     "@most/prelude": "^1.4.0",
-    "symbol-observable": "^1.0.2"
+    "symbol-observable": "^2.0.2"
   },
   "standard": {
     "parser": "babel-eslint",
