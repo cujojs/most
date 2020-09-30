@@ -10,10 +10,9 @@ import { of, empty, never } from './source/core'
 import { from } from './source/from'
 import { periodic } from './source/periodic'
 import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
 
-// eslint-disable-next-line no-new-func
-const globalThis = new Function('return this')()
-const symbolObservable = provideSymbolObservable(globalThis)
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 /**
  * Core stream type
