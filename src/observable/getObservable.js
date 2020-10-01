@@ -3,10 +3,9 @@
 /** @author John Hann */
 
 import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
 
-// eslint-disable-next-line no-new-func
-const globalThis = new Function('return this')()
-const symbolObservable = provideSymbolObservable(globalThis)
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 export default function getObservable (o) { // eslint-disable-line complexity
   var obs = null

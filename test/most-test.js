@@ -2,10 +2,9 @@ import { spec, referee } from 'buster'
 
 import * as most from '../src/index'
 import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
 
-// eslint-disable-next-line no-new-func
-const globalThis = new Function('return this')()
-const symbolObservable = provideSymbolObservable(globalThis)
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 const { describe, it } = spec
 const { assert } = referee
