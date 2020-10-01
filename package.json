@@ -69,7 +69,7 @@
     "@most/multicast": "^1.2.5",
     "@most/prelude": "^1.4.0",
     "globalthis": "^1.0.1",
-    "symbol-observable": "^2.0.2"
+    "symbol-observable": "^2.0.3"
   },
   "standard": {
     "parser": "babel-eslint",
