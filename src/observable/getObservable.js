@@ -2,7 +2,10 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-import symbolObservable from 'symbol-observable'
+import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
+
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 export default function getObservable (o) { // eslint-disable-line complexity
   var obs = null

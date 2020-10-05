@@ -9,7 +9,10 @@ import * as base from '@most/prelude'
 import { of, empty, never } from './source/core'
 import { from } from './source/from'
 import { periodic } from './source/periodic'
-import symbolObservable from 'symbol-observable'
+import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
+
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 /**
  * Core stream type

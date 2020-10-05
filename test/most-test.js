@@ -1,7 +1,10 @@
 import { spec, referee } from 'buster'
 
 import * as most from '../src/index'
-import symbolObservable from 'symbol-observable'
+import provideSymbolObservable from 'symbol-observable/ponyfill'
+import { getPolyfill as getGlobalThis } from 'globalthis'
+
+const symbolObservable = provideSymbolObservable(getGlobalThis())
 
 const { describe, it } = spec
 const { assert } = referee
