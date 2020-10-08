@@ -9,8 +9,8 @@ import * as base from '@most/prelude'
 import { of, empty, never } from './source/core'
 import { from } from './source/from'
 import { periodic } from './source/periodic'
-import provideSymbolObservable from 'symbol-observable/ponyfill'
-import { getPolyfill as getGlobalThis } from 'globalthis'
+const getGlobalThis = require('globalthis').getPolyfill
+const provideSymbolObservable = require('symbol-observable/ponyfill').default
 
 const symbolObservable = provideSymbolObservable(getGlobalThis())
 
