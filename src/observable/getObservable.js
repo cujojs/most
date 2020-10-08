@@ -2,8 +2,8 @@
 /** @author Brian Cavalier */
 /** @author John Hann */
 
-const getPolyfill = require('globalthis').getPolyfill
-const provideSymbolObservable = require('symbol-observable/ponyfill')
+const getGlobalThis = require('globalthis').getPolyfill
+const provideSymbolObservable = require('symbol-observable/ponyfill').default
 
 const symbolObservable = provideSymbolObservable(getGlobalThis())
 

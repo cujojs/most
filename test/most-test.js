@@ -1,8 +1,8 @@
 import { spec, referee } from 'buster'
 
 import * as most from '../src/index'
-const getPolyfill = require('globalthis').getPolyfill
-const provideSymbolObservable = require('symbol-observable/ponyfill')
+const getGlobalThis = require('globalthis').getPolyfill
+const provideSymbolObservable = require('symbol-observable/ponyfill').default
 
 const symbolObservable = provideSymbolObservable(getGlobalThis())
 
