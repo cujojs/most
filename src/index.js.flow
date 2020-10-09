@@ -58,7 +58,7 @@ export type Subscription<A> = {
   unsubscribe(): void;
 }
 
-declare export class Stream<A> {
+declare export class Stream<+A> {
   constructor(source: Source<A>): Stream<A>;
   source: Source<A>;
   run (sink: Sink<A>, scheduler: Scheduler): Disposable<A>;
