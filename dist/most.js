@@ -581,50 +581,20 @@ function runProducer$1 (t, iterator, sink) {
   sink.end(t, r.value);
 }
 
-function symbolObservablePonyfill(root) {
-	var result;
-	var Symbol = root.Symbol;
-
-	if (typeof Symbol === 'function') {
-		if (Symbol.observable) {
-			result = Symbol.observable;
-		} else {
-			result = Symbol('observable');
-			Symbol.observable = result;
-		}
-	} else {
-		result = '@@observable';
-	}
-
-	return result;
-}
-
-/* global window */
-var root;
-
-if (typeof self !== 'undefined') {
-  root = self;
-} else if (typeof window !== 'undefined') {
-  root = window;
-} else if (typeof global !== 'undefined') {
-  root = global;
-} else if (typeof module !== 'undefined') {
-  root = module;
-} else {
-  root = Function('return this')();
-}
-
-var result = symbolObservablePonyfill(root);
-
 /** @license MIT License (c) copyright 2010-2016 original author or authors */
 /** @author Brian Cavalier */
 /** @author John Hann */
+
+var getGlobalThis$1 = require('globalthis').getPolyfill;
+var provideSymbolObservable$1 = require('symbol-observable/ponyfill').default;
+
+var symbolObservable$1 = provideSymbolObservable$1(getGlobalThis$1());
 
 function getObservable (o) { // eslint-disable-line complexity
   var obs = null;
   if (o) {
   // Access foreign method only once
-    var method = o[result];
+    var method = o[symbolObservable$1];
     if (typeof method === 'function') {
       obs = method.call(o);
       if (!(obs && typeof obs.subscribe === 'function')) {
@@ -3958,6 +3928,11 @@ function multicast (stream) {
 
 /* eslint import/first: 0 */
 
+var getGlobalThis = require('globalthis').getPolyfill;
+var provideSymbolObservable = require('symbol-observable/ponyfill').default;
+
+var symbolObservable = provideSymbolObservable(getGlobalThis());
+
 // Add of and empty to constructor for fantasy-land compat
 Stream.of = of;
 Stream.empty = empty;
@@ -3971,7 +3946,7 @@ Stream.prototype.subscribe = function (subscriber) {
   return subscribe(subscriber, this)
 };
 
-Stream.prototype[result] = function () {
+Stream.prototype[symbolObservable] = function () {
   return this
 };
 
