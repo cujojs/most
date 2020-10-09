@@ -2,8 +2,9 @@ require('buba/register')
 var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
-var rxjs = require('@reactivex/rxjs')
-var kefir = require('kefir');
+var rxjs = require('@reactivex/rxjs');
+var rxjs6 = require('rxjs');
+var rxjs6Operators = require('rxjs/operators');
 var bacon = require('baconjs');
 var highland = require('highland');
 var xs = require('xstream').default;
@@ -33,6 +34,14 @@ function merge(n, create) {
     s = s.merge(create(a))
   }
   return s;
+}
+
+function mergeRxjs6(n, create) {
+  var s = [];
+  for(var i=0; i<n; ++i) {
+    s.push(create(a));
+  }
+  return create(a).pipe(rxjs6Operators.merge(...s));
 }
 
 function mergeHighland(n) {
@@ -109,6 +118,22 @@ suite
   .add('rx 5 (depth 100)', function(deferred) {
     var s = merge(100, function(x) {return rxjs.Observable.from(x)});
     runners.runRx5(deferred, s.reduce(sum, 0));
+  }, options)
+  .add('rx 6 (depth 2)', function(deferred) {
+    var s = mergeRxjs6(2, function(x) {return rxjs6.from(x)});
+    runners.runRx6(deferred, s.pipe(rxjs6Operators.reduce(sum, 0)));
+  }, options)
+  .add('rx 6 (depth 5)', function(deferred) {
+    var s = mergeRxjs6(5, function(x) {return rxjs6.from(x)});
+    runners.runRx6(deferred, s.pipe(rxjs6Operators.reduce(sum, 0)));
+  }, options)
+  .add('rx 6 (depth 10)', function(deferred) {
+    var s = mergeRxjs6(10, function(x) {return rxjs6.from(x)});
+    runners.runRx6(deferred, s.pipe(rxjs6Operators.reduce(sum, 0)));
+  }, options)
+  .add('rx 6 (depth 100)', function(deferred) {
+    var s = mergeRxjs6(100, function(x) {return rxjs6.from(x)});
+    runners.runRx6(deferred, s.pipe(rxjs6Operators.reduce(sum, 0)));
   }, options)
   .add('xstream (depth 2)', function(deferred) {
     var s = merge(2, xs.fromArray);

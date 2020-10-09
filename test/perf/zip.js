@@ -3,6 +3,8 @@ var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs');
+var rxjs6 = require('rxjs');
+var rxjs6Operators = require('rxjs/operators');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var highland = require('highland');
@@ -38,6 +40,13 @@ suite
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred, rxjs.Observable.from(a).zip(rxjs.Observable.from(b), add).reduce(add, 0));
+  }, options)
+  .add('rx 6', function(deferred) {
+    runners.runRx6(deferred, 
+      rxjs6.from(a).pipe(
+        rxjs6Operators.zip(rxjs6.from(b), add),
+        rxjs6Operators.reduce(add, 0))
+     );
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).zip(kefirFromArray(b), add).scan(add, 0).last());

@@ -3,6 +3,8 @@ var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs');
+var rxjs6 = require('rxjs');
+var rxjs6Operators = require('rxjs/operators');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var xs = require('xstream').default;
@@ -51,6 +53,13 @@ suite
   }, options)
   .add('rx 5', function(deffered) {
     runners.runRx5(deffered, rxjs.Observable.from(a).concatMap(function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
+  }, options)
+  .add('rx 6', function(deffered) {
+    runners.runRx6(deffered, 
+      rxjs6.of(a).pipe(
+        rxjs6Operators.concatMap(function(x) {return rxjs6.from(x)}),
+        rxjs6Operators.reduce(sum, 0))
+      )
   }, options)
   .add('xstream', function(deferred) {
     runners.runXstream(deferred, xs.fromArray(a).map(xs.fromArray).compose(xstreamFlattenSequentially).fold(sum, 0).last())

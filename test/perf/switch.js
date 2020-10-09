@@ -2,7 +2,9 @@ require('buba/register')
 var Benchmark = require('benchmark');
 var most = require('../../src/index');
 var rx = require('rx');
-var rxjs = require('@reactivex/rxjs')
+var rxjs = require('@reactivex/rxjs');
+var rxjs6 = require('rxjs');
+var rxjs6Operators = require('rxjs/operators');
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
@@ -48,15 +50,21 @@ suite
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).map(most.from).switch().reduce(sum, 0));
   }, options)
+  .add('rx 4', function(deferred) {
+    runners.runRx(deferred,
+      rx.Observable.fromArray(a).flatMapLatest(
+        function(x) {return rx.Observable.fromArray(x)}).reduce(sum, 0));
+  }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
       rxjs.Observable.from(a).switchMap(
         function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
   }, options)
-  .add('rx 4', function(deferred) {
-    runners.runRx(deferred,
-      rx.Observable.fromArray(a).flatMapLatest(
-        function(x) {return rx.Observable.fromArray(x)}).reduce(sum, 0));
+  .add('rx 6', function(deferred) {
+    runners.runRx6(deferred,
+      rxjs6.from(a).pipe(
+        rxjs6Operators.switchMap(function(x) {return rxjs6.from(x)}),
+        rxjs6Operators.reduce(sum, 0)))
   }, options)
   .add('xstream', function(deferred) {
     runners.runXstream(deferred, xs.fromArray(a).map(xs.fromArray).flatten().fold(sum, 0).last());
