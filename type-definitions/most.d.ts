@@ -49,10 +49,10 @@ export interface Observable<A> {
 }
 
 export interface Subscriber<A> {
-  next(value: A): void;
-  error(err: Error): void;
+  next?(value: A): void;
+  error?(err: Error): void;
   // complete value parameter is deprecated
-  complete(value?: A): void;
+  complete?(value?: A): void;
 }
 
 export interface Subscription<A> {
