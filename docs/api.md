@@ -1160,18 +1160,18 @@ The returned promise will fulfill after all the events have been consumed, or wi
 
 #### `stream.subscribe(Observer) -> Subscription`
 
-Draft ES Observable compatible subscribe.  Start consuming events from `stream` by providing an [Observer object](https://github.com/zenparsing/es-observable#observer).
+Draft ES Observable compatible subscribe.  Start consuming events from `stream` by providing an [Observer object](https://github.com/zenparsing/es-observable#observer). All methods on `Observer` are optional.
 
 <!-- skip-example -->
 ```js
 type Observer = {
   // Receives the next value in the sequence
-  next(value) => void
+  next?(value) => void
   // Receives the sequence error
-  error(errorValue) => void
+  error?(errorValue) => void
   // Receives the sequence completion signal
   // The completionValue parameter is deprecated
-  complete(completionValue) => void
+  complete?(completionValue) => void
 }
 ```
 
